@@ -1,138 +1,138 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Problem Solving Platform — ???? ?? ???????</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#050810;--bg2:#0a0f1e;--card:#0f1524;--border:#1a2540;--a1:#a78bfa;--a2:#7c3aed;--a3:#f59e0b;--a4:#10b981;--text:#e2e8f0;--text2:#94a3b8;--text3:#475569;}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;min-height:100vh;}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 40px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);}
-.back{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--a1);font-weight:600;font-size:.9rem;padding:6px 16px;border:1px solid rgba(167,139,250,.3);border-radius:8px;transition:.2s;}
-.back:hover{background:rgba(167,139,250,.1);}
-.top-title{font-size:.9rem;color:var(--text2);}
-.hero{padding:70px 40px 50px;text-align:center;background:radial-gradient(ellipse at 50% 0%,rgba(124,58,237,.15) 0%,transparent 60%);}
-.badge{display:inline-block;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3);color:var(--a1);padding:6px 20px;border-radius:50px;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;}
-h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:900;line-height:1.2;margin-bottom:12px;}
-.gp{background:linear-gradient(90deg,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.gp2{background:linear-gradient(90deg,#f59e0b,#f43f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.hero p{color:var(--text2);max-width:580px;margin:0 auto 32px;font-size:1rem;line-height:1.8;}
-.stats{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 28px;text-align:center;}
-.stat-n{font-size:1.5rem;font-weight:900;color:var(--a1);font-family:'Fira Code',monospace;}
-.stat-l{font-size:.75rem;color:var(--text3);margin-top:2px;}
-.container{max-width:1100px;margin:0 auto;padding:40px 24px;}
-.sec-title{font-size:1.2rem;font-weight:700;margin-bottom:20px;color:var(--text);display:flex;align-items:center;gap:10px;}
-.sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
-.guides-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;margin-bottom:48px;}
-.gcard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:26px;text-decoration:none;color:var(--text);transition:.3s;position:relative;overflow:hidden;display:block;}
-.gcard::before{content:'';position:absolute;inset:0;opacity:0;transition:.3s;}
-.gcard:hover{transform:translateY(-4px);}
-.gcard.g1:hover{border-color:#a78bfa;box-shadow:0 16px 40px rgba(124,58,237,.15);}
-.gcard.g1::before{background:radial-gradient(circle at 20% 20%,rgba(124,58,237,.08),transparent 60%);}
-.gcard.g2:hover{border-color:var(--a3);box-shadow:0 16px 40px rgba(245,158,11,.15);}
-.gcard.g2::before{background:radial-gradient(circle at 20% 20%,rgba(245,158,11,.08),transparent 60%);}
-.gcard.g3:hover{border-color:var(--a4);box-shadow:0 16px 40px rgba(16,185,129,.15);}
-.gcard.g3::before{background:radial-gradient(circle at 20% 20%,rgba(16,185,129,.08),transparent 60%);}
-.gcard.g4:hover{border-color:#60a5fa;box-shadow:0 16px 40px rgba(96,165,250,.15);}
-.gcard.g4::before{background:radial-gradient(circle at 20% 20%,rgba(96,165,250,.08),transparent 60%);}
-.gcard.coming{opacity:.5;pointer-events:none;}
-.gcard:hover::before{opacity:1;}
-.gcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.gcard-ico{font-size:2.2rem;}
-.gcard-badge{font-size:.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:10px;border:1px solid;}
-.g1 .gcard-badge{color:#a78bfa;border-color:rgba(124,58,237,.3);background:rgba(124,58,237,.08);}
-.g2 .gcard-badge{color:var(--a3);border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.08);}
-.g3 .gcard-badge{color:var(--a4);border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.08);}
-.g4 .gcard-badge{color:#60a5fa;border-color:rgba(96,165,250,.3);background:rgba(96,165,250,.08);}
-.gcard-title{font-size:1.1rem;font-weight:700;margin-bottom:8px;}
-.gcard-desc{color:var(--text2);font-size:.85rem;line-height:1.7;margin-bottom:14px;}
-.gcard-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;}
-.tag{font-size:.68rem;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.04);color:var(--text3);border:1px solid var(--border);}
-.gcard-arr{text-align:left;font-size:1.1rem;transition:.3s;}
-.g1 .gcard-arr{color:#a78bfa;} .g2 .gcard-arr{color:var(--a3);} .g3 .gcard-arr{color:var(--a4);} .g4 .gcard-arr{color:#60a5fa;}
-.gcard:hover .gcard-arr{transform:translateX(-5px);}
-.cheat{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:48px;}
-.cx{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
-.cx h4{font-size:.78rem;color:var(--text2);margin-bottom:6px;}
-.cx-v{font-family:'Fira Code',monospace;font-size:1rem;font-weight:700;}
-.o1{color:#00ff88;} .on{color:#ffd700;} .on2{color:#ff5555;} .olog{color:#00d4ff;}
-footer{text-align:center;padding:28px;border-top:1px solid var(--border);color:var(--text3);font-size:.82rem;}
-.theme-fab{position:fixed;bottom:24px;left:24px;width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--a2),var(--a1));font-size:1.2rem;box-shadow:0 4px 18px rgba(0,0,0,.4);z-index:999;}
-[data-theme="light"] body{background:#f5f3ff;color:#1e293b;}
-[data-theme="light"] .gcard,[data-theme="light"] .stat,[data-theme="light"] .cx{background:#fff;border-color:#e2e8f0;}
-[data-theme="light"] .topbar{background:#fff;border-color:#e2e8f0;}
-[data-theme="light"] .tag{background:#f1f5f9;color:#64748b;border-color:#e2e8f0;}
-</style>
-<script>var s=localStorage.getItem('aaos_theme')||'dark';document.documentElement.setAttribute('data-theme',s);</script>
-</head>
-<body>
-<div class="topbar">
-  <a href="hub.html" class="back">?? ???????? ????????</a>
-  <span class="top-title">?? Problem Solving Platform</span>
-</div>
-
-<div class="hero">
-  <div class="badge">PROBLEM SOLVING PLATFORM</div>
-  <h1><span class="gp">Problem</span> <span class="gp2">Solving</span></h1>
-  <p>?? ?? ?????? ??????? ??????? ???????? — ????? C++ ???????? ?????? ???? ???????</p>
-  <div class="stats">
-    <div class="stat"><div class="stat-n">4+</div><div class="stat-l">???? ???????</div></div>
-    <div class="stat"><div class="stat-n">50+</div><div class="stat-l">????? LeetCode</div></div>
-    <div class="stat"><div class="stat-n">C++</div><div class="stat-l">??? ???????</div></div>
-    <div class="stat"><div class="stat-n">O(1)</div><div class="stat-l">???? complexity</div></div>
-  </div>
-</div>
-
-<div class="container">
-  <div class="sec-title">?? ?????? ???????</div>
-  <div class="guides-grid">
-    <a href="guides/dsa_guide.html" class="gcard g1">
-      <div class="gcard-top"><div class="gcard-ico">??</div><span class="gcard-badge">Arrays</span></div>
-      <div class="gcard-title">Arrays, Two Pointers & Sliding Window</div>
-      <div class="gcard-desc">Two Pointers, Sliding Window, Prefix Sums — ??? patterns ???????? ?? ????? C++ ?????.</div>
-      <div class="gcard-tags"><span class="tag">Two Pointers</span><span class="tag">Sliding Window</span><span class="tag">Prefix Sums</span><span class="tag">3Sum</span></div>
-      <div class="gcard-arr">?</div>
-    </a>
-    <a href="guides/linked_lists_guide.html" class="gcard g2">
-      <div class="gcard-top"><div class="gcard-ico">??</div><span class="gcard-badge">Linked Lists</span></div>
-      <div class="gcard-title">Linked Lists — ?? ????? ????????</div>
-      <div class="gcard-desc">Singly, Doubly, Circular, Cycle Detection, Reversal ?? ??????? ?????? ?????? C++.</div>
-      <div class="gcard-tags"><span class="tag">Floyd's</span><span class="tag">Reversal</span><span class="tag">Dummy Node</span><span class="tag">O(1) space</span></div>
-      <div class="gcard-arr">?</div>
-    </a>
-    <a href="guides/hashmaps_sets_guide.html" class="gcard g3">
-      <div class="gcard-top"><div class="gcard-ico">???</div><span class="gcard-badge">HashMaps</span></div>
-      <div class="gcard-title">HashMaps & Sets — O(1) Lookup</div>
-      <div class="gcard-desc">unordered_map, unordered_set, Two Sum, Frequency Count, Grouping — ?????? ??????.</div>
-      <div class="gcard-tags"><span class="tag">Two Sum</span><span class="tag">Frequency</span><span class="tag">Anagrams</span><span class="tag">O(1)</span></div>
-      <div class="gcard-arr">?</div>
-    </a>
-    <a href="#" class="gcard g4 coming">
-      <div class="gcard-top"><div class="gcard-ico">??</div><span class="gcard-badge">??????</span></div>
-      <div class="gcard-title">Trees & Graphs</div>
-      <div class="gcard-desc">BFS, DFS, Binary Search Tree, Dijkstra — ??????!</div>
-      <div class="gcard-tags"><span class="tag">BFS</span><span class="tag">DFS</span><span class="tag">BST</span></div>
-      <div class="gcard-arr">?</div>
-    </a>
-  </div>
-
-  <div class="sec-title">? Complexity Cheat Sheet</div>
-  <div class="cheat">
-    <div class="cx"><h4>HashMap get/set</h4><div class="cx-v o1">O(1)</div></div>
-    <div class="cx"><h4>Array access</h4><div class="cx-v o1">O(1)</div></div>
-    <div class="cx"><h4>Two Pointers</h4><div class="cx-v on">O(n)</div></div>
-    <div class="cx"><h4>Sliding Window</h4><div class="cx-v on">O(n)</div></div>
-    <div class="cx"><h4>Prefix Sum query</h4><div class="cx-v o1">O(1)</div></div>
-    <div class="cx"><h4>Binary Search</h4><div class="cx-v olog">O(log n)</div></div>
-    <div class="cx"><h4>Sorting</h4><div class="cx-v olog">O(n log n)</div></div>
-    <div class="cx"><h4>Brute Force</h4><div class="cx-v on2">O(n²)</div></div>
-  </div>
-</div>
-
-<footer>Problem Solving Platform — Tech Mastery Hub ??</footer>
-<button class="theme-fab" onclick="var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('aaos_theme',t);">??</button>
-</body>
-</html>
+ï»¿ï»¿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Problem Solving Platform â€” ???? ?? ???????</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050810;--bg2:#0a0f1e;--card:#0f1524;--border:#1a2540;--a1:#a78bfa;--a2:#7c3aed;--a3:#f59e0b;--a4:#10b981;--text:#e2e8f0;--text2:#94a3b8;--text3:#475569;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;min-height:100vh;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 40px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);}
+.back{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--a1);font-weight:600;font-size:.9rem;padding:6px 16px;border:1px solid rgba(167,139,250,.3);border-radius:8px;transition:.2s;}
+.back:hover{background:rgba(167,139,250,.1);}
+.top-title{font-size:.9rem;color:var(--text2);}
+.hero{padding:70px 40px 50px;text-align:center;background:radial-gradient(ellipse at 50% 0%,rgba(124,58,237,.15) 0%,transparent 60%);}
+.badge{display:inline-block;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3);color:var(--a1);padding:6px 20px;border-radius:50px;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;}
+h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:900;line-height:1.2;margin-bottom:12px;}
+.gp{background:linear-gradient(90deg,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.gp2{background:linear-gradient(90deg,#f59e0b,#f43f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hero p{color:var(--text2);max-width:580px;margin:0 auto 32px;font-size:1rem;line-height:1.8;}
+.stats{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 28px;text-align:center;}
+.stat-n{font-size:1.5rem;font-weight:900;color:var(--a1);font-family:'Fira Code',monospace;}
+.stat-l{font-size:.75rem;color:var(--text3);margin-top:2px;}
+.container{max-width:1100px;margin:0 auto;padding:40px 24px;}
+.sec-title{font-size:1.2rem;font-weight:700;margin-bottom:20px;color:var(--text);display:flex;align-items:center;gap:10px;}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.guides-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;margin-bottom:48px;}
+.gcard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:26px;text-decoration:none;color:var(--text);transition:.3s;position:relative;overflow:hidden;display:block;}
+.gcard::before{content:'';position:absolute;inset:0;opacity:0;transition:.3s;}
+.gcard:hover{transform:translateY(-4px);}
+.gcard.g1:hover{border-color:#a78bfa;box-shadow:0 16px 40px rgba(124,58,237,.15);}
+.gcard.g1::before{background:radial-gradient(circle at 20% 20%,rgba(124,58,237,.08),transparent 60%);}
+.gcard.g2:hover{border-color:var(--a3);box-shadow:0 16px 40px rgba(245,158,11,.15);}
+.gcard.g2::before{background:radial-gradient(circle at 20% 20%,rgba(245,158,11,.08),transparent 60%);}
+.gcard.g3:hover{border-color:var(--a4);box-shadow:0 16px 40px rgba(16,185,129,.15);}
+.gcard.g3::before{background:radial-gradient(circle at 20% 20%,rgba(16,185,129,.08),transparent 60%);}
+.gcard.g4:hover{border-color:#60a5fa;box-shadow:0 16px 40px rgba(96,165,250,.15);}
+.gcard.g4::before{background:radial-gradient(circle at 20% 20%,rgba(96,165,250,.08),transparent 60%);}
+.gcard.coming{opacity:.5;pointer-events:none;}
+.gcard:hover::before{opacity:1;}
+.gcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.gcard-ico{font-size:2.2rem;}
+.gcard-badge{font-size:.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:10px;border:1px solid;}
+.g1 .gcard-badge{color:#a78bfa;border-color:rgba(124,58,237,.3);background:rgba(124,58,237,.08);}
+.g2 .gcard-badge{color:var(--a3);border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.08);}
+.g3 .gcard-badge{color:var(--a4);border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.08);}
+.g4 .gcard-badge{color:#60a5fa;border-color:rgba(96,165,250,.3);background:rgba(96,165,250,.08);}
+.gcard-title{font-size:1.1rem;font-weight:700;margin-bottom:8px;}
+.gcard-desc{color:var(--text2);font-size:.85rem;line-height:1.7;margin-bottom:14px;}
+.gcard-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;}
+.tag{font-size:.68rem;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.04);color:var(--text3);border:1px solid var(--border);}
+.gcard-arr{text-align:left;font-size:1.1rem;transition:.3s;}
+.g1 .gcard-arr{color:#a78bfa;} .g2 .gcard-arr{color:var(--a3);} .g3 .gcard-arr{color:var(--a4);} .g4 .gcard-arr{color:#60a5fa;}
+.gcard:hover .gcard-arr{transform:translateX(-5px);}
+.cheat{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:48px;}
+.cx{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
+.cx h4{font-size:.78rem;color:var(--text2);margin-bottom:6px;}
+.cx-v{font-family:'Fira Code',monospace;font-size:1rem;font-weight:700;}
+.o1{color:#00ff88;} .on{color:#ffd700;} .on2{color:#ff5555;} .olog{color:#00d4ff;}
+footer{text-align:center;padding:28px;border-top:1px solid var(--border);color:var(--text3);font-size:.82rem;}
+.theme-fab{position:fixed;bottom:24px;left:24px;width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--a2),var(--a1));font-size:1.2rem;box-shadow:0 4px 18px rgba(0,0,0,.4);z-index:999;}
+[data-theme="light"] body{background:#f5f3ff;color:#1e293b;}
+[data-theme="light"] .gcard,[data-theme="light"] .stat,[data-theme="light"] .cx{background:#fff;border-color:#e2e8f0;}
+[data-theme="light"] .topbar{background:#fff;border-color:#e2e8f0;}
+[data-theme="light"] .tag{background:#f1f5f9;color:#64748b;border-color:#e2e8f0;}
+</style>
+<script>var s=localStorage.getItem('aaos_theme')||'dark';document.documentElement.setAttribute('data-theme',s);</script>
+</head>
+<body>
+<div class="topbar">
+  <a href="hub.html" class="back">?? ???????? ????????</a>
+  <span class="top-title">?? Problem Solving Platform</span>
+</div>
+
+<div class="hero">
+  <div class="badge">PROBLEM SOLVING PLATFORM</div>
+  <h1><span class="gp">Problem</span> <span class="gp2">Solving</span></h1>
+  <p>?? ?? ?????? ??????? ??????? ???????? â€” ????? C++ ???????? ?????? ???? ???????</p>
+  <div class="stats">
+    <div class="stat"><div class="stat-n">4+</div><div class="stat-l">???? ???????</div></div>
+    <div class="stat"><div class="stat-n">50+</div><div class="stat-l">????? LeetCode</div></div>
+    <div class="stat"><div class="stat-n">C++</div><div class="stat-l">??? ???????</div></div>
+    <div class="stat"><div class="stat-n">O(1)</div><div class="stat-l">???? complexity</div></div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="sec-title">?? ?????? ???????</div>
+  <div class="guides-grid">
+    <a href="guides/dsa_guide.html" class="gcard g1">
+      <div class="gcard-top"><div class="gcard-ico">??</div><span class="gcard-badge">Arrays</span></div>
+      <div class="gcard-title">Arrays, Two Pointers & Sliding Window</div>
+      <div class="gcard-desc">Two Pointers, Sliding Window, Prefix Sums â€” ??? patterns ???????? ?? ????? C++ ?????.</div>
+      <div class="gcard-tags"><span class="tag">Two Pointers</span><span class="tag">Sliding Window</span><span class="tag">Prefix Sums</span><span class="tag">3Sum</span></div>
+      <div class="gcard-arr">?</div>
+    </a>
+    <a href="guides/linked_lists_guide.html" class="gcard g2">
+      <div class="gcard-top"><div class="gcard-ico">??</div><span class="gcard-badge">Linked Lists</span></div>
+      <div class="gcard-title">Linked Lists â€” ?? ????? ????????</div>
+      <div class="gcard-desc">Singly, Doubly, Circular, Cycle Detection, Reversal ?? ??????? ?????? ?????? C++.</div>
+      <div class="gcard-tags"><span class="tag">Floyd's</span><span class="tag">Reversal</span><span class="tag">Dummy Node</span><span class="tag">O(1) space</span></div>
+      <div class="gcard-arr">?</div>
+    </a>
+    <a href="guides/hashmaps_sets_guide.html" class="gcard g3">
+      <div class="gcard-top"><div class="gcard-ico">???</div><span class="gcard-badge">HashMaps</span></div>
+      <div class="gcard-title">HashMaps & Sets â€” O(1) Lookup</div>
+      <div class="gcard-desc">unordered_map, unordered_set, Two Sum, Frequency Count, Grouping â€” ?????? ??????.</div>
+      <div class="gcard-tags"><span class="tag">Two Sum</span><span class="tag">Frequency</span><span class="tag">Anagrams</span><span class="tag">O(1)</span></div>
+      <div class="gcard-arr">?</div>
+    </a>
+    <a href="#" class="gcard g4 coming">
+      <div class="gcard-top"><div class="gcard-ico">??</div><span class="gcard-badge">??????</span></div>
+      <div class="gcard-title">Trees & Graphs</div>
+      <div class="gcard-desc">BFS, DFS, Binary Search Tree, Dijkstra â€” ??????!</div>
+      <div class="gcard-tags"><span class="tag">BFS</span><span class="tag">DFS</span><span class="tag">BST</span></div>
+      <div class="gcard-arr">?</div>
+    </a>
+  </div>
+
+  <div class="sec-title">? Complexity Cheat Sheet</div>
+  <div class="cheat">
+    <div class="cx"><h4>HashMap get/set</h4><div class="cx-v o1">O(1)</div></div>
+    <div class="cx"><h4>Array access</h4><div class="cx-v o1">O(1)</div></div>
+    <div class="cx"><h4>Two Pointers</h4><div class="cx-v on">O(n)</div></div>
+    <div class="cx"><h4>Sliding Window</h4><div class="cx-v on">O(n)</div></div>
+    <div class="cx"><h4>Prefix Sum query</h4><div class="cx-v o1">O(1)</div></div>
+    <div class="cx"><h4>Binary Search</h4><div class="cx-v olog">O(log n)</div></div>
+    <div class="cx"><h4>Sorting</h4><div class="cx-v olog">O(n log n)</div></div>
+    <div class="cx"><h4>Brute Force</h4><div class="cx-v on2">O(nÂ²)</div></div>
+  </div>
+</div>
+
+<footer>Problem Solving Platform â€” Tech Mastery Hub ??</footer>
+<button class="theme-fab" onclick="var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('aaos_theme',t);">??</button>
+</body>
+</html>

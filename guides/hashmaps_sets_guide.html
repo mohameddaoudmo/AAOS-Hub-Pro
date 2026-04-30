@@ -1,1719 +1,1719 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hash Maps & Sets — ?????? ??????</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #0a0a0f;
-  --bg2: #111118;
-  --bg3: #1a1a26;
-  --card: #16161f;
-  --border: #2a2a3e;
-  --accent1: #00f5c4;
-  --accent2: #7c3aed;
-  --accent3: #f59e0b;
-  --accent4: #ef4444;
-  --accent5: #3b82f6;
-  --text: #e8e8f0;
-  --muted: #888899;
-  --code-bg: #0d0d1a;
-  --green: #22c55e;
-  --pink: #ec4899;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Cairo', sans-serif;
-  overflow-x: hidden;
-}
-
-/* ========== SCROLLBAR ========== */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--accent2); border-radius: 3px; }
-
-/* ========== HEADER ========== */
-header {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  overflow: hidden;
-  padding: 2rem;
-}
-
-.grid-bg {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(124,58,237,.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(124,58,237,.06) 1px, transparent 1px);
-  background-size: 40px 40px;
-  animation: gridMove 20s linear infinite;
-}
-
-@keyframes gridMove {
-  0% { background-position: 0 0; }
-  100% { background-position: 40px 40px; }
-}
-
-.glow-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  animation: orbFloat 6s ease-in-out infinite;
-}
-.orb1 { width: 400px; height: 400px; background: rgba(124,58,237,.3); top: -100px; right: -100px; animation-delay: 0s; }
-.orb2 { width: 300px; height: 300px; background: rgba(0,245,196,.2); bottom: -80px; left: -80px; animation-delay: 3s; }
-
-@keyframes orbFloat {
-  0%,100% { transform: translate(0,0) scale(1); }
-  50% { transform: translate(20px,-20px) scale(1.05); }
-}
-
-.header-content { position: relative; z-index: 1; }
-
-.badge {
-  display: inline-block;
-  padding: .4rem 1.2rem;
-  border: 1px solid var(--accent1);
-  border-radius: 999px;
-  color: var(--accent1);
-  font-size: .85rem;
-  letter-spacing: 2px;
-  margin-bottom: 1.5rem;
-  animation: fadeDown .8s ease both;
-}
-
-h1 {
-  font-size: clamp(2.5rem, 6vw, 5rem);
-  font-weight: 900;
-  line-height: 1.1;
-  margin-bottom: 1rem;
-  animation: fadeDown .8s .2s ease both;
-}
-
-h1 span.grad {
-  background: linear-gradient(135deg, var(--accent1), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.subtitle {
-  font-size: 1.2rem;
-  color: var(--muted);
-  max-width: 600px;
-  margin: 0 auto 2.5rem;
-  animation: fadeDown .8s .4s ease both;
-}
-
-.toc {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .7rem;
-  justify-content: center;
-  animation: fadeDown .8s .6s ease both;
-}
-
-.toc a {
-  padding: .5rem 1rem;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  text-decoration: none;
-  font-size: .85rem;
-  transition: all .2s;
-}
-.toc a:hover { border-color: var(--accent1); color: var(--accent1); transform: translateY(-2px); }
-
-@keyframes fadeDown {
-  from { opacity:0; transform: translateY(-20px); }
-  to { opacity:1; transform: translateY(0); }
-}
-
-/* ========== SECTIONS ========== */
-.container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
-
-section { padding: 4rem 0; border-top: 1px solid var(--border); }
-
-.section-label {
-  font-size: .75rem;
-  letter-spacing: 3px;
-  color: var(--accent1);
-  text-transform: uppercase;
-  margin-bottom: .5rem;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-h2 {
-  font-size: clamp(1.8rem, 3vw, 2.5rem);
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-}
-
-h3 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  color: var(--accent3);
-}
-
-p { line-height: 1.9; color: var(--muted); margin-bottom: 1rem; }
-
-strong { color: var(--text); }
-
-/* ========== CARDS ========== */
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 1.8rem;
-  margin-bottom: 1.5rem;
-  transition: border-color .3s, transform .3s;
-}
-.card:hover { border-color: var(--accent2); transform: translateY(-3px); }
-
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.2rem;
-  margin-bottom: 2rem;
-}
-
-/* ========== CODE BLOCKS ========== */
-.code-block {
-  background: var(--code-bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: .82rem;
-  line-height: 1.8;
-  overflow-x: auto;
-  margin: 1.2rem 0;
-  position: relative;
-}
-
-.code-label {
-  position: absolute;
-  top: .6rem;
-  left: .8rem;
-  font-size: .7rem;
-  color: var(--muted);
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.kw { color: #c792ea; }
-.fn { color: #82aaff; }
-.str { color: #c3e88d; }
-.num { color: var(--accent3); }
-.cmt { color: #546e7a; font-style: italic; }
-.var { color: var(--accent1); }
-.op { color: var(--accent4); }
-
-/* ========== ANIMATIONS ========== */
-/* Hash Function Animation */
-.hash-demo {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 2rem;
-  margin: 2rem 0;
-  text-align: center;
-}
-
-.hash-flow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin: 1.5rem 0;
-}
-
-.hash-box {
-  padding: .8rem 1.4rem;
-  border-radius: 10px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: .9rem;
-  font-weight: 700;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.input-box { background: rgba(0,245,196,.15); border: 2px solid var(--accent1); color: var(--accent1); }
-.func-box { background: rgba(124,58,237,.2); border: 2px solid var(--accent2); color: #a78bfa; }
-.output-box { background: rgba(245,158,11,.15); border: 2px solid var(--accent3); color: var(--accent3); }
-
-@keyframes pulse {
-  0%,100% { box-shadow: 0 0 0 0 transparent; }
-  50% { box-shadow: 0 0 15px rgba(0,245,196,.3); }
-}
-
-.arrow {
-  font-size: 1.5rem;
-  color: var(--muted);
-  animation: arrowBlink 1.5s ease-in-out infinite;
-}
-
-@keyframes arrowBlink {
-  0%,100% { opacity:.3; }
-  50% { opacity:1; }
-}
-
-/* Array Visualization */
-.array-viz {
-  display: flex;
-  gap: 4px;
-  justify-content: center;
-  margin: 1.5rem 0;
-  flex-wrap: wrap;
-}
-
-.bucket {
-  width: 60px;
-  min-height: 60px;
-  border: 2px solid var(--border);
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: .4rem;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: .7rem;
-  transition: all .4s;
-  position: relative;
-}
-
-.bucket .idx {
-  color: var(--muted);
-  font-size: .65rem;
-  margin-bottom: 4px;
-}
-
-.bucket.filled { border-color: var(--accent2); background: rgba(124,58,237,.1); }
-.bucket.collision { border-color: var(--accent4); background: rgba(239,68,68,.1); }
-
-.chain-item {
-  background: var(--accent2);
-  color: white;
-  border-radius: 4px;
-  padding: 2px 5px;
-  margin: 2px 0;
-  font-size: .65rem;
-  animation: chainAppear .4s ease both;
-}
-
-@keyframes chainAppear {
-  from { opacity:0; transform: scale(.6); }
-  to { opacity:1; transform: scale(1); }
-}
-
-/* Collision Animation */
-.collision-demo {
-  background: var(--bg3);
-  border-radius: 16px;
-  padding: 2rem;
-  margin: 2rem 0;
-}
-
-.collision-container {
-  display: flex;
-  gap: 2rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin: 1.5rem 0;
-}
-
-.collision-method {
-  flex: 1;
-  min-width: 200px;
-  background: var(--card);
-  border-radius: 12px;
-  padding: 1.2rem;
-  border: 1px solid var(--border);
-}
-
-.method-title {
-  font-size: .85rem;
-  font-weight: 700;
-  color: var(--accent1);
-  margin-bottom: 1rem;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-/* ========== COMPLEXITY TABLE ========== */
-.complexity-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.5rem 0;
-  font-size: .9rem;
-}
-
-.complexity-table th {
-  background: var(--bg3);
-  padding: .8rem 1rem;
-  text-align: right;
-  color: var(--accent1);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: .8rem;
-  letter-spacing: 1px;
-}
-
-.complexity-table td {
-  padding: .8rem 1rem;
-  border-bottom: 1px solid var(--border);
-  color: var(--muted);
-}
-
-.complexity-table tr:hover td { background: var(--bg3); color: var(--text); }
-
-.o-good { color: var(--green); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
-.o-bad { color: var(--accent4); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
-.o-ok { color: var(--accent3); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
-
-/* ========== PATTERNS SECTION ========== */
-.pattern-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 2rem;
-  margin-bottom: 1.5rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.pattern-card::before {
-  content: '';
-  position: absolute;
-  top: 0; right: 0;
-  width: 4px;
-  height: 100%;
-  background: var(--accent2);
-}
-
-.pattern-card.green::before { background: var(--green); }
-.pattern-card.amber::before { background: var(--accent3); }
-.pattern-card.red::before { background: var(--accent4); }
-.pattern-card.blue::before { background: var(--accent5); }
-.pattern-card.pink::before { background: var(--pink); }
-
-.pattern-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: .4rem;
-  padding: .3rem .8rem;
-  border-radius: 999px;
-  font-size: .75rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  letter-spacing: 1px;
-}
-
-.tag-freq { background: rgba(0,245,196,.15); color: var(--accent1); border: 1px solid var(--accent1); }
-.tag-two { background: rgba(59,130,246,.15); color: var(--accent5); border: 1px solid var(--accent5); }
-.tag-slide { background: rgba(245,158,11,.15); color: var(--accent3); border: 1px solid var(--accent3); }
-.tag-set { background: rgba(34,197,94,.15); color: var(--green); border: 1px solid var(--green); }
-.tag-anagram { background: rgba(236,72,153,.15); color: var(--pink); border: 1px solid var(--pink); }
-.tag-graph { background: rgba(124,58,237,.15); color: #a78bfa; border: 1px solid var(--accent2); }
-
-/* ========== SIGNAL SIGNS ========== */
-.signals-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin: 2rem 0;
-}
-
-.signal-item {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.2rem;
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  transition: all .3s;
-}
-
-.signal-item:hover { border-color: var(--accent1); transform: translateX(-4px); }
-
-.signal-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  flex-shrink: 0;
-}
-
-.si1 { background: rgba(0,245,196,.15); }
-.si2 { background: rgba(124,58,237,.15); }
-.si3 { background: rgba(245,158,11,.15); }
-.si4 { background: rgba(239,68,68,.15); }
-.si5 { background: rgba(59,130,246,.15); }
-.si6 { background: rgba(34,197,94,.15); }
-.si7 { background: rgba(236,72,153,.15); }
-.si8 { background: rgba(124,58,237,.15); }
-
-.signal-text h4 { font-size: .9rem; color: var(--text); margin-bottom: .3rem; }
-.signal-text p { font-size: .8rem; margin: 0; }
-
-/* ========== INTERACTIVE HASH SIM ========== */
-#hashSim {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 2rem;
-  margin: 2rem 0;
-}
-
-#hashSim input {
-  background: var(--bg);
-  border: 2px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  padding: .7rem 1rem;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: .9rem;
-  width: 100%;
-  max-width: 300px;
-  outline: none;
-  transition: border-color .2s;
-  direction: ltr;
-}
-#hashSim input:focus { border-color: var(--accent1); }
-
-#hashSim button {
-  background: linear-gradient(135deg, var(--accent2), var(--accent1));
-  border: none;
-  border-radius: 8px;
-  color: white;
-  padding: .7rem 1.5rem;
-  cursor: pointer;
-  font-family: 'Cairo', sans-serif;
-  font-size: .9rem;
-  font-weight: 700;
-  transition: transform .2s, box-shadow .2s;
-  margin-right: .5rem;
-}
-#hashSim button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(124,58,237,.4); }
-
-.sim-controls { display: flex; gap: .8rem; flex-wrap: wrap; margin-bottom: 1.5rem; align-items: center; }
-
-/* ========== PROBLEMS LIST ========== */
-.problem-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  border-bottom: 1px solid var(--border);
-  transition: background .2s;
-}
-.problem-item:hover { background: var(--bg3); }
-
-.diff {
-  padding: .25rem .7rem;
-  border-radius: 999px;
-  font-size: .7rem;
-  font-weight: 700;
-  font-family: 'JetBrains Mono', monospace;
-  flex-shrink: 0;
-}
-.easy { background: rgba(34,197,94,.15); color: var(--green); }
-.medium { background: rgba(245,158,11,.15); color: var(--accent3); }
-.hard { background: rgba(239,68,68,.15); color: var(--accent4); }
-
-.problem-name { flex: 1; font-size: .9rem; }
-.problem-pattern { font-size: .75rem; color: var(--accent2); font-family: 'JetBrains Mono', monospace; }
-
-/* ========== TIPS BOX ========== */
-.tip-box {
-  background: linear-gradient(135deg, rgba(0,245,196,.08), rgba(124,58,237,.08));
-  border: 1px solid rgba(0,245,196,.3);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin: 1.5rem 0;
-}
-
-.tip-box .tip-title {
-  color: var(--accent1);
-  font-weight: 700;
-  margin-bottom: .7rem;
-  font-size: 1rem;
-}
-
-.tip-box p { margin: 0; font-size: .9rem; }
-
-/* ========== FOOTER ========== */
-footer {
-  text-align: center;
-  padding: 3rem;
-  color: var(--muted);
-  font-size: .85rem;
-  border-top: 1px solid var(--border);
-}
-
-/* ========== SCROLL REVEAL ========== */
-.reveal {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity .7s ease, transform .7s ease;
-}
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ========== ANIMATED COUNTER ========== */
-.steps-list {
-  list-style: none;
-  counter-reset: step;
-}
-.steps-list li {
-  counter-increment: step;
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: .8rem 0;
-  border-bottom: 1px solid var(--border);
-  color: var(--muted);
-  font-size: .9rem;
-  line-height: 1.7;
-}
-.steps-list li::before {
-  content: counter(step);
-  min-width: 28px;
-  height: 28px;
-  background: var(--accent2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: .75rem;
-  font-weight: 700;
-  color: white;
-  flex-shrink: 0;
-}
-
-/* Chaining visual */
-.chain-visual {
-  display: flex;
-  flex-direction: column;
-  gap: .5rem;
-  padding: 1rem;
-}
-
-.chain-row {
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-}
-
-.chain-head {
-  width: 50px;
-  height: 36px;
-  border: 2px solid var(--accent2);
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: .75rem;
-  color: var(--accent2);
-  background: rgba(124,58,237,.1);
-}
-
-.chain-node {
-  padding: .3rem .7rem;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: .75rem;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: .4rem;
-  animation: slideIn .5s ease both;
-}
-
-@keyframes slideIn {
-  from { opacity:0; transform: translateX(20px); }
-  to { opacity:1; transform: translateX(0); }
-}
-
-.chain-arrow { color: var(--accent3); font-size: .9rem; }
-
-/* Open addressing viz */
-.open-addr-grid {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  gap: 4px;
-  margin: 1rem 0;
-}
-
-.oa-cell {
-  height: 50px;
-  border: 2px solid var(--border);
-  border-radius: 6px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: .65rem;
-  transition: all .3s;
-}
-.oa-cell.filled { border-color: var(--accent1); background: rgba(0,245,196,.1); color: var(--accent1); }
-.oa-cell.probed { border-color: var(--accent3); background: rgba(245,158,11,.1); color: var(--accent3); }
-.oa-cell .cell-idx { color: var(--muted); font-size: .55rem; }
-
-pre, .code-block {
-    direction: ltr !important;
-    text-align: left !important;
-    unicode-bidi: plaintext;
-}
-.code-block { position: relative; padding-top: 2.5rem; }
-.code-label { font-size: .7rem; color: #546e7a; position: absolute; top: .6rem; left: 1rem; font-family: 'JetBrains Mono',monospace; letter-spacing: 1px; }
-[data-theme="light"] body { background:#f0f6ff; color:#1e293b; }
-[data-theme="light"] .card,[data-theme="light"] .code-block,[data-theme="light"] .pattern-card { background:#fff; border-color:#e2e8f0; }
-[data-theme="light"] .tip-box { background:#f0fdf4; border-color:rgba(0,200,150,.3); }
-[data-theme="light"] p { color:#475569; }
-.aaos-theme-bar{position:fixed;bottom:24px;left:24px;display:flex;flex-direction:column;gap:10px;z-index:999;}
-.aaos-fab{width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,#7c3aed,#00f5c4);font-size:1.2rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.3);transition:.3s;text-decoration:none;color:#fff;}
-.aaos-fab:hover{transform:scale(1.1);}
-</style>
-<script>var s=localStorage.getItem('aaos_theme')||'dark';document.documentElement.setAttribute('data-theme',s);</script></head>
-<body>
-<div style="position:fixed;top:14px;right:20px;z-index:999">
-  <a href="../dsa.html" style="background:rgba(0,245,196,.1);border:1px solid rgba(0,245,196,.3);color:#00f5c4;padding:7px 16px;border-radius:8px;text-decoration:none;font-family:Cairo,sans-serif;font-size:.85rem;font-weight:700;">?? Problem Solving Hub</a>
-</div>
-
-<!-- ===== HEADER ===== -->
-<header>
-  <div class="grid-bg"></div>
-  <div class="glow-orb orb1"></div>
-  <div class="glow-orb orb2"></div>
-  <div class="header-content">
-    <div class="badge">DATA STRUCTURES • ALGORITHMS</div>
-    <h1>Hash Maps <span class="grad">&</span> Sets<br><span class="grad">?????? ?????? A?Z</span></h1>
-    <p class="subtitle">?? ???? ???????? ????? ????? ????????? — ?? ??????? ?????? ???? ????</p>
-    <div class="toc">
-      <a href="#basics">?????????</a>
-      <a href="#hash-function">???? ??? Hash</a>
-      <a href="#collision">Collision & Chaining</a>
-      <a href="#operations">????????</a>
-      <a href="#sets">Sets</a>
-      <a href="#patterns">????????</a>
-      <a href="#signals">?????? ???????</a>
-      <a href="#problems">??? ???????</a>
-      <a href="#tricks">????? ????</a>
-    </div>
-  </div>
-</header>
-
-<!-- ===== SECTION 1: BASICS ===== -->
-<section id="basics">
-<div class="container">
-  <div class="reveal">
-    <div class="section-label">01 — ?????????</div>
-    <h2>??? ?? ??? Hash Map?</h2>
-    <p>??? Hash Map (?? Hash Table) ?? <strong>data structure ????? ?????? ??? ??? key ? value</strong>. ?????? ????????: ??? ?? ???? ??? ???? ???? index ?? array ?? ???? traversal ?? linked list? ????? ??? key ?? index ??????? ?? ???? <strong>hash function</strong> — ??????? ???????? ????? O(1) ?? ???? ???????.</p>
-
-    <div class="card-grid">
-      <div class="card">
-        <h3>?? Array ???????</h3>
-        <p>Access: O(1) ?? ???? index ???<br>?????: O(n)<br>?? ???? ?????? string key</p>
-      </div>
-      <div class="card">
-        <h3>?? Hash Map</h3>
-        <p>Access: O(1) ??? key<br>?????: O(1)<br>Keys ???? ???? string, int, object</p>
-      </div>
-      <div class="card">
-        <h3>?? BST/Tree Map</h3>
-        <p>Access: O(log n)<br>???????? ?????<br>???? ?? HashMap</p>
-      </div>
-    </div>
-
-    <div class="tip-box">
-      <div class="tip-title">?? ??? ?????? HashMap?</div>
-      <p>?? ?? ???? "???? ?? ??? ?????" ?? "???? ???? ??? ???? ???? ????" ?? "??? ??? ????? ?????" — HashMap ?? ?????? ????? ???? ???? ??? ?????.</p>
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- ===== SECTION 2: HASH FUNCTION ===== -->
-<section id="hash-function">
-<div class="container">
-  <div class="reveal">
-    <div class="section-label">02 — ???? ??? Hash</div>
-    <h2>Hash Function — ????? ??????</h2>
-    <p>??? hash function ????? ??? key ???????? <strong>index ?? ??? array ????????</strong>. ??????? ???????? ????:</p>
-
-    <div class="hash-demo">
-      <p style="color:var(--muted); margin-bottom:1.5rem; font-size:.9rem;">? ???? ??: "apple" ? hash ? index</p>
-      <div class="hash-flow">
-        <div class="hash-box input-box">"apple"</div>
-        <div class="arrow">?</div>
-        <div class="hash-box func-box">hash(key) = sum(chars) % size</div>
-        <div class="arrow">?</div>
-        <div class="hash-box func-box">97+112+112+108+101 = 530</div>
-        <div class="arrow">?</div>
-        <div class="hash-box func-box">530 % 16 = 2</div>
-        <div class="arrow">?</div>
-        <div class="hash-box output-box">index: 2</div>
-      </div>
-      <p style="color:var(--muted); font-size:.8rem; margin-top:1rem;">* ??? ???? ???? — ??? hash functions ???????? ???? ????? (djb2, MurmurHash, etc.)</p>
-    </div>
-
-    <div class="code-block">
-      <span class="code-label">C++ — hash function ?????</span>
-<span class="cmt"># ???? ?????? ??? — Python ????? ?? ????????</span>
-<span class="kw">size_t</span> <span class="fn">simpleHash</span>(const string& key, int sz) {
-    size_t total = 0;
-    for (char ch : key) total += (unsigned char)ch;
-    return total % sz;
-}
-<span class="fn">simpleHash</span>(<span class="str">"apple"</span>, <span class="num">16</span>);
-<span class="fn">simpleHash</span>(<span class="str">"mango"</span>, <span class="num">16</span>)ass="num">16</span>)  <span class="cmt"># ? 5</span>
-    </div>
-
-    <div class="card-grid">
-      <div class="card">
-        <h3>? ????? Hash Function ??????</h3>
-        <ul class="steps-list">
-          <li>Deterministic: ??? ??? key ? ??? ??? hash ??????</li>
-          <li>Fast: O(1) ?? O(k) ??? k = ??? ??? key</li>
-          <li>Uniform: ????? ?????? ??? ?? ??? buckets</li>
-          <li>Avalanche Effect: ?? ????? ???? ? hash ????? ????</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>?? ????? ??? Hash Functions ???????</h3>
-        <ul class="steps-list">
-          <li>Many Collisions: ???? ?? ??? keys ????? ??? ??? index</li>
-          <li>Clustering: ???????? ?? ????? ????????</li>
-          <li>Slow: ?? ?????? ???? ????</li>
-          <li>Predictable: ????? HashDoS</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- ===== SECTION 3: COLLISION ===== -->
-<section id="collision">
-<div class="container">
-  <div class="reveal">
-    <div class="section-label">03 — ??????? ???????</div>
-    <h2>Collision — ??? ????? ?????? ?? ??? ??????</h2>
-    <p>??? <strong>collision</strong> ????? ??? key ????? ????? ??? ??? hash index. ?? ???? ????? ????? (Birthday Paradox). ?? ??????? ??????? ??????? ????:</p>
-
-    <div class="collision-demo">
-      <h3 style="color:var(--text); margin-bottom:1rem;">?? ????? ?: Separate Chaining (?????? ??????)</h3>
-      <p>?? bucket ?????? ?? <strong>linked list</strong> — ?? collision ????? node ????? ?? ??? list ??? ?? ???? ??? ???????.</p>
-
-      <div class="chain-visual">
-        <div class="chain-row">
-          <div class="chain-head">0</div>
-        </div>
-        <div class="chain-row">
-          <div class="chain-head">1</div>
-          <div class="chain-arrow">?</div>
-          <div class="chain-node" style="animation-delay:.1s">("ant", 5) <span class="chain-arrow">?</span></div>
-          <div class="chain-node" style="animation-delay:.3s">("cat", 2) <span class="chain-arrow">?</span></div>
-          <div class="chain-node" style="animation-delay:.5s">null</div>
-        </div>
-        <div class="chain-row">
-          <div class="chain-head">2</div>
-          <div class="chain-arrow">?</div>
-          <div class="chain-node" style="animation-delay:.2s">("apple", 10) <span class="chain-arrow">?</span></div>
-          <div class="chain-node" style="animation-delay:.4s">null</div>
-        </div>
-        <div class="chain-row">
-          <div class="chain-head">3</div>
-          <div class="chain-arrow">?</div>
-          <div class="chain-node" style="animation-delay:.3s">("bat", 3) <span class="chain-arrow">?</span></div>
-          <div class="chain-node" style="animation-delay:.6s">("car", 7) <span class="chain-arrow">?</span></div>
-          <div class="chain-node" style="animation-delay:.9s">("act", 1) <span class="chain-arrow">?</span></div>
-          <div class="chain-node" style="animation-delay:1.2s">null</div>
-        </div>
-        <div class="chain-row">
-          <div class="chain-head">4</div>
-        </div>
-      </div>
-      <p style="color:var(--muted); font-size:.85rem; margin-top:.5rem;">?? ??? bucket ??? 3 ???? 3 ????? (collision ???? 3 ????) — ???? ?? linked list</p>
-    </div>
-
-    <div class="collision-demo" style="margin-top:1.5rem;">
-      <h3 style="color:var(--text); margin-bottom:1rem;">?? ????? ?: Open Addressing (Linear Probing)</h3>
-      <p>?? ??? bucket ?????? ???? ??? bucket ?????? <strong>??? ??? ??? array</strong> — ???? linked lists.</p>
-
-      <div style="overflow-x:auto;">
-        <div class="open-addr-grid" style="min-width:400px;">
-          <div class="oa-cell filled"><div class="cell-idx">0</div>cat</div>
-          <div class="oa-cell filled"><div class="cell-idx">1</div>ant</div>
-          <div class="oa-cell probed"><div class="cell-idx">2</div>bat<br><span style="color:var(--accent3);font-size:.55rem">?probed</span></div>
-          <div class="oa-cell filled"><div class="cell-idx">3</div>apple</div>
-          <div class="oa-cell"><div class="cell-idx">4</div>—</div>
-          <div class="oa-cell filled"><div class="cell-idx">5</div>mango</div>
-          <div class="oa-cell probed"><div class="cell-idx">6</div>car<br><span style="color:var(--accent3);font-size:.55rem">?probed</span></div>
-          <div class="oa-cell"><div class="cell-idx">7</div>—</div>
-        </div>
-      </div>
-      <p style="color:var(--muted); font-size:.85rem; margin-top:.5rem;">?? ?????? = elements ??????? ???? linear probing (??? bucket ?????? ??? ?????)</p>
-    </div>
-
-    <div class="card-grid" style="margin-top:2rem;">
-      <div class="card">
-        <h3>Separate Chaining</h3>
-        <table class="complexity-table">
-          <tr><td>Average Insert</td><td class="o-good">O(1)</td></tr>
-          <tr><td>Worst Case</td><td class="o-bad">O(n)</td></tr>
-          <tr><td>Memory</td><td class="o-ok">Extra (pointers)</td></tr>
-          <tr><td>Load Factor OK?</td><td class="o-good">????? > 1</td></tr>
-        </table>
-      </div>
-      <div class="card">
-        <h3>Open Addressing</h3>
-        <table class="complexity-table">
-          <tr><td>Average Insert</td><td class="o-good">O(1)</td></tr>
-          <tr><td>Worst Case</td><td class="o-bad">O(n)</td></tr>
-          <tr><td>Memory</td><td class="o-good">??? (?? ??? array)</td></tr>
-          <tr><td>Load Factor OK?</td><td class="o-ok">????? < 0.7</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <div class="code-block">
-      <span class="code-label">C++ — HashMap ?? ????? ?? Separate Chaining</span>
-<span class="cmt">// C++ — unordered_map (???? ?? STL? no need to implement)</span>
-<span class="kw">#include</span> <span class="str">&lt;unordered_map&gt;</span>
-<span class="kw">using namespace</span> std;
-
-<span class="cmt">// ????? ??????</span>
-unordered_map&lt;<span class="kw">string</span>, <span class="kw">int</span>&gt; mp;
-mp[<span class="str">"key"</span>] = <span class="num">10</span>;                    <span class="cmt">// put</span>
-mp.insert({<span class="str">"key2"</span>, <span class="num">20</span>});            <span class="cmt">// insert</span>
-
-<span class="cmt">// ????? ????</span>
-<span class="kw">int</span> val = mp.count(<span class="str">"key"</span>) ? mp[<span class="str">"key"</span>] : <span class="num">0</span>;  <span class="cmt">// safe get</span>
-
-<span class="cmt">// ???</span>
-mp.erase(<span class="str">"key"</span>);                    <span class="cmt">// O(1) average</span>
-
-<span class="cmt">// ?????? ?? ???? key</span>
-<span class="kw">if</span> (mp.count(<span class="str">"key"</span>)) { <span class="cmt">/* ????? */</span> }
-<span class="kw">if</span> (mp.find(<span class="str">"key"</span>) != mp.end()) { <span class="cmt">/* ????? */</span> }
-
-<span class="cmt">// Iteration</span>
-<span class="kw">for</span> (<span class="kw">auto</span>&amp; [k, v] : mp) { <span class="cmt">/* k=key, v=value */</span> }
-
-<span class="cmt">// ?? ????????? (??? Counter ?? Python)</span>
-unordered_map&lt;<span class="kw">char</span>, <span class="kw">int</span>&gt; freq;
-<span class="kw">for</span> (<span class="kw">char</span> c : <span class="str">"hello"</span>) freq[c]++;   <span class="cmt">// freq['l']=2, etc.</span>
-    </div>
-
-    <div class="tip-box">
-      <div class="tip-title">?? Load Factor — ??????? ???????</div>
-      <p><strong>Load Factor = ??? ??????? ÷ ??? ??? array</strong><br>
-      ??? ??? load factor ???? <strong>0.75</strong>? ??? HashMap ????? <strong>rehashing</strong> — ?????? ??? array ???? ????? ?????? ????? ?? ???????. ?? ????? O(n) ??? ????? ??? ?????? ??? O(1) average.</p>
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- ===== SECTION 4: OPERATIONS ===== -->
-<section id="operations">
-<div class="container">
-  <div class="reveal">
-    <div class="section-label">04 — ???????? ????????</div>
-    <h2>HashMap ?? C++ — unordered_map</h2>
-
-    <div class="code-block">
-      <span class="code-label">C++ — dict (HashMap)</span>
-<span class="cmt"># ?????</span>
-<span class="var">d</span> = {}
-<span class="var">d</span> = <span class="fn">dict</span>()
-<span class="var">d</span> = {<span class="str">"a"</span>: <span class="num">1</span>, <span class="str">"b"</span>: <span class="num">2</span>}
-
-<span class="cmt"># ????? / ?????</span>
-<span class="var">d</span>[<span class="str">"key"</span>] = <span class="num">10</span>
-
-<span class="cmt"># ????? ???? (?? ???crash ?? ?? ?????)</span>
-<span class="var">val</span> = <span class="var">d</span>.<span class="fn">get</span>(<span class="str">"key"</span>, <span class="num">0</span>)   <span class="cmt"># default = 0</span>
-
-<span class="cmt"># ???</span>
-<span class="kw">del</span> <span class="var">d</span>[<span class="str">"key"</span>]
-<span class="var">d</span>.<span class="fn">pop</span>(<span class="str">"key"</span>, <span class="num">None</span>)  <span class="cmt"># ??? — ?? ????? ???</span>
-
-<span class="cmt"># ?????? ?? ???? key</span>
-<span class="str">"key"</span> <span class="kw">in</span> <span class="var">d</span>           <span class="cmt"># True/False — O(1)</span>
-
-<span class="cmt"># Iteration</span>
-<span class="kw">for</span> <span class="var">k</span>, <span class="var">v</span> <span class="kw">in</span> <span class="var">d</span>.<span class="fn">items</span>(): ...
-<span class="kw">for</span> <span class="var">k</span> <span class="kw">in</span> <span class="var">d</span>.<span class="fn">keys</span>():   ...
-<span class="kw">for</span> <span class="var">v</span> <span class="kw">in</span> <span class="var">d</span>.<span class="fn">values</span>(): ...
-
-<span class="cmt"># ??????: Counter ? defaultdict</span>
-<span class="kw">from</span> collections <span class="kw">import</span> Counter, defaultdict
-
-<span class="var">freq</span> = <span class="fn">Counter</span>([<span class="str">"a"</span>,<span class="str">"b"</span>,<span class="str">"a"</span>,<span class="str">"c"</span>,<span class="str">"a"</span>])  <span class="cmt"># {"a":3,"b":1,"c":1}</span>
-<span class="var">freq</span>.<span class="fn">most_common</span>(<span class="num">2</span>)   <span class="cmt"># ???? 2 ????? ???????</span>
-
-<span class="var">dd</span> = <span class="fn">defaultdict</span>(<span class="fn">list</span>)    <span class="cmt"># default value = []</span>
-<span class="var">dd</span>[<span class="str">"key"</span>].<span class="fn">append</span>(<span class="num">1</span>)        <span class="cmt"># ???? KeyError!</span>
-    </div>
-
-    <table class="complexity-table">
-      <thead>
-        <tr>
-          <th>???????</th>
-          <th>Average Case</th>
-          <th>Worst Case</th>
-          <th>??????</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Insert / Put</td><td class="o-good">O(1)</td><td class="o-bad">O(n)</td><td style="color:var(--muted);font-size:.8rem">Worst ?? collision ????</td></tr>
-        <tr><td>Get / Access</td><td class="o-good">O(1)</td><td class="o-bad">O(n)</td><td style="color:var(--muted);font-size:.8rem">??? ?????</td></tr>
-        <tr><td>Delete</td><td class="o-good">O(1)</td><td class="o-bad">O(n)</td><td style="color:var(--muted);font-size:.8rem">??? ?????</td></tr>
-        <tr><td>Search (key)</td><td class="o-good">O(1)</td><td class="o-bad">O(n)</td><td style="color:var(--muted);font-size:.8rem">"key in dict"</td></tr>
-        <tr><td>Iteration</td><td class="o-ok">O(n)</td><td class="o-ok">O(n)</td><td style="color:var(--muted);font-size:.8rem">???? ???? ??? ?? ????</td></tr>
-        <tr><td>Space</td><td class="o-ok">O(n)</td><td class="o-ok">O(n)</td><td style="color:var(--muted);font-size:.8rem">??? ???????</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-</section>
-
-<!-- ===== SECTION 5: SETS ===== -->
-<section id="sets">
-<div class="container">
-  <div class="reveal">
-    <div class="section-label">05 — Sets</div>
-    <h2>Set — HashMap ???? Value</h2>
-    <p>??? <strong>Set</strong> ?? hash map ????? <strong>keys ??? ???? values</strong>. ?? ???? ??? unique. ??? ??? O(1) ??????? ?????? ??????.</p>
-
-    <div class="card-grid">
-      <div class="card">
-        <h3>?? Set Operations</h3>
-        <div class="code-block" style="margin-top:.5rem;">
-<span class="cmt">// C++ — unordered_set</span>
-unordered_set&lt;<span class="kw">int</span>&gt; s = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>};
-s.insert(<span class="num">4</span>);           <span class="cmt">// ?????</span>
-s.erase(<span class="num">2</span>);            <span class="cmt">// ???</span>
-<span class="kw">if</span> (s.count(<span class="num">9</span>)) ...   <span class="cmt">// ??? ??? — count ?????</span>
-<span class="kw">bool</span> found = s.count(<span class="num">3</span>) > <span class="num">0</span>;  <span class="cmt">// True — O(1)</span>
-        </div>
-      </div>
-      <div class="card">
-        <h3>?? Set Mathematics</h3>
-        <div class="code-block" style="margin-top:.5rem;">
-unordered_set&lt;<span class="kw">int</span>&gt; a = {<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>};
-unordered_set&lt;<span class="kw">int</span>&gt; b = {<span class="num">3</span>,<span class="num">4</span>,<span class="num">5</span>,<span class="num">6</span>};
-
-<span class="cmt">// Union — ??? a ???? b</span>
-unordered_set&lt;<span class="kw">int</span>&gt; uni = a;
-<span class="kw">for</span> (<span class="kw">int</span> x : b) uni.insert(x); <span class="cmt">// {1,2,3,4,5,6}</span>
-
-<span class="cmt">// Intersection</span>
-unordered_set&lt;<span class="kw">int</span>&gt; inter;
-<span class="kw">for</span> (<span class="kw">int</span> x : a) <span class="kw">if</span> (b.count(x)) inter.insert(x); <span class="cmt">// {3,4}</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="code-block">
-      <span class="code-label">C++ — ???? ????????? Set</span>
-<span class="cmt">// 1. ????? ???????</span>
-vector&lt;<span class="kw">int</span>&gt; nums = {<span class="num">1</span>,<span class="num">2</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">3</span>,<span class="num">4</span>};
-unordered_set&lt;<span class="kw">int</span>&gt; unique(nums.begin(), nums.end()); <span class="cmt">// {1,2,3,4}</span>
-
-<span class="cmt">// 2. Two Sum Check — O(n)</span>
-<span class="kw">bool</span> <span class="fn">hasPairSum</span>(vector&lt;<span class="kw">int</span>&gt;&amp; nums, <span class="kw">int</span> target) {
-    unordered_set&lt;<span class="kw">int</span>&gt; seen;
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) {
-        <span class="kw">if</span> (seen.count(target - n)) <span class="kw">return true</span>;
-        seen.insert(n);
-    }
-    <span class="kw">return false</span>;
-}
-
-<span class="cmt">// 3. Cycle Detection ?? Graph</span>
-unordered_set&lt;<span class="kw">int</span>&gt; visited;
-<span class="kw">if</span> (visited.count(node)) <span class="kw">return true</span>;  <span class="cmt">// cycle!</span>
-visited.insert(node);
-
-<span class="cmt">// 4. Longest Consecutive Sequence — O(n)</span>
-unordered_set&lt;<span class="kw">int</span>&gt; numSet(nums.begin(), nums.end());
-<span class="kw">for</span> (<span class="kw">int</span> n : numSet) {
-    <span class="kw">if</span> (!numSet.count(n - <span class="num">1</span>)) { <span class="cmt">// start of sequence</span>
-        <span class="kw">int</span> len = <span class="num">1</span>;
-        <span class="kw">while</span> (numSet.count(n + len)) len++;
-        best = max(best, len);
-    }
-}
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- ===== SECTION 6: FREQUENCY COUNTING ===== -->
-<section id="patterns">
-<div class="container">
-  <div class="reveal">
-    <div class="section-label">06 — ???????? ????????</div>
-    <h2>???????? ???? ????????? 80% ?? ?????</h2>
-
-    <!-- Pattern 1 -->
-    <div class="pattern-card">
-      <div class="pattern-tag tag-freq">? Frequency Counting</div>
-      <h3>?? ?????????</h3>
-      <p>???? ????? ???? ?? ????? ??? HashMap. ?? ???? ??? "?? ????" ?? "???? ?????" ?? "??? ??????" — ??? ?????.</p>
-      <div class="code-block">
-<span class="cmt">// Two Sum — O(n) Time, O(n) Space</span>
-vector&lt;<span class="kw">int</span>&gt; <span class="fn">twoSum</span>(vector&lt;<span class="kw">int</span>&gt;&amp; nums, <span class="kw">int</span> target) {
-    unordered_map&lt;<span class="kw">int</span>, <span class="kw">int</span>&gt; seen; <span class="cmt">// {value: index}</span>
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; nums.size(); i++) {
-        <span class="kw">int</span> complement = target - nums[i];
-        <span class="kw">if</span> (seen.count(complement))
-            <span class="kw">return</span> {seen[complement], i};
-        seen[nums[i]] = i;
-    }
-    <span class="kw">return</span> {};
-}
-<span class="cmt">// Time: O(n) | Space: O(n)</span>
-
-<span class="cmt">// Top K Frequent Elements</span>
-vector&lt;<span class="kw">int</span>&gt; <span class="fn">topKFrequent</span>(vector&lt;<span class="kw">int</span>&gt;&amp; nums, <span class="kw">int</span> k) {
-    unordered_map&lt;<span class="kw">int</span>, <span class="kw">int</span>&gt; freq;
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) freq[n]++;
-    <span class="cmt">// sort by frequency and take top k</span>
-    vector&lt;pair&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt;&gt; v(freq.begin(), freq.end());
-    sort(v.begin(), v.end(), [](<span class="kw">auto</span>&amp; a, <span class="kw">auto</span>&amp; b){ <span class="kw">return</span> a.second &gt; b.second; });
-    vector&lt;<span class="kw">int</span>&gt; res;
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; k; i++) res.push_back(v[i].first);
-    <span class="kw">return</span> res;
-}
-      </div>
-    </div>
-
-    <!-- Pattern 2 -->
-    <div class="pattern-card green">
-      <div class="pattern-tag tag-set">?? Two Pointers + HashSet</div>
-      <h3>????? ?? ??????? ????????</h3>
-      <div class="code-block">
-<span class="cmt">// Contains Duplicate — O(n)</span>
-<span class="kw">bool</span> <span class="fn">containsDuplicate</span>(vector&lt;<span class="kw">int</span>&gt;&amp; nums) {
-    unordered_set&lt;<span class="kw">int</span>&gt; seen;
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) {
-        <span class="kw">if</span> (seen.count(n)) <span class="kw">return true</span>;
-        seen.insert(n);
-    }
-    <span class="kw">return false</span>;
-}
-
-<span class="cmt">// Longest Consecutive Sequence — O(n)</span>
-<span class="kw">int</span> <span class="fn">longestConsecutive</span>(vector&lt;<span class="kw">int</span>&gt;&amp; nums) {
-    unordered_set&lt;<span class="kw">int</span>&gt; numSet(nums.begin(), nums.end());
-    <span class="kw">int</span> best = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> n : numSet) {
-        <span class="kw">if</span> (!numSet.count(n - <span class="num">1</span>)) { <span class="cmt">// ????? sequence</span>
-            <span class="kw">int</span> len = <span class="num">1</span>;
-            <span class="kw">while</span> (numSet.count(n + len)) len++;
-            best = max(best, len);
-        }
-    }
-    <span class="kw">return</span> best;
-}
-      </div>
-    </div>
-
-    <!-- Pattern 3 -->
-    <div class="pattern-card amber">
-      <div class="pattern-tag tag-slide">?? Sliding Window + HashMap</div>
-      <h3>????? ?????? ?? ???? ?????</h3>
-      <div class="code-block">
-<span class="cmt">// Longest Substring Without Repeating Characters — O(n)</span>
-<span class="kw">int</span> <span class="fn">lengthOfLongestSubstring</span>(string s) {
-    unordered_map&lt;<span class="kw">char</span>, <span class="kw">int</span>&gt; charIdx; <span class="cmt">// {char: last_seen_index}</span>
-    <span class="kw">int</span> left = <span class="num">0</span>, best = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> right = <span class="num">0</span>; right &lt; s.size(); right++) {
-        <span class="kw">char</span> c = s[right];
-        <span class="kw">if</span> (charIdx.count(c) &amp;&amp; charIdx[c] &gt;= left)
-            left = charIdx[c] + <span class="num">1</span>;  <span class="cmt">// ??? left ??? ???????</span>
-        charIdx[c] = right;
-        best = max(best, right - left + <span class="num">1</span>);
-    }
-    <span class="kw">return</span> best;
-}
-
-<span class="cmt"># Minimum Window Substring</span>
-<span class="kw">def</span> <span class="fn">minWindow</span>(<span class="var">s</span>, <span class="var">t</span>):
-    <span class="var">need</span> = <span class="fn">Counter</span>(<span class="var">t</span>)
-    <span class="var">have</span>, <span class="var">total</span> = <span class="num">0</span>, <span class="fn">len</span>(<span class="var">need</span>)
-    <span class="var">window</span> = {}
-    <span class="var">res</span>, <span class="var">resLen</span> = [-<span class="num">1</span>,-<span class="num">1</span>], <span class="fn">float</span>(<span class="str">"inf"</span>)
-    <span class="var">l</span> = <span class="num">0</span>
-    <span class="kw">for</span> <span class="var">r</span>, <span class="var">c</span> <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="var">s</span>):
-        <span class="var">window</span>[<span class="var">c</span>] = <span class="var">window</span>.<span class="fn">get</span>(<span class="var">c</span>, <span class="num">0</span>) + <span class="num">1</span>
-        <span class="kw">if</span> <span class="var">c</span> <span class="kw">in</span> <span class="var">need</span> <span class="kw">and</span> <span class="var">window</span>[<span class="var">c</span>] == <span class="var">need</span>[<span class="var">c</span>]: <span class="var">have</span> += <span class="num">1</span>
-        <span class="kw">while</span> <span class="var">have</span> == <span class="var">total</span>:
-            <span class="kw">if</span> <span class="var">r</span>-<span class="var">l</span>+<span class="num">1</span> < <span class="var">resLen</span>: <span class="var">res</span>, <span class="var">resLen</span> = [<span class="var">l</span>,<span class="var">r</span>], <span class="var">r</span>-<span class="var">l</span>+<span class="num">1</span>
-            <span class="var">window</span>[<span class="var">s</span>[<span class="var">l</span>]] -= <span class="num">1</span>
-            <span class="kw">if</span> <span class="var">s</span>[<span class="var">l</span>] <span class="kw">in</span> <span class="var">need</span> <span class="kw">and</span> <span class="var">window</span>[<span class="var">s</span>[<span class="var">l</span>]] < <span class="var">need</span>[<span class="var">s</span>[<span class="var">l</span>]]: <span class="var">have</span> -= <span class="num">1</span>
-            <span class="var">l</span> += <span class="num">1</span>
-    <span class="kw">return</span> <span class="str">""</span> <span class="kw">if</span> <span class="var">resLen</span> == <span class="fn">float</span>(<span class="str">"inf"</span>) <span class="kw">else</span> <span class="var">s</span>[<span class="var">res</span>[<span class="num">0</span>]:<span class="var">res</span>[<span class="num">1</span>]+<span class="num">1</span>]
-      </div>
-    </div>
-
-    <!-- Pattern 4 -->
-    <div class="pattern-card">
-      <div class="pattern-tag tag-anagram">?? Anagram Detection</div>
-      <h3>??? Anagrams ???? Grouping</h3>
-      <div class="code-block">
-<span class="cmt">// Valid Anagram — O(n)</span>
-<span class="kw">bool</span> <span class="fn">isAnagram</span>(string s, string t) {
-    <span class="kw">if</span> (s.size() != t.size()) <span class="kw">return false</span>;
-    unordered_map&lt;<span class="kw">char</span>, <span class="kw">int</span>&gt; freq;
-    <span class="kw">for</span> (<span class="kw">char</span> c : s) freq[c]++;
-    <span class="kw">for</span> (<span class="kw">char</span> c : t) { freq[c]--; <span class="kw">if</span> (freq[c] &lt; <span class="num">0</span>) <span class="kw">return false</span>; }
-    <span class="kw">return true</span>;
-}
-
-<span class="cmt">// Group Anagrams — Key Trick: sorted string as key</span>
-vector&lt;vector&lt;string&gt;&gt; <span class="fn">groupAnagrams</span>(vector&lt;string&gt;&amp; strs) {
-    unordered_map&lt;string, vector&lt;string&gt;&gt; groups;
-    <span class="kw">for</span> (<span class="kw">auto</span>&amp; word : strs) {
-        string key = word;
-        sort(key.begin(), key.end()); <span class="cmt">// "eat"?"aet" key</span>
-        groups[key].push_back(word);
-    }
-    vector&lt;vector&lt;string&gt;&gt; res;
-    <span class="kw">for</span> (<span class="kw">auto</span>&amp; [k, v] : groups) res.push_back(v);
-    <span class="kw">return</span> res;
-}
-<span class="cmt">// Time: O(n * k log k) | Space: O(n*k)</span>
-      </div>
-    </div>
-
-    <!-- Pattern 5 -->
-    <div class="pattern-card blue">
-      <div class="pattern-tag tag-two">??? Prefix Sum + HashMap</div>
-      <h3>Subarray Sum ????? K</h3>
-      <div class="code-block">
-<span class="cmt">// Subarray Sum Equals K — O(n)</span>
-<span class="kw">int</span> <span class="fn">subarraySum</span>(vector&lt;<span class="kw">int</span>&gt;&amp; nums, <span class="kw">int</span> k) {
-    <span class="kw">int</span> count = <span class="num">0</span>, prefix = <span class="num">0</span>;
-    unordered_map&lt;<span class="kw">int</span>, <span class="kw">int</span>&gt; seen = {{<span class="num">0</span>, <span class="num">1</span>}}; <span class="cmt">// {prefix_sum: freq}</span>
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) {
-        prefix += n;
-        <span class="cmt">// ?? ?? prefix ???? ???? prefix-k ????? ?? ??? seen?</span>
-        <span class="kw">if</span> (seen.count(prefix - k)) count += seen[prefix - k];
-        seen[prefix]++;
-    }
-    <span class="kw">return</span> count;
-}
-<span class="cmt">// Time: O(n) | Space: O(n)</span>
-      </div>
-    </div>
-
-    <!-- Pattern 6 -->
-    <div class="pattern-card" style="--accent2: var(--pink)">
-      <div class="pattern-tag tag-graph">?? Graph ?? HashMap</div>
-      <h3>Adjacency List ????? ??? Visited</h3>
-      <div class="code-block">
-<span class="cmt"># ???? Adjacency List</span>
-<span class="kw">def</span> <span class="fn">buildGraph</span>(<span class="var">edges</span>):
-    <span class="var">graph</span> = <span class="fn">defaultdict</span>(<span class="fn">list</span>)
-    <span class="kw">for</span> <span class="var">u</span>, <span class="var">v</span> <span class="kw">in</span> <span class="var">edges</span>:
-        <span class="var">graph</span>[<span class="var">u</span>].<span class="fn">append</span>(<span class="var">v</span>)
-        <span class="var">graph</span>[<span class="var">v</span>].<span class="fn">append</span>(<span class="var">u</span>)
-    <span class="kw">return</span> <span class="var">graph</span>
-
-<span class="cmt"># BFS ?? visited set</span>
-<span class="kw">def</span> <span class="fn">bfs</span>(<span class="var">graph</span>, <span class="var">start</span>):
-    <span class="var">visited</span> = {<span class="var">start</span>}
-    <span class="var">queue</span> = <span class="fn">deque</span>([<span class="var">start</span>])
-    <span class="kw">while</span> <span class="var">queue</span>:
-        <span class="var">node</span> = <span class="var">queue</span>.<span class="fn">popleft</span>()
-        <span class="kw">for</span> <span class="var">nei</span> <span class="kw">in</span> <span class="var">graph</span>[<span class="var">node</span>]:
-            <span class="kw">if</span> <span class="var">nei</span> <span class="op">not</span> <span class="kw">in</span> <span class="var">visited</span>:
-                <span class="var">visited</span>.<span class="fn">add</span>(<span class="var">nei</span>)
-                <span class="var">queue</span>.<span class="fn">append</span>(<span class="var">nei</span>)
-      </div>
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- ===== SECTION 7: SIGNALS ===== -->
-<section id="signals">
-<div class="container">
-  <div class="reveal">
-    <div class="section-label">07 — ?????? ??????</div>
-    <h2>?? ??? ???? ?????? ?? ?? ??????? ? HashMap/Set!</h2>
-
-    <div class="signals-grid">
-      <div class="signal-item">
-        <div class="signal-icon si1">??</div>
-        <div class="signal-text">
-          <h4>Two Sum / ?????? ??????? = target</h4>
-          <p>HashMap ???? ?????? ?????? ?? O(1)</p>
-        </div>
-      </div>
-      <div class="signal-item">
-        <div class="signal-icon si2">??</div>
-        <div class="signal-text">
-          <h4>"?? ??? ???" ?? "Frequency"</h4>
-          <p>Counter ?? defaultdict ???????</p>
-        </div>
-      </div>
-      <div class="signal-item">
-        <div class="signal-icon si3">??</div>
-        <div class="signal-text">
-          <h4>Anagram ?? Permutation</h4>
-          <p>???? ??? character counts ???????? Counter</p>
-        </div>
-      </div>
-      <div class="signal-item">
-        <div class="signal-icon si4">??</div>
-        <div class="signal-text">
-          <h4>"No Duplicates" ?? Unique</h4>
-          <p>Set ?????? ?????? — O(1) lookup</p>
-        </div>
-      </div>
-      <div class="signal-item">
-        <div class="signal-icon si5">??</div>
-        <div class="signal-text">
-          <h4>Subarray Sum = K</h4>
-          <p>Prefix Sum + HashMap = O(n) ????</p>
-        </div>
-      </div>
-      <div class="signal-item">
-        <div class="signal-icon si6">??</div>
-        <div class="signal-text">
-          <h4>Longest Substring / Window</h4>
-          <p>Sliding Window + HashMap ????? ??????</p>
-        </div>
-      </div>
-      <div class="signal-item">
-        <div class="signal-icon si7">??</div>
-        <div class="signal-text">
-          <h4>Cycle Detection ?? Linked List ?? Graph</h4>
-          <p>Set ??? visited nodes — O(1) check</p>
-        </div>
-      </div>
-      <div class="signal-item">
-        <div class="signal-icon si8">???</div>
-        <div class="signal-text">
-          <h4>Grouping ?? Property ?????</h4>
-          <p>defaultdict(list) ?????? ??????? ?????????</p>
-        </div>
-      </div>
-      <div class="signal-item">
-        <div class="signal-icon si1">?</div>
-        <div class="signal-text">
-          <h4>"Happy Number" / Cycle in Math</h4>
-          <p>Set ???? ??????? ???????</p>
-        </div>
-      </div>
-      <div class="signal-item">
-        <div class="signal-icon si3">??</div>
-        <div class="signal-text">
-          <h4>Consecutive Sequence ?? Missing Number</h4>
-          <p>Set ????? ?? O(1) ??? sort O(n log n)</p>
-        </div>
-      </div>
-      <div class="signal-item">
-        <div class="signal-icon si2">???</div>
-        <div class="signal-text">
-          <h4>Graph Adjacency List</h4>
-          <p>defaultdict(list) ?????? ??? edges</p>
-        </div>
-      </div>
-      <div class="signal-item">
-        <div class="signal-icon si4">??</div>
-        <div class="signal-text">
-          <h4>LRU Cache / Memoization</h4>
-          <p>HashMap ???? ??????? ???????</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- ===== SECTION 8: PROBLEMS ===== -->
-<section id="problems">
-<div class="container">
-  <div class="reveal">
-    <div class="section-label">08 — ??? ???????</div>
-    <h2>Must-Know Problems (LeetCode)</h2>
-
-    <div class="card">
-      <div class="problem-item">
-        <span class="diff easy">Easy</span>
-        <span class="problem-name">1. Two Sum</span>
-        <span class="problem-pattern">HashMap - complement</span>
-      </div>
-      <div class="problem-item">
-        <span class="diff easy">Easy</span>
-        <span class="problem-name">217. Contains Duplicate</span>
-        <span class="problem-pattern">HashSet</span>
-      </div>
-      <div class="problem-item">
-        <span class="diff easy">Easy</span>
-        <span class="problem-name">242. Valid Anagram</span>
-        <span class="problem-pattern">Counter comparison</span>
-      </div>
-      <div class="problem-item">
-        <span class="diff easy">Easy</span>
-        <span class="problem-name">383. Ransom Note</span>
-        <span class="problem-pattern">Frequency counting</span>
-      </div>
-      <div class="problem-item">
-        <span class="diff easy">Easy</span>
-        <span class="problem-name">202. Happy Number</span>
-        <span class="problem-pattern">Set cycle detection</span>
-      </div>
-      <div class="problem-item">
-        <span class="diff easy">Easy</span>
-        <span class="problem-name">169. Majority Element</span>
-        <span class="problem-pattern">Counter / Boyer-Moore</span>
-      </div>
-      <div class="problem-item">
-        <span class="diff medium">Medium</span>
-        <span class="problem-name">49. Group Anagrams</span>
-        <span class="problem-pattern">defaultdict + sorted key</span>
-      </div>
-      <div class="problem-item">
-        <span class="diff medium">Medium</span>
-        <span class="problem-name">347. Top K Frequent Elements</span>
-        <span class="problem-pattern">Counter + heap/bucket sort</span>
-      </div>
-      <div class="problem-item">
-        <span class="diff medium">Medium</span>
-        <span class="problem-name">3. Longest Substring Without Repeating</span>
-        <span class="problem-pattern">Sliding window + HashMap</span>
-      </div>
-      <div class="problem-item">
-        <span class="diff medium">Medium</span>
-        <span class="problem-name">560. Subarray Sum Equals K</span>
-        <span class="problem-pattern">Prefix sum + HashMap</span>
-      </div>
-      <div class="problem-item">
-        <span class="diff medium">Medium</span>
-        <span class="problem-name">128. Longest Consecutive Sequence</span>
-        <span class="problem-pattern">HashSet O(n)</span>
-      </div>
-      <div class="problem-item">
-        <span class="diff medium">Medium</span>
-        <span class="problem-name">438. Find All Anagrams in a String</span>
-        <span class="problem-pattern">Sliding window + Counter</span>
-      </div>
-      <div class="problem-item">
-        <span class="diff medium">Medium</span>
-        <span class="problem-name">454. 4Sum II</span>
-        <span class="problem-pattern">HashMap + pair sums</span>
-      </div>
-      <div class="problem-item">
-        <span class="diff medium">Medium</span>
-        <span class="problem-name">146. LRU Cache</span>
-        <span class="problem-pattern">HashMap + Doubly Linked List</span>
-      </div>
-      <div class="problem-item">
-        <span class="diff medium">Medium</span>
-        <span class="problem-name">981. Time Based Key-Value Store</span>
-        <span class="problem-pattern">HashMap + binary search</span>
-      </div>
-      <div class="problem-item">
-        <span class="diff hard">Hard</span>
-        <span class="problem-name">76. Minimum Window Substring</span>
-        <span class="problem-pattern">Sliding window + two counters</span>
-      </div>
-      <div class="problem-item">
-        <span class="diff hard">Hard</span>
-        <span class="problem-name">460. LFU Cache</span>
-        <span class="problem-pattern">Double HashMap + frequency tracking</span>
-      </div>
-      <div class="problem-item">
-        <span class="diff hard">Hard</span>
-        <span class="problem-name">30. Substring with Concatenation of All Words</span>
-        <span class="problem-pattern">Sliding window + HashMap</span>
-      </div>
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- ===== SECTION 9: TRICKS ===== -->
-<section id="tricks">
-<div class="container">
-  <div class="reveal">
-    <div class="section-label">09 — ????? ????</div>
-    <h2>??? Tricks ???? ????? ?? ??? Interview</h2>
-
-    <div class="card-grid">
-      <div class="card">
-        <h3>?? Trick 1: get() ?? Default</h3>
-        <div class="code-block" style="margin-top:.5rem;">
-<span class="cmt"># ???</span>
-<span class="kw">if</span> <span class="var">key</span> <span class="kw">in</span> <span class="var">d</span>: <span class="var">d</span>[<span class="var">key</span>] += <span class="num">1</span>
-<span class="kw">else</span>: <span class="var">d</span>[<span class="var">key</span>] = <span class="num">1</span>
-
-<span class="cmt"># ??????</span>
-<span class="var">d</span>[<span class="var">key</span>] = <span class="var">d</span>.<span class="fn">get</span>(<span class="var">key</span>, <span class="num">0</span>) + <span class="num">1</span>
-<span class="cmt"># ?? ???? ????</span>
-<span class="var">dd</span> = <span class="fn">defaultdict</span>(<span class="fn">int</span>)
-<span class="var">dd</span>[<span class="var">key</span>] += <span class="num">1</span>
-        </div>
-      </div>
-      <div class="card">
-        <h3>?? Trick 2: Tuple ?? Key</h3>
-        <div class="code-block" style="margin-top:.5rem;">
-<span class="cmt"># Tuples ????? ??? hashing</span>
-<span class="cmt"># ????? ?? 2D coordinates</span>
-<span class="var">grid</span> = {}
-<span class="var">grid</span>[(<span class="num">0</span>, <span class="num">0</span>)] = <span class="str">"start"</span>
-<span class="var">grid</span>[(<span class="num">3</span>, <span class="num">4</span>)] = <span class="str">"end"</span>
-
-<span class="cmt"># Group Anagrams: tuple(sorted(word))</span>
-<span class="var">key</span> = <span class="fn">tuple</span>(<span class="fn">sorted</span>(<span class="str">"eat"</span>))
-<span class="cmt"># ? ('a', 'e', 't')</span>
-        </div>
-      </div>
-      <div class="card">
-        <h3>?? Trick 3: Counter Subtraction</h3>
-        <div class="code-block" style="margin-top:.5rem;">
-<span class="kw">from</span> collections <span class="kw">import</span> Counter
-
-<span class="var">a</span> = <span class="fn">Counter</span>(<span class="str">"aabbc"</span>)
-<span class="var">b</span> = <span class="fn">Counter</span>(<span class="str">"abc"</span>)
-
-<span class="cmt"># Remaining after removal</span>
-<span class="var">remaining</span> = <span class="var">a</span> - <span class="var">b</span>
-<span class="cmt"># ? Counter({'a':1, 'b':1})</span>
-
-<span class="cmt"># ?? b ???? ????? ?? a?</span>
-<span class="op">not</span> (<span class="var">b</span> - <span class="var">a</span>)  <span class="cmt"># True ?? ????</span>
-        </div>
-      </div>
-      <div class="card">
-        <h3>?? Trick 4: Index Tracking</h3>
-        <div class="code-block" style="margin-top:.5rem;">
-<span class="cmt"># ????? index ?? ??????</span>
-<span class="cmt"># Useful in Two Sum, Word Pattern</span>
-<span class="var">seen</span> = {}
-<span class="kw">for</span> <span class="var">i</span>, <span class="var">val</span> <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="var">nums</span>):
-    <span class="kw">if</span> <span class="var">val</span> <span class="kw">in</span> <span class="var">seen</span>:
-        <span class="kw">return</span> [<span class="var">seen</span>[<span class="var">val</span>], <span class="var">i</span>]
-    <span class="var">seen</span>[<span class="var">val</span>] = <span class="var">i</span>
-        </div>
-      </div>
-      <div class="card">
-        <h3>?? Trick 5: Bucket Sort ?? HashMap</h3>
-        <div class="code-block" style="margin-top:.5rem;">
-<span class="cmt"># Top K Frequent ???? heap O(n)</span>
-<span class="var">freq</span> = <span class="fn">Counter</span>(<span class="var">nums</span>)
-<span class="var">buckets</span> = [[] <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(<span class="var">nums</span>)+<span class="num">1</span>)]
-<span class="kw">for</span> <span class="var">n</span>, <span class="var">f</span> <span class="kw">in</span> <span class="var">freq</span>.<span class="fn">items</span>():
-    <span class="var">buckets</span>[<span class="var">f</span>].<span class="fn">append</span>(<span class="var">n</span>)
-<span class="cmt"># ???? ?? ?????</span>
-<span class="var">res</span> = []
-<span class="kw">for</span> <span class="var">b</span> <span class="kw">in</span> <span class="fn">reversed</span>(<span class="var">buckets</span>):
-    <span class="var">res</span>.<span class="fn">extend</span>(<span class="var">b</span>)
-    <span class="kw">if</span> <span class="fn">len</span>(<span class="var">res</span>) >= <span class="var">k</span>: <span class="kw">break</span>
-        </div>
-      </div>
-      <div class="card">
-        <h3>?? Trick 6: Character Count Array</h3>
-        <div class="code-block" style="margin-top:.5rem;">
-<span class="cmt"># ??? Counter ????? a-z ???</span>
-<span class="cmt"># ???? ?????? ?? ????? performance</span>
-<span class="var">count</span> = [<span class="num">0</span>] * <span class="num">26</span>
-<span class="kw">for</span> <span class="var">c</span> <span class="kw">in</span> <span class="var">s</span>:
-    <span class="var">count</span>[<span class="fn">ord</span>(<span class="var">c</span>) - <span class="fn">ord</span>(<span class="str">'a'</span>)] += <span class="num">1</span>
-
-<span class="cmt"># ?????? ?????</span>
-<span class="var">count_s</span> == <span class="var">count_t</span>  <span class="cmt"># True ? anagram</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="tip-box">
-      <div class="tip-title">?? ????? ????? ?? HashMap</div>
-      <p>
-        <strong>1.</strong> ??????? list ?? key — Lists mutable ??? hashable. ?????? tuple ?????.<br>
-        <strong>2.</strong> ????? ?? ??? dict ?? Python 3.7+ ????? ??? ????? ??????? — ?? ????? ordered ?????? OrderedDict.<br>
-        <strong>3.</strong> ??? d[key] ????? KeyError ?? ?? ????? — ?????? d.get(key, default) ?????? ?? ??? interview.<br>
-        <strong>4.</strong> ?????? Counters: Counter("abc") == Counter("bca") ????? True — ????? ?? Anagram check.<br>
-        <strong>5.</strong> HashSet ?? ?????? ??? ??????? — ?? ????? ????? ?? uniqueness ?????? dict.fromkeys().
-      </p>
-    </div>
-
-    <div class="card-grid" style="margin-top:2rem;">
-      <div class="card">
-        <h3>?? HashMap vs Array vs Set</h3>
-        <table class="complexity-table">
-          <thead><tr><th>??????</th><th>??????</th><th>Why</th></tr></thead>
-          <tbody>
-            <tr><td>?? ???????</td><td class="o-good">HashMap</td><td style="font-size:.8rem;color:var(--muted)">O(1) access</td></tr>
-            <tr><td>Check existence</td><td class="o-good">Set</td><td style="font-size:.8rem;color:var(--muted)">O(1) lookup</td></tr>
-            <tr><td>Ordered access</td><td class="o-ok">Array</td><td style="font-size:.8rem;color:var(--muted)">cache friendly</td></tr>
-            <tr><td>Key-value pairs</td><td class="o-good">HashMap</td><td style="font-size:.8rem;color:var(--muted)">by design</td></tr>
-            <tr><td>Sorted iteration</td><td class="o-ok">TreeMap</td><td style="font-size:.8rem;color:var(--muted)">O(log n) ops</td></tr>
-            <tr><td>Math operations</td><td class="o-good">Set</td><td style="font-size:.8rem;color:var(--muted)">union/intersect</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card">
-        <h3>?? Template ??? Interview</h3>
-        <div class="code-block" style="margin-top:.5rem;">
-<span class="cmt"># ??? Template ??????</span>
-<span class="kw">def</span> <span class="fn">solve</span>(<span class="var">problem_input</span>):
-    <span class="cmt"># 1. ???? ????: ????? count / existence / mapping?</span>
-    <span class="cmt"># 2. ?????: Counter / Set / defaultdict / dict</span>
-    <span class="cmt"># 3. ???? ??? HashMap ?? pass ????</span>
-    <span class="cmt"># 4. ??????? ?? pass ????</span>
-
-    <span class="var">freq</span> = <span class="fn">Counter</span>(<span class="var">problem_input</span>)  <span class="cmt"># O(n)</span>
-    <span class="var">seen</span> = <span class="fn">set</span>()                     <span class="cmt"># O(1) lookup</span>
-    <span class="var">mapping</span> = {}                      <span class="cmt"># key?value</span>
-    <span class="var">groups</span> = <span class="fn">defaultdict</span>(<span class="fn">list</span>)       <span class="cmt"># grouping</span>
-
-    <span class="cmt"># Time: O(n) | Space: O(n)</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- ===== INTERACTIVE SIMULATOR ===== -->
-<section>
-<div class="container">
-  <div class="reveal">
-    <div class="section-label">10 — ????? ???????</div>
-    <h2>?? Hash Simulator</h2>
-    <p>??? ????? — ???? ????? ???? ???? ?????? ?? indices</p>
-
-    <div id="hashSim">
-      <div class="sim-controls">
-        <input type="text" id="simInput" placeholder='???? ???? (e.g. "apple")' />
-        <button onclick="addToHash()">? ???</button>
-        <button onclick="resetHash()" style="background: var(--bg3); border: 1px solid var(--border);">?? Reset</button>
-      </div>
-      <p style="font-size:.85rem; margin-bottom:1rem;">Buckets (size = 16) — ??????? = hash indices</p>
-      <div class="array-viz" id="simBuckets"></div>
-      <div id="simLog" style="margin-top:1rem; font-family:'JetBrains Mono',monospace; font-size:.8rem; color:var(--muted);"></div>
-    </div>
-  </div>
-</div>
-</section>
-
-<footer>
-  <p style="color:var(--accent1); font-weight:700; margin-bottom:.5rem;">Hash Maps & Sets — ?????? ??????</p>
-  <p>?? ??? Collision ??? Patterns ??? Interview Tricks</p>
-  <p style="margin-top:1rem; font-size:.75rem;">Practice ? LeetCode | GeeksForGeeks | NeetCode.io</p>
-</footer>
-
-<script>
-// ===== SCROLL REVEAL =====
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) { e.target.classList.add('visible'); }
-  });
-}, { threshold: 0.1 });
-
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-// ===== HASH SIMULATOR =====
-const SIZE = 16;
-let buckets = Array.from({length: SIZE}, () => []);
-
-function simpleHash(key) {
-  let total = 0;
-  for (let c of key) total += c.charCodeAt(0);
-  return total % SIZE;
-}
-
-function renderBuckets() {
-  const container = document.getElementById('simBuckets');
-  container.innerHTML = '';
-  buckets.forEach((bucket, i) => {
-    const div = document.createElement('div');
-    div.className = 'bucket' + (bucket.length > 0 ? (bucket.length > 1 ? ' collision' : ' filled') : '');
-    div.innerHTML = `<span class="idx">[${i}]</span>`;
-    bucket.forEach(key => {
-      const span = document.createElement('div');
-      span.className = 'chain-item';
-      span.textContent = key;
-      div.appendChild(span);
-    });
-    container.appendChild(div);
-  });
-}
-
-function addToHash() {
-  const input = document.getElementById('simInput');
-  const key = input.value.trim();
-  if (!key) return;
-
-  const idx = simpleHash(key);
-  const isCollision = buckets[idx].length > 0;
-  buckets[idx].push(key);
-
-  const log = document.getElementById('simLog');
-  const hash = Array.from(key).reduce((s, c) => s + c.charCodeAt(0), 0);
-  log.innerHTML = `<span style="color:var(--accent1)">hash("${key}")</span> = sum(${Array.from(key).map(c => c.charCodeAt(0)).join('+')}) = ${hash} ? ${hash} % ${SIZE} = <span style="color:var(--accent3)">${idx}</span>` +
-    (isCollision ? ` <span style="color:var(--accent4)">?? COLLISION! Chained</span>` : ` <span style="color:var(--green)">? Inserted</span>`);
-
-  renderBuckets();
-  input.value = '';
-  input.focus();
-}
-
-function resetHash() {
-  buckets = Array.from({length: SIZE}, () => []);
-  document.getElementById('simLog').innerHTML = '';
-  renderBuckets();
-}
-
-document.getElementById('simInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') addToHash();
-});
-
-renderBuckets();
-
-// ===== CHAIN ANIMATION DELAYS =====
-document.querySelectorAll('.chain-node').forEach((node, i) => {
-  node.style.animationDelay = (i * 0.15) + 's';
-});
-</script>
-<div class="aaos-theme-bar">
-  <button class="aaos-fab" onclick="var t=document.documentElement.getAttribute(''data-theme'')==''dark''?''light'':''dark'';document.documentElement.setAttribute(''data-theme'',t);localStorage.setItem(''aaos_theme'',t);" title="????? ?????">??</button>
-  <a class="aaos-fab" href="../dsa.html" title="Problem Solving Hub">??</a>
-</div>
-</body>
-</html>
-
-
-
-
+ï»¿ï»¿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hash Maps & Sets â€” ?????? ??????</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #1a1a26;
+  --card: #16161f;
+  --border: #2a2a3e;
+  --accent1: #00f5c4;
+  --accent2: #7c3aed;
+  --accent3: #f59e0b;
+  --accent4: #ef4444;
+  --accent5: #3b82f6;
+  --text: #e8e8f0;
+  --muted: #888899;
+  --code-bg: #0d0d1a;
+  --green: #22c55e;
+  --pink: #ec4899;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Cairo', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ========== SCROLLBAR ========== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--accent2); border-radius: 3px; }
+
+/* ========== HEADER ========== */
+header {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  padding: 2rem;
+}
+
+.grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(124,58,237,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124,58,237,.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+  0% { background-position: 0 0; }
+  100% { background-position: 40px 40px; }
+}
+
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: orbFloat 6s ease-in-out infinite;
+}
+.orb1 { width: 400px; height: 400px; background: rgba(124,58,237,.3); top: -100px; right: -100px; animation-delay: 0s; }
+.orb2 { width: 300px; height: 300px; background: rgba(0,245,196,.2); bottom: -80px; left: -80px; animation-delay: 3s; }
+
+@keyframes orbFloat {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(20px,-20px) scale(1.05); }
+}
+
+.header-content { position: relative; z-index: 1; }
+
+.badge {
+  display: inline-block;
+  padding: .4rem 1.2rem;
+  border: 1px solid var(--accent1);
+  border-radius: 999px;
+  color: var(--accent1);
+  font-size: .85rem;
+  letter-spacing: 2px;
+  margin-bottom: 1.5rem;
+  animation: fadeDown .8s ease both;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+  animation: fadeDown .8s .2s ease both;
+}
+
+h1 span.grad {
+  background: linear-gradient(135deg, var(--accent1), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: var(--muted);
+  max-width: 600px;
+  margin: 0 auto 2.5rem;
+  animation: fadeDown .8s .4s ease both;
+}
+
+.toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .7rem;
+  justify-content: center;
+  animation: fadeDown .8s .6s ease both;
+}
+
+.toc a {
+  padding: .5rem 1rem;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: .85rem;
+  transition: all .2s;
+}
+.toc a:hover { border-color: var(--accent1); color: var(--accent1); transform: translateY(-2px); }
+
+@keyframes fadeDown {
+  from { opacity:0; transform: translateY(-20px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
+/* ========== SECTIONS ========== */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+section { padding: 4rem 0; border-top: 1px solid var(--border); }
+
+.section-label {
+  font-size: .75rem;
+  letter-spacing: 3px;
+  color: var(--accent1);
+  text-transform: uppercase;
+  margin-bottom: .5rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+h2 {
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--accent3);
+}
+
+p { line-height: 1.9; color: var(--muted); margin-bottom: 1rem; }
+
+strong { color: var(--text); }
+
+/* ========== CARDS ========== */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.8rem;
+  margin-bottom: 1.5rem;
+  transition: border-color .3s, transform .3s;
+}
+.card:hover { border-color: var(--accent2); transform: translateY(-3px); }
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+/* ========== CODE BLOCKS ========== */
+.code-block {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .82rem;
+  line-height: 1.8;
+  overflow-x: auto;
+  margin: 1.2rem 0;
+  position: relative;
+}
+
+.code-label {
+  position: absolute;
+  top: .6rem;
+  left: .8rem;
+  font-size: .7rem;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.kw { color: #c792ea; }
+.fn { color: #82aaff; }
+.str { color: #c3e88d; }
+.num { color: var(--accent3); }
+.cmt { color: #546e7a; font-style: italic; }
+.var { color: var(--accent1); }
+.op { color: var(--accent4); }
+
+/* ========== ANIMATIONS ========== */
+/* Hash Function Animation */
+.hash-demo {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.hash-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+
+.hash-box {
+  padding: .8rem 1.4rem;
+  border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .9rem;
+  font-weight: 700;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.input-box { background: rgba(0,245,196,.15); border: 2px solid var(--accent1); color: var(--accent1); }
+.func-box { background: rgba(124,58,237,.2); border: 2px solid var(--accent2); color: #a78bfa; }
+.output-box { background: rgba(245,158,11,.15); border: 2px solid var(--accent3); color: var(--accent3); }
+
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 0 transparent; }
+  50% { box-shadow: 0 0 15px rgba(0,245,196,.3); }
+}
+
+.arrow {
+  font-size: 1.5rem;
+  color: var(--muted);
+  animation: arrowBlink 1.5s ease-in-out infinite;
+}
+
+@keyframes arrowBlink {
+  0%,100% { opacity:.3; }
+  50% { opacity:1; }
+}
+
+/* Array Visualization */
+.array-viz {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+}
+
+.bucket {
+  width: 60px;
+  min-height: 60px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: .4rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .7rem;
+  transition: all .4s;
+  position: relative;
+}
+
+.bucket .idx {
+  color: var(--muted);
+  font-size: .65rem;
+  margin-bottom: 4px;
+}
+
+.bucket.filled { border-color: var(--accent2); background: rgba(124,58,237,.1); }
+.bucket.collision { border-color: var(--accent4); background: rgba(239,68,68,.1); }
+
+.chain-item {
+  background: var(--accent2);
+  color: white;
+  border-radius: 4px;
+  padding: 2px 5px;
+  margin: 2px 0;
+  font-size: .65rem;
+  animation: chainAppear .4s ease both;
+}
+
+@keyframes chainAppear {
+  from { opacity:0; transform: scale(.6); }
+  to { opacity:1; transform: scale(1); }
+}
+
+/* Collision Animation */
+.collision-demo {
+  background: var(--bg3);
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+
+.collision-container {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+
+.collision-method {
+  flex: 1;
+  min-width: 200px;
+  background: var(--card);
+  border-radius: 12px;
+  padding: 1.2rem;
+  border: 1px solid var(--border);
+}
+
+.method-title {
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--accent1);
+  margin-bottom: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ========== COMPLEXITY TABLE ========== */
+.complexity-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: .9rem;
+}
+
+.complexity-table th {
+  background: var(--bg3);
+  padding: .8rem 1rem;
+  text-align: right;
+  color: var(--accent1);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .8rem;
+  letter-spacing: 1px;
+}
+
+.complexity-table td {
+  padding: .8rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.complexity-table tr:hover td { background: var(--bg3); color: var(--text); }
+
+.o-good { color: var(--green); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.o-bad { color: var(--accent4); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.o-ok { color: var(--accent3); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+/* ========== PATTERNS SECTION ========== */
+.pattern-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.pattern-card::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--accent2);
+}
+
+.pattern-card.green::before { background: var(--green); }
+.pattern-card.amber::before { background: var(--accent3); }
+.pattern-card.red::before { background: var(--accent4); }
+.pattern-card.blue::before { background: var(--accent5); }
+.pattern-card.pink::before { background: var(--pink); }
+
+.pattern-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .3rem .8rem;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  letter-spacing: 1px;
+}
+
+.tag-freq { background: rgba(0,245,196,.15); color: var(--accent1); border: 1px solid var(--accent1); }
+.tag-two { background: rgba(59,130,246,.15); color: var(--accent5); border: 1px solid var(--accent5); }
+.tag-slide { background: rgba(245,158,11,.15); color: var(--accent3); border: 1px solid var(--accent3); }
+.tag-set { background: rgba(34,197,94,.15); color: var(--green); border: 1px solid var(--green); }
+.tag-anagram { background: rgba(236,72,153,.15); color: var(--pink); border: 1px solid var(--pink); }
+.tag-graph { background: rgba(124,58,237,.15); color: #a78bfa; border: 1px solid var(--accent2); }
+
+/* ========== SIGNAL SIGNS ========== */
+.signals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.signal-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: all .3s;
+}
+
+.signal-item:hover { border-color: var(--accent1); transform: translateX(-4px); }
+
+.signal-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.si1 { background: rgba(0,245,196,.15); }
+.si2 { background: rgba(124,58,237,.15); }
+.si3 { background: rgba(245,158,11,.15); }
+.si4 { background: rgba(239,68,68,.15); }
+.si5 { background: rgba(59,130,246,.15); }
+.si6 { background: rgba(34,197,94,.15); }
+.si7 { background: rgba(236,72,153,.15); }
+.si8 { background: rgba(124,58,237,.15); }
+
+.signal-text h4 { font-size: .9rem; color: var(--text); margin-bottom: .3rem; }
+.signal-text p { font-size: .8rem; margin: 0; }
+
+/* ========== INTERACTIVE HASH SIM ========== */
+#hashSim {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+
+#hashSim input {
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: .7rem 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .9rem;
+  width: 100%;
+  max-width: 300px;
+  outline: none;
+  transition: border-color .2s;
+  direction: ltr;
+}
+#hashSim input:focus { border-color: var(--accent1); }
+
+#hashSim button {
+  background: linear-gradient(135deg, var(--accent2), var(--accent1));
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: .7rem 1.5rem;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  font-size: .9rem;
+  font-weight: 700;
+  transition: transform .2s, box-shadow .2s;
+  margin-right: .5rem;
+}
+#hashSim button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(124,58,237,.4); }
+
+.sim-controls { display: flex; gap: .8rem; flex-wrap: wrap; margin-bottom: 1.5rem; align-items: center; }
+
+/* ========== PROBLEMS LIST ========== */
+.problem-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  transition: background .2s;
+}
+.problem-item:hover { background: var(--bg3); }
+
+.diff {
+  padding: .25rem .7rem;
+  border-radius: 999px;
+  font-size: .7rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  flex-shrink: 0;
+}
+.easy { background: rgba(34,197,94,.15); color: var(--green); }
+.medium { background: rgba(245,158,11,.15); color: var(--accent3); }
+.hard { background: rgba(239,68,68,.15); color: var(--accent4); }
+
+.problem-name { flex: 1; font-size: .9rem; }
+.problem-pattern { font-size: .75rem; color: var(--accent2); font-family: 'JetBrains Mono', monospace; }
+
+/* ========== TIPS BOX ========== */
+.tip-box {
+  background: linear-gradient(135deg, rgba(0,245,196,.08), rgba(124,58,237,.08));
+  border: 1px solid rgba(0,245,196,.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.tip-box .tip-title {
+  color: var(--accent1);
+  font-weight: 700;
+  margin-bottom: .7rem;
+  font-size: 1rem;
+}
+
+.tip-box p { margin: 0; font-size: .9rem; }
+
+/* ========== FOOTER ========== */
+footer {
+  text-align: center;
+  padding: 3rem;
+  color: var(--muted);
+  font-size: .85rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ========== SCROLL REVEAL ========== */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ========== ANIMATED COUNTER ========== */
+.steps-list {
+  list-style: none;
+  counter-reset: step;
+}
+.steps-list li {
+  counter-increment: step;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: .8rem 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.7;
+}
+.steps-list li::before {
+  content: counter(step);
+  min-width: 28px;
+  height: 28px;
+  background: var(--accent2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .75rem;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+/* Chaining visual */
+.chain-visual {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  padding: 1rem;
+}
+
+.chain-row {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.chain-head {
+  width: 50px;
+  height: 36px;
+  border: 2px solid var(--accent2);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .75rem;
+  color: var(--accent2);
+  background: rgba(124,58,237,.1);
+}
+
+.chain-node {
+  padding: .3rem .7rem;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .75rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  animation: slideIn .5s ease both;
+}
+
+@keyframes slideIn {
+  from { opacity:0; transform: translateX(20px); }
+  to { opacity:1; transform: translateX(0); }
+}
+
+.chain-arrow { color: var(--accent3); font-size: .9rem; }
+
+/* Open addressing viz */
+.open-addr-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  margin: 1rem 0;
+}
+
+.oa-cell {
+  height: 50px;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .65rem;
+  transition: all .3s;
+}
+.oa-cell.filled { border-color: var(--accent1); background: rgba(0,245,196,.1); color: var(--accent1); }
+.oa-cell.probed { border-color: var(--accent3); background: rgba(245,158,11,.1); color: var(--accent3); }
+.oa-cell .cell-idx { color: var(--muted); font-size: .55rem; }
+
+pre, .code-block {
+    direction: ltr !important;
+    text-align: left !important;
+    unicode-bidi: plaintext;
+}
+.code-block { position: relative; padding-top: 2.5rem; }
+.code-label { font-size: .7rem; color: #546e7a; position: absolute; top: .6rem; left: 1rem; font-family: 'JetBrains Mono',monospace; letter-spacing: 1px; }
+[data-theme="light"] body { background:#f0f6ff; color:#1e293b; }
+[data-theme="light"] .card,[data-theme="light"] .code-block,[data-theme="light"] .pattern-card { background:#fff; border-color:#e2e8f0; }
+[data-theme="light"] .tip-box { background:#f0fdf4; border-color:rgba(0,200,150,.3); }
+[data-theme="light"] p { color:#475569; }
+.aaos-theme-bar{position:fixed;bottom:24px;left:24px;display:flex;flex-direction:column;gap:10px;z-index:999;}
+.aaos-fab{width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,#7c3aed,#00f5c4);font-size:1.2rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.3);transition:.3s;text-decoration:none;color:#fff;}
+.aaos-fab:hover{transform:scale(1.1);}
+</style>
+<script>var s=localStorage.getItem('aaos_theme')||'dark';document.documentElement.setAttribute('data-theme',s);</script></head>
+<body>
+<div style="position:fixed;top:14px;right:20px;z-index:999">
+  <a href="../dsa.html" style="background:rgba(0,245,196,.1);border:1px solid rgba(0,245,196,.3);color:#00f5c4;padding:7px 16px;border-radius:8px;text-decoration:none;font-family:Cairo,sans-serif;font-size:.85rem;font-weight:700;">?? Problem Solving Hub</a>
+</div>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="grid-bg"></div>
+  <div class="glow-orb orb1"></div>
+  <div class="glow-orb orb2"></div>
+  <div class="header-content">
+    <div class="badge">DATA STRUCTURES â€¢ ALGORITHMS</div>
+    <h1>Hash Maps <span class="grad">&</span> Sets<br><span class="grad">?????? ?????? A?Z</span></h1>
+    <p class="subtitle">?? ???? ???????? ????? ????? ????????? â€” ?? ??????? ?????? ???? ????</p>
+    <div class="toc">
+      <a href="#basics">?????????</a>
+      <a href="#hash-function">???? ??? Hash</a>
+      <a href="#collision">Collision & Chaining</a>
+      <a href="#operations">????????</a>
+      <a href="#sets">Sets</a>
+      <a href="#patterns">????????</a>
+      <a href="#signals">?????? ???????</a>
+      <a href="#problems">??? ???????</a>
+      <a href="#tricks">????? ????</a>
+    </div>
+  </div>
+</header>
+
+<!-- ===== SECTION 1: BASICS ===== -->
+<section id="basics">
+<div class="container">
+  <div class="reveal">
+    <div class="section-label">01 â€” ?????????</div>
+    <h2>??? ?? ??? Hash Map?</h2>
+    <p>??? Hash Map (?? Hash Table) ?? <strong>data structure ????? ?????? ??? ??? key ? value</strong>. ?????? ????????: ??? ?? ???? ??? ???? ???? index ?? array ?? ???? traversal ?? linked list? ????? ??? key ?? index ??????? ?? ???? <strong>hash function</strong> â€” ??????? ???????? ????? O(1) ?? ???? ???????.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>?? Array ???????</h3>
+        <p>Access: O(1) ?? ???? index ???<br>?????: O(n)<br>?? ???? ?????? string key</p>
+      </div>
+      <div class="card">
+        <h3>?? Hash Map</h3>
+        <p>Access: O(1) ??? key<br>?????: O(1)<br>Keys ???? ???? string, int, object</p>
+      </div>
+      <div class="card">
+        <h3>?? BST/Tree Map</h3>
+        <p>Access: O(log n)<br>???????? ?????<br>???? ?? HashMap</p>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-title">?? ??? ?????? HashMap?</div>
+      <p>?? ?? ???? "???? ?? ??? ?????" ?? "???? ???? ??? ???? ???? ????" ?? "??? ??? ????? ?????" â€” HashMap ?? ?????? ????? ???? ???? ??? ?????.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== SECTION 2: HASH FUNCTION ===== -->
+<section id="hash-function">
+<div class="container">
+  <div class="reveal">
+    <div class="section-label">02 â€” ???? ??? Hash</div>
+    <h2>Hash Function â€” ????? ??????</h2>
+    <p>??? hash function ????? ??? key ???????? <strong>index ?? ??? array ????????</strong>. ??????? ???????? ????:</p>
+
+    <div class="hash-demo">
+      <p style="color:var(--muted); margin-bottom:1.5rem; font-size:.9rem;">? ???? ??: "apple" ? hash ? index</p>
+      <div class="hash-flow">
+        <div class="hash-box input-box">"apple"</div>
+        <div class="arrow">?</div>
+        <div class="hash-box func-box">hash(key) = sum(chars) % size</div>
+        <div class="arrow">?</div>
+        <div class="hash-box func-box">97+112+112+108+101 = 530</div>
+        <div class="arrow">?</div>
+        <div class="hash-box func-box">530 % 16 = 2</div>
+        <div class="arrow">?</div>
+        <div class="hash-box output-box">index: 2</div>
+      </div>
+      <p style="color:var(--muted); font-size:.8rem; margin-top:1rem;">* ??? ???? ???? â€” ??? hash functions ???????? ???? ????? (djb2, MurmurHash, etc.)</p>
+    </div>
+
+    <div class="code-block">
+      <span class="code-label">C++ â€” hash function ?????</span>
+<span class="cmt"># ???? ?????? ??? â€” Python ????? ?? ????????</span>
+<span class="kw">size_t</span> <span class="fn">simpleHash</span>(const string& key, int sz) {
+    size_t total = 0;
+    for (char ch : key) total += (unsigned char)ch;
+    return total % sz;
+}
+<span class="fn">simpleHash</span>(<span class="str">"apple"</span>, <span class="num">16</span>);
+<span class="fn">simpleHash</span>(<span class="str">"mango"</span>, <span class="num">16</span>)ass="num">16</span>)  <span class="cmt"># ? 5</span>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>? ????? Hash Function ??????</h3>
+        <ul class="steps-list">
+          <li>Deterministic: ??? ??? key ? ??? ??? hash ??????</li>
+          <li>Fast: O(1) ?? O(k) ??? k = ??? ??? key</li>
+          <li>Uniform: ????? ?????? ??? ?? ??? buckets</li>
+          <li>Avalanche Effect: ?? ????? ???? ? hash ????? ????</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>?? ????? ??? Hash Functions ???????</h3>
+        <ul class="steps-list">
+          <li>Many Collisions: ???? ?? ??? keys ????? ??? ??? index</li>
+          <li>Clustering: ???????? ?? ????? ????????</li>
+          <li>Slow: ?? ?????? ???? ????</li>
+          <li>Predictable: ????? HashDoS</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== SECTION 3: COLLISION ===== -->
+<section id="collision">
+<div class="container">
+  <div class="reveal">
+    <div class="section-label">03 â€” ??????? ???????</div>
+    <h2>Collision â€” ??? ????? ?????? ?? ??? ??????</h2>
+    <p>??? <strong>collision</strong> ????? ??? key ????? ????? ??? ??? hash index. ?? ???? ????? ????? (Birthday Paradox). ?? ??????? ??????? ??????? ????:</p>
+
+    <div class="collision-demo">
+      <h3 style="color:var(--text); margin-bottom:1rem;">?? ????? ?: Separate Chaining (?????? ??????)</h3>
+      <p>?? bucket ?????? ?? <strong>linked list</strong> â€” ?? collision ????? node ????? ?? ??? list ??? ?? ???? ??? ???????.</p>
+
+      <div class="chain-visual">
+        <div class="chain-row">
+          <div class="chain-head">0</div>
+        </div>
+        <div class="chain-row">
+          <div class="chain-head">1</div>
+          <div class="chain-arrow">?</div>
+          <div class="chain-node" style="animation-delay:.1s">("ant", 5) <span class="chain-arrow">?</span></div>
+          <div class="chain-node" style="animation-delay:.3s">("cat", 2) <span class="chain-arrow">?</span></div>
+          <div class="chain-node" style="animation-delay:.5s">null</div>
+        </div>
+        <div class="chain-row">
+          <div class="chain-head">2</div>
+          <div class="chain-arrow">?</div>
+          <div class="chain-node" style="animation-delay:.2s">("apple", 10) <span class="chain-arrow">?</span></div>
+          <div class="chain-node" style="animation-delay:.4s">null</div>
+        </div>
+        <div class="chain-row">
+          <div class="chain-head">3</div>
+          <div class="chain-arrow">?</div>
+          <div class="chain-node" style="animation-delay:.3s">("bat", 3) <span class="chain-arrow">?</span></div>
+          <div class="chain-node" style="animation-delay:.6s">("car", 7) <span class="chain-arrow">?</span></div>
+          <div class="chain-node" style="animation-delay:.9s">("act", 1) <span class="chain-arrow">?</span></div>
+          <div class="chain-node" style="animation-delay:1.2s">null</div>
+        </div>
+        <div class="chain-row">
+          <div class="chain-head">4</div>
+        </div>
+      </div>
+      <p style="color:var(--muted); font-size:.85rem; margin-top:.5rem;">?? ??? bucket ??? 3 ???? 3 ????? (collision ???? 3 ????) â€” ???? ?? linked list</p>
+    </div>
+
+    <div class="collision-demo" style="margin-top:1.5rem;">
+      <h3 style="color:var(--text); margin-bottom:1rem;">?? ????? ?: Open Addressing (Linear Probing)</h3>
+      <p>?? ??? bucket ?????? ???? ??? bucket ?????? <strong>??? ??? ??? array</strong> â€” ???? linked lists.</p>
+
+      <div style="overflow-x:auto;">
+        <div class="open-addr-grid" style="min-width:400px;">
+          <div class="oa-cell filled"><div class="cell-idx">0</div>cat</div>
+          <div class="oa-cell filled"><div class="cell-idx">1</div>ant</div>
+          <div class="oa-cell probed"><div class="cell-idx">2</div>bat<br><span style="color:var(--accent3);font-size:.55rem">?probed</span></div>
+          <div class="oa-cell filled"><div class="cell-idx">3</div>apple</div>
+          <div class="oa-cell"><div class="cell-idx">4</div>â€”</div>
+          <div class="oa-cell filled"><div class="cell-idx">5</div>mango</div>
+          <div class="oa-cell probed"><div class="cell-idx">6</div>car<br><span style="color:var(--accent3);font-size:.55rem">?probed</span></div>
+          <div class="oa-cell"><div class="cell-idx">7</div>â€”</div>
+        </div>
+      </div>
+      <p style="color:var(--muted); font-size:.85rem; margin-top:.5rem;">?? ?????? = elements ??????? ???? linear probing (??? bucket ?????? ??? ?????)</p>
+    </div>
+
+    <div class="card-grid" style="margin-top:2rem;">
+      <div class="card">
+        <h3>Separate Chaining</h3>
+        <table class="complexity-table">
+          <tr><td>Average Insert</td><td class="o-good">O(1)</td></tr>
+          <tr><td>Worst Case</td><td class="o-bad">O(n)</td></tr>
+          <tr><td>Memory</td><td class="o-ok">Extra (pointers)</td></tr>
+          <tr><td>Load Factor OK?</td><td class="o-good">????? > 1</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Open Addressing</h3>
+        <table class="complexity-table">
+          <tr><td>Average Insert</td><td class="o-good">O(1)</td></tr>
+          <tr><td>Worst Case</td><td class="o-bad">O(n)</td></tr>
+          <tr><td>Memory</td><td class="o-good">??? (?? ??? array)</td></tr>
+          <tr><td>Load Factor OK?</td><td class="o-ok">????? < 0.7</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <span class="code-label">C++ â€” HashMap ?? ????? ?? Separate Chaining</span>
+<span class="cmt">// C++ â€” unordered_map (???? ?? STL? no need to implement)</span>
+<span class="kw">#include</span> <span class="str">&lt;unordered_map&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="cmt">// ????? ??????</span>
+unordered_map&lt;<span class="kw">string</span>, <span class="kw">int</span>&gt; mp;
+mp[<span class="str">"key"</span>] = <span class="num">10</span>;                    <span class="cmt">// put</span>
+mp.insert({<span class="str">"key2"</span>, <span class="num">20</span>});            <span class="cmt">// insert</span>
+
+<span class="cmt">// ????? ????</span>
+<span class="kw">int</span> val = mp.count(<span class="str">"key"</span>) ? mp[<span class="str">"key"</span>] : <span class="num">0</span>;  <span class="cmt">// safe get</span>
+
+<span class="cmt">// ???</span>
+mp.erase(<span class="str">"key"</span>);                    <span class="cmt">// O(1) average</span>
+
+<span class="cmt">// ?????? ?? ???? key</span>
+<span class="kw">if</span> (mp.count(<span class="str">"key"</span>)) { <span class="cmt">/* ????? */</span> }
+<span class="kw">if</span> (mp.find(<span class="str">"key"</span>) != mp.end()) { <span class="cmt">/* ????? */</span> }
+
+<span class="cmt">// Iteration</span>
+<span class="kw">for</span> (<span class="kw">auto</span>&amp; [k, v] : mp) { <span class="cmt">/* k=key, v=value */</span> }
+
+<span class="cmt">// ?? ????????? (??? Counter ?? Python)</span>
+unordered_map&lt;<span class="kw">char</span>, <span class="kw">int</span>&gt; freq;
+<span class="kw">for</span> (<span class="kw">char</span> c : <span class="str">"hello"</span>) freq[c]++;   <span class="cmt">// freq['l']=2, etc.</span>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-title">?? Load Factor â€” ??????? ???????</div>
+      <p><strong>Load Factor = ??? ??????? Ã· ??? ??? array</strong><br>
+      ??? ??? load factor ???? <strong>0.75</strong>? ??? HashMap ????? <strong>rehashing</strong> â€” ?????? ??? array ???? ????? ?????? ????? ?? ???????. ?? ????? O(n) ??? ????? ??? ?????? ??? O(1) average.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== SECTION 4: OPERATIONS ===== -->
+<section id="operations">
+<div class="container">
+  <div class="reveal">
+    <div class="section-label">04 â€” ???????? ????????</div>
+    <h2>HashMap ?? C++ â€” unordered_map</h2>
+
+    <div class="code-block">
+      <span class="code-label">C++ â€” dict (HashMap)</span>
+<span class="cmt"># ?????</span>
+<span class="var">d</span> = {}
+<span class="var">d</span> = <span class="fn">dict</span>()
+<span class="var">d</span> = {<span class="str">"a"</span>: <span class="num">1</span>, <span class="str">"b"</span>: <span class="num">2</span>}
+
+<span class="cmt"># ????? / ?????</span>
+<span class="var">d</span>[<span class="str">"key"</span>] = <span class="num">10</span>
+
+<span class="cmt"># ????? ???? (?? ???crash ?? ?? ?????)</span>
+<span class="var">val</span> = <span class="var">d</span>.<span class="fn">get</span>(<span class="str">"key"</span>, <span class="num">0</span>)   <span class="cmt"># default = 0</span>
+
+<span class="cmt"># ???</span>
+<span class="kw">del</span> <span class="var">d</span>[<span class="str">"key"</span>]
+<span class="var">d</span>.<span class="fn">pop</span>(<span class="str">"key"</span>, <span class="num">None</span>)  <span class="cmt"># ??? â€” ?? ????? ???</span>
+
+<span class="cmt"># ?????? ?? ???? key</span>
+<span class="str">"key"</span> <span class="kw">in</span> <span class="var">d</span>           <span class="cmt"># True/False â€” O(1)</span>
+
+<span class="cmt"># Iteration</span>
+<span class="kw">for</span> <span class="var">k</span>, <span class="var">v</span> <span class="kw">in</span> <span class="var">d</span>.<span class="fn">items</span>(): ...
+<span class="kw">for</span> <span class="var">k</span> <span class="kw">in</span> <span class="var">d</span>.<span class="fn">keys</span>():   ...
+<span class="kw">for</span> <span class="var">v</span> <span class="kw">in</span> <span class="var">d</span>.<span class="fn">values</span>(): ...
+
+<span class="cmt"># ??????: Counter ? defaultdict</span>
+<span class="kw">from</span> collections <span class="kw">import</span> Counter, defaultdict
+
+<span class="var">freq</span> = <span class="fn">Counter</span>([<span class="str">"a"</span>,<span class="str">"b"</span>,<span class="str">"a"</span>,<span class="str">"c"</span>,<span class="str">"a"</span>])  <span class="cmt"># {"a":3,"b":1,"c":1}</span>
+<span class="var">freq</span>.<span class="fn">most_common</span>(<span class="num">2</span>)   <span class="cmt"># ???? 2 ????? ???????</span>
+
+<span class="var">dd</span> = <span class="fn">defaultdict</span>(<span class="fn">list</span>)    <span class="cmt"># default value = []</span>
+<span class="var">dd</span>[<span class="str">"key"</span>].<span class="fn">append</span>(<span class="num">1</span>)        <span class="cmt"># ???? KeyError!</span>
+    </div>
+
+    <table class="complexity-table">
+      <thead>
+        <tr>
+          <th>???????</th>
+          <th>Average Case</th>
+          <th>Worst Case</th>
+          <th>??????</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Insert / Put</td><td class="o-good">O(1)</td><td class="o-bad">O(n)</td><td style="color:var(--muted);font-size:.8rem">Worst ?? collision ????</td></tr>
+        <tr><td>Get / Access</td><td class="o-good">O(1)</td><td class="o-bad">O(n)</td><td style="color:var(--muted);font-size:.8rem">??? ?????</td></tr>
+        <tr><td>Delete</td><td class="o-good">O(1)</td><td class="o-bad">O(n)</td><td style="color:var(--muted);font-size:.8rem">??? ?????</td></tr>
+        <tr><td>Search (key)</td><td class="o-good">O(1)</td><td class="o-bad">O(n)</td><td style="color:var(--muted);font-size:.8rem">"key in dict"</td></tr>
+        <tr><td>Iteration</td><td class="o-ok">O(n)</td><td class="o-ok">O(n)</td><td style="color:var(--muted);font-size:.8rem">???? ???? ??? ?? ????</td></tr>
+        <tr><td>Space</td><td class="o-ok">O(n)</td><td class="o-ok">O(n)</td><td style="color:var(--muted);font-size:.8rem">??? ???????</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- ===== SECTION 5: SETS ===== -->
+<section id="sets">
+<div class="container">
+  <div class="reveal">
+    <div class="section-label">05 â€” Sets</div>
+    <h2>Set â€” HashMap ???? Value</h2>
+    <p>??? <strong>Set</strong> ?? hash map ????? <strong>keys ??? ???? values</strong>. ?? ???? ??? unique. ??? ??? O(1) ??????? ?????? ??????.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>?? Set Operations</h3>
+        <div class="code-block" style="margin-top:.5rem;">
+<span class="cmt">// C++ â€” unordered_set</span>
+unordered_set&lt;<span class="kw">int</span>&gt; s = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>};
+s.insert(<span class="num">4</span>);           <span class="cmt">// ?????</span>
+s.erase(<span class="num">2</span>);            <span class="cmt">// ???</span>
+<span class="kw">if</span> (s.count(<span class="num">9</span>)) ...   <span class="cmt">// ??? ??? â€” count ?????</span>
+<span class="kw">bool</span> found = s.count(<span class="num">3</span>) > <span class="num">0</span>;  <span class="cmt">// True â€” O(1)</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>?? Set Mathematics</h3>
+        <div class="code-block" style="margin-top:.5rem;">
+unordered_set&lt;<span class="kw">int</span>&gt; a = {<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>};
+unordered_set&lt;<span class="kw">int</span>&gt; b = {<span class="num">3</span>,<span class="num">4</span>,<span class="num">5</span>,<span class="num">6</span>};
+
+<span class="cmt">// Union â€” ??? a ???? b</span>
+unordered_set&lt;<span class="kw">int</span>&gt; uni = a;
+<span class="kw">for</span> (<span class="kw">int</span> x : b) uni.insert(x); <span class="cmt">// {1,2,3,4,5,6}</span>
+
+<span class="cmt">// Intersection</span>
+unordered_set&lt;<span class="kw">int</span>&gt; inter;
+<span class="kw">for</span> (<span class="kw">int</span> x : a) <span class="kw">if</span> (b.count(x)) inter.insert(x); <span class="cmt">// {3,4}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <span class="code-label">C++ â€” ???? ????????? Set</span>
+<span class="cmt">// 1. ????? ???????</span>
+vector&lt;<span class="kw">int</span>&gt; nums = {<span class="num">1</span>,<span class="num">2</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">3</span>,<span class="num">4</span>};
+unordered_set&lt;<span class="kw">int</span>&gt; unique(nums.begin(), nums.end()); <span class="cmt">// {1,2,3,4}</span>
+
+<span class="cmt">// 2. Two Sum Check â€” O(n)</span>
+<span class="kw">bool</span> <span class="fn">hasPairSum</span>(vector&lt;<span class="kw">int</span>&gt;&amp; nums, <span class="kw">int</span> target) {
+    unordered_set&lt;<span class="kw">int</span>&gt; seen;
+    <span class="kw">for</span> (<span class="kw">int</span> n : nums) {
+        <span class="kw">if</span> (seen.count(target - n)) <span class="kw">return true</span>;
+        seen.insert(n);
+    }
+    <span class="kw">return false</span>;
+}
+
+<span class="cmt">// 3. Cycle Detection ?? Graph</span>
+unordered_set&lt;<span class="kw">int</span>&gt; visited;
+<span class="kw">if</span> (visited.count(node)) <span class="kw">return true</span>;  <span class="cmt">// cycle!</span>
+visited.insert(node);
+
+<span class="cmt">// 4. Longest Consecutive Sequence â€” O(n)</span>
+unordered_set&lt;<span class="kw">int</span>&gt; numSet(nums.begin(), nums.end());
+<span class="kw">for</span> (<span class="kw">int</span> n : numSet) {
+    <span class="kw">if</span> (!numSet.count(n - <span class="num">1</span>)) { <span class="cmt">// start of sequence</span>
+        <span class="kw">int</span> len = <span class="num">1</span>;
+        <span class="kw">while</span> (numSet.count(n + len)) len++;
+        best = max(best, len);
+    }
+}
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== SECTION 6: FREQUENCY COUNTING ===== -->
+<section id="patterns">
+<div class="container">
+  <div class="reveal">
+    <div class="section-label">06 â€” ???????? ????????</div>
+    <h2>???????? ???? ????????? 80% ?? ?????</h2>
+
+    <!-- Pattern 1 -->
+    <div class="pattern-card">
+      <div class="pattern-tag tag-freq">? Frequency Counting</div>
+      <h3>?? ?????????</h3>
+      <p>???? ????? ???? ?? ????? ??? HashMap. ?? ???? ??? "?? ????" ?? "???? ?????" ?? "??? ??????" â€” ??? ?????.</p>
+      <div class="code-block">
+<span class="cmt">// Two Sum â€” O(n) Time, O(n) Space</span>
+vector&lt;<span class="kw">int</span>&gt; <span class="fn">twoSum</span>(vector&lt;<span class="kw">int</span>&gt;&amp; nums, <span class="kw">int</span> target) {
+    unordered_map&lt;<span class="kw">int</span>, <span class="kw">int</span>&gt; seen; <span class="cmt">// {value: index}</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; nums.size(); i++) {
+        <span class="kw">int</span> complement = target - nums[i];
+        <span class="kw">if</span> (seen.count(complement))
+            <span class="kw">return</span> {seen[complement], i};
+        seen[nums[i]] = i;
+    }
+    <span class="kw">return</span> {};
+}
+<span class="cmt">// Time: O(n) | Space: O(n)</span>
+
+<span class="cmt">// Top K Frequent Elements</span>
+vector&lt;<span class="kw">int</span>&gt; <span class="fn">topKFrequent</span>(vector&lt;<span class="kw">int</span>&gt;&amp; nums, <span class="kw">int</span> k) {
+    unordered_map&lt;<span class="kw">int</span>, <span class="kw">int</span>&gt; freq;
+    <span class="kw">for</span> (<span class="kw">int</span> n : nums) freq[n]++;
+    <span class="cmt">// sort by frequency and take top k</span>
+    vector&lt;pair&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt;&gt; v(freq.begin(), freq.end());
+    sort(v.begin(), v.end(), [](<span class="kw">auto</span>&amp; a, <span class="kw">auto</span>&amp; b){ <span class="kw">return</span> a.second &gt; b.second; });
+    vector&lt;<span class="kw">int</span>&gt; res;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; k; i++) res.push_back(v[i].first);
+    <span class="kw">return</span> res;
+}
+      </div>
+    </div>
+
+    <!-- Pattern 2 -->
+    <div class="pattern-card green">
+      <div class="pattern-tag tag-set">?? Two Pointers + HashSet</div>
+      <h3>????? ?? ??????? ????????</h3>
+      <div class="code-block">
+<span class="cmt">// Contains Duplicate â€” O(n)</span>
+<span class="kw">bool</span> <span class="fn">containsDuplicate</span>(vector&lt;<span class="kw">int</span>&gt;&amp; nums) {
+    unordered_set&lt;<span class="kw">int</span>&gt; seen;
+    <span class="kw">for</span> (<span class="kw">int</span> n : nums) {
+        <span class="kw">if</span> (seen.count(n)) <span class="kw">return true</span>;
+        seen.insert(n);
+    }
+    <span class="kw">return false</span>;
+}
+
+<span class="cmt">// Longest Consecutive Sequence â€” O(n)</span>
+<span class="kw">int</span> <span class="fn">longestConsecutive</span>(vector&lt;<span class="kw">int</span>&gt;&amp; nums) {
+    unordered_set&lt;<span class="kw">int</span>&gt; numSet(nums.begin(), nums.end());
+    <span class="kw">int</span> best = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> n : numSet) {
+        <span class="kw">if</span> (!numSet.count(n - <span class="num">1</span>)) { <span class="cmt">// ????? sequence</span>
+            <span class="kw">int</span> len = <span class="num">1</span>;
+            <span class="kw">while</span> (numSet.count(n + len)) len++;
+            best = max(best, len);
+        }
+    }
+    <span class="kw">return</span> best;
+}
+      </div>
+    </div>
+
+    <!-- Pattern 3 -->
+    <div class="pattern-card amber">
+      <div class="pattern-tag tag-slide">?? Sliding Window + HashMap</div>
+      <h3>????? ?????? ?? ???? ?????</h3>
+      <div class="code-block">
+<span class="cmt">// Longest Substring Without Repeating Characters â€” O(n)</span>
+<span class="kw">int</span> <span class="fn">lengthOfLongestSubstring</span>(string s) {
+    unordered_map&lt;<span class="kw">char</span>, <span class="kw">int</span>&gt; charIdx; <span class="cmt">// {char: last_seen_index}</span>
+    <span class="kw">int</span> left = <span class="num">0</span>, best = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> right = <span class="num">0</span>; right &lt; s.size(); right++) {
+        <span class="kw">char</span> c = s[right];
+        <span class="kw">if</span> (charIdx.count(c) &amp;&amp; charIdx[c] &gt;= left)
+            left = charIdx[c] + <span class="num">1</span>;  <span class="cmt">// ??? left ??? ???????</span>
+        charIdx[c] = right;
+        best = max(best, right - left + <span class="num">1</span>);
+    }
+    <span class="kw">return</span> best;
+}
+
+<span class="cmt"># Minimum Window Substring</span>
+<span class="kw">def</span> <span class="fn">minWindow</span>(<span class="var">s</span>, <span class="var">t</span>):
+    <span class="var">need</span> = <span class="fn">Counter</span>(<span class="var">t</span>)
+    <span class="var">have</span>, <span class="var">total</span> = <span class="num">0</span>, <span class="fn">len</span>(<span class="var">need</span>)
+    <span class="var">window</span> = {}
+    <span class="var">res</span>, <span class="var">resLen</span> = [-<span class="num">1</span>,-<span class="num">1</span>], <span class="fn">float</span>(<span class="str">"inf"</span>)
+    <span class="var">l</span> = <span class="num">0</span>
+    <span class="kw">for</span> <span class="var">r</span>, <span class="var">c</span> <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="var">s</span>):
+        <span class="var">window</span>[<span class="var">c</span>] = <span class="var">window</span>.<span class="fn">get</span>(<span class="var">c</span>, <span class="num">0</span>) + <span class="num">1</span>
+        <span class="kw">if</span> <span class="var">c</span> <span class="kw">in</span> <span class="var">need</span> <span class="kw">and</span> <span class="var">window</span>[<span class="var">c</span>] == <span class="var">need</span>[<span class="var">c</span>]: <span class="var">have</span> += <span class="num">1</span>
+        <span class="kw">while</span> <span class="var">have</span> == <span class="var">total</span>:
+            <span class="kw">if</span> <span class="var">r</span>-<span class="var">l</span>+<span class="num">1</span> < <span class="var">resLen</span>: <span class="var">res</span>, <span class="var">resLen</span> = [<span class="var">l</span>,<span class="var">r</span>], <span class="var">r</span>-<span class="var">l</span>+<span class="num">1</span>
+            <span class="var">window</span>[<span class="var">s</span>[<span class="var">l</span>]] -= <span class="num">1</span>
+            <span class="kw">if</span> <span class="var">s</span>[<span class="var">l</span>] <span class="kw">in</span> <span class="var">need</span> <span class="kw">and</span> <span class="var">window</span>[<span class="var">s</span>[<span class="var">l</span>]] < <span class="var">need</span>[<span class="var">s</span>[<span class="var">l</span>]]: <span class="var">have</span> -= <span class="num">1</span>
+            <span class="var">l</span> += <span class="num">1</span>
+    <span class="kw">return</span> <span class="str">""</span> <span class="kw">if</span> <span class="var">resLen</span> == <span class="fn">float</span>(<span class="str">"inf"</span>) <span class="kw">else</span> <span class="var">s</span>[<span class="var">res</span>[<span class="num">0</span>]:<span class="var">res</span>[<span class="num">1</span>]+<span class="num">1</span>]
+      </div>
+    </div>
+
+    <!-- Pattern 4 -->
+    <div class="pattern-card">
+      <div class="pattern-tag tag-anagram">?? Anagram Detection</div>
+      <h3>??? Anagrams ???? Grouping</h3>
+      <div class="code-block">
+<span class="cmt">// Valid Anagram â€” O(n)</span>
+<span class="kw">bool</span> <span class="fn">isAnagram</span>(string s, string t) {
+    <span class="kw">if</span> (s.size() != t.size()) <span class="kw">return false</span>;
+    unordered_map&lt;<span class="kw">char</span>, <span class="kw">int</span>&gt; freq;
+    <span class="kw">for</span> (<span class="kw">char</span> c : s) freq[c]++;
+    <span class="kw">for</span> (<span class="kw">char</span> c : t) { freq[c]--; <span class="kw">if</span> (freq[c] &lt; <span class="num">0</span>) <span class="kw">return false</span>; }
+    <span class="kw">return true</span>;
+}
+
+<span class="cmt">// Group Anagrams â€” Key Trick: sorted string as key</span>
+vector&lt;vector&lt;string&gt;&gt; <span class="fn">groupAnagrams</span>(vector&lt;string&gt;&amp; strs) {
+    unordered_map&lt;string, vector&lt;string&gt;&gt; groups;
+    <span class="kw">for</span> (<span class="kw">auto</span>&amp; word : strs) {
+        string key = word;
+        sort(key.begin(), key.end()); <span class="cmt">// "eat"?"aet" key</span>
+        groups[key].push_back(word);
+    }
+    vector&lt;vector&lt;string&gt;&gt; res;
+    <span class="kw">for</span> (<span class="kw">auto</span>&amp; [k, v] : groups) res.push_back(v);
+    <span class="kw">return</span> res;
+}
+<span class="cmt">// Time: O(n * k log k) | Space: O(n*k)</span>
+      </div>
+    </div>
+
+    <!-- Pattern 5 -->
+    <div class="pattern-card blue">
+      <div class="pattern-tag tag-two">??? Prefix Sum + HashMap</div>
+      <h3>Subarray Sum ????? K</h3>
+      <div class="code-block">
+<span class="cmt">// Subarray Sum Equals K â€” O(n)</span>
+<span class="kw">int</span> <span class="fn">subarraySum</span>(vector&lt;<span class="kw">int</span>&gt;&amp; nums, <span class="kw">int</span> k) {
+    <span class="kw">int</span> count = <span class="num">0</span>, prefix = <span class="num">0</span>;
+    unordered_map&lt;<span class="kw">int</span>, <span class="kw">int</span>&gt; seen = {{<span class="num">0</span>, <span class="num">1</span>}}; <span class="cmt">// {prefix_sum: freq}</span>
+    <span class="kw">for</span> (<span class="kw">int</span> n : nums) {
+        prefix += n;
+        <span class="cmt">// ?? ?? prefix ???? ???? prefix-k ????? ?? ??? seen?</span>
+        <span class="kw">if</span> (seen.count(prefix - k)) count += seen[prefix - k];
+        seen[prefix]++;
+    }
+    <span class="kw">return</span> count;
+}
+<span class="cmt">// Time: O(n) | Space: O(n)</span>
+      </div>
+    </div>
+
+    <!-- Pattern 6 -->
+    <div class="pattern-card" style="--accent2: var(--pink)">
+      <div class="pattern-tag tag-graph">?? Graph ?? HashMap</div>
+      <h3>Adjacency List ????? ??? Visited</h3>
+      <div class="code-block">
+<span class="cmt"># ???? Adjacency List</span>
+<span class="kw">def</span> <span class="fn">buildGraph</span>(<span class="var">edges</span>):
+    <span class="var">graph</span> = <span class="fn">defaultdict</span>(<span class="fn">list</span>)
+    <span class="kw">for</span> <span class="var">u</span>, <span class="var">v</span> <span class="kw">in</span> <span class="var">edges</span>:
+        <span class="var">graph</span>[<span class="var">u</span>].<span class="fn">append</span>(<span class="var">v</span>)
+        <span class="var">graph</span>[<span class="var">v</span>].<span class="fn">append</span>(<span class="var">u</span>)
+    <span class="kw">return</span> <span class="var">graph</span>
+
+<span class="cmt"># BFS ?? visited set</span>
+<span class="kw">def</span> <span class="fn">bfs</span>(<span class="var">graph</span>, <span class="var">start</span>):
+    <span class="var">visited</span> = {<span class="var">start</span>}
+    <span class="var">queue</span> = <span class="fn">deque</span>([<span class="var">start</span>])
+    <span class="kw">while</span> <span class="var">queue</span>:
+        <span class="var">node</span> = <span class="var">queue</span>.<span class="fn">popleft</span>()
+        <span class="kw">for</span> <span class="var">nei</span> <span class="kw">in</span> <span class="var">graph</span>[<span class="var">node</span>]:
+            <span class="kw">if</span> <span class="var">nei</span> <span class="op">not</span> <span class="kw">in</span> <span class="var">visited</span>:
+                <span class="var">visited</span>.<span class="fn">add</span>(<span class="var">nei</span>)
+                <span class="var">queue</span>.<span class="fn">append</span>(<span class="var">nei</span>)
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== SECTION 7: SIGNALS ===== -->
+<section id="signals">
+<div class="container">
+  <div class="reveal">
+    <div class="section-label">07 â€” ?????? ??????</div>
+    <h2>?? ??? ???? ?????? ?? ?? ??????? ? HashMap/Set!</h2>
+
+    <div class="signals-grid">
+      <div class="signal-item">
+        <div class="signal-icon si1">??</div>
+        <div class="signal-text">
+          <h4>Two Sum / ?????? ??????? = target</h4>
+          <p>HashMap ???? ?????? ?????? ?? O(1)</p>
+        </div>
+      </div>
+      <div class="signal-item">
+        <div class="signal-icon si2">??</div>
+        <div class="signal-text">
+          <h4>"?? ??? ???" ?? "Frequency"</h4>
+          <p>Counter ?? defaultdict ???????</p>
+        </div>
+      </div>
+      <div class="signal-item">
+        <div class="signal-icon si3">??</div>
+        <div class="signal-text">
+          <h4>Anagram ?? Permutation</h4>
+          <p>???? ??? character counts ???????? Counter</p>
+        </div>
+      </div>
+      <div class="signal-item">
+        <div class="signal-icon si4">??</div>
+        <div class="signal-text">
+          <h4>"No Duplicates" ?? Unique</h4>
+          <p>Set ?????? ?????? â€” O(1) lookup</p>
+        </div>
+      </div>
+      <div class="signal-item">
+        <div class="signal-icon si5">??</div>
+        <div class="signal-text">
+          <h4>Subarray Sum = K</h4>
+          <p>Prefix Sum + HashMap = O(n) ????</p>
+        </div>
+      </div>
+      <div class="signal-item">
+        <div class="signal-icon si6">??</div>
+        <div class="signal-text">
+          <h4>Longest Substring / Window</h4>
+          <p>Sliding Window + HashMap ????? ??????</p>
+        </div>
+      </div>
+      <div class="signal-item">
+        <div class="signal-icon si7">??</div>
+        <div class="signal-text">
+          <h4>Cycle Detection ?? Linked List ?? Graph</h4>
+          <p>Set ??? visited nodes â€” O(1) check</p>
+        </div>
+      </div>
+      <div class="signal-item">
+        <div class="signal-icon si8">???</div>
+        <div class="signal-text">
+          <h4>Grouping ?? Property ?????</h4>
+          <p>defaultdict(list) ?????? ??????? ?????????</p>
+        </div>
+      </div>
+      <div class="signal-item">
+        <div class="signal-icon si1">?</div>
+        <div class="signal-text">
+          <h4>"Happy Number" / Cycle in Math</h4>
+          <p>Set ???? ??????? ???????</p>
+        </div>
+      </div>
+      <div class="signal-item">
+        <div class="signal-icon si3">??</div>
+        <div class="signal-text">
+          <h4>Consecutive Sequence ?? Missing Number</h4>
+          <p>Set ????? ?? O(1) ??? sort O(n log n)</p>
+        </div>
+      </div>
+      <div class="signal-item">
+        <div class="signal-icon si2">???</div>
+        <div class="signal-text">
+          <h4>Graph Adjacency List</h4>
+          <p>defaultdict(list) ?????? ??? edges</p>
+        </div>
+      </div>
+      <div class="signal-item">
+        <div class="signal-icon si4">??</div>
+        <div class="signal-text">
+          <h4>LRU Cache / Memoization</h4>
+          <p>HashMap ???? ??????? ???????</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== SECTION 8: PROBLEMS ===== -->
+<section id="problems">
+<div class="container">
+  <div class="reveal">
+    <div class="section-label">08 â€” ??? ???????</div>
+    <h2>Must-Know Problems (LeetCode)</h2>
+
+    <div class="card">
+      <div class="problem-item">
+        <span class="diff easy">Easy</span>
+        <span class="problem-name">1. Two Sum</span>
+        <span class="problem-pattern">HashMap - complement</span>
+      </div>
+      <div class="problem-item">
+        <span class="diff easy">Easy</span>
+        <span class="problem-name">217. Contains Duplicate</span>
+        <span class="problem-pattern">HashSet</span>
+      </div>
+      <div class="problem-item">
+        <span class="diff easy">Easy</span>
+        <span class="problem-name">242. Valid Anagram</span>
+        <span class="problem-pattern">Counter comparison</span>
+      </div>
+      <div class="problem-item">
+        <span class="diff easy">Easy</span>
+        <span class="problem-name">383. Ransom Note</span>
+        <span class="problem-pattern">Frequency counting</span>
+      </div>
+      <div class="problem-item">
+        <span class="diff easy">Easy</span>
+        <span class="problem-name">202. Happy Number</span>
+        <span class="problem-pattern">Set cycle detection</span>
+      </div>
+      <div class="problem-item">
+        <span class="diff easy">Easy</span>
+        <span class="problem-name">169. Majority Element</span>
+        <span class="problem-pattern">Counter / Boyer-Moore</span>
+      </div>
+      <div class="problem-item">
+        <span class="diff medium">Medium</span>
+        <span class="problem-name">49. Group Anagrams</span>
+        <span class="problem-pattern">defaultdict + sorted key</span>
+      </div>
+      <div class="problem-item">
+        <span class="diff medium">Medium</span>
+        <span class="problem-name">347. Top K Frequent Elements</span>
+        <span class="problem-pattern">Counter + heap/bucket sort</span>
+      </div>
+      <div class="problem-item">
+        <span class="diff medium">Medium</span>
+        <span class="problem-name">3. Longest Substring Without Repeating</span>
+        <span class="problem-pattern">Sliding window + HashMap</span>
+      </div>
+      <div class="problem-item">
+        <span class="diff medium">Medium</span>
+        <span class="problem-name">560. Subarray Sum Equals K</span>
+        <span class="problem-pattern">Prefix sum + HashMap</span>
+      </div>
+      <div class="problem-item">
+        <span class="diff medium">Medium</span>
+        <span class="problem-name">128. Longest Consecutive Sequence</span>
+        <span class="problem-pattern">HashSet O(n)</span>
+      </div>
+      <div class="problem-item">
+        <span class="diff medium">Medium</span>
+        <span class="problem-name">438. Find All Anagrams in a String</span>
+        <span class="problem-pattern">Sliding window + Counter</span>
+      </div>
+      <div class="problem-item">
+        <span class="diff medium">Medium</span>
+        <span class="problem-name">454. 4Sum II</span>
+        <span class="problem-pattern">HashMap + pair sums</span>
+      </div>
+      <div class="problem-item">
+        <span class="diff medium">Medium</span>
+        <span class="problem-name">146. LRU Cache</span>
+        <span class="problem-pattern">HashMap + Doubly Linked List</span>
+      </div>
+      <div class="problem-item">
+        <span class="diff medium">Medium</span>
+        <span class="problem-name">981. Time Based Key-Value Store</span>
+        <span class="problem-pattern">HashMap + binary search</span>
+      </div>
+      <div class="problem-item">
+        <span class="diff hard">Hard</span>
+        <span class="problem-name">76. Minimum Window Substring</span>
+        <span class="problem-pattern">Sliding window + two counters</span>
+      </div>
+      <div class="problem-item">
+        <span class="diff hard">Hard</span>
+        <span class="problem-name">460. LFU Cache</span>
+        <span class="problem-pattern">Double HashMap + frequency tracking</span>
+      </div>
+      <div class="problem-item">
+        <span class="diff hard">Hard</span>
+        <span class="problem-name">30. Substring with Concatenation of All Words</span>
+        <span class="problem-pattern">Sliding window + HashMap</span>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== SECTION 9: TRICKS ===== -->
+<section id="tricks">
+<div class="container">
+  <div class="reveal">
+    <div class="section-label">09 â€” ????? ????</div>
+    <h2>??? Tricks ???? ????? ?? ??? Interview</h2>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>?? Trick 1: get() ?? Default</h3>
+        <div class="code-block" style="margin-top:.5rem;">
+<span class="cmt"># ???</span>
+<span class="kw">if</span> <span class="var">key</span> <span class="kw">in</span> <span class="var">d</span>: <span class="var">d</span>[<span class="var">key</span>] += <span class="num">1</span>
+<span class="kw">else</span>: <span class="var">d</span>[<span class="var">key</span>] = <span class="num">1</span>
+
+<span class="cmt"># ??????</span>
+<span class="var">d</span>[<span class="var">key</span>] = <span class="var">d</span>.<span class="fn">get</span>(<span class="var">key</span>, <span class="num">0</span>) + <span class="num">1</span>
+<span class="cmt"># ?? ???? ????</span>
+<span class="var">dd</span> = <span class="fn">defaultdict</span>(<span class="fn">int</span>)
+<span class="var">dd</span>[<span class="var">key</span>] += <span class="num">1</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>?? Trick 2: Tuple ?? Key</h3>
+        <div class="code-block" style="margin-top:.5rem;">
+<span class="cmt"># Tuples ????? ??? hashing</span>
+<span class="cmt"># ????? ?? 2D coordinates</span>
+<span class="var">grid</span> = {}
+<span class="var">grid</span>[(<span class="num">0</span>, <span class="num">0</span>)] = <span class="str">"start"</span>
+<span class="var">grid</span>[(<span class="num">3</span>, <span class="num">4</span>)] = <span class="str">"end"</span>
+
+<span class="cmt"># Group Anagrams: tuple(sorted(word))</span>
+<span class="var">key</span> = <span class="fn">tuple</span>(<span class="fn">sorted</span>(<span class="str">"eat"</span>))
+<span class="cmt"># ? ('a', 'e', 't')</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>?? Trick 3: Counter Subtraction</h3>
+        <div class="code-block" style="margin-top:.5rem;">
+<span class="kw">from</span> collections <span class="kw">import</span> Counter
+
+<span class="var">a</span> = <span class="fn">Counter</span>(<span class="str">"aabbc"</span>)
+<span class="var">b</span> = <span class="fn">Counter</span>(<span class="str">"abc"</span>)
+
+<span class="cmt"># Remaining after removal</span>
+<span class="var">remaining</span> = <span class="var">a</span> - <span class="var">b</span>
+<span class="cmt"># ? Counter({'a':1, 'b':1})</span>
+
+<span class="cmt"># ?? b ???? ????? ?? a?</span>
+<span class="op">not</span> (<span class="var">b</span> - <span class="var">a</span>)  <span class="cmt"># True ?? ????</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>?? Trick 4: Index Tracking</h3>
+        <div class="code-block" style="margin-top:.5rem;">
+<span class="cmt"># ????? index ?? ??????</span>
+<span class="cmt"># Useful in Two Sum, Word Pattern</span>
+<span class="var">seen</span> = {}
+<span class="kw">for</span> <span class="var">i</span>, <span class="var">val</span> <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="var">nums</span>):
+    <span class="kw">if</span> <span class="var">val</span> <span class="kw">in</span> <span class="var">seen</span>:
+        <span class="kw">return</span> [<span class="var">seen</span>[<span class="var">val</span>], <span class="var">i</span>]
+    <span class="var">seen</span>[<span class="var">val</span>] = <span class="var">i</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>?? Trick 5: Bucket Sort ?? HashMap</h3>
+        <div class="code-block" style="margin-top:.5rem;">
+<span class="cmt"># Top K Frequent ???? heap O(n)</span>
+<span class="var">freq</span> = <span class="fn">Counter</span>(<span class="var">nums</span>)
+<span class="var">buckets</span> = [[] <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(<span class="var">nums</span>)+<span class="num">1</span>)]
+<span class="kw">for</span> <span class="var">n</span>, <span class="var">f</span> <span class="kw">in</span> <span class="var">freq</span>.<span class="fn">items</span>():
+    <span class="var">buckets</span>[<span class="var">f</span>].<span class="fn">append</span>(<span class="var">n</span>)
+<span class="cmt"># ???? ?? ?????</span>
+<span class="var">res</span> = []
+<span class="kw">for</span> <span class="var">b</span> <span class="kw">in</span> <span class="fn">reversed</span>(<span class="var">buckets</span>):
+    <span class="var">res</span>.<span class="fn">extend</span>(<span class="var">b</span>)
+    <span class="kw">if</span> <span class="fn">len</span>(<span class="var">res</span>) >= <span class="var">k</span>: <span class="kw">break</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>?? Trick 6: Character Count Array</h3>
+        <div class="code-block" style="margin-top:.5rem;">
+<span class="cmt"># ??? Counter ????? a-z ???</span>
+<span class="cmt"># ???? ?????? ?? ????? performance</span>
+<span class="var">count</span> = [<span class="num">0</span>] * <span class="num">26</span>
+<span class="kw">for</span> <span class="var">c</span> <span class="kw">in</span> <span class="var">s</span>:
+    <span class="var">count</span>[<span class="fn">ord</span>(<span class="var">c</span>) - <span class="fn">ord</span>(<span class="str">'a'</span>)] += <span class="num">1</span>
+
+<span class="cmt"># ?????? ?????</span>
+<span class="var">count_s</span> == <span class="var">count_t</span>  <span class="cmt"># True ? anagram</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-title">?? ????? ????? ?? HashMap</div>
+      <p>
+        <strong>1.</strong> ??????? list ?? key â€” Lists mutable ??? hashable. ?????? tuple ?????.<br>
+        <strong>2.</strong> ????? ?? ??? dict ?? Python 3.7+ ????? ??? ????? ??????? â€” ?? ????? ordered ?????? OrderedDict.<br>
+        <strong>3.</strong> ??? d[key] ????? KeyError ?? ?? ????? â€” ?????? d.get(key, default) ?????? ?? ??? interview.<br>
+        <strong>4.</strong> ?????? Counters: Counter("abc") == Counter("bca") ????? True â€” ????? ?? Anagram check.<br>
+        <strong>5.</strong> HashSet ?? ?????? ??? ??????? â€” ?? ????? ????? ?? uniqueness ?????? dict.fromkeys().
+      </p>
+    </div>
+
+    <div class="card-grid" style="margin-top:2rem;">
+      <div class="card">
+        <h3>?? HashMap vs Array vs Set</h3>
+        <table class="complexity-table">
+          <thead><tr><th>??????</th><th>??????</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td>?? ???????</td><td class="o-good">HashMap</td><td style="font-size:.8rem;color:var(--muted)">O(1) access</td></tr>
+            <tr><td>Check existence</td><td class="o-good">Set</td><td style="font-size:.8rem;color:var(--muted)">O(1) lookup</td></tr>
+            <tr><td>Ordered access</td><td class="o-ok">Array</td><td style="font-size:.8rem;color:var(--muted)">cache friendly</td></tr>
+            <tr><td>Key-value pairs</td><td class="o-good">HashMap</td><td style="font-size:.8rem;color:var(--muted)">by design</td></tr>
+            <tr><td>Sorted iteration</td><td class="o-ok">TreeMap</td><td style="font-size:.8rem;color:var(--muted)">O(log n) ops</td></tr>
+            <tr><td>Math operations</td><td class="o-good">Set</td><td style="font-size:.8rem;color:var(--muted)">union/intersect</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>?? Template ??? Interview</h3>
+        <div class="code-block" style="margin-top:.5rem;">
+<span class="cmt"># ??? Template ??????</span>
+<span class="kw">def</span> <span class="fn">solve</span>(<span class="var">problem_input</span>):
+    <span class="cmt"># 1. ???? ????: ????? count / existence / mapping?</span>
+    <span class="cmt"># 2. ?????: Counter / Set / defaultdict / dict</span>
+    <span class="cmt"># 3. ???? ??? HashMap ?? pass ????</span>
+    <span class="cmt"># 4. ??????? ?? pass ????</span>
+
+    <span class="var">freq</span> = <span class="fn">Counter</span>(<span class="var">problem_input</span>)  <span class="cmt"># O(n)</span>
+    <span class="var">seen</span> = <span class="fn">set</span>()                     <span class="cmt"># O(1) lookup</span>
+    <span class="var">mapping</span> = {}                      <span class="cmt"># key?value</span>
+    <span class="var">groups</span> = <span class="fn">defaultdict</span>(<span class="fn">list</span>)       <span class="cmt"># grouping</span>
+
+    <span class="cmt"># Time: O(n) | Space: O(n)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== INTERACTIVE SIMULATOR ===== -->
+<section>
+<div class="container">
+  <div class="reveal">
+    <div class="section-label">10 â€” ????? ???????</div>
+    <h2>?? Hash Simulator</h2>
+    <p>??? ????? â€” ???? ????? ???? ???? ?????? ?? indices</p>
+
+    <div id="hashSim">
+      <div class="sim-controls">
+        <input type="text" id="simInput" placeholder='???? ???? (e.g. "apple")' />
+        <button onclick="addToHash()">? ???</button>
+        <button onclick="resetHash()" style="background: var(--bg3); border: 1px solid var(--border);">?? Reset</button>
+      </div>
+      <p style="font-size:.85rem; margin-bottom:1rem;">Buckets (size = 16) â€” ??????? = hash indices</p>
+      <div class="array-viz" id="simBuckets"></div>
+      <div id="simLog" style="margin-top:1rem; font-family:'JetBrains Mono',monospace; font-size:.8rem; color:var(--muted);"></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<footer>
+  <p style="color:var(--accent1); font-weight:700; margin-bottom:.5rem;">Hash Maps & Sets â€” ?????? ??????</p>
+  <p>?? ??? Collision ??? Patterns ??? Interview Tricks</p>
+  <p style="margin-top:1rem; font-size:.75rem;">Practice ? LeetCode | GeeksForGeeks | NeetCode.io</p>
+</footer>
+
+<script>
+// ===== SCROLL REVEAL =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ===== HASH SIMULATOR =====
+const SIZE = 16;
+let buckets = Array.from({length: SIZE}, () => []);
+
+function simpleHash(key) {
+  let total = 0;
+  for (let c of key) total += c.charCodeAt(0);
+  return total % SIZE;
+}
+
+function renderBuckets() {
+  const container = document.getElementById('simBuckets');
+  container.innerHTML = '';
+  buckets.forEach((bucket, i) => {
+    const div = document.createElement('div');
+    div.className = 'bucket' + (bucket.length > 0 ? (bucket.length > 1 ? ' collision' : ' filled') : '');
+    div.innerHTML = `<span class="idx">[${i}]</span>`;
+    bucket.forEach(key => {
+      const span = document.createElement('div');
+      span.className = 'chain-item';
+      span.textContent = key;
+      div.appendChild(span);
+    });
+    container.appendChild(div);
+  });
+}
+
+function addToHash() {
+  const input = document.getElementById('simInput');
+  const key = input.value.trim();
+  if (!key) return;
+
+  const idx = simpleHash(key);
+  const isCollision = buckets[idx].length > 0;
+  buckets[idx].push(key);
+
+  const log = document.getElementById('simLog');
+  const hash = Array.from(key).reduce((s, c) => s + c.charCodeAt(0), 0);
+  log.innerHTML = `<span style="color:var(--accent1)">hash("${key}")</span> = sum(${Array.from(key).map(c => c.charCodeAt(0)).join('+')}) = ${hash} ? ${hash} % ${SIZE} = <span style="color:var(--accent3)">${idx}</span>` +
+    (isCollision ? ` <span style="color:var(--accent4)">?? COLLISION! Chained</span>` : ` <span style="color:var(--green)">? Inserted</span>`);
+
+  renderBuckets();
+  input.value = '';
+  input.focus();
+}
+
+function resetHash() {
+  buckets = Array.from({length: SIZE}, () => []);
+  document.getElementById('simLog').innerHTML = '';
+  renderBuckets();
+}
+
+document.getElementById('simInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addToHash();
+});
+
+renderBuckets();
+
+// ===== CHAIN ANIMATION DELAYS =====
+document.querySelectorAll('.chain-node').forEach((node, i) => {
+  node.style.animationDelay = (i * 0.15) + 's';
+});
+</script>
+<div class="aaos-theme-bar">
+  <button class="aaos-fab" onclick="var t=document.documentElement.getAttribute(''data-theme'')==''dark''?''light'':''dark'';document.documentElement.setAttribute(''data-theme'',t);localStorage.setItem(''aaos_theme'',t);" title="????? ?????">??</button>
+  <a class="aaos-fab" href="../dsa.html" title="Problem Solving Hub">??</a>
+</div>
+</body>
+</html>
+
+
+
+

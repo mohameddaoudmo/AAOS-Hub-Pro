@@ -1,2469 +1,2454 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Linked Lists � ?????? ?????? ?? A ??? Z</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Fira+Code:wght@400;500;700&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #0a0a0f;
-  --surface: #12121a;
-  --surface2: #1a1a28;
-  --border: #2a2a42;
-  --accent1: #00d4ff;
-  --accent2: #ff6b6b;
-  --accent3: #ffd93d;
-  --accent4: #6bcb77;
-  --accent5: #c77dff;
-  --text: #e8e8f0;
-  --text-dim: #8888aa;
-  --node-bg: #1e1e30;
-  --node-border: #00d4ff;
-  --glow: 0 0 20px rgba(0,212,255,0.3);
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Tajawal', sans-serif;
-  line-height: 1.7;
-  overflow-x: hidden;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--accent1); border-radius: 3px; }
-
-/* Hero */
-.hero {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 40px 20px;
-  background: radial-gradient(ellipse at 50% 0%, rgba(0,212,255,0.15) 0%, transparent 60%),
-              radial-gradient(ellipse at 80% 80%, rgba(199,125,255,0.1) 0%, transparent 50%),
-              var(--bg);
-  position: relative;
-  overflow: hidden;
-}
-
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: 
-    linear-gradient(rgba(0,212,255,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,212,255,0.05) 1px, transparent 1px);
-  background-size: 50px 50px;
-  animation: gridMove 20s linear infinite;
-}
-
-@keyframes gridMove {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(50px); }
-}
-
-.hero-badge {
-  background: rgba(0,212,255,0.1);
-  border: 1px solid rgba(0,212,255,0.4);
-  color: var(--accent1);
-  padding: 6px 18px;
-  border-radius: 20px;
-  font-size: 13px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 24px;
-  animation: fadeDown 0.8s ease both;
-}
-
-.hero h1 {
-  font-size: clamp(2.2rem, 6vw, 5rem);
-  font-weight: 900;
-  line-height: 1.1;
-  margin-bottom: 16px;
-  animation: fadeDown 0.8s 0.2s ease both;
-}
-
-.hero h1 span { color: var(--accent1); }
-.hero h1 em { color: var(--accent2); font-style: normal; }
-
-.hero-sub {
-  font-size: 1.15rem;
-  color: var(--text-dim);
-  max-width: 600px;
-  margin-bottom: 40px;
-  animation: fadeDown 0.8s 0.4s ease both;
-}
-
-.hero-nodes {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  animation: fadeDown 0.8s 0.6s ease both;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.hero-node {
-  display: flex;
-  align-items: center;
-  gap: 0;
-}
-
-.node-box {
-  background: var(--node-bg);
-  border: 2px solid var(--node-border);
-  border-radius: 8px;
-  padding: 10px 18px;
-  font-family: 'Fira Code', monospace;
-  font-size: 14px;
-  box-shadow: var(--glow);
-  animation: nodePulse 3s ease-in-out infinite;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.node-box .val { color: var(--accent3); font-weight: 700; }
-.node-box .ptr { color: var(--accent5); font-size: 11px; }
-.node-box .sep { color: var(--border); }
-
-.node-arrow {
-  color: var(--accent1);
-  font-size: 20px;
-  padding: 0 6px;
-  animation: arrowPulse 1.5s ease-in-out infinite;
-}
-
-.null-box {
-  background: rgba(255,107,107,0.1);
-  border: 2px solid var(--accent2);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-family: 'Fira Code', monospace;
-  font-size: 12px;
-  color: var(--accent2);
-}
-
-@keyframes nodePulse {
-  0%, 100% { box-shadow: 0 0 15px rgba(0,212,255,0.3); }
-  50% { box-shadow: 0 0 30px rgba(0,212,255,0.6); }
-}
-
-@keyframes arrowPulse {
-  0%, 100% { opacity: 0.6; transform: translateX(0); }
-  50% { opacity: 1; transform: translateX(3px); }
-}
-
-@keyframes fadeDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* TOC */
-.toc {
-  padding: 60px 20px;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.section-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.section-tag {
-  display: inline-block;
-  background: rgba(255,217,61,0.1);
-  border: 1px solid rgba(255,217,61,0.4);
-  color: var(--accent3);
-  padding: 4px 14px;
-  border-radius: 12px;
-  font-size: 12px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-}
-
-.section-header h2 {
-  font-size: 2rem;
-  font-weight: 800;
-}
-
-.toc-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px;
-}
-
-.toc-item {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 18px;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-decoration: none;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.toc-item:hover {
-  border-color: var(--accent1);
-  background: rgba(0,212,255,0.05);
-  transform: translateY(-2px);
-}
-
-.toc-num {
-  color: var(--accent1);
-  font-family: 'Fira Code', monospace;
-  font-size: 12px;
-  min-width: 24px;
-}
-
-/* Main Content Sections */
-.content {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 20px 80px;
-}
-
-.lesson {
-  margin-bottom: 80px;
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.6s ease;
-}
-
-.lesson.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.lesson-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 30px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid var(--border);
-}
-
-.lesson-num {
-  background: linear-gradient(135deg, var(--accent1), var(--accent5));
-  color: #000;
-  font-weight: 900;
-  font-family: 'Fira Code', monospace;
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.lesson-header h2 {
-  font-size: 1.6rem;
-  font-weight: 800;
-}
-
-.lesson-header h2 .en {
-  color: var(--accent1);
-  font-family: 'Space Grotesk', sans-serif;
-}
-
-/* Cards */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 24px;
-  margin-bottom: 20px;
-}
-
-.card-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--accent3);
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.card-title::before {
-  content: '?';
-  color: var(--accent1);
-  font-size: 10px;
-}
-
-/* Concept Grid */
-.concept-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.concept-card {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
-  transition: all 0.2s;
-}
-
-.concept-card:hover { border-color: var(--accent5); transform: translateY(-2px); }
-
-.concept-icon {
-  font-size: 28px;
-  margin-bottom: 10px;
-}
-
-.concept-card h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--accent5);
-  margin-bottom: 8px;
-  font-family: 'Fira Code', monospace;
-}
-
-.concept-card p {
-  color: var(--text-dim);
-  font-size: 0.88rem;
-  line-height: 1.6;
-}
-
-/* Code Block */
-.code-block {
-  background: #0d0d14;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  margin: 16px 0;
-  font-family: 'Fira Code', monospace;
-  font-size: 13px;
-}
-
-.code-header {
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-  padding: 8px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.code-lang {
-  color: var(--accent1);
-  font-size: 11px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.code-dots {
-  display: flex;
-  gap: 5px;
-}
-
-.code-dots span {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.code-dots span:nth-child(1) { background: #ff5f57; }
-.code-dots span:nth-child(2) { background: #febc2e; }
-.code-dots span:nth-child(3) { background: #28c840; }
-
-pre {
-  padding: 20px;
-  overflow-x: auto;
-  line-height: 1.8;
-  direction: ltr;
-  text-align: left;
-}
-
-.kw { color: #c77dff; }
-.fn { color: #00d4ff; }
-.str { color: #ffd93d; }
-.num { color: #ff6b6b; }
-.cm { color: #556677; font-style: italic; }
-.cls { color: #6bcb77; }
-.op { color: #ff9f43; }
-
-/* Animation Canvas */
-.anim-container {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 24px;
-  margin: 20px 0;
-  text-align: center;
-}
-
-.anim-title {
-  color: var(--accent3);
-  font-size: 0.9rem;
-  font-weight: 700;
-  margin-bottom: 20px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.anim-stage {
-  min-height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: 20px;
-}
-
-.anim-controls {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.btn {
-  background: rgba(0,212,255,0.1);
-  border: 1px solid rgba(0,212,255,0.4);
-  color: var(--accent1);
-  padding: 8px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
-  font-size: 13px;
-  transition: all 0.2s;
-}
-
-.btn:hover {
-  background: rgba(0,212,255,0.2);
-  box-shadow: 0 0 12px rgba(0,212,255,0.3);
-}
-
-.btn.danger {
-  border-color: rgba(255,107,107,0.4);
-  color: var(--accent2);
-  background: rgba(255,107,107,0.1);
-}
-
-.btn.success {
-  border-color: rgba(107,203,119,0.4);
-  color: var(--accent4);
-  background: rgba(107,203,119,0.1);
-}
-
-/* Animated Node */
-.a-node {
-  display: inline-flex;
-  align-items: center;
-  animation: nodeIn 0.4s ease both;
-}
-
-.a-node-box {
-  background: var(--node-bg);
-  border: 2px solid var(--accent1);
-  border-radius: 8px;
-  padding: 8px 14px;
-  font-family: 'Fira Code', monospace;
-  font-size: 13px;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  box-shadow: 0 0 12px rgba(0,212,255,0.2);
-}
-
-.a-node-box.doubly {
-  border-color: var(--accent5);
-  box-shadow: 0 0 12px rgba(199,125,255,0.2);
-}
-
-.a-node-box.cycle-node {
-  border-color: var(--accent3);
-  box-shadow: 0 0 12px rgba(255,217,61,0.3);
-}
-
-.a-node-box.head-node {
-  border-color: var(--accent4);
-  box-shadow: 0 0 12px rgba(107,203,119,0.3);
-}
-
-.a-node-box .nval { color: var(--accent3); font-weight: 700; font-size: 15px; }
-.a-node-box .nptr { color: var(--text-dim); font-size: 10px; }
-
-.a-arrow {
-  color: var(--accent1);
-  font-size: 18px;
-  padding: 0 4px;
-  transition: color 0.3s;
-}
-
-.a-arrow.back {
-  color: var(--accent5);
-}
-
-.a-arrow.cycle {
-  color: var(--accent3);
-}
-
-.a-null {
-  background: rgba(255,107,107,0.1);
-  border: 2px solid rgba(255,107,107,0.5);
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-family: 'Fira Code', monospace;
-  font-size: 12px;
-  color: var(--accent2);
-}
-
-@keyframes nodeIn {
-  from { opacity: 0; transform: scale(0.7); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.node-label {
-  font-size: 10px;
-  color: var(--accent4);
-  text-align: center;
-  margin-top: 4px;
-  font-family: 'Fira Code', monospace;
-}
-
-.node-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Highlight / pointer */
-.pointer-label {
-  background: var(--accent4);
-  color: #000;
-  font-size: 10px;
-  font-weight: 700;
-  font-family: 'Fira Code', monospace;
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-bottom: 4px;
-}
-
-/* Comparison table */
-.compare-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 16px 0;
-  font-size: 14px;
-}
-
-.compare-table th {
-  background: var(--surface2);
-  color: var(--accent1);
-  padding: 12px 16px;
-  text-align: right;
-  border: 1px solid var(--border);
-  font-family: 'Fira Code', monospace;
-  font-size: 12px;
-}
-
-.compare-table td {
-  padding: 10px 16px;
-  border: 1px solid var(--border);
-  color: var(--text-dim);
-  font-size: 13px;
-}
-
-.compare-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
-.compare-table .good { color: var(--accent4); }
-.compare-table .bad { color: var(--accent2); }
-.compare-table .mid { color: var(--accent3); }
-
-/* Signs / Patterns */
-.sign-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 14px;
-}
-
-.sign-card {
-  background: var(--surface2);
-  border-radius: 12px;
-  padding: 18px;
-  border-right: 4px solid var(--accent5);
-}
-
-.sign-card.warn { border-right-color: var(--accent3); }
-.sign-card.info { border-right-color: var(--accent1); }
-.sign-card.danger { border-right-color: var(--accent2); }
-.sign-card.success { border-right-color: var(--accent4); }
-
-.sign-card h4 {
-  font-size: 0.95rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: var(--text);
-}
-
-.sign-card p, .sign-card li {
-  color: var(--text-dim);
-  font-size: 0.85rem;
-  line-height: 1.6;
-}
-
-.sign-card ul { padding-right: 16px; }
-
-/* Step list */
-.steps {
-  counter-reset: step;
-  padding: 0;
-  list-style: none;
-}
-
-.steps li {
-  counter-increment: step;
-  padding: 10px 0 10px 50px;
-  position: relative;
-  color: var(--text-dim);
-  font-size: 0.9rem;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-}
-
-.steps li::before {
-  content: counter(step);
-  position: absolute;
-  left: 0;
-  top: 8px;
-  background: linear-gradient(135deg, var(--accent1), var(--accent5));
-  color: #000;
-  font-weight: 900;
-  font-size: 11px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Complexity badge */
-.complexity {
-  display: inline-flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.cx-badge {
-  background: rgba(0,0,0,0.3);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-family: 'Fira Code', monospace;
-  font-size: 12px;
-}
-
-.cx-badge .cx-label { color: var(--text-dim); }
-.cx-badge .cx-val { color: var(--accent3); font-weight: 700; }
-
-/* Problem cards */
-.problems-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 14px;
-}
-
-.prob-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 18px;
-  transition: all 0.2s;
-}
-
-.prob-card:hover { border-color: var(--accent5); }
-
-.prob-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.prob-diff {
-  font-size: 10px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.easy { background: rgba(107,203,119,0.15); color: var(--accent4); border: 1px solid rgba(107,203,119,0.3); }
-.medium { background: rgba(255,217,61,0.15); color: var(--accent3); border: 1px solid rgba(255,217,61,0.3); }
-.hard { background: rgba(255,107,107,0.15); color: var(--accent2); border: 1px solid rgba(255,107,107,0.3); }
-
-.prob-card h4 {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.prob-card p {
-  color: var(--text-dim);
-  font-size: 0.8rem;
-  margin-top: 6px;
-  line-height: 1.5;
-}
-
-.prob-tags {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: 10px;
-}
-
-.tag {
-  background: rgba(0,212,255,0.08);
-  border: 1px solid rgba(0,212,255,0.2);
-  color: var(--accent1);
-  font-size: 10px;
-  padding: 2px 7px;
-  border-radius: 4px;
-  font-family: 'Fira Code', monospace;
-}
-
-/* Info note */
-.note {
-  background: rgba(0,212,255,0.05);
-  border: 1px solid rgba(0,212,255,0.2);
-  border-radius: 10px;
-  padding: 14px 18px;
-  font-size: 0.85rem;
-  color: var(--text-dim);
-  margin: 16px 0;
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-}
-
-.note-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
-
-.warning {
-  background: rgba(255,107,107,0.05);
-  border-color: rgba(255,107,107,0.3);
-}
-
-/* Cycle viz */
-.cycle-viz {
-  position: relative;
-  width: 300px;
-  height: 200px;
-  margin: 0 auto;
-}
-
-.cycle-arrow-curved {
-  color: var(--accent3);
-  font-size: 22px;
-  font-weight: bold;
-}
-
-/* section divider */
-.divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent1), transparent);
-  margin: 40px 0;
-  opacity: 0.3;
-}
-
-/* Highlight text */
-.hl { color: var(--accent1); font-weight: 700; }
-.hl2 { color: var(--accent2); font-weight: 700; }
-.hl3 { color: var(--accent3); font-weight: 700; }
-.hl4 { color: var(--accent4); font-weight: 700; }
-.hl5 { color: var(--accent5); font-weight: 700; }
-
-/* Algo step */
-.algo-step {
-  background: var(--surface2);
-  border-radius: 10px;
-  padding: 14px 18px;
-  margin: 8px 0;
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-
-.algo-num {
-  background: var(--accent1);
-  color: #000;
-  font-weight: 900;
-  font-size: 11px;
-  min-width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 2px;
-}
-
-.algo-step p { color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; }
-.algo-step strong { color: var(--text); }
-
-/* Responsive */
-@media (max-width: 768px) {
-  .hero h1 { font-size: 2rem; }
-  .lesson-header h2 { font-size: 1.3rem; }
-  .hero-nodes { gap: 4px; }
-  .node-box { padding: 8px 12px; font-size: 12px; }
-}
-
-/* Pulse animation for slow/fast pointers */
-@keyframes slowPulse {
-  0%, 100% { border-color: var(--accent4); box-shadow: 0 0 8px rgba(107,203,119,0.3); }
-  50% { border-color: var(--accent4); box-shadow: 0 0 20px rgba(107,203,119,0.7); }
-}
-
-@keyframes fastPulse {
-  0%, 100% { border-color: var(--accent2); box-shadow: 0 0 8px rgba(255,107,107,0.3); }
-  50% { border-color: var(--accent2); box-shadow: 0 0 20px rgba(255,107,107,0.7); }
-}
-
-.slow-ptr { animation: slowPulse 1.5s ease-in-out infinite; }
-.fast-ptr { animation: fastPulse 0.8s ease-in-out infinite; }
-
-/* Step-through animation */
-@keyframes highlight {
-  0% { background: rgba(255,217,61,0.4); }
-  100% { background: transparent; }
-}
-
-.highlight-anim { animation: highlight 1s ease both; }
-
-/* Footer */
-footer {
-  text-align: center;
-  padding: 40px;
-  color: var(--text-dim);
-  font-size: 0.8rem;
-  border-top: 1px solid var(--border);
-  background: var(--surface);
-}
-pre, code {
-    direction: ltr !important;
-    text-align: left !important;
-    unicode-bidi: plaintext !important;
-}
-</style>
-<link rel="stylesheet" href="../styles/theme.css">
-<script>var s=localStorage.getItem('aaos_theme')||'dark';document.documentElement.setAttribute('data-theme',s);</script></head>
-<body>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-badge">Data Structures � ?????? ??????</div>
-  <h1><span>Linked Lists</span><br>?? <em>?????</em> ????????</h1>
-  <p class="hero-sub">Singly � Doubly � Circular � Cycle Detection � Reversal<br>?? ??? ????? ?????? ?? ????? ???????? ??????</p>
-  
-  <div class="hero-nodes">
-    <div class="hero-node">
-      <div class="node-wrapper">
-        <div class="pointer-label">HEAD</div>
-        <div class="node-box"><span class="val">10</span><span class="sep">|</span><span class="ptr">next?</span></div>
-      </div>
-    </div>
-    <div class="node-arrow">?</div>
-    <div class="hero-node">
-      <div class="node-box"><span class="val">20</span><span class="sep">|</span><span class="ptr">next?</span></div>
-    </div>
-    <div class="node-arrow">?</div>
-    <div class="hero-node">
-      <div class="node-box"><span class="val">30</span><span class="sep">|</span><span class="ptr">next?</span></div>
-    </div>
-    <div class="node-arrow">?</div>
-    <div class="null-box">NULL</div>
-  </div>
-</section>
-
-<!-- TOC -->
-<section class="toc">
-  <div class="section-header">
-    <div class="section-tag">Table of Contents</div>
-    <h2>???? ?????????</h2>
-  </div>
-  <div class="toc-grid">
-    <a href="#basics" class="toc-item"><span class="toc-num">01</span> ?? ?? Linked List?</a>
-    <a href="#singly" class="toc-item"><span class="toc-num">02</span> Singly Linked List</a>
-    <a href="#doubly" class="toc-item"><span class="toc-num">03</span> Doubly Linked List</a>
-    <a href="#circular" class="toc-item"><span class="toc-num">04</span> Circular Linked List</a>
-    <a href="#operations" class="toc-item"><span class="toc-num">05</span> ???????? ????????</a>
-    <a href="#reversal" class="toc-item"><span class="toc-num">06</span> Reversal � ??? ???????</a>
-    <a href="#cycle" class="toc-item"><span class="toc-num">07</span> Cycle Detection</a>
-    <a href="#two-pointers" class="toc-item"><span class="toc-num">08</span> Two Pointers Tricks</a>
-    <a href="#signs" class="toc-item"><span class="toc-num">09</span> ?????? ?????? ??? ???????</a>
-    <a href="#problems" class="toc-item"><span class="toc-num">10</span> ??? ??????? + ??????</a>
-  </div>
-</section>
-
-<!-- CONTENT -->
-<div class="content">
-
-<!-- ---------------------------------------------------
-     SECTION 1: BASICS
---------------------------------------------------- -->
-<section class="lesson" id="basics">
-  <div class="lesson-header">
-    <div class="lesson-num">01</div>
-    <h2>?? ?? <span class="en">Linked List</span>?</h2>
-  </div>
-
-  <div class="concept-grid">
-    <div class="concept-card">
-      <div class="concept-icon">??</div>
-      <h3>Node</h3>
-      <p>???? ?????? ????????. ?? Node ?????? ??? <strong>data</strong> (??????) ?<strong>pointer</strong> ????? ??? node ??????.</p>
-    </div>
-    <div class="concept-card">
-      <div class="concept-icon">??</div>
-      <h3>Head</h3>
-      <p>??? node ?? ???????. ?? ????? ???? ??????? ????. ?? ?????? ???? ??????? ????!</p>
-    </div>
-    <div class="concept-card">
-      <div class="concept-icon">??</div>
-      <h3>Tail</h3>
-      <p>??? node ?? ???????. ??? next pointer ????? ????? ?? NULL (????? ???????).</p>
-    </div>
-    <div class="concept-card">
-      <div class="concept-icon">??</div>
-      <h3>Dynamic Size</h3>
-      <p>?? ?? Arrays � ?? ????? ???? ????? ??????. ????? ????? ?????????? ??? ???????.</p>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">?????? Array vs Linked List</div>
-    <table class="compare-table">
-      <tr>
-        <th>???????</th>
-        <th>Array</th>
-        <th>Linked List</th>
-        <th>??????</th>
-      </tr>
-      <tr>
-        <td>Access by index</td>
-        <td class="good">O(1)</td>
-        <td class="bad">O(n)</td>
-        <td>Array ????</td>
-      </tr>
-      <tr>
-        <td>Insert at beginning</td>
-        <td class="bad">O(n)</td>
-        <td class="good">O(1)</td>
-        <td>Linked List ????</td>
-      </tr>
-      <tr>
-        <td>Insert at end</td>
-        <td class="good">O(1) amortized</td>
-        <td class="mid">O(1) ?? ???? tail</td>
-        <td>????????</td>
-      </tr>
-      <tr>
-        <td>Delete from middle</td>
-        <td class="bad">O(n)</td>
-        <td class="good">O(1) ?? ???? pointer</td>
-        <td>Linked List ????</td>
-      </tr>
-      <tr>
-        <td>Search</td>
-        <td class="mid">O(n)</td>
-        <td class="bad">O(n)</td>
-        <td>????????</td>
-      </tr>
-      <tr>
-        <td>Memory</td>
-        <td class="good">Compact</td>
-        <td class="bad">Extra pointer per node</td>
-        <td>Array ????</td>
-      </tr>
-    </table>
-  </div>
-
-  <div class="card">
-    <div class="card-title">??? ??? Node ???????</div>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-lang">C++</span>
-        <div class="code-dots"><span></span><span></span><span></span></div>
-      </div>
-      <pre><span class="cm">// ============================
-// Node ??????? ?? Linked List
-// ============================</span>
-<span class="kw">struct</span> <span class="cls">Node</span> {
-    <span class="kw">int</span> <span class="var">data</span>;         <span class="cm">// ?????? ???????</span>
-    <span class="cls">Node</span>* <span class="var">next</span>;       <span class="cm">// Pointer ??? Node ??????</span>
-
-    <span class="cls">Node</span>(<span class="kw">int</span> <span class="var">val</span>) : <span class="var">data</span>(<span class="var">val</span>), <span class="var">next</span>(<span class="kw">nullptr</span>) {}
-};
-
-<span class="cm">// ???? ??? ????? Nodes:</span>
-<span class="cls">Node</span>* <span class="var">n1</span> = <span class="kw">new</span> <span class="cls">Node</span>(<span class="nm">10</span>);
-<span class="cls">Node</span>* <span class="var">n2</span> = <span class="kw">new</span> <span class="cls">Node</span>(<span class="nm">20</span>);
-<span class="cls">Node</span>* <span class="var">n3</span> = <span class="kw">new</span> <span class="cls">Node</span>(<span class="nm">30</span>);
-
-<span class="cm">// ????? ????:</span>
-<span class="var">n1</span>-><span class="var">next</span> = <span class="var">n2</span>;
-<span class="var">n2</span>-><span class="var">next</span> = <span class="var">n3</span>;
-<span class="cm">// n3->next = nullptr (?????? ???? constructor)</span>
-
-<span class="cls">Node</span>* <span class="var">head</span> = <span class="var">n1</span>;  <span class="cm">// HEAD ????? ???? Node</span>
-
-<span class="cm">// ???????: 10 ? 20 ? 30 ? NULL</span></pre>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ---------------------------------------------------
-     SECTION 2: SINGLY
---------------------------------------------------- -->
-<section class="lesson" id="singly">
-  <div class="lesson-header">
-    <div class="lesson-num">02</div>
-    <h2><span class="en">Singly Linked List</span> � ??????? ?????? ???????</h2>
-  </div>
-
-  <p style="color: var(--text-dim); margin-bottom: 20px;">
-    ?? node ????? <span class="hl">pointer ???? ??</span> ????? ??? node ??????. ???? ????? ???? ?????!<br>
-    ?????? ???? <span class="hl2">?? ????? ???? ???</span> ?? ?????? ??????.
-  </p>
-
-  <!-- Singly Animation -->
-  <div class="anim-container">
-    <div class="anim-title">?? ??????? Singly Linked List � ????? ????</div>
-    <div class="anim-stage" id="singly-stage">
-      <!-- Populated by JS -->
-    </div>
-    <div id="singly-msg" style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 16px; min-height: 20px;"></div>
-    <div class="anim-controls">
-      <button class="btn" onclick="singlyAddFront()">+ ????? ???????</button>
-      <button class="btn" onclick="singlyAddEnd()">+ ????? ???????</button>
-      <button class="btn danger" onclick="singlyDeleteHead()">- ??? ?????</button>
-      <button class="btn danger" onclick="singlyDeleteTail()">- ??? ??????</button>
-      <button class="btn success" onclick="singlyReset()">? ?????</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Insert at Head � ????? ?? ??????? O(1)</div>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-lang">C++</span>
-        <div class="code-dots"><span></span><span></span><span></span></div>
-      </div>
-      <pre><span class="kw">void</span> <span class="fn">insertAtHead</span>(<span class="cls">Node</span>** <span class="var">head</span>, <span class="kw">int</span> <span class="var">data</span>) {
-    <span class="cls">Node</span>* <span class="var">newNode</span> = <span class="kw">new</span> <span class="cls">Node</span>(<span class="var">data</span>);
-    <span class="var">newNode</span>-><span class="var">next</span> = *<span class="var">head</span>;  <span class="cm">// ? ??? node ?????? ???? ??? head ??????</span>
-    *<span class="var">head</span> = <span class="var">newNode</span>;        <span class="cm">// ? ??? head ???? ??? node ??????</span>
-}
-<span class="cm">// ? O(1) � ???? ????</span></pre>
-    </div>
-
-    <div class="card-title" style="margin-top: 16px;">Insert at Tail � ????? ?? ??????? O(n)</div>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-lang">C++</span>
-        <div class="code-dots"><span></span><span></span><span></span></div>
-      </div>
-      <pre><span class="kw">void</span> <span class="fn">insertAtTail</span>(<span class="cls">Node</span>** <span class="var">head</span>, <span class="kw">int</span> <span class="var">data</span>) {
-    <span class="cls">Node</span>* <span class="var">newNode</span> = <span class="kw">new</span> <span class="cls">Node</span>(<span class="var">data</span>);
-    <span class="kw">if</span> (!*<span class="var">head</span>) {
-        *<span class="var">head</span> = <span class="var">newNode</span>;
-        <span class="kw">return</span>;
-    }
-    <span class="cls">Node</span>* <span class="var">curr</span> = *<span class="var">head</span>;
-    <span class="kw">while</span> (<span class="var">curr</span>-><span class="var">next</span>) {   <span class="cm">// ? ???? ??? ?? ???? ??????</span>
-        <span class="var">curr</span> = <span class="var">curr</span>-><span class="var">next</span>;
-    }
-    <span class="var">curr</span>-><span class="var">next</span> = <span class="var">newNode</span>;  <span class="cm">// ? ???? ??? new node</span>
-}
-<span class="cm">// ?? O(n) � ?? ???? tail pointer ???? O(1)</span></pre>
-    </div>
-
-    <div class="card-title" style="margin-top: 16px;">Delete by Value � ??? ??????? O(n)</div>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-lang">C++</span>
-        <div class="code-dots"><span></span><span></span><span></span></div>
-      </div>
-      <pre><span class="kw">void</span> <span class="fn">deleteNode</span>(<span class="cls">Node</span>** <span class="var">head</span>, <span class="kw">int</span> <span class="var">val</span>) {
-    <span class="kw">if</span> (!*<span class="var">head</span>) <span class="kw">return</span>;
-    
-    <span class="cm">// Case 1: ??? head ?? ???? ??????</span>
-    <span class="kw">if</span> ((*<span class="var">head</span>)-><span class="var">data</span> == <span class="var">val</span>) {
-        <span class="cls">Node</span>* <span class="var">temp</span> = *<span class="var">head</span>;
-        *<span class="var">head</span> = (*<span class="var">head</span>)-><span class="var">next</span>;
-        <span class="kw">delete</span> <span class="var">temp</span>;
-        <span class="kw">return</span>;
-    }
-    
-    <span class="cm">// Case 2: ???? ?? ??? node ??? ???????</span>
-    <span class="cls">Node</span>* <span class="var">prev</span> = *<span class="var">head</span>;
-    <span class="kw">while</span> (<span class="var">prev</span>-><span class="var">next</span> && <span class="var">prev</span>-><span class="var">next</span>-><span class="var">data</span> != <span class="var">val</span>) {
-        <span class="var">prev</span> = <span class="var">prev</span>-><span class="var">next</span>;
-    }
-    
-    <span class="kw">if</span> (<span class="var">prev</span>-><span class="var">next</span>) {  <span class="cm">// ??????</span>
-        <span class="cls">Node</span>* <span class="var">temp</span> = <span class="var">prev</span>-><span class="var">next</span>;
-        <span class="var">prev</span>-><span class="var">next</span> = <span class="var">prev</span>-><span class="var">next</span>-><span class="var">next</span>; <span class="cm">// ? "???" ??? ??? node ???????</span>
-        <span class="kw">delete</span> <span class="var">temp</span>;
-    }
-}
-</pre>
-    </div>
-  </div>
-
-  <div class="note">
-    <span class="note-icon">??</span>
-    <div><strong style="color: var(--accent1);">???? ???:</strong> ?? ????? ???? node ????? pointer ????? ?????? (?? head)? ???? ???? ?????? ?? ??? node ?????? ????? ??? node ?????? ??? ?? ???? ???? ??? prev!</div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ---------------------------------------------------
-     SECTION 3: DOUBLY
---------------------------------------------------- -->
-<section class="lesson" id="doubly">
-  <div class="card">
-    <div class="card-title">Node ????? ??? Doubly List</div>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-lang">C++</span>
-        <div class="code-dots"><span></span><span></span><span></span></div>
-      </div>
-      <pre><span class="kw">struct</span> <span class="cls">DoublyNode</span> {
-    <span class="kw">int</span> <span class="var">data</span>;
-    <span class="cls">DoublyNode</span>* <span class="var">next</span>; <span class="cm">// ? ??????</span>
-    <span class="cls">DoublyNode</span>* <span class="var">prev</span>; <span class="cm">// ? ?????</span>
-    <span class="cls">DoublyNode</span>(<span class="kw">int</span> <span class="var">val</span>) : <span class="var">data</span>(<span class="var">val</span>), <span class="var">next</span>(<span class="kw">nullptr</span>), <span class="var">prev</span>(<span class="kw">nullptr</span>) {}
-};
-
-<span class="kw">void</span> <span class="fn">insertAtTail</span>(<span class="cls">DoublyNode</span>** <span class="var">head</span>, <span class="cls">DoublyNode</span>** <span class="var">tail</span>, <span class="kw">int</span> <span class="var">data</span>) {
-    <span class="cls">DoublyNode</span>* <span class="var">newNode</span> = <span class="kw">new</span> <span class="cls">DoublyNode</span>(<span class="var">data</span>);
-    <span class="kw">if</span> (!*<span class="var">head</span>) {
-        *<span class="var">head</span> = *<span class="var">tail</span> = <span class="var">newNode</span>;
-        <span class="kw">return</span>;
-    }
-    <span class="cm">// ? ??? ??? new node</span>
-    <span class="var">newNode</span>-><span class="var">prev</span> = *<span class="var">tail</span>;
-    (*<span class="var">tail</span>)-><span class="var">next</span> = <span class="var">newNode</span>;
-    *<span class="var">tail</span> = <span class="var">newNode</span>;
-}
-
-<span class="kw">void</span> <span class="fn">deleteNode</span>(<span class="cls">DoublyNode</span>** <span class="var">head</span>, <span class="cls">DoublyNode</span>** <span class="var">tail</span>, <span class="cls">DoublyNode</span>* <span class="var">node</span>) {
-    <span class="kw">if</span> (<span class="var">node</span>-><span class="var">prev</span>) <span class="var">node</span>-><span class="var">prev</span>-><span class="var">next</span> = <span class="var">node</span>-><span class="var">next</span>;
-    <span class="kw">else</span> *<span class="var">head</span> = <span class="var">node</span>-><span class="var">next</span>;
-    
-    <span class="kw">if</span> (<span class="var">node</span>-><span class="var">next</span>) <span class="var">node</span>-><span class="var">next</span>-><span class="var">prev</span> = <span class="var">node</span>-><span class="var">prev</span>;
-    <span class="kw">else</span> *<span class="var">tail</span> = <span class="var">node</span>-><span class="var">prev</span>;
-    
-    <span class="kw">delete</span> <span class="var">node</span>;
-}
-</pre>
-    </div>
-  </div>
-
-  <div class="concept-grid">
-    <div class="concept-card">
-      <div class="concept-icon">?</div>
-      <h3>????? Doubly</h3>
-      <p style="color: var(--accent4);">??? O(1) ?? ???? pointer<br>traversal ?? ?????????<br>????? ??? LRU Cache<br>??? ??? ???????</p>
-    </div>
-    <div class="concept-card">
-      <div class="concept-icon">??</div>
-      <h3>???? Doubly</h3>
-      <p style="color: var(--accent2);">????? ???? (pointer ?????)<br>??? ????<br>?? ?????/??? ???? ???? pointer??</p>
-    </div>
-  </div>
-
-  <div class="note warning">
-    <span class="note-icon">??</span>
-    <div><strong style="color: var(--accent2);">??? ???? ????:</strong> ??? ???? node ?? doubly? ?????? ???? ??? prev pointer ???? ??? node ?????? ???? next pointer ???? ??? node ???????! ?? ???? ???? ???? ????? corruption ?? ???????.</div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ---------------------------------------------------
-     SECTION 4: CIRCULAR
---------------------------------------------------- -->
-<section class="lesson" id="circular">
-  <div class="lesson-header">
-    <div class="lesson-num">04</div>
-    <h2><span class="en">Circular Linked List</span> � ??????? ????????</h2>
-  </div>
-
-  <p style="color: var(--text-dim); margin-bottom: 20px;">
-    ??? node ?? ????? ?? NULL? ????? <span class="hl">??? head</span> ??? ?????!<br>
-    ???? ??????? ?? <span class="hl3">????</span> � ???? ????? ????? ?????.
-  </p>
-
-  <div class="card">
-    <div class="card-title">??? Circular List � Insert & Traverse</div>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-lang">C++</span>
-        <div class="code-dots"><span></span><span></span><span></span></div>
-      </div>
-      <pre><span class="kw">void</span> <span class="fn">insertCircular</span>(<span class="cls">Node</span>** <span class="var">head</span>, <span class="kw">int</span> <span class="var">data</span>) {
-    <span class="cls">Node</span>* <span class="var">newNode</span> = <span class="kw">new</span> <span class="cls">Node</span>(<span class="var">data</span>);
-    <span class="kw">if</span> (!*<span class="var">head</span>) {
-        *<span class="var">head</span> = <span class="var">newNode</span>;
-        <span class="var">newNode</span>-><span class="var">next</span> = *<span class="var">head</span>;
-        <span class="kw">return</span>;
-    }
-    <span class="cls">Node</span>* <span class="var">tail</span> = *<span class="var">head</span>;
-    <span class="kw">while</span> (<span class="var">tail</span>-><span class="var">next</span> != *<span class="var">head</span>) {
-        <span class="var">tail</span> = <span class="var">tail</span>-><span class="var">next</span>;
-    }
-    <span class="var">tail</span>-><span class="var">next</span> = <span class="var">newNode</span>;
-    <span class="var">newNode</span>-><span class="var">next</span> = *<span class="var">head</span>;
-}
-
-<span class="kw">void</span> <span class="fn">traverseCircular</span>(<span class="cls">Node</span>* <span class="var">head</span>) {
-    <span class="kw">if</span> (!<span class="var">head</span>) <span class="kw">return</span>;
-    <span class="cls">Node</span>* <span class="var">curr</span> = <span class="var">head</span>;
-    <span class="kw">do</span> {
-        <span class="fn">printf</span>(<span class="st">"%d "</span>, <span class="var">curr</span>-><span class="var">data</span>);
-        <span class="var">curr</span> = <span class="var">curr</span>-><span class="var">next</span>;
-    } <span class="kw">while</span> (<span class="var">curr</span> != <span class="var">head</span>);
-}
-</pre>
-    </div>
-  </div>
-    <div id="circular-linear" style="display:flex; align-items:center; gap:4px; flex-wrap:wrap; justify-content:center;"></div>
-      <div style="color: var(--accent3); font-size: 13px; font-family: 'Fira Code', monospace;">
-        ? ??? tail.next ????? ??? head ?
-      </div>
-    </div>
-    <div id="circular-msg" style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 16px; min-height: 20px;"></div>
-    <div class="anim-controls">
-      <button class="btn" onclick="circularAdd()">+ ????? Node</button>
-      <button class="btn danger" onclick="circularDelete()">- ??? Head</button>
-      <button class="btn success" onclick="circularReset()">? ?????</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">??? Circular List � Insert & Traverse</div>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-lang">C++</span>
-        <div class="code-dots"><span></span><span></span><span></span></div>
-      </div>
-      <pre><span class="kw">void</span> <span class="fn">insertCircular</span>(<span class="cls">Node</span>** <span class="var">head</span>, <span class="kw">int</span> <span class="var">data</span>) {
-    <span class="cls">Node</span>* <span class="var">newNode</span> = <span class="kw">new</span> <span class="cls">Node</span>(<span class="var">data</span>);
-    <span class="kw">if</span> (!*<span class="var">head</span>) {
-        *<span class="var">head</span> = <span class="var">newNode</span>;
-        <span class="var">newNode</span>-><span class="var">next</span> = *<span class="var">head</span>;
-        <span class="kw">return</span>;
-    }
-    <span class="cls">Node</span>* <span class="var">tail</span> = *<span class="var">head</span>;
-    <span class="kw">while</span> (<span class="var">tail</span>-><span class="var">next</span> != *<span class="var">head</span>) {
-        <span class="var">tail</span> = <span class="var">tail</span>-><span class="var">next</span>;
-    }
-    <span class="var">tail</span>-><span class="var">next</span> = <span class="var">newNode</span>;
-    <span class="var">newNode</span>-><span class="var">next</span> = *<span class="var">head</span>;
-}
-
-<span class="kw">void</span> <span class="fn">traverseCircular</span>(<span class="cls">Node</span>* <span class="var">head</span>) {
-    <span class="kw">if</span> (!<span class="var">head</span>) <span class="kw">return</span>;
-    <span class="cls">Node</span>* <span class="var">curr</span> = <span class="var">head</span>;
-    <span class="kw">do</span> {
-        <span class="fn">printf</span>(<span class="st">"%d "</span>, <span class="var">curr</span>-><span class="var">data</span>);
-        <span class="var">curr</span> = <span class="var">curr</span>-><span class="var">next</span>;
-    } <span class="kw">while</span> (<span class="var">curr</span> != <span class="var">head</span>);
-}</pre>
-    </div>
-  </div>
-
-  <div class="note">
-    <span class="note-icon">??</span>
-    <div><strong style="color: var(--accent1);">????????? Circular List:</strong> Round Robin scheduling ?? ??? OS? queue ?? playlist ???? ?????? ????? ??? buffer ??????? (ring buffer).</div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ---------------------------------------------------
-     SECTION 5: REVERSAL
---------------------------------------------------- -->
-<section class="lesson" id="reversal">
-  <div class="lesson-header">
-    <div class="lesson-num">06</div>
-    <h2><span class="en">Reversal</span> � ??? ??? Linked List</h2>
-  </div>
-
-  <p style="color: var(--text-dim); margin-bottom: 20px;">
-    ?? ???? ??????? ???? ????? ?? ??????????! ????? ???? ????? ?? ??? pointers.
-  </p>
-
-  <!-- Reversal Animation -->
-  <div class="anim-container">
-    <div class="anim-title">?? ??????? Reversal � ???? ?????</div>
-    <div class="anim-stage" id="rev-stage" style="flex-direction: column; gap: 16px;">
-      <div id="rev-list" style="display:flex; align-items:center; gap:4px; flex-wrap:wrap; justify-content:center;"></div>
-      <div id="rev-pointers" style="display:flex; gap:20px; justify-content:center; flex-wrap:wrap;"></div>
-      <div id="rev-info" style="color: var(--text-dim); font-size: 0.85rem; font-family: 'Fira Code', monospace; text-align:center;"></div>
-    </div>
-    <div class="anim-controls">
-      <button class="btn" onclick="revStep()">? ???? ??????</button>
-      <button class="btn success" onclick="revAuto()">? ????? ??????</button>
-      <button class="btn danger" onclick="revReset()">? ?????</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">?????????? Iterative � 3 pointers</div>
-
-    <div class="algo-step">
-      <div class="algo-num">1</div>
-      <p>????? 3 variables: <strong>prev = None</strong>, <strong>curr = head</strong>, <strong>next_node = None</strong></p>
-    </div>
-    <div class="algo-step">
-      <div class="algo-num">2</div>
-      <p>?? ?? iteration: ????? <strong>next_node = curr.next</strong> (???? ??????? ???? ???????)</p>
-    </div>
-    <div class="algo-step">
-      <div class="algo-num">3</div>
-      <p>????? ??? pointer: <strong>curr.next = prev</strong> (????? ??????)</p>
-    </div>
-    <div class="algo-step">
-      <div class="algo-num">4</div>
-      <p>????? ??? pointers ??????: <strong>prev = curr</strong>, <strong>curr = next_node</strong></p>
-    </div>
-    <div class="algo-step">
-      <div class="algo-num">5</div>
-      <p>??? curr == None? ??? <strong>prev</strong> ????? ??? head ??????!</p>
-    </div>
-
-    <div class="code-block" style="margin-top: 16px;">
-      <div class="code-header">
-        <span class="code-lang">C++ � Iterative O(n) time, O(1) space</span>
-        <div class="code-dots"><span></span><span></span><span></span></div>
-      </div>
-      <pre><span class="kw">void</span> <span class="fn">reverse</span>(<span class="cls">Node</span>** <span class="var">head</span>) {
-    <span class="cls">Node</span> *<span class="var">prev</span> = <span class="kw">nullptr</span>, *<span class="var">curr</span> = *<span class="var">head</span>, *<span class="var">nextNode</span> = <span class="kw">nullptr</span>;
-    
-    <span class="kw">while</span> (<span class="var">curr</span>) {
-        <span class="var">nextNode</span> = <span class="var">curr</span>-><span class="var">next</span>;  <span class="cm">// ? ???? ??? next</span>
-        <span class="var">curr</span>-><span class="var">next</span> = <span class="var">prev</span>;       <span class="cm">// ? ???? ??? pointer</span>
-        <span class="var">prev</span> = <span class="var">curr</span>;            <span class="cm">// ? ??? prev ??????</span>
-        <span class="var">curr</span> = <span class="var">nextNode</span>;        <span class="cm">// ? ??? curr ??????</span>
-    }
-    *<span class="var">head</span> = <span class="var">prev</span>;  <span class="cm">// ? prev ?????? = head ??????</span>
-}
-
-<span class="cm">// --------------------------------</span>
-<span class="cm">// Recursive (elegant, O(n) space)</span>
-<span class="cm">// --------------------------------</span>
-<span class="cls">Node</span>* <span class="fn">reverseRecursive</span>(<span class="cls">Node</span>* <span class="var">node</span>) {
-    <span class="kw">if</span> (!<span class="var">node</span> || !<span class="var">node</span>-><span class="var">next</span>) <span class="kw">return</span> <span class="var">node</span>;
-    
-    <span class="cls">Node</span>* <span class="var">newHead</span> = <span class="fn">reverseRecursive</span>(<span class="var">node</span>-><span class="var">next</span>);
-    <span class="var">node</span>-><span class="var">next</span>-><span class="var">next</span> = <span class="var">node</span>;  <span class="cm">// ???? ??? pointer</span>
-    <span class="var">node</span>-><span class="var">next</span> = <span class="kw">nullptr</span>;       <span class="cm">// ??? ??? old pointer</span>
-    <span class="kw">return</span> <span class="var">newHead</span>;
-}
-</pre>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Reverse a Sublist � ??? ??? ??? (????? LeetCode 92)</div>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-lang">C++ � Reverse from position left to right</span>
-        <div class="code-dots"><span></span><span></span><span></span></div>
-      </div>
-      <pre><span class="cls">Node</span>* <span class="fn">reverseBetween</span>(<span class="cls">Node</span>* <span class="var">head</span>, <span class="kw">int</span> <span class="var">left</span>, <span class="kw">int</span> <span class="var">right</span>) {
-    <span class="cls">Node</span>* <span class="var">dummy</span> = <span class="kw">new</span> <span class="cls">Node</span>(<span class="nm">0</span>);
-    <span class="var">dummy</span>-><span class="var">next</span> = <span class="var">head</span>;
-    <span class="cls">Node</span>* <span class="var">prev</span> = <span class="var">dummy</span>;
-    
-    <span class="cm">// ? ???? ?? (left - 1)</span>
-    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">0</span>; <span class="var">i</span> < <span class="var">left</span> - <span class="nm">1</span>; ++<span class="var">i</span>)
-        <span class="var">prev</span> = <span class="var">prev</span>-><span class="var">next</span>;
-    
-    <span class="cls">Node</span>* <span class="var">curr</span> = <span class="var">prev</span>-><span class="var">next</span>;
-    
-    <span class="cm">// ? ???? (right - left) ????</span>
-    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">0</span>; <span class="var">i</span> < <span class="var">right</span> - <span class="var">left</span>; ++<span class="var">i</span>) {
-        <span class="cls">Node</span>* <span class="var">nextNode</span> = <span class="var">curr</span>-><span class="var">next</span>;
-        <span class="var">curr</span>-><span class="var">next</span> = <span class="var">nextNode</span>-><span class="var">next</span>;
-        <span class="var">nextNode</span>-><span class="var">next</span> = <span class="var">prev</span>-><span class="var">next</span>;
-        <span class="var">prev</span>-><span class="var">next</span> = <span class="var">nextNode</span>;
-    }
-    
-    <span class="kw">return</span> <span class="var">dummy</span>-><span class="var">next</span>;
-}</pre>
-    </div>
-  </div>
-
-  <div style="margin-top: 16px;" class="complexity">
-    <div class="cx-badge"><span class="cx-label">Time: </span><span class="cx-val">O(n)</span></div>
-    <div class="cx-badge"><span class="cx-label">Space (iterative): </span><span class="cx-val">O(1)</span></div>
-    <div class="cx-badge"><span class="cx-label">Space (recursive): </span><span class="cx-val">O(n)</span></div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ---------------------------------------------------
-     SECTION 6: CYCLE DETECTION
---------------------------------------------------- -->
-<section class="lesson" id="cycle">
-  <div class="lesson-header">
-    <div class="lesson-num">07</div>
-    <h2><span class="en">Cycle Detection</span> � ?????? ?????? ????</h2>
-  </div>
-
-  <p style="color: var(--text-dim); margin-bottom: 20px;">
-    ??????? ?? ?????? ??? node ????? ?? node ?? ??????? ??? NULL � ??????? <span class="hl2">cycle (????)</span>.<br>
-    ?????????? ?????? ????????? ?? <span class="hl3">Floyd's Algorithm</span> ?? "???????? ???????" ????.
-  </p>
-
-  <!-- Cycle Animation -->
-  <div class="anim-container">
-    <div class="anim-title">?? Floyd's Cycle Detection � ??? Slow ? Fast Pointers</div>
-    <div class="anim-stage" id="cycle-stage" style="flex-direction:column; gap:12px;">
-      <div id="cycle-list" style="display:flex; align-items:center; gap:4px; flex-wrap:wrap; justify-content:center;"></div>
-      <div id="cycle-ptrs" style="display:flex; gap:20px; justify-content:center; flex-wrap:wrap;"></div>
-      <div id="cycle-info" style="font-family:'Fira Code',monospace; font-size:12px; color:var(--text-dim); text-align:center;"></div>
-    </div>
-    <div class="anim-controls">
-      <button class="btn" onclick="cycleStep()">? ????</button>
-      <button class="btn success" onclick="cycleAuto()">? ????? ??????</button>
-      <button class="btn danger" onclick="cycleReset()">? ?????</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Floyd's Algorithm � ??? ????</div>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-lang">C++ � Detect & Find Entry</span>
-        <div class="code-dots"><span></span><span></span><span></span></div>
-      </div>
-      <pre><span class="kw">bool</span> <span class="fn">hasCycle</span>(<span class="cls">Node</span>* <span class="var">head</span>) {
-    <span class="cls">Node</span> *<span class="var">slow</span> = <span class="var">head</span>, *<span class="var">fast</span> = <span class="var">head</span>;
-    <span class="kw">while</span> (<span class="var">fast</span> && <span class="var">fast</span>-><span class="var">next</span>) {
-        <span class="var">slow</span> = <span class="var">slow</span>-><span class="var">next</span>;
-        <span class="var">fast</span> = <span class="var">fast</span>-><span class="var">next</span>-><span class="var">next</span>;
-        <span class="kw">if</span> (<span class="var">slow</span> == <span class="var">fast</span>) <span class="kw">return</span> <span class="kw">true</span>;
-    }
-    <span class="kw">return</span> <span class="kw">false</span>;
-}
-
-<span class="cls">Node</span>* <span class="fn">findCycleEntry</span>(<span class="cls">Node</span>* <span class="var">head</span>) {
-    <span class="cls">Node</span> *<span class="var">slow</span> = <span class="var">head</span>, *<span class="var">fast</span> = <span class="var">head</span>;
-    <span class="kw">while</span> (<span class="var">fast</span> && <span class="var">fast</span>-><span class="var">next</span>) {
-        <span class="var">slow</span> = <span class="var">slow</span>-><span class="var">next</span>;
-        <span class="var">fast</span> = <span class="var">fast</span>-><span class="var">next</span>-><span class="var">next</span>;
-        <span class="kw">if</span> (<span class="var">slow</span> == <span class="var">fast</span>) {
-            <span class="var">slow</span> = <span class="var">head</span>;
-            <span class="kw">while</span> (<span class="var">slow</span> != <span class="var">fast</span>) {
-                <span class="var">slow</span> = <span class="var">slow</span>-><span class="var">next</span>;
-                <span class="var">fast</span> = <span class="var">fast</span>-><span class="var">next</span>;
-            }
-            <span class="kw">return</span> <span class="var">slow</span>;
-        }
-    }
-    <span class="kw">return</span> <span class="kw">nullptr</span>;
-}
-</pre>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ---------------------------------------------------
-     SECTION 7: TWO POINTERS
---------------------------------------------------- -->
-<section class="lesson" id="two-pointers">
-  <div class="lesson-header">
-    <div class="lesson-num">08</div>
-    <h2><span class="en">Two Pointers Tricks</span> � ?????? ????????</h2>
-  </div>
-
-  <div class="concept-grid">
-    <div class="concept-card">
-      <div class="concept-icon">????</div>
-      <h3>Slow & Fast</h3>
-      <p>Slow ????? Fast ??????.<br>
-      <span class="hl4">???????????:</span> ????? ???????? cycle detection? ????? ??? n-th from end.</p>
-    </div>
-    <div class="concept-card">
-      <div class="concept-icon">??</div>
-      <h3>Prev & Curr</h3>
-      <p>Prev ??? node ???????? Curr ???????.<br>
-      <span class="hl4">???????????:</span> ?????? ??? reversal? ??? merging.</p>
-    </div>
-    <div class="concept-card">
-      <div class="concept-icon">??</div>
-      <h3>Dummy Node</h3>
-      <p>Node ????? ??? ??? head ???? ???? ?????.<br>
-      <span class="hl4">???????????:</span> ??? ??? node? merge lists? ?? ?????? ??? head.</p>
-    </div>
-    <div class="concept-card">
-      <div class="concept-icon">??</div>
-      <h3>Two Lists</h3>
-      <p>Pointer ???? ?? ?? ?????.<br>
-      <span class="hl4">???????????:</span> merge sorted lists? intersection point.</p>
-    </div>
-  </div>
-
-  <div class="card">
-      </div>
-      <pre><span class="cm"># ------------------------------------
-# ????? ??????? (Middle of Linked List)
-# ------------------------------------</span>
-<span class="cls">Node</span>* <span class="fn">findMiddle</span>(<span class="cls">Node</span>* <span class="var">head</span>) {
-    <span class="cls">Node</span> *<span class="var">slow</span> = <span class="var">head</span>, *<span class="var">fast</span> = <span class="var">head</span>;
-    <span class="kw">while</span> (<span class="var">fast</span> && <span class="var">fast</span>-><span class="var">next</span>) {
-        <span class="var">slow</span> = <span class="var">slow</span>-><span class="var">next</span>;
-        <span class="var">fast</span> = <span class="var">fast</span>-><span class="var">next</span>-><span class="var">next</span>;
-    }
-    <span class="kw">return</span> <span class="var">slow</span>;
-}
-
-<span class="cm"># ---------------------------------------------------
-# ????? ??? N-th node from the END
-# ????: fast ???? n ???? ???? ??? ????? ?? ???
-# ---------------------------------------------------</span>
-<span class="cls">Node</span>* <span class="fn">findNthFromEnd</span>(<span class="cls">Node</span>* <span class="var">head</span>, <span class="kw">int</span> <span class="var">n</span>) {
-    <span class="cls">Node</span> *<span class="var">fast</span> = <span class="var">head</span>, *<span class="var">slow</span> = <span class="var">head</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">0</span>; <span class="var">i</span> < <span class="var">n</span>; ++<span class="var">i</span>) <span class="var">fast</span> = <span class="var">fast</span>-><span class="var">next</span>;
-    <span class="kw">while</span> (<span class="var">fast</span>) {
-        <span class="var">slow</span> = <span class="var">slow</span>-><span class="var">next</span>;
-        <span class="var">fast</span> = <span class="var">fast</span>-><span class="var">next</span>;
-    }
-    <span class="kw">return</span> <span class="var">slow</span>;
-}
-
-<span class="cm"># ----------------------------------------
-# Intersection of Two Lists
-# ----------------------------------------
-# len(A) + len(B) = len(B) + len(A) ?</span>
-<span class="cls">Node</span>* <span class="fn">getIntersection</span>(<span class="cls">Node</span>* <span class="var">headA</span>, <span class="cls">Node</span>* <span class="var">headB</span>) {
-    <span class="cls">Node</span> *<span class="var">a</span> = <span class="var">headA</span>, *<span class="var">b</span> = <span class="var">headB</span>;
-    <span class="kw">while</span> (<span class="var">a</span> != <span class="var">b</span>) {
-        <span class="var">a</span> = <span class="var">a</span> ? <span class="var">a</span>-><span class="var">next</span> : <span class="var">headB</span>;
-        <span class="var">b</span> = <span class="var">b</span> ? <span class="var">b</span>-><span class="var">next</span> : <span class="var">headA</span>;
-    }
-    <span class="kw">return</span> <span class="var">a</span>;
-}
-
-<span class="cm"># ----------------------------------
-# Merge Two Sorted Lists
-# ----------------------------------</span>
-<span class="cls">Node</span>* <span class="fn">mergeSorted</span>(<span class="cls">Node</span>* <span class="var">l1</span>, <span class="cls">Node</span>* <span class="var">l2</span>) {
-    <span class="cls">Node</span>* <span class="var">dummy</span> = <span class="kw">new</span> <span class="cls">Node</span>(<span class="nm">0</span>);
-    <span class="cls">Node</span>* <span class="var">curr</span> = <span class="var">dummy</span>;
-    <span class="kw">while</span> (<span class="var">l1</span> && <span class="var">l2</span>) {
-        <span class="kw">if</span> (<span class="var">l1</span>-><span class="var">data</span> <= <span class="var">l2</span>-><span class="var">data</span>) {
-            <span class="var">curr</span>-><span class="var">next</span> = <span class="var">l1</span>; <span class="var">l1</span> = <span class="var">l1</span>-><span class="var">next</span>;
-        } <span class="kw">else</span> {
-            <span class="var">curr</span>-><span class="var">next</span> = <span class="var">l2</span>; <span class="var">l2</span> = <span class="var">l2</span>-><span class="var">next</span>;
-        }
-        <span class="var">curr</span> = <span class="var">curr</span>-><span class="var">next</span>;
-    }
-    <span class="var">curr</span>-><span class="var">next</span> = <span class="var">l1</span> ? <span class="var">l1</span> : <span class="var">l2</span>;
-    <span class="kw">return</span> <span class="var">dummy</span>-><span class="var">next</span>;
-}</pre>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ---------------------------------------------------
-     SECTION 8: SIGNS
---------------------------------------------------- -->
-<section class="lesson" id="signs">
-  <div class="lesson-header">
-    <div class="lesson-num">09</div>
-    <h2>???????? � ???? ???? ??????? ?? ??? ????</h2>
-  </div>
-
-  <p style="color: var(--text-dim); margin-bottom: 24px;">
-    ????? ?? ??? ??? ?? ???????! ???? ????? ??? ??? <span class="hl">patterns</span> ???? ????? ?? ???????.
-  </p>
-
-  <div class="sign-grid">
-    <div class="sign-card success">
-      <h4>???? Slow & Fast Pointer</h4>
-      <p><strong>??? ??????? ????:</strong></p>
-      <ul>
-        <li>?? ??? cycle?</li>
-        <li>????? ????? ???????</li>
-        <li>Palindrome ?? linked list</li>
-        <li>Happy Number (??? ??????)</li>
-        <li>??? N-th from end</li>
-      </ul>
-    </div>
-    <div class="sign-card info">
-      <h4>?? Prev + Curr Pattern</h4>
-      <p><strong>??? ??????? ????:</strong></p>
-      <ul>
-        <li>Reverse the list (?? ??? ????)</li>
-        <li>Delete a node</li>
-        <li>Remove duplicates</li>
-        <li>Swap nodes</li>
-      </ul>
-    </div>
-    <div class="sign-card warn">
-      <h4>?? Dummy Node Pattern</h4>
-      <p><strong>??? ??????? ????:</strong></p>
-      <ul>
-        <li>Merge multiple lists</li>
-        <li>Remove Nth from end</li>
-        <li>Partition list</li>
-        <li>?? ????? ???? ????? ??? head</li>
-      </ul>
-    </div>
-    <div class="sign-card danger">
-      <h4>?? In-place Manipulation</h4>
-      <p><strong>??? ??????? ????:</strong></p>
-      <ul>
-        <li>Reorder list (1?2?3?4 to 1?4?2?3)</li>
-        <li>Reverse K-group</li>
-        <li>Odd-Even linked list</li>
-        <li>"No extra space" ?????</li>
-      </ul>
-    </div>
-    <div class="sign-card">
-      <h4>?? Two Lists Pattern</h4>
-      <p><strong>??? ??????? ????:</strong></p>
-      <ul>
-        <li>Intersection of two lists</li>
-        <li>Merge sorted lists</li>
-        <li>Add two numbers (?? linked lists)</li>
-        <li>Flatten multilevel</li>
-      </ul>
-    </div>
-    <div class="sign-card info">
-      <h4>?? Recursive Pattern</h4>
-      <p><strong>??? ??????? ????:</strong></p>
-      <ul>
-        <li>Reverse (?????? recursive ?????)</li>
-        <li>Merge sort ??? linked list</li>
-        <li>Flatten nested list</li>
-        <li>Deep copy with random pointers</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="note" style="margin-top: 24px;">
-    <span class="note-icon">??</span>
-    <div>
-      <strong style="color: var(--accent1);">????? ?????:</strong><br>
-      ?? ??????? ???? <span class="hl3">"O(1) extra space"</span> ? ???? ??? ?? Slow/Fast ?? Prev/Curr<br>
-      ?? ??????? ???? <span class="hl3">"sorted"</span> ? ???? ??? ?? Merge Sort ?? Two Pointers<br>
-      ?? ??????? ???? <span class="hl3">"cycle"</span> ?? <span class="hl3">"loop"</span> ? Floyd's Algorithm ?????<br>
-      ?? ??????? ???? <span class="hl3">"reverse"</span> ? Iterative ?? 3 pointers
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ---------------------------------------------------
-     SECTION 9: PROBLEMS
---------------------------------------------------- -->
-<section class="lesson" id="problems">
-  <div class="lesson-header">
-    <div class="lesson-num">10</div>
-    <h2>??? ??????? + ????? ????</h2>
-  </div>
-
-  <div class="problems-grid">
-    <div class="prob-card">
-      <div class="prob-header">
-        <span class="prob-diff easy">Easy</span>
-        <h4>Reverse Linked List (#206)</h4>
-      </div>
-      <p>???? ???????. ???? ????????? ?? 3 pointers: prev, curr, next.</p>
-      <div class="prob-tags">
-        <span class="tag">prev+curr</span>
-        <span class="tag">O(1) space</span>
-        <span class="tag">iterative</span>
-      </div>
-    </div>
-
-    <div class="prob-card">
-      <div class="prob-header">
-        <span class="prob-diff easy">Easy</span>
-        <h4>Middle of Linked List (#876)</h4>
-      </div>
-      <p>????? ????? ???????. Slow ???? ????? Fast ??????.</p>
-      <div class="prob-tags">
-        <span class="tag">slow+fast</span>
-        <span class="tag">O(1) space</span>
-      </div>
-    </div>
-
-    <div class="prob-card">
-      <div class="prob-header">
-        <span class="prob-diff easy">Easy</span>
-        <h4>Merge Two Sorted Lists (#21)</h4>
-      </div>
-      <p>??? ??????? ???????. Dummy node + ?????? ?????.</p>
-      <div class="prob-tags">
-        <span class="tag">dummy node</span>
-        <span class="tag">two lists</span>
-      </div>
-    </div>
-
-    <div class="prob-card">
-      <div class="prob-header">
-        <span class="prob-diff easy">Easy</span>
-        <h4>Linked List Cycle (#141)</h4>
-      </div>
-      <p>?? ??? cycle? Floyd's Algorithm: slow+fast. ?? ?????? = cycle.</p>
-      <div class="prob-tags">
-        <span class="tag">Floyd's</span>
-        <span class="tag">slow+fast</span>
-        <span class="tag">O(1) space</span>
-      </div>
-    </div>
-
-    <div class="prob-card">
-      <div class="prob-header">
-        <span class="prob-diff medium">Medium</span>
-        <h4>Remove Nth from End (#19)</h4>
-      </div>
-      <p>Fast ???? N ???? ?????? ??? ????? ?? ???. ???? slow = ???????.</p>
-      <div class="prob-tags">
-        <span class="tag">slow+fast</span>
-        <span class="tag">dummy node</span>
-        <span class="tag">one pass</span>
-      </div>
-    </div>
-
-    <div class="prob-card">
-      <div class="prob-header">
-        <span class="prob-diff medium">Medium</span>
-        <h4>Linked List Cycle II (#142)</h4>
-      </div>
-      <p>????? ???? ????? ??? cycle. ??? ????????? slow ???? ??? head ?????? ???? ??????.</p>
-      <div class="prob-tags">
-        <span class="tag">Floyd's</span>
-        <span class="tag">math</span>
-        <span class="tag">O(1) space</span>
-      </div>
-    </div>
-
-    <div class="prob-card">
-      <div class="prob-header">
-        <span class="prob-diff medium">Medium</span>
-        <h4>Reorder List (#143)</h4>
-      </div>
-      <p>?. ????? ??????? ?. ??? ???? ?????? ?. ??? ?????????. 3 ????? ?????!</p>
-      <div class="prob-tags">
-        <span class="tag">slow+fast</span>
-        <span class="tag">reverse</span>
-        <span class="tag">merge</span>
-      </div>
-    </div>
-
-    <div class="prob-card">
-      <div class="prob-header">
-        <span class="prob-diff medium">Medium</span>
-        <h4>Palindrome Linked List (#234)</h4>
-      </div>
-      <p>????? ?????? ??? ???? ??????? ????. Time O(n), Space O(1).</p>
-      <div class="prob-tags">
-        <span class="tag">slow+fast</span>
-        <span class="tag">reverse</span>
-        <span class="tag">compare</span>
-      </div>
-    </div>
-
-    <div class="prob-card">
-      <div class="prob-header">
-        <span class="prob-diff medium">Medium</span>
-        <h4>Reverse Linked List II (#92)</h4>
-      </div>
-      <p>??? ?? position L ?? R ???. ???? ?? L-1 ?? ???? R-L ???? ?? insert at front.</p>
-      <div class="prob-tags">
-        <span class="tag">prev+curr</span>
-        <span class="tag">in-place</span>
-        <span class="tag">sublist</span>
-      </div>
-    </div>
-
-    <div class="prob-card">
-      <div class="prob-header">
-        <span class="prob-diff medium">Medium</span>
-        <h4>Odd Even Linked List (#328)</h4>
-      </div>
-      <p>??? ??? nodes ??????? ?? ???????. Pointer ???? ??? odd ????? ??? even.</p>
-      <div class="prob-tags">
-        <span class="tag">in-place</span>
-        <span class="tag">two pointers</span>
-      </div>
-    </div>
-
-    <div class="prob-card">
-      <div class="prob-header">
-        <span class="prob-diff medium">Medium</span>
-        <h4>Add Two Numbers (#2)</h4>
-      </div>
-      <p>????????? ??????? ?????. ???? ?? ??? carry. dummy node + traversal.</p>
-      <div class="prob-tags">
-        <span class="tag">two lists</span>
-        <span class="tag">carry</span>
-        <span class="tag">dummy</span>
-      </div>
-    </div>
-
-    <div class="prob-card">
-      <div class="prob-header">
-        <span class="prob-diff medium">Medium</span>
-        <h4>Intersection of Two Lists (#160)</h4>
-      </div>
-      <p>??? A ????? ???? ?? B ??????. ??????? ??? ???? ???????.</p>
-      <div class="prob-tags">
-        <span class="tag">two pointers</span>
-        <span class="tag">O(1) space</span>
-        <span class="tag">elegant</span>
-      </div>
-    </div>
-
-    <div class="prob-card">
-      <div class="prob-header">
-        <span class="prob-diff hard">Hard</span>
-        <h4>Merge K Sorted Lists (#23)</h4>
-      </div>
-      <p>Min Heap ?????? ??? ??? element ?? ?? ?????. ??? ?????? ???? ??????.</p>
-      <div class="prob-tags">
-        <span class="tag">min heap</span>
-        <span class="tag">O(nlogk)</span>
-        <span class="tag">divide+conquer</span>
-      </div>
-    </div>
-
-    <div class="prob-card">
-      <div class="prob-header">
-        <span class="prob-diff hard">Hard</span>
-        <h4>Reverse Nodes in K-Group (#25)</h4>
-      </div>
-      <p>???? ?? K nodes ?? ???. ???? ?? ??? K nodes ??? ?? ???.</p>
-      <div class="prob-tags">
-        <span class="tag">reverse</span>
-        <span class="tag">recursion</span>
-        <span class="tag">K-group</span>
-      </div>
-    </div>
-
-    <div class="prob-card">
-      <div class="prob-header">
-        <span class="prob-diff hard">Hard</span>
-        <h4>Copy List with Random Pointer (#138)</h4>
-      </div>
-      <p>Deep copy ?????? ???? random pointers. HashMap ?? ??? interweaving technique.</p>
-      <div class="prob-tags">
-        <span class="tag">hashmap</span>
-        <span class="tag">deep copy</span>
-        <span class="tag">O(1) space trick</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="card" style="margin-top: 24px;">
-    <div class="card-title">Reverse K-Group � ????? ??????</div>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-lang">C++ � LeetCode #25 Hard</span>
-        <div class="code-dots"><span></span><span></span><span></span></div>
-      </div>
-      <pre><span class="cls">Node</span>* <span class="fn">reverseKGroup</span>(<span class="cls">Node</span>* <span class="var">head</span>, <span class="kw">int</span> <span class="var">k</span>) {
-    <span class="cm">// ? ???? ?? ??? k nodes</span>
-    <span class="kw">int</span> <span class="var">count</span> = <span class="nm">0</span>;
-    <span class="cls">Node</span>* <span class="var">curr</span> = <span class="var">head</span>;
-    <span class="kw">while</span> (<span class="var">curr</span> && <span class="var">count</span> < <span class="var">k</span>) {
-        <span class="var">curr</span> = <span class="var">curr</span>-><span class="var">next</span>;
-        <span class="var">count</span>++;
-    }
-    <span class="kw">if</span> (<span class="var">count</span> < <span class="var">k</span>) <span class="kw">return</span> <span class="var">head</span>;  <span class="cm">// ??? ?? k nodes? ??? ??? ??</span>
-    
-    <span class="cm">// ? ???? ??? k nodes</span>
-    <span class="cls">Node</span> *<span class="var">prev</span> = <span class="kw">nullptr</span>;
-    <span class="var">curr</span> = <span class="var">head</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">0</span>; <span class="var">i</span> < <span class="var">k</span>; ++<span class="var">i</span>) {
-        <span class="cls">Node</span>* <span class="var">nextNode</span> = <span class="var">curr</span>-><span class="var">next</span>;
-        <span class="var">curr</span>-><span class="var">next</span> = <span class="var">prev</span>;
-        <span class="var">prev</span> = <span class="var">curr</span>;
-        <span class="var">curr</span> = <span class="var">nextNode</span>;
-    }
-    
-    <span class="cm">// ? head ?????? ??? tail � ????? ???????</span>
-    <span class="var">head</span>-><span class="var">next</span> = <span class="fn">reverseKGroup</span>(<span class="var">curr</span>, <span class="var">k</span>);
-    <span class="kw">return</span> <span class="var">prev</span>;  <span class="cm">// prev = head ?????? ??? group</span>
-}</pre>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- Operations Section -->
-<section class="lesson" id="operations">
-  <div class="lesson-header">
-    <div class="lesson-num">05</div>
-    <h2>???? Complexity ????????</h2>
-  </div>
-
-  <table class="compare-table">
-    <tr>
-      <th>???????</th>
-      <th>Singly</th>
-      <th>Doubly</th>
-      <th>??????</th>
-    </tr>
-    <tr>
-      <td>Insert at Head</td>
-      <td class="good">O(1)</td>
-      <td class="good">O(1)</td>
-      <td>??? ??????</td>
-    </tr>
-    <tr>
-      <td>Insert at Tail</td>
-      <td class="mid">O(1)* ?? tail ptr</td>
-      <td class="good">O(1)</td>
-      <td>*???? tail = O(n)</td>
-    </tr>
-    <tr>
-      <td>Insert at Position</td>
-      <td class="bad">O(n)</td>
-      <td class="bad">O(n)</td>
-      <td>???? ???? ?????</td>
-    </tr>
-    <tr>
-      <td>Delete Head</td>
-      <td class="good">O(1)</td>
-      <td class="good">O(1)</td>
-      <td>??? ??????</td>
-    </tr>
-    <tr>
-      <td>Delete Tail</td>
-      <td class="bad">O(n)</td>
-      <td class="good">O(1)</td>
-      <td>Doubly ???? ?????!</td>
-    </tr>
-    <tr>
-      <td>Delete by Pointer</td>
-      <td class="bad">O(n)</td>
-      <td class="good">O(1)</td>
-      <td>Doubly ???? ???? prev</td>
-    </tr>
-    <tr>
-      <td>Search</td>
-      <td class="bad">O(n)</td>
-      <td class="bad">O(n)</td>
-      <td>???? ???? ?? ???????</td>
-    </tr>
-    <tr>
-      <td>Access by Index</td>
-      <td class="bad">O(n)</td>
-      <td class="bad">O(n)</td>
-      <td>?????? Array ??? ???</td>
-    </tr>
-  </table>
-</section>
-
-</div><!-- end .content -->
-
-<footer>
-  <p>Linked Lists A to Z � ?????? ?????? | Singly � Doubly � Circular � Cycle Detection � Reversal</p>
-  <p style="margin-top: 8px; color: rgba(255,255,255,0.3);">?? ??? ???????? ??</p>
-</footer>
-
-<script>
-// ----------------------------
-// Intersection Observer � fade in
-// ----------------------------
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.1 });
-document.querySelectorAll('.lesson').forEach(l => observer.observe(l));
-
-// ----------------------------
-// SINGLY ANIMATION
-// ----------------------------
-let singlyData = [10, 20, 30];
-let singlyCounter = 40;
-
-function singlyRender() {
-  const stage = document.getElementById('singly-stage');
-  stage.innerHTML = '';
-  singlyData.forEach((val, i) => {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'a-node';
-    wrapper.style.animationDelay = (i * 0.08) + 's';
-    const nw = document.createElement('div');
-    nw.className = 'node-wrapper';
-    if(i === 0) {
-      const lbl = document.createElement('div');
-      lbl.className = 'pointer-label';
-      lbl.textContent = 'HEAD';
-      nw.appendChild(lbl);
-    }
-    const box = document.createElement('div');
-    box.className = 'a-node-box';
-    box.innerHTML = `<span class="nval">${val}</span><span class="nptr">next?</span>`;
-    nw.appendChild(box);
-    wrapper.appendChild(nw);
-    stage.appendChild(wrapper);
-
-    if(i < singlyData.length - 1) {
-      const arr = document.createElement('span');
-      arr.className = 'a-arrow';
-      arr.textContent = '?';
-      stage.appendChild(arr);
-    } else {
-      const arr = document.createElement('span');
-      arr.className = 'a-arrow';
-      arr.textContent = '?';
-      stage.appendChild(arr);
-      const nl = document.createElement('div');
-      nl.className = 'a-null';
-      nl.textContent = 'NULL';
-      stage.appendChild(nl);
-    }
-  });
-}
-
-function singlyMsg(msg) {
-  document.getElementById('singly-msg').textContent = msg;
-}
-
-function singlyAddFront() {
-  singlyData.unshift(singlyCounter);
-  singlyCounter += 10;
-  singlyMsg(`? ????? ${singlyCounter-10} ?? ??????? � O(1): ?? ????? ??? HEAD`);
-  singlyRender();
-}
-
-function singlyAddEnd() {
-  singlyData.push(singlyCounter);
-  singlyCounter += 10;
-  singlyMsg(`? ????? ${singlyCounter-10} ?? ??????? � O(n): ????? ??? ?? ??? nodes`);
-  singlyRender();
-}
-
-function singlyDeleteHead() {
-  if(singlyData.length === 0) return;
-  const v = singlyData.shift();
-  singlyMsg(`? ????? ${v} ?? ??????? � O(1): ?? ????? ??? HEAD ??? next`);
-  singlyRender();
-}
-
-function singlyDeleteTail() {
-  if(singlyData.length === 0) return;
-  const v = singlyData.pop();
-  singlyMsg(`? ????? ${v} ?? ??????? � O(n): ????? ??? ?? ??? nodes ?????? ??? prev`);
-  singlyRender();
-}
-
-function singlyReset() {
-  singlyData = [10, 20, 30]; singlyCounter = 40;
-  singlyMsg('? ?? ???????');
-  singlyRender();
-}
-
-singlyRender();
-
-// ----------------------------
-// DOUBLY ANIMATION
-// ----------------------------
-let doublyData = [10, 20, 30];
-let doublyCounter = 40;
-
-function doublyRender() {
-  const stage = document.getElementById('doubly-stage');
-  stage.innerHTML = '';
-  doublyData.forEach((val, i) => {
-    if(i > 0) {
-      const arr = document.createElement('span');
-      arr.className = 'a-arrow back';
-      arr.textContent = '?';
-      stage.appendChild(arr);
-    }
-    const wrapper = document.createElement('div');
-    wrapper.className = 'a-node';
-    const nw = document.createElement('div');
-    nw.className = 'node-wrapper';
-    if(i === 0) {
-      const lbl = document.createElement('div');
-      lbl.className = 'pointer-label';
-      lbl.style.background = 'var(--accent5)';
-      lbl.textContent = 'HEAD';
-      nw.appendChild(lbl);
-    }
-    if(i === doublyData.length - 1) {
-      const lbl = document.createElement('div');
-      lbl.className = 'pointer-label';
-      lbl.style.background = 'var(--accent2)';
-      lbl.textContent = 'TAIL';
-      nw.appendChild(lbl);
-    }
-    const box = document.createElement('div');
-    box.className = 'a-node-box doubly';
-    box.innerHTML = `<span style="color:var(--accent5);font-size:10px">?prev</span><span class="nval">${val}</span><span style="color:var(--accent1);font-size:10px">next?</span>`;
-    nw.appendChild(box);
-    wrapper.appendChild(nw);
-    stage.appendChild(wrapper);
-
-    if(i < doublyData.length - 1) {
-      const arr = document.createElement('span');
-      arr.className = 'a-arrow';
-      arr.textContent = '?';
-      stage.appendChild(arr);
-    }
-  });
-}
-
-function doublyMsg(msg) {
-  document.getElementById('doubly-msg').textContent = msg;
-}
-
-function doublyAddFront() {
-  doublyData.unshift(doublyCounter); doublyCounter+=10;
-  doublyMsg(`? ????? ${doublyCounter-10} ??????? � O(1): ????? next ?prev ??? node ??????`);
-  doublyRender();
-}
-function doublyAddEnd() {
-  doublyData.push(doublyCounter); doublyCounter+=10;
-  doublyMsg(`? ????? ${doublyCounter-10} ??????? � O(1): ??? ????? TAIL pointer!`);
-  doublyRender();
-}
-function doublyDeleteHead() {
-  if(!doublyData.length) return;
-  const v = doublyData.shift();
-  doublyMsg(`? ????? ${v} � O(1): ????? 2 pointers ???`);
-  doublyRender();
-}
-function doublyDeleteTail() {
-  if(!doublyData.length) return;
-  const v = doublyData.pop();
-  doublyMsg(`? ????? ${v} ?? ??????? � O(1) ?? doubly! ??????? TAIL.prev ??????`);
-  doublyRender();
-}
-function doublyReset() {
-  doublyData=[10,20,30]; doublyCounter=40;
-  doublyMsg('? ?? ???????');
-  doublyRender();
-}
-doublyRender();
-
-// ----------------------------
-// CIRCULAR ANIMATION
-// ----------------------------
-let circData = [10, 20, 30, 40];
-let circCounter = 50;
-
-function circRender() {
-  const linear = document.getElementById('circular-linear');
-  linear.innerHTML = '';
-  circData.forEach((val, i) => {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'a-node';
-    const nw = document.createElement('div');
-    nw.className = 'node-wrapper';
-    if(i === 0) {
-      const lbl = document.createElement('div');
-      lbl.className = 'pointer-label';
-      lbl.textContent = 'HEAD';
-      nw.appendChild(lbl);
-    }
-    const box = document.createElement('div');
-    box.className = 'a-node-box cycle-node';
-    box.innerHTML = `<span class="nval">${val}</span><span class="nptr">next?</span>`;
-    nw.appendChild(box);
-    wrapper.appendChild(nw);
-    linear.appendChild(wrapper);
-
-    const arr = document.createElement('span');
-    arr.className = 'a-arrow cycle';
-    if(i === circData.length - 1) {
-      arr.textContent = '?';
-      arr.title = '???? ??? HEAD';
-      arr.style.color = 'var(--accent3)';
-      arr.style.fontSize = '20px';
-    } else {
-      arr.textContent = '?';
-    }
-    linear.appendChild(arr);
-  });
-}
-
-function circularAdd() {
-  circData.push(circCounter); circCounter+=10;
-  document.getElementById('circular-msg').textContent = `? ????? node ???? � tail.next ???? ??? HEAD`;
-  circRender();
-}
-function circularDelete() {
-  if(!circData.length) return;
-  const v = circData.shift();
-  document.getElementById('circular-msg').textContent = `? ????? HEAD (${v}) � ??? tail.next ????? ??? head ??????`;
-  circRender();
-}
-function circularReset() {
-  circData=[10,20,30,40]; circCounter=50;
-  document.getElementById('circular-msg').textContent = '? ?? ???????';
-  circRender();
-}
-circRender();
-
-// ----------------------------
-// REVERSAL ANIMATION
-// ----------------------------
-let revOriginal = [1,2,3,4,5];
-let revState = {
-  list: [1,2,3,4,5],
-  prev: null,
-  curr: 0,
-  done: false,
-  reversed: []
-};
-
-function revReset() {
-  revState = { list:[1,2,3,4,5], prev:null, curr:0, done:false, reversed:[] };
-  document.getElementById('rev-info').textContent = '???? "???? ??????" ???? ??? Reversal';
-  revRenderState();
-}
-
-function revRenderState() {
-  const listEl = document.getElementById('rev-list');
-  const ptrsEl = document.getElementById('rev-pointers');
-  listEl.innerHTML = '';
-  ptrsEl.innerHTML = '';
-
-  if(revState.done) {
-    // Show reversed list
-    const revd = [...revOriginal].reverse();
-    revd.forEach((val, i) => {
-      const nw = document.createElement('div');
-      nw.className = 'node-wrapper';
-      if(i===0){const l=document.createElement('div');l.className='pointer-label';l.textContent='HEAD';nw.appendChild(l);}
-      const box = document.createElement('div');
-      box.className = 'a-node-box head-node';
-      box.innerHTML = `<span class="nval">${val}</span><span class="nptr">next?</span>`;
-      nw.appendChild(box);
-      listEl.appendChild(nw);
-      if(i<revd.length-1){const a=document.createElement('span');a.className='a-arrow';a.textContent='?';listEl.appendChild(a);}
-      else{const a=document.createElement('span');a.className='a-arrow';a.textContent='?';listEl.appendChild(a);const nl=document.createElement('div');nl.className='a-null';nl.textContent='NULL';listEl.appendChild(nl);}
-    });
-    document.getElementById('rev-info').textContent = '? ????? ??? Reversal! prev = HEAD ??????';
-    return;
-  }
-
-  revState.list.forEach((val, i) => {
-    const nw = document.createElement('div');
-    nw.className = 'node-wrapper';
-    if(i === revState.curr) {
-      const l = document.createElement('div'); l.className='pointer-label'; l.textContent='curr'; nw.appendChild(l);
-    }
-    const box = document.createElement('div');
-    box.className = 'a-node-box';
-    if(i === revState.curr) box.style.borderColor = 'var(--accent3)';
-    box.innerHTML = `<span class="nval">${val}</span><span class="nptr">next?</span>`;
-    nw.appendChild(box);
-    listEl.appendChild(nw);
-    if(i < revState.list.length-1){const a=document.createElement('span');a.className='a-arrow';a.textContent='?';listEl.appendChild(a);}
-    else{const a=document.createElement('span');a.className='a-arrow';a.textContent='?';listEl.appendChild(a);const nl=document.createElement('div');nl.className='a-null';nl.textContent='NULL';listEl.appendChild(nl);}
-  });
-
-  // Show reversed so far
-  if(revState.reversed.length > 0) {
-    const label = document.createElement('div');
-    label.style.color = 'var(--text-dim)'; label.style.fontSize='11px'; label.style.margin='4px 0';
-    label.textContent = '?? ????? ??? ????:';
-    ptrsEl.appendChild(label);
-    revState.reversed.slice().reverse().forEach((val, i) => {
-      const nw = document.createElement('div'); nw.className='node-wrapper';
-      if(i===0){const l=document.createElement('div');l.className='pointer-label';l.style.background='var(--accent5)';l.textContent='prev';nw.appendChild(l);}
-      const box = document.createElement('div');
-      box.className = 'a-node-box doubly';
-      box.innerHTML = `<span class="nval">${val}</span>`;
-      nw.appendChild(box);
-      ptrsEl.appendChild(nw);
-      if(i<revState.reversed.length-1){const a=document.createElement('span');a.className='a-arrow';a.textContent='?';ptrsEl.appendChild(a);}
-    });
-  }
-}
-
-function revStep() {
-  if(revState.done) return;
-  if(revState.curr >= revState.list.length) {
-    revState.done = true;
-    revRenderState();
-    return;
-  }
-  const val = revState.list[revState.curr];
-  revState.reversed.push(val);
-  revState.curr++;
-  const step = revState.curr;
-  const total = revState.list.length;
-  document.getElementById('rev-info').textContent =
-    `?????? ${step}/${total}: ????? next ? ????? pointer ? ????? prev ?curr`;
-  if(revState.curr >= revState.list.length) revState.done = true;
-  revRenderState();
-}
-
-let revAutoInterval = null;
-function revAuto() {
-  if(revAutoInterval) { clearInterval(revAutoInterval); revAutoInterval = null; return; }
-  revReset();
-  revAutoInterval = setInterval(() => {
-    if(revState.done) { clearInterval(revAutoInterval); revAutoInterval = null; return; }
-    revStep();
-  }, 900);
-}
-
-revReset();
-
-// ----------------------------
-// CYCLE DETECTION ANIMATION
-// ----------------------------
-const cycleNodes = [1, 2, 3, 4, 5, 6];
-const cycleEntry = 2; // index where cycle begins (0-based)
-let slowIdx = 0;
-let fastIdx = 0;
-let cycleStepCount = 0;
-let cycleMet = false;
-
-function cycleReset() {
-  slowIdx = 0; fastIdx = 0; cycleStepCount = 0; cycleMet = false;
-  document.getElementById('cycle-info').textContent = '?? slow = node[0]   ?? fast = node[0]   � ???? "????"';
-  cycleRender();
-}
-
-function getNext(idx) {
-  if(idx === cycleNodes.length - 1) return cycleEntry; // cycle!
-  return idx + 1;
-}
-
-function cycleRender() {
-  const listEl = document.getElementById('cycle-list');
-  const ptrsEl = document.getElementById('cycle-ptrs');
-  listEl.innerHTML = '';
-  ptrsEl.innerHTML = '';
-
-  cycleNodes.forEach((val, i) => {
-    const nw = document.createElement('div');
-    nw.className = 'node-wrapper';
-    const labels = [];
-    if(i === slowIdx) labels.push({t:'??slow', c:'var(--accent4)'});
-    if(i === fastIdx && fastIdx !== slowIdx) labels.push({t:'??fast', c:'var(--accent2)'});
-    if(i === slowIdx && i === fastIdx) labels.push({t:'??+??', c:'var(--accent3)'});
-    labels.forEach(lb => {
-      const l = document.createElement('div');
-      l.className = 'pointer-label';
-      l.style.background = lb.c;
-      l.textContent = lb.t;
-      nw.appendChild(l);
-    });
-    if(i === cycleEntry) {
-      const entryL = document.createElement('div');
-      entryL.style.fontSize = '9px'; entryL.style.color = 'var(--accent3)'; entryL.style.fontFamily = 'Fira Code';
-      entryL.textContent = '? cycle';
-      nw.appendChild(entryL);
-    }
-    const box = document.createElement('div');
-    box.className = 'a-node-box';
-    if(i === slowIdx && i === fastIdx && cycleStepCount > 0) {
-      box.style.borderColor = 'var(--accent3)';
-      box.style.boxShadow = '0 0 20px rgba(255,217,61,0.5)';
-    } else if(i === slowIdx) {
-      box.style.borderColor = 'var(--accent4)';
-    } else if(i === fastIdx) {
-      box.style.borderColor = 'var(--accent2)';
-    }
-    box.innerHTML = `<span class="nval">${val}</span>`;
-    nw.appendChild(box);
-    listEl.appendChild(nw);
-
-    const arr = document.createElement('span');
-    arr.className = 'a-arrow';
-    if(i === cycleNodes.length - 1) {
-      arr.textContent = '?';
-      arr.style.color = 'var(--accent3)';
-      arr.title = `cycle ? node[${cycleEntry}]`;
-    } else {
-      arr.textContent = '?';
-    }
-    listEl.appendChild(arr);
-  });
-
-  if(cycleMet) {
-    document.getElementById('cycle-info').textContent =
-      `? ?????? ??? node[${slowIdx}] = ${cycleNodes[slowIdx]}! ? ??? CYCLE! (??? ${cycleStepCount} ?????)`;
-  }
-}
-
-function cycleStep() {
-  if(cycleMet) return;
-  slowIdx = getNext(slowIdx);
-  fastIdx = getNext(getNext(fastIdx));
-  cycleStepCount++;
-  if(slowIdx === fastIdx) {
-    cycleMet = true;
-  }
-  if(!cycleMet) {
-    document.getElementById('cycle-info').textContent =
-      `?????? ${cycleStepCount}: ??slow?node[${slowIdx}]=${cycleNodes[slowIdx]}   ??fast?node[${fastIdx}]=${cycleNodes[fastIdx]}`;
-  }
-  cycleRender();
-}
-
-let cycleAutoInt = null;
-function cycleAuto() {
-  if(cycleAutoInt) { clearInterval(cycleAutoInt); cycleAutoInt=null; return; }
-  cycleReset();
-  cycleAutoInt = setInterval(() => {
-    if(cycleMet) { clearInterval(cycleAutoInt); cycleAutoInt=null; return; }
-    cycleStep();
-  }, 800);
-}
-
-cycleReset();
-</script>
-
-<div class="aaos-theme-bar">
-  <button class="aaos-fab theme-toggle-btn" onclick="aaosToggleTheme()" title="????? ?????">??</button>
-  <a class="aaos-fab" href="../index.html" title="????????">??</a>
-</div>
-<script src="../scripts/theme.js"></script></body>
-</html>
-
-
-
-
+﻿﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linked Lists — الدليل الشامل من A إلى Z</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Fira+Code:wght@400;500;700&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface2: #1a1a28;
+  --border: #2a2a42;
+  --accent1: #00d4ff;
+  --accent2: #ff6b6b;
+  --accent3: #ffd93d;
+  --accent4: #6bcb77;
+  --accent5: #c77dff;
+  --text: #e8e8f0;
+  --text-dim: #8888aa;
+  --node-bg: #1e1e30;
+  --node-border: #00d4ff;
+  --glow: 0 0 20px rgba(0,212,255,0.3);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Tajawal', sans-serif;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--accent1); border-radius: 3px; }
+
+/* Hero */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(0,212,255,0.15) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 80%, rgba(199,125,255,0.1) 0%, transparent 50%),
+              var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(0,212,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(50px); }
+}
+
+.hero-badge {
+  background: rgba(0,212,255,0.1);
+  border: 1px solid rgba(0,212,255,0.4);
+  color: var(--accent1);
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  animation: fadeDown 0.8s ease both;
+}
+
+.hero h1 {
+  font-size: clamp(2.2rem, 6vw, 5rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 16px;
+  animation: fadeDown 0.8s 0.2s ease both;
+}
+
+.hero h1 span { color: var(--accent1); }
+.hero h1 em { color: var(--accent2); font-style: normal; }
+
+.hero-sub {
+  font-size: 1.15rem;
+  color: var(--text-dim);
+  max-width: 600px;
+  margin-bottom: 40px;
+  animation: fadeDown 0.8s 0.4s ease both;
+}
+
+.hero-nodes {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  animation: fadeDown 0.8s 0.6s ease both;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.hero-node {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.node-box {
+  background: var(--node-bg);
+  border: 2px solid var(--node-border);
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-family: 'Fira Code', monospace;
+  font-size: 14px;
+  box-shadow: var(--glow);
+  animation: nodePulse 3s ease-in-out infinite;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.node-box .val { color: var(--accent3); font-weight: 700; }
+.node-box .ptr { color: var(--accent5); font-size: 11px; }
+.node-box .sep { color: var(--border); }
+
+.node-arrow {
+  color: var(--accent1);
+  font-size: 20px;
+  padding: 0 6px;
+  animation: arrowPulse 1.5s ease-in-out infinite;
+}
+
+.null-box {
+  background: rgba(255,107,107,0.1);
+  border: 2px solid var(--accent2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  color: var(--accent2);
+}
+
+@keyframes nodePulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(0,212,255,0.3); }
+  50% { box-shadow: 0 0 30px rgba(0,212,255,0.6); }
+}
+
+@keyframes arrowPulse {
+  0%, 100% { opacity: 0.6; transform: translateX(0); }
+  50% { opacity: 1; transform: translateX(3px); }
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* TOC */
+.toc {
+  padding: 60px 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.section-tag {
+  display: inline-block;
+  background: rgba(255,217,61,0.1);
+  border: 1px solid rgba(255,217,61,0.4);
+  color: var(--accent3);
+  padding: 4px 14px;
+  border-radius: 12px;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.section-header h2 {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.toc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.toc-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toc-item:hover {
+  border-color: var(--accent1);
+  background: rgba(0,212,255,0.05);
+  transform: translateY(-2px);
+}
+
+.toc-num {
+  color: var(--accent1);
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  min-width: 24px;
+}
+
+/* Main Content Sections */
+.content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+}
+
+.lesson {
+  margin-bottom: 80px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease;
+}
+
+.lesson.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.lesson-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 30px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--border);
+}
+
+.lesson-num {
+  background: linear-gradient(135deg, var(--accent1), var(--accent5));
+  color: #000;
+  font-weight: 900;
+  font-family: 'Fira Code', monospace;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.lesson-header h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.lesson-header h2 .en {
+  color: var(--accent1);
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent3);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-title::before {
+  content: '▶';
+  color: var(--accent1);
+  font-size: 10px;
+}
+
+/* Concept Grid */
+.concept-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.concept-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.2s;
+}
+
+.concept-card:hover { border-color: var(--accent5); transform: translateY(-2px); }
+
+.concept-icon {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.concept-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent5);
+  margin-bottom: 8px;
+  font-family: 'Fira Code', monospace;
+}
+
+.concept-card p {
+  color: var(--text-dim);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+/* Code Block */
+.code-block {
+  background: #0d0d14;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 16px 0;
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+}
+
+.code-header {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.code-lang {
+  color: var(--accent1);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.code-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.code-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.code-dots span:nth-child(1) { background: #ff5f57; }
+.code-dots span:nth-child(2) { background: #febc2e; }
+.code-dots span:nth-child(3) { background: #28c840; }
+
+pre {
+  padding: 20px;
+  overflow-x: auto;
+  line-height: 1.8;
+  direction: ltr;
+  text-align: left;
+}
+
+.kw { color: #c77dff; }
+.fn { color: #00d4ff; }
+.str { color: #ffd93d; }
+.num { color: #ff6b6b; }
+.cm { color: #556677; font-style: italic; }
+.cls { color: #6bcb77; }
+.op { color: #ff9f43; }
+
+/* Animation Canvas */
+.anim-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.anim-title {
+  color: var(--accent3);
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.anim-stage {
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.anim-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  background: rgba(0,212,255,0.1);
+  border: 1px solid rgba(0,212,255,0.4);
+  color: var(--accent1);
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.btn:hover {
+  background: rgba(0,212,255,0.2);
+  box-shadow: 0 0 12px rgba(0,212,255,0.3);
+}
+
+.btn.danger {
+  border-color: rgba(255,107,107,0.4);
+  color: var(--accent2);
+  background: rgba(255,107,107,0.1);
+}
+
+.btn.success {
+  border-color: rgba(107,203,119,0.4);
+  color: var(--accent4);
+  background: rgba(107,203,119,0.1);
+}
+
+/* Animated Node */
+.a-node {
+  display: inline-flex;
+  align-items: center;
+  animation: nodeIn 0.4s ease both;
+}
+
+.a-node-box {
+  background: var(--node-bg);
+  border: 2px solid var(--accent1);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  box-shadow: 0 0 12px rgba(0,212,255,0.2);
+}
+
+.a-node-box.doubly {
+  border-color: var(--accent5);
+  box-shadow: 0 0 12px rgba(199,125,255,0.2);
+}
+
+.a-node-box.cycle-node {
+  border-color: var(--accent3);
+  box-shadow: 0 0 12px rgba(255,217,61,0.3);
+}
+
+.a-node-box.head-node {
+  border-color: var(--accent4);
+  box-shadow: 0 0 12px rgba(107,203,119,0.3);
+}
+
+.a-node-box .nval { color: var(--accent3); font-weight: 700; font-size: 15px; }
+.a-node-box .nptr { color: var(--text-dim); font-size: 10px; }
+
+.a-arrow {
+  color: var(--accent1);
+  font-size: 18px;
+  padding: 0 4px;
+  transition: color 0.3s;
+}
+
+.a-arrow.back {
+  color: var(--accent5);
+}
+
+.a-arrow.cycle {
+  color: var(--accent3);
+}
+
+.a-null {
+  background: rgba(255,107,107,0.1);
+  border: 2px solid rgba(255,107,107,0.5);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  color: var(--accent2);
+}
+
+@keyframes nodeIn {
+  from { opacity: 0; transform: scale(0.7); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.node-label {
+  font-size: 10px;
+  color: var(--accent4);
+  text-align: center;
+  margin-top: 4px;
+  font-family: 'Fira Code', monospace;
+}
+
+.node-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Highlight / pointer */
+.pointer-label {
+  background: var(--accent4);
+  color: #000;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'Fira Code', monospace;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+/* Comparison table */
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 14px;
+}
+
+.compare-table th {
+  background: var(--surface2);
+  color: var(--accent1);
+  padding: 12px 16px;
+  text-align: right;
+  border: 1px solid var(--border);
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+}
+
+.compare-table td {
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.compare-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+.compare-table .good { color: var(--accent4); }
+.compare-table .bad { color: var(--accent2); }
+.compare-table .mid { color: var(--accent3); }
+
+/* Signs / Patterns */
+.sign-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.sign-card {
+  background: var(--surface2);
+  border-radius: 12px;
+  padding: 18px;
+  border-right: 4px solid var(--accent5);
+}
+
+.sign-card.warn { border-right-color: var(--accent3); }
+.sign-card.info { border-right-color: var(--accent1); }
+.sign-card.danger { border-right-color: var(--accent2); }
+.sign-card.success { border-right-color: var(--accent4); }
+
+.sign-card h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.sign-card p, .sign-card li {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.sign-card ul { padding-right: 16px; }
+
+/* Step list */
+.steps {
+  counter-reset: step;
+  padding: 0;
+  list-style: none;
+}
+
+.steps li {
+  counter-increment: step;
+  padding: 10px 0 10px 50px;
+  position: relative;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 8px;
+  background: linear-gradient(135deg, var(--accent1), var(--accent5));
+  color: #000;
+  font-weight: 900;
+  font-size: 11px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Complexity badge */
+.complexity {
+  display: inline-flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cx-badge {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+}
+
+.cx-badge .cx-label { color: var(--text-dim); }
+.cx-badge .cx-val { color: var(--accent3); font-weight: 700; }
+
+/* Problem cards */
+.problems-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+.prob-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  transition: all 0.2s;
+}
+
+.prob-card:hover { border-color: var(--accent5); }
+
+.prob-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.prob-diff {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.easy { background: rgba(107,203,119,0.15); color: var(--accent4); border: 1px solid rgba(107,203,119,0.3); }
+.medium { background: rgba(255,217,61,0.15); color: var(--accent3); border: 1px solid rgba(255,217,61,0.3); }
+.hard { background: rgba(255,107,107,0.15); color: var(--accent2); border: 1px solid rgba(255,107,107,0.3); }
+
+.prob-card h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.prob-card p {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.prob-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.tag {
+  background: rgba(0,212,255,0.08);
+  border: 1px solid rgba(0,212,255,0.2);
+  color: var(--accent1);
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'Fira Code', monospace;
+}
+
+/* Info note */
+.note {
+  background: rgba(0,212,255,0.05);
+  border: 1px solid rgba(0,212,255,0.2);
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin: 16px 0;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.note-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+
+.warning {
+  background: rgba(255,107,107,0.05);
+  border-color: rgba(255,107,107,0.3);
+}
+
+/* Cycle viz */
+.cycle-viz {
+  position: relative;
+  width: 300px;
+  height: 200px;
+  margin: 0 auto;
+}
+
+.cycle-arrow-curved {
+  color: var(--accent3);
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* section divider */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent1), transparent);
+  margin: 40px 0;
+  opacity: 0.3;
+}
+
+/* Highlight text */
+.hl { color: var(--accent1); font-weight: 700; }
+.hl2 { color: var(--accent2); font-weight: 700; }
+.hl3 { color: var(--accent3); font-weight: 700; }
+.hl4 { color: var(--accent4); font-weight: 700; }
+.hl5 { color: var(--accent5); font-weight: 700; }
+
+/* Algo step */
+.algo-step {
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin: 8px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.algo-num {
+  background: var(--accent1);
+  color: #000;
+  font-weight: 900;
+  font-size: 11px;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.algo-step p { color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; }
+.algo-step strong { color: var(--text); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2rem; }
+  .lesson-header h2 { font-size: 1.3rem; }
+  .hero-nodes { gap: 4px; }
+  .node-box { padding: 8px 12px; font-size: 12px; }
+}
+
+/* Pulse animation for slow/fast pointers */
+@keyframes slowPulse {
+  0%, 100% { border-color: var(--accent4); box-shadow: 0 0 8px rgba(107,203,119,0.3); }
+  50% { border-color: var(--accent4); box-shadow: 0 0 20px rgba(107,203,119,0.7); }
+}
+
+@keyframes fastPulse {
+  0%, 100% { border-color: var(--accent2); box-shadow: 0 0 8px rgba(255,107,107,0.3); }
+  50% { border-color: var(--accent2); box-shadow: 0 0 20px rgba(255,107,107,0.7); }
+}
+
+.slow-ptr { animation: slowPulse 1.5s ease-in-out infinite; }
+.fast-ptr { animation: fastPulse 0.8s ease-in-out infinite; }
+
+/* Step-through animation */
+@keyframes highlight {
+  0% { background: rgba(255,217,61,0.4); }
+  100% { background: transparent; }
+}
+
+.highlight-anim { animation: highlight 1s ease both; }
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">Data Structures — الدليل الشامل</div>
+  <h1><span>Linked Lists</span><br>من <em>الصفر</em> للاحتراف</h1>
+  <p class="hero-sub">Singly · Doubly · Circular · Cycle Detection · Reversal<br>كل شيء تحتاج معرفته مع أمثلة وأنيميشن تفاعلي</p>
+  
+  <div class="hero-nodes">
+    <div class="hero-node">
+      <div class="node-wrapper">
+        <div class="pointer-label">HEAD</div>
+        <div class="node-box"><span class="val">10</span><span class="sep">|</span><span class="ptr">next→</span></div>
+      </div>
+    </div>
+    <div class="node-arrow">→</div>
+    <div class="hero-node">
+      <div class="node-box"><span class="val">20</span><span class="sep">|</span><span class="ptr">next→</span></div>
+    </div>
+    <div class="node-arrow">→</div>
+    <div class="hero-node">
+      <div class="node-box"><span class="val">30</span><span class="sep">|</span><span class="ptr">next→</span></div>
+    </div>
+    <div class="node-arrow">→</div>
+    <div class="null-box">NULL</div>
+  </div>
+</section>
+
+<!-- TOC -->
+<section class="toc">
+  <div class="section-header">
+    <div class="section-tag">Table of Contents</div>
+    <h2>فهرس المحتويات</h2>
+  </div>
+  <div class="toc-grid">
+    <a href="#basics" class="toc-item"><span class="toc-num">01</span> ما هي Linked List؟</a>
+    <a href="#singly" class="toc-item"><span class="toc-num">02</span> Singly Linked List</a>
+    <a href="#doubly" class="toc-item"><span class="toc-num">03</span> Doubly Linked List</a>
+    <a href="#circular" class="toc-item"><span class="toc-num">04</span> Circular Linked List</a>
+    <a href="#operations" class="toc-item"><span class="toc-num">05</span> العمليات الأساسية</a>
+    <a href="#reversal" class="toc-item"><span class="toc-num">06</span> Reversal — قلب القائمة</a>
+    <a href="#cycle" class="toc-item"><span class="toc-num">07</span> Cycle Detection</a>
+    <a href="#two-pointers" class="toc-item"><span class="toc-num">08</span> Two Pointers Tricks</a>
+    <a href="#signs" class="toc-item"><span class="toc-num">09</span> علامات التعرف على المسائل</a>
+    <a href="#problems" class="toc-item"><span class="toc-num">10</span> أهم المسائل + حلولها</a>
+  </div>
+</section>
+
+<!-- CONTENT -->
+<div class="content">
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 1: BASICS
+═══════════════════════════════════════════════════ -->
+<section class="lesson" id="basics">
+  <div class="lesson-header">
+    <div class="lesson-num">01</div>
+    <h2>ما هي <span class="en">Linked List</span>؟</h2>
+  </div>
+
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="concept-icon">🔗</div>
+      <h3>Node</h3>
+      <p>وحدة البناء الأساسية. كل Node بتحتوي على <strong>data</strong> (القيمة) و<strong>pointer</strong> بيشير للـ node الجاية.</p>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">🏠</div>
+      <h3>Head</h3>
+      <p>أول node في القائمة. ده بوابة دخول القائمة كلها. لو فقدته، فقدت القائمة كلها!</p>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">🛑</div>
+      <h3>Tail</h3>
+      <p>آخر node في القائمة. الـ next pointer بتاعه بيشير لـ NULL (نهاية القائمة).</p>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">📦</div>
+      <h3>Dynamic Size</h3>
+      <p>مش زي Arrays — مش محتاج تعرف الحجم مسبقاً. بتكبر وتصغر ديناميكياً وقت التشغيل.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">مقارنة Array vs Linked List</div>
+    <table class="compare-table">
+      <tr>
+        <th>العملية</th>
+        <th>Array</th>
+        <th>Linked List</th>
+        <th>ملاحظة</th>
+      </tr>
+      <tr>
+        <td>Access by index</td>
+        <td class="good">O(1)</td>
+        <td class="bad">O(n)</td>
+        <td>Array أسرع</td>
+      </tr>
+      <tr>
+        <td>Insert at beginning</td>
+        <td class="bad">O(n)</td>
+        <td class="good">O(1)</td>
+        <td>Linked List أسرع</td>
+      </tr>
+      <tr>
+        <td>Insert at end</td>
+        <td class="good">O(1) amortized</td>
+        <td class="mid">O(1) لو عندك tail</td>
+        <td>متشابهين</td>
+      </tr>
+      <tr>
+        <td>Delete from middle</td>
+        <td class="bad">O(n)</td>
+        <td class="good">O(1) لو عندك pointer</td>
+        <td>Linked List أسرع</td>
+      </tr>
+      <tr>
+        <td>Search</td>
+        <td class="mid">O(n)</td>
+        <td class="bad">O(n)</td>
+        <td>متشابهين</td>
+      </tr>
+      <tr>
+        <td>Memory</td>
+        <td class="good">Compact</td>
+        <td class="bad">Extra pointer per node</td>
+        <td>Array أكفأ</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">كود الـ Node الأساسي</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="cm"># ============================
+# Node الأساسي لـ Linked List
+# ============================</span>
+<span class="kw">class</span> <span class="cls">Node</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, data):
+        <span class="kw">self</span>.data <span class="op">=</span> data        <span class="cm"># القيمة المخزنة</span>
+        <span class="kw">self</span>.next <span class="op">=</span> <span class="kw">None</span>        <span class="cm"># Pointer للـ Node الجاية</span>
+
+<span class="cm"># مثال على إنشاء Nodes:</span>
+n1 <span class="op">=</span> <span class="cls">Node</span>(<span class="num">10</span>)
+n2 <span class="op">=</span> <span class="cls">Node</span>(<span class="num">20</span>)
+n3 <span class="op">=</span> <span class="cls">Node</span>(<span class="num">30</span>)
+
+<span class="cm"># ربطهم ببعض:</span>
+n1.next <span class="op">=</span> n2
+n2.next <span class="op">=</span> n3
+<span class="cm"># n3.next = None (تلقائي)</span>
+
+head <span class="op">=</span> n1  <span class="cm"># HEAD بيشير لأول Node</span>
+
+<span class="cm"># التصوير: 10 → 20 → 30 → NULL</span></pre>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 2: SINGLY
+═══════════════════════════════════════════════════ -->
+<section class="lesson" id="singly">
+  <div class="lesson-header">
+    <div class="lesson-num">02</div>
+    <h2><span class="en">Singly Linked List</span> — القائمة أحادية الاتجاه</h2>
+  </div>
+
+  <p style="color: var(--text-dim); margin-bottom: 20px;">
+    كل node عندها <span class="hl">pointer واحد بس</span> بيشير للـ node الجاية. يعني مقدرش أرجع للخلف!<br>
+    الحركة فيها <span class="hl2">في اتجاه واحد فقط</span> من اليسار لليمين.
+  </p>
+
+  <!-- Singly Animation -->
+  <div class="anim-container">
+    <div class="anim-title">🎬 أنيميشن Singly Linked List — إضافة وحذف</div>
+    <div class="anim-stage" id="singly-stage">
+      <!-- Populated by JS -->
+    </div>
+    <div id="singly-msg" style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 16px; min-height: 20px;"></div>
+    <div class="anim-controls">
+      <button class="btn" onclick="singlyAddFront()">+ إضافة للبداية</button>
+      <button class="btn" onclick="singlyAddEnd()">+ إضافة للنهاية</button>
+      <button class="btn danger" onclick="singlyDeleteHead()">− حذف الأول</button>
+      <button class="btn danger" onclick="singlyDeleteTail()">− حذف الأخير</button>
+      <button class="btn success" onclick="singlyReset()">↺ إعادة</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Insert at Head — إضافة في البداية O(1)</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="kw">def</span> <span class="fn">insert_at_head</span>(<span class="kw">self</span>, data):
+    new_node <span class="op">=</span> <span class="cls">Node</span>(data)
+    new_node.next <span class="op">=</span> <span class="kw">self</span>.head  <span class="cm"># ①  الـ node الجديد يشير للـ head القديم</span>
+    <span class="kw">self</span>.head <span class="op">=</span> new_node       <span class="cm"># ②  الـ head يبقى الـ node الجديد</span>
+    <span class="cm"># ✅ O(1) — سريع جداً</span></pre>
+    </div>
+
+    <div class="card-title" style="margin-top: 16px;">Insert at Tail — إضافة في النهاية O(n)</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="kw">def</span> <span class="fn">insert_at_tail</span>(<span class="kw">self</span>, data):
+    new_node <span class="op">=</span> <span class="cls">Node</span>(data)
+    <span class="kw">if not self</span>.head:
+        <span class="kw">self</span>.head <span class="op">=</span> new_node
+        <span class="kw">return</span>
+    
+    curr <span class="op">=</span> <span class="kw">self</span>.head
+    <span class="kw">while</span> curr.next:   <span class="cm"># ① امشي لحد ما توصل للأخير</span>
+        curr <span class="op">=</span> curr.next
+    curr.next <span class="op">=</span> new_node  <span class="cm"># ② اربط الـ new node</span>
+    <span class="cm"># ⚠️ O(n) — لو عندك tail pointer تبقى O(1)</span></pre>
+    </div>
+
+    <div class="card-title" style="margin-top: 16px;">Delete by Value — حذف بالقيمة O(n)</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="kw">def</span> <span class="fn">delete</span>(<span class="kw">self</span>, val):
+    <span class="kw">if not self</span>.head: <span class="kw">return</span>
+    
+    <span class="cm"># Case 1: الـ head هو اللي هنحذفه</span>
+    <span class="kw">if</span> <span class="kw">self</span>.head.data <span class="op">==</span> val:
+        <span class="kw">self</span>.head <span class="op">=</span> <span class="kw">self</span>.head.next
+        <span class="kw">return</span>
+    
+    <span class="cm"># Case 2: ابحث عن الـ node قبل المطلوب</span>
+    prev <span class="op">=</span> <span class="kw">self</span>.head
+    <span class="kw">while</span> prev.next <span class="kw">and</span> prev.next.data <span class="op">!=</span> val:
+        prev <span class="op">=</span> prev.next
+    
+    <span class="kw">if</span> prev.next:  <span class="cm"># وجدناه</span>
+        prev.next <span class="op">=</span> prev.next.next  <span class="cm"># ① "قفز" فوق الـ node المحذوف</span></pre>
+    </div>
+  </div>
+
+  <div class="note">
+    <span class="note-icon">💡</span>
+    <div><strong style="color: var(--accent1);">تريك مهم:</strong> لو محتاج تحذف node وعندك pointer عليها مباشرة (مش head)، ممكن تنسخ القيمة من الـ node الجاية وتحذف الـ node الجاية بدل ما تتعب تجيب الـ prev!</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 3: DOUBLY
+═══════════════════════════════════════════════════ -->
+<section class="lesson" id="doubly">
+  <div class="lesson-header">
+    <div class="lesson-num">03</div>
+    <h2><span class="en">Doubly Linked List</span> — القائمة ثنائية الاتجاه</h2>
+  </div>
+
+  <p style="color: var(--text-dim); margin-bottom: 20px;">
+    كل node عندها <span class="hl5">pointerين</span>: <span class="hl">next</span> للأمام و<span class="hl2">prev</span> للخلف.<br>
+    ممكن أتحرك في <span class="hl4">الاتجاهين</span>! ده بيفيد جداً في عمليات معينة.
+  </p>
+
+  <!-- Doubly Animation -->
+  <div class="anim-container">
+    <div class="anim-title">🎬 أنيميشن Doubly Linked List — حركة في الاتجاهين</div>
+    <div class="anim-stage" id="doubly-stage"></div>
+    <div id="doubly-msg" style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 16px; min-height: 20px;"></div>
+    <div class="anim-controls">
+      <button class="btn" onclick="doublyAddFront()">+ إضافة للبداية</button>
+      <button class="btn" onclick="doublyAddEnd()">+ إضافة للنهاية</button>
+      <button class="btn danger" onclick="doublyDeleteHead()">− حذف الأول</button>
+      <button class="btn danger" onclick="doublyDeleteTail()">− حذف الأخير</button>
+      <button class="btn success" onclick="doublyReset()">↺ إعادة</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Node وكلاس الـ Doubly List</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="kw">class</span> <span class="cls">DoublyNode</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, data):
+        <span class="kw">self</span>.data <span class="op">=</span> data
+        <span class="kw">self</span>.next <span class="op">=</span> <span class="kw">None</span>    <span class="cm"># ← الأمام</span>
+        <span class="kw">self</span>.prev <span class="op">=</span> <span class="kw">None</span>    <span class="cm"># ← الخلف</span>
+
+<span class="kw">def</span> <span class="fn">insert_at_tail</span>(<span class="kw">self</span>, data):
+    new_node <span class="op">=</span> <span class="cls">DoublyNode</span>(data)
+    <span class="kw">if not self</span>.head:
+        <span class="kw">self</span>.head <span class="op">=</span> <span class="kw">self</span>.tail <span class="op">=</span> new_node
+        <span class="kw">return</span>
+    <span class="cm"># ① ربط الـ new node</span>
+    new_node.prev <span class="op">=</span> <span class="kw">self</span>.tail
+    <span class="kw">self</span>.tail.next <span class="op">=</span> new_node
+    <span class="kw">self</span>.tail <span class="op">=</span> new_node
+    <span class="cm"># ✅ O(1) — لأن عندنا tail pointer!</span>
+
+<span class="kw">def</span> <span class="fn">delete_node</span>(<span class="kw">self</span>, node):
+    <span class="cm"># ✨ مش محتاجين ندور على الـ prev!</span>
+    <span class="kw">if</span> node.prev: node.prev.next <span class="op">=</span> node.next
+    <span class="kw">else</span>: <span class="kw">self</span>.head <span class="op">=</span> node.next  <span class="cm"># كان head</span>
+    <span class="kw">if</span> node.next: node.next.prev <span class="op">=</span> node.prev
+    <span class="kw">else</span>: <span class="kw">self</span>.tail <span class="op">=</span> node.prev  <span class="cm"># كان tail</span>
+    <span class="cm"># ✅ O(1) — مزية الـ doubly!</span></pre>
+    </div>
+  </div>
+
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="concept-icon">✅</div>
+      <h3>مزايا Doubly</h3>
+      <p style="color: var(--accent4);">حذف O(1) لو عندك pointer<br>traversal في الاتجاهين<br>مناسب للـ LRU Cache<br>سهل عكس القائمة</p>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">⚠️</div>
+      <h3>عيوب Doubly</h3>
+      <p style="color: var(--accent2);">ذاكرة أكثر (pointer زيادة)<br>كود أعقد<br>كل إضافة/حذف لازم تعدل pointerين</p>
+    </div>
+  </div>
+
+  <div class="note warning">
+    <span class="note-icon">⚠️</span>
+    <div><strong style="color: var(--accent2);">خطأ شائع جداً:</strong> لما تحذف node في doubly، متنساش تعدل الـ prev pointer بتاع الـ node الجاية والـ next pointer بتاع الـ node السابقة! لو نسيت واحد فيهم هتعمل corruption في القائمة.</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 4: CIRCULAR
+═══════════════════════════════════════════════════ -->
+<section class="lesson" id="circular">
+  <div class="lesson-header">
+    <div class="lesson-num">04</div>
+    <h2><span class="en">Circular Linked List</span> — القائمة الدائرية</h2>
+  </div>
+
+  <p style="color: var(--text-dim); margin-bottom: 20px;">
+    آخر node مش بتشير لـ NULL، بتشير <span class="hl">للـ head</span> مرة تانية!<br>
+    يعني القائمة زي <span class="hl3">حلقة</span> — مفيش بداية ومفيش نهاية.
+  </p>
+
+  <div class="anim-container">
+    <div class="anim-title">🎬 أنيميشن Circular Linked List</div>
+    <div class="anim-stage" id="circular-stage" style="flex-direction: column; gap: 10px;">
+      <div id="circular-linear" style="display:flex; align-items:center; gap:4px; flex-wrap:wrap; justify-content:center;"></div>
+      <div style="color: var(--accent3); font-size: 13px; font-family: 'Fira Code', monospace;">
+        ↑ الـ tail.next بيرجع للـ head ↑
+      </div>
+    </div>
+    <div id="circular-msg" style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 16px; min-height: 20px;"></div>
+    <div class="anim-controls">
+      <button class="btn" onclick="circularAdd()">+ إضافة Node</button>
+      <button class="btn danger" onclick="circularDelete()">− حذف Head</button>
+      <button class="btn success" onclick="circularReset()">↺ إعادة</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">كود Circular List — Insert & Traverse</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="kw">def</span> <span class="fn">insert</span>(<span class="kw">self</span>, data):
+    new_node <span class="op">=</span> <span class="cls">Node</span>(data)
+    <span class="kw">if not self</span>.head:
+        <span class="kw">self</span>.head <span class="op">=</span> new_node
+        new_node.next <span class="op">=</span> <span class="kw">self</span>.head  <span class="cm"># يشير لنفسه!</span>
+        <span class="kw">return</span>
+    <span class="cm"># ابحث عن الـ tail</span>
+    tail <span class="op">=</span> <span class="kw">self</span>.head
+    <span class="kw">while</span> tail.next <span class="op">!=</span> <span class="kw">self</span>.head:
+        tail <span class="op">=</span> tail.next
+    tail.next <span class="op">=</span> new_node
+    new_node.next <span class="op">=</span> <span class="kw">self</span>.head  <span class="cm"># أهم سطر! الربط الدائري</span>
+
+<span class="kw">def</span> <span class="fn">traverse</span>(<span class="kw">self</span>):
+    <span class="kw">if not self</span>.head: <span class="kw">return</span>
+    curr <span class="op">=</span> <span class="kw">self</span>.head
+    <span class="kw">while True</span>:
+        <span class="fn">print</span>(curr.data)
+        curr <span class="op">=</span> curr.next
+        <span class="kw">if</span> curr <span class="op">==</span> <span class="kw">self</span>.head:  <span class="cm"># ⚠️ الشرط: رجعنا للبداية</span>
+            <span class="kw">break</span></pre>
+    </div>
+  </div>
+
+  <div class="note">
+    <span class="note-icon">💡</span>
+    <div><strong style="color: var(--accent1);">استخدامات Circular List:</strong> Round Robin scheduling في الـ OS، queue أو playlist ملوش نهاية، تنفيذ الـ buffer الدائري (ring buffer).</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 5: REVERSAL
+═══════════════════════════════════════════════════ -->
+<section class="lesson" id="reversal">
+  <div class="lesson-header">
+    <div class="lesson-num">06</div>
+    <h2><span class="en">Reversal</span> — قلب الـ Linked List</h2>
+  </div>
+
+  <p style="color: var(--text-dim); margin-bottom: 20px;">
+    من أكتر المسائل اللي بتيجي في الإنترفيوز! محتاج تعكس اتجاه كل الـ pointers.
+  </p>
+
+  <!-- Reversal Animation -->
+  <div class="anim-container">
+    <div class="anim-title">🎬 أنيميشن Reversal — خطوة بخطوة</div>
+    <div class="anim-stage" id="rev-stage" style="flex-direction: column; gap: 16px;">
+      <div id="rev-list" style="display:flex; align-items:center; gap:4px; flex-wrap:wrap; justify-content:center;"></div>
+      <div id="rev-pointers" style="display:flex; gap:20px; justify-content:center; flex-wrap:wrap;"></div>
+      <div id="rev-info" style="color: var(--text-dim); font-size: 0.85rem; font-family: 'Fira Code', monospace; text-align:center;"></div>
+    </div>
+    <div class="anim-controls">
+      <button class="btn" onclick="revStep()">▶ خطوة للأمام</button>
+      <button class="btn success" onclick="revAuto()">⚡ تشغيل تلقائي</button>
+      <button class="btn danger" onclick="revReset()">↺ إعادة</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">الخوارزمية Iterative — 3 pointers</div>
+
+    <div class="algo-step">
+      <div class="algo-num">1</div>
+      <p>بنعمل 3 variables: <strong>prev = None</strong>, <strong>curr = head</strong>, <strong>next_node = None</strong></p>
+    </div>
+    <div class="algo-step">
+      <div class="algo-num">2</div>
+      <p>في كل iteration: بنحفظ <strong>next_node = curr.next</strong> (عشان مانضيعش باقي القائمة)</p>
+    </div>
+    <div class="algo-step">
+      <div class="algo-num">3</div>
+      <p>بنعكس الـ pointer: <strong>curr.next = prev</strong> (القلب الفعلي)</p>
+    </div>
+    <div class="algo-step">
+      <div class="algo-num">4</div>
+      <p>بنحرك الـ pointers للأمام: <strong>prev = curr</strong>, <strong>curr = next_node</strong></p>
+    </div>
+    <div class="algo-step">
+      <div class="algo-num">5</div>
+      <p>لما curr == None، الـ <strong>prev</strong> بيبقى الـ head الجديد!</p>
+    </div>
+
+    <div class="code-block" style="margin-top: 16px;">
+      <div class="code-header">
+        <span class="code-lang">Python — Iterative O(n) time, O(1) space</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="kw">def</span> <span class="fn">reverse</span>(<span class="kw">self</span>):
+    prev <span class="op">=</span> <span class="kw">None</span>
+    curr <span class="op">=</span> <span class="kw">self</span>.head
+    
+    <span class="kw">while</span> curr:
+        next_node <span class="op">=</span> curr.next  <span class="cm"># ① احفظ الـ next</span>
+        curr.next <span class="op">=</span> prev        <span class="cm"># ② اقلب الـ pointer</span>
+        prev <span class="op">=</span> curr             <span class="cm"># ③ حرك prev للأمام</span>
+        curr <span class="op">=</span> next_node        <span class="cm"># ④ حرك curr للأمام</span>
+    
+    <span class="kw">self</span>.head <span class="op">=</span> prev  <span class="cm"># ⑤ prev الجديد = head الجديد</span>
+    
+<span class="cm"># ════════════════════════════════</span>
+<span class="cm"># Recursive (elegant, O(n) space)</span>
+<span class="cm"># ════════════════════════════════</span>
+<span class="kw">def</span> <span class="fn">reverse_recursive</span>(<span class="kw">self</span>, node):
+    <span class="kw">if not</span> node <span class="kw">or not</span> node.next:
+        <span class="kw">return</span> node  <span class="cm"># Base case: آخر node هو الـ head الجديد</span>
+    
+    new_head <span class="op">=</span> <span class="kw">self</span>.reverse_recursive(node.next)
+    node.next.next <span class="op">=</span> node  <span class="cm"># اقلب الـ pointer</span>
+    node.next <span class="op">=</span> <span class="kw">None</span>        <span class="cm"># ازل الـ old pointer</span>
+    <span class="kw">return</span> new_head</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Reverse a Sublist — عكس جزء فقط (مسألة LeetCode 92)</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Reverse from position left to right</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="kw">def</span> <span class="fn">reverseBetween</span>(head, left, right):
+    dummy <span class="op">=</span> <span class="cls">Node</span>(<span class="num">0</span>)
+    dummy.next <span class="op">=</span> head
+    prev <span class="op">=</span> dummy
+    
+    <span class="cm"># ① امشي لـ (left - 1)</span>
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(left <span class="op">-</span> <span class="num">1</span>):
+        prev <span class="op">=</span> prev.next
+    
+    curr <span class="op">=</span> prev.next
+    
+    <span class="cm"># ② اعكس (right - left) مرات</span>
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(right <span class="op">-</span> left):
+        next_node <span class="op">=</span> curr.next
+        curr.next <span class="op">=</span> next_node.next
+        next_node.next <span class="op">=</span> prev.next
+        prev.next <span class="op">=</span> next_node
+    
+    <span class="kw">return</span> dummy.next</pre>
+    </div>
+  </div>
+
+  <div style="margin-top: 16px;" class="complexity">
+    <div class="cx-badge"><span class="cx-label">Time: </span><span class="cx-val">O(n)</span></div>
+    <div class="cx-badge"><span class="cx-label">Space (iterative): </span><span class="cx-val">O(1)</span></div>
+    <div class="cx-badge"><span class="cx-label">Space (recursive): </span><span class="cx-val">O(n)</span></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 6: CYCLE DETECTION
+═══════════════════════════════════════════════════ -->
+<section class="lesson" id="cycle">
+  <div class="lesson-header">
+    <div class="lesson-num">07</div>
+    <h2><span class="en">Cycle Detection</span> — اكتشاف الحلقة 🐢🐰</h2>
+  </div>
+
+  <p style="color: var(--text-dim); margin-bottom: 20px;">
+    أحياناً في قائمة، آخر node بيشير لـ node في المنتصف بدل NULL — فبيتكون <span class="hl2">cycle (حلقة)</span>.<br>
+    الخوارزمية الأشهر لاكتشافها هي <span class="hl3">Floyd's Algorithm</span> أو "السلحفاة والأرنب" 🐢🐰.
+  </p>
+
+  <!-- Cycle Animation -->
+  <div class="anim-container">
+    <div class="anim-title">🎬 Floyd's Cycle Detection — الـ Slow و Fast Pointers</div>
+    <div class="anim-stage" id="cycle-stage" style="flex-direction:column; gap:12px;">
+      <div id="cycle-list" style="display:flex; align-items:center; gap:4px; flex-wrap:wrap; justify-content:center;"></div>
+      <div id="cycle-ptrs" style="display:flex; gap:20px; justify-content:center; flex-wrap:wrap;"></div>
+      <div id="cycle-info" style="font-family:'Fira Code',monospace; font-size:12px; color:var(--text-dim); text-align:center;"></div>
+    </div>
+    <div class="anim-controls">
+      <button class="btn" onclick="cycleStep()">▶ خطوة</button>
+      <button class="btn success" onclick="cycleAuto()">⚡ تشغيل تلقائي</button>
+      <button class="btn danger" onclick="cycleReset()">↺ إعادة</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Floyd's Algorithm — كود كامل</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Detect, Find Entry, Find Length</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="cm"># ═══════════════════════════════════
+# ① هل فيه Cycle؟ — O(n) T, O(1) S
+# ═══════════════════════════════════</span>
+<span class="kw">def</span> <span class="fn">has_cycle</span>(head):
+    slow <span class="op">=</span> fast <span class="op">=</span> head
+    <span class="kw">while</span> fast <span class="kw">and</span> fast.next:
+        slow <span class="op">=</span> slow.next         <span class="cm"># 🐢 خطوة واحدة</span>
+        fast <span class="op">=</span> fast.next.next    <span class="cm"># 🐰 خطوتين</span>
+        <span class="kw">if</span> slow <span class="op">==</span> fast:
+            <span class="kw">return True</span>          <span class="cm"># التقوا = فيه cycle</span>
+    <span class="kw">return False</span>
+
+<span class="cm"># ═══════════════════════════════════════════
+# ② إيه نقطة بداية الـ Cycle؟
+# ═══════════════════════════════════════════
+# بعد التقاء slow و fast:
+# - ارجع slow للـ head
+# - حرك الاتنين خطوة خطوة
+# - مكان التقاؤهم = بداية الـ cycle ✨</span>
+<span class="kw">def</span> <span class="fn">find_cycle_entry</span>(head):
+    slow <span class="op">=</span> fast <span class="op">=</span> head
+    <span class="kw">while</span> fast <span class="kw">and</span> fast.next:
+        slow <span class="op">=</span> slow.next
+        fast <span class="op">=</span> fast.next.next
+        <span class="kw">if</span> slow <span class="op">==</span> fast:
+            slow <span class="op">=</span> head         <span class="cm"># ← أعد slow للـ head</span>
+            <span class="kw">while</span> slow <span class="op">!=</span> fast:
+                slow <span class="op">=</span> slow.next
+                fast <span class="op">=</span> fast.next
+            <span class="kw">return</span> slow        <span class="cm"># بداية الـ cycle!</span>
+    <span class="kw">return None</span>
+
+<span class="cm"># ════════════════════════════
+# ③ طول الـ Cycle؟
+# ════════════════════════════</span>
+<span class="kw">def</span> <span class="fn">cycle_length</span>(head):
+    slow <span class="op">=</span> fast <span class="op">=</span> head
+    <span class="kw">while</span> fast <span class="kw">and</span> fast.next:
+        slow <span class="op">=</span> slow.next
+        fast <span class="op">=</span> fast.next.next
+        <span class="kw">if</span> slow <span class="op">==</span> fast:           <span class="cm"># التقوا</span>
+            count <span class="op">=</span> <span class="num">1</span>
+            fast <span class="op">=</span> fast.next
+            <span class="kw">while</span> slow <span class="op">!=</span> fast:   <span class="cm"># دور على نفسك وعد</span>
+                fast <span class="op">=</span> fast.next
+                count <span class="op">+=</span> <span class="num">1</span>
+            <span class="kw">return</span> count
+    <span class="kw">return</span> <span class="num">0</span></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">ليه الـ Floyd Algorithm شغال؟ — البرهان الرياضي</div>
+    <p style="color: var(--text-dim); font-size: 0.88rem; margin-bottom: 12px;">
+      تخيل الـ cycle بدأ بعد <span class="hl">F</span> خطوات من الـ head، وطوله <span class="hl3">C</span>.<br>
+      لما slow يوصل لبداية الـ cycle، fast كان مشى <span class="hl">2F</span> خطوة — يعني مشى <span class="hl">F steps</span> جوه الـ cycle.<br>
+      المسافة بين fast وبداية الـ cycle = <span class="hl2">C - (F mod C)</span>.<br>
+      لما تحرك slow من الـ head وfast من مكان الالتقاء بنفس السرعة، بيلتقوا عند <span class="hl4">بداية الـ cycle</span> بالظبط! ✨
+    </p>
+  </div>
+
+  <div style="margin-top: 16px;" class="complexity">
+    <div class="cx-badge"><span class="cx-label">Time: </span><span class="cx-val">O(n)</span></div>
+    <div class="cx-badge"><span class="cx-label">Space: </span><span class="cx-val">O(1)</span></div>
+    <div class="cx-badge"><span class="cx-label">الاسم: </span><span class="cx-val">Floyd / Tortoise & Hare</span></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 7: TWO POINTERS
+═══════════════════════════════════════════════════ -->
+<section class="lesson" id="two-pointers">
+  <div class="lesson-header">
+    <div class="lesson-num">08</div>
+    <h2><span class="en">Two Pointers Tricks</span> — تريكات المؤشرين</h2>
+  </div>
+
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="concept-icon">🐢🐰</div>
+      <h3>Slow & Fast</h3>
+      <p>Slow خطوة، Fast خطوتين.<br>
+      <span class="hl4">الاستخدامات:</span> إيجاد المنتصف، cycle detection، إيجاد الـ n-th from end.</p>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">↔️</div>
+      <h3>Prev & Curr</h3>
+      <p>Prev للـ node السابقة، Curr للحالية.<br>
+      <span class="hl4">الاستخدامات:</span> الحذف، الـ reversal، الـ merging.</p>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">🎯</div>
+      <h3>Dummy Node</h3>
+      <p>Node وهمية قبل الـ head عشان تبسط الكود.<br>
+      <span class="hl4">الاستخدامات:</span> حذف أول node، merge lists، كل عمليات الـ head.</p>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">🔄</div>
+      <h3>Two Lists</h3>
+      <p>Pointer واحد في كل قائمة.<br>
+      <span class="hl4">الاستخدامات:</span> merge sorted lists، intersection point.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">أهم الـ Patterns — بكود</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Critical Patterns</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="cm"># ════════════════════════════════════
+# إيجاد المنتصف (Middle of Linked List)
+# ════════════════════════════════════</span>
+<span class="kw">def</span> <span class="fn">find_middle</span>(head):
+    slow <span class="op">=</span> fast <span class="op">=</span> head
+    <span class="kw">while</span> fast <span class="kw">and</span> fast.next:
+        slow <span class="op">=</span> slow.next
+        fast <span class="op">=</span> fast.next.next
+    <span class="kw">return</span> slow  <span class="cm"># ← المنتصف! 🎯</span>
+
+<span class="cm"># ═══════════════════════════════════════════════════
+# إيجاد الـ N-th node from the END
+# فكرة: fast يمشي n خطوة أول، تعد يمشوا مع بعض
+# ═══════════════════════════════════════════════════</span>
+<span class="kw">def</span> <span class="fn">find_nth_from_end</span>(head, n):
+    fast <span class="op">=</span> slow <span class="op">=</span> head
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n):    <span class="cm"># fast يمشي n خطوة</span>
+        fast <span class="op">=</span> fast.next
+    <span class="kw">while</span> fast:            <span class="cm"># امشوا مع بعض</span>
+        slow <span class="op">=</span> slow.next
+        fast <span class="op">=</span> fast.next
+    <span class="kw">return</span> slow            <span class="cm"># ← الـ N-th from end!</span>
+
+<span class="cm"># ════════════════════════════════════════
+# Intersection of Two Lists
+# ════════════════════════════════════════
+# len(A) + len(B) = len(B) + len(A) ✨</span>
+<span class="kw">def</span> <span class="fn">get_intersection</span>(headA, headB):
+    a, b <span class="op">=</span> headA, headB
+    <span class="kw">while</span> a <span class="op">!=</span> b:
+        a <span class="op">=</span> a.next <span class="kw">if</span> a <span class="kw">else</span> headB
+        b <span class="op">=</span> b.next <span class="kw">if</span> b <span class="kw">else</span> headA
+    <span class="kw">return</span> a  <span class="cm"># نقطة التقاطع أو None</span>
+
+<span class="cm"># ══════════════════════════════════
+# Merge Two Sorted Lists
+# ══════════════════════════════════</span>
+<span class="kw">def</span> <span class="fn">merge_sorted</span>(l1, l2):
+    dummy <span class="op">=</span> <span class="cls">Node</span>(<span class="num">0</span>)  <span class="cm"># Dummy Node!</span>
+    curr <span class="op">=</span> dummy
+    <span class="kw">while</span> l1 <span class="kw">and</span> l2:
+        <span class="kw">if</span> l1.data <span class="op">&lt;=</span> l2.data:
+            curr.next <span class="op">=</span> l1; l1 <span class="op">=</span> l1.next
+        <span class="kw">else</span>:
+            curr.next <span class="op">=</span> l2; l2 <span class="op">=</span> l2.next
+        curr <span class="op">=</span> curr.next
+    curr.next <span class="op">=</span> l1 <span class="kw">or</span> l2
+    <span class="kw">return</span> dummy.next</pre>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 8: SIGNS
+═══════════════════════════════════════════════════ -->
+<section class="lesson" id="signs">
+  <div class="lesson-header">
+    <div class="lesson-num">09</div>
+    <h2>العلامات — ازاي أعرف المسألة من نوع إيه؟</h2>
+  </div>
+
+  <p style="color: var(--text-dim); margin-bottom: 24px;">
+    الجزء ده أهم جزء في الدراسة! لازم تتعرف على الـ <span class="hl">patterns</span> اللي بتظهر في المسائل.
+  </p>
+
+  <div class="sign-grid">
+    <div class="sign-card success">
+      <h4>🐢🐰 Slow & Fast Pointer</h4>
+      <p><strong>لما المسألة تقول:</strong></p>
+      <ul>
+        <li>هل فيه cycle?</li>
+        <li>إيجاد منتصف القائمة</li>
+        <li>Palindrome في linked list</li>
+        <li>Happy Number (غير مباشرة)</li>
+        <li>الـ N-th from end</li>
+      </ul>
+    </div>
+    <div class="sign-card info">
+      <h4>↔️ Prev + Curr Pattern</h4>
+      <p><strong>لما المسألة تقول:</strong></p>
+      <ul>
+        <li>Reverse the list (أو جزء منها)</li>
+        <li>Delete a node</li>
+        <li>Remove duplicates</li>
+        <li>Swap nodes</li>
+      </ul>
+    </div>
+    <div class="sign-card warn">
+      <h4>🎯 Dummy Node Pattern</h4>
+      <p><strong>لما المسألة تقول:</strong></p>
+      <ul>
+        <li>Merge multiple lists</li>
+        <li>Remove Nth from end</li>
+        <li>Partition list</li>
+        <li>أي مسألة فيها تعديل الـ head</li>
+      </ul>
+    </div>
+    <div class="sign-card danger">
+      <h4>🔄 In-place Manipulation</h4>
+      <p><strong>لما المسألة تقول:</strong></p>
+      <ul>
+        <li>Reorder list (1→2→3→4 to 1→4→2→3)</li>
+        <li>Reverse K-group</li>
+        <li>Odd-Even linked list</li>
+        <li>"No extra space" مذكور</li>
+      </ul>
+    </div>
+    <div class="sign-card">
+      <h4>🔗 Two Lists Pattern</h4>
+      <p><strong>لما المسألة تقول:</strong></p>
+      <ul>
+        <li>Intersection of two lists</li>
+        <li>Merge sorted lists</li>
+        <li>Add two numbers (كـ linked lists)</li>
+        <li>Flatten multilevel</li>
+      </ul>
+    </div>
+    <div class="sign-card info">
+      <h4>🔁 Recursive Pattern</h4>
+      <p><strong>لما المسألة تقول:</strong></p>
+      <ul>
+        <li>Reverse (بطريقة recursive أنيقة)</li>
+        <li>Merge sort على linked list</li>
+        <li>Flatten nested list</li>
+        <li>Deep copy with random pointers</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top: 24px;">
+    <span class="note-icon">🎯</span>
+    <div>
+      <strong style="color: var(--accent1);">قاعدة الذهب:</strong><br>
+      لو المسألة قالت <span class="hl3">"O(1) extra space"</span> → ابدأ فكر في Slow/Fast أو Prev/Curr<br>
+      لو المسألة قالت <span class="hl3">"sorted"</span> → ابدأ فكر في Merge Sort أو Two Pointers<br>
+      لو المسألة قالت <span class="hl3">"cycle"</span> أو <span class="hl3">"loop"</span> → Floyd's Algorithm فوراً<br>
+      لو المسألة قالت <span class="hl3">"reverse"</span> → Iterative بـ 3 pointers
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 9: PROBLEMS
+═══════════════════════════════════════════════════ -->
+<section class="lesson" id="problems">
+  <div class="lesson-header">
+    <div class="lesson-num">10</div>
+    <h2>أهم المسائل + طريقة الحل</h2>
+  </div>
+
+  <div class="problems-grid">
+    <div class="prob-card">
+      <div class="prob-header">
+        <span class="prob-diff easy">Easy</span>
+        <h4>Reverse Linked List (#206)</h4>
+      </div>
+      <p>اعكس القائمة. الحل الكلاسيكي بـ 3 pointers: prev, curr, next.</p>
+      <div class="prob-tags">
+        <span class="tag">prev+curr</span>
+        <span class="tag">O(1) space</span>
+        <span class="tag">iterative</span>
+      </div>
+    </div>
+
+    <div class="prob-card">
+      <div class="prob-header">
+        <span class="prob-diff easy">Easy</span>
+        <h4>Middle of Linked List (#876)</h4>
+      </div>
+      <p>إيجاد منتصف القائمة. Slow يمشي خطوة، Fast خطوتين.</p>
+      <div class="prob-tags">
+        <span class="tag">slow+fast</span>
+        <span class="tag">O(1) space</span>
+      </div>
+    </div>
+
+    <div class="prob-card">
+      <div class="prob-header">
+        <span class="prob-diff easy">Easy</span>
+        <h4>Merge Two Sorted Lists (#21)</h4>
+      </div>
+      <p>دمج قائمتين مرتبتين. Dummy node + مقارنة القيم.</p>
+      <div class="prob-tags">
+        <span class="tag">dummy node</span>
+        <span class="tag">two lists</span>
+      </div>
+    </div>
+
+    <div class="prob-card">
+      <div class="prob-header">
+        <span class="prob-diff easy">Easy</span>
+        <h4>Linked List Cycle (#141)</h4>
+      </div>
+      <p>هل فيه cycle؟ Floyd's Algorithm: slow+fast. لو التقوا = cycle.</p>
+      <div class="prob-tags">
+        <span class="tag">Floyd's</span>
+        <span class="tag">slow+fast</span>
+        <span class="tag">O(1) space</span>
+      </div>
+    </div>
+
+    <div class="prob-card">
+      <div class="prob-header">
+        <span class="prob-diff medium">Medium</span>
+        <h4>Remove Nth from End (#19)</h4>
+      </div>
+      <p>Fast يمشي N خطوة الأول، تعد يمشوا مع بعض. مكان slow = المطلوب.</p>
+      <div class="prob-tags">
+        <span class="tag">slow+fast</span>
+        <span class="tag">dummy node</span>
+        <span class="tag">one pass</span>
+      </div>
+    </div>
+
+    <div class="prob-card">
+      <div class="prob-header">
+        <span class="prob-diff medium">Medium</span>
+        <h4>Linked List Cycle II (#142)</h4>
+      </div>
+      <p>إيجاد نقطة بداية الـ cycle. بعد الالتقاء، slow يرجع للـ head ويمشيا بنفس السرعة.</p>
+      <div class="prob-tags">
+        <span class="tag">Floyd's</span>
+        <span class="tag">math</span>
+        <span class="tag">O(1) space</span>
+      </div>
+    </div>
+
+    <div class="prob-card">
+      <div class="prob-header">
+        <span class="prob-diff medium">Medium</span>
+        <h4>Reorder List (#143)</h4>
+      </div>
+      <p>١. إيجاد المنتصف ٢. عكس النص الثاني ٣. دمج القائمتين. 3 خطوات واضحة!</p>
+      <div class="prob-tags">
+        <span class="tag">slow+fast</span>
+        <span class="tag">reverse</span>
+        <span class="tag">merge</span>
+      </div>
+    </div>
+
+    <div class="prob-card">
+      <div class="prob-header">
+        <span class="prob-diff medium">Medium</span>
+        <h4>Palindrome Linked List (#234)</h4>
+      </div>
+      <p>إيجاد منتصف، عكس النص الثاني، قارن. Time O(n), Space O(1).</p>
+      <div class="prob-tags">
+        <span class="tag">slow+fast</span>
+        <span class="tag">reverse</span>
+        <span class="tag">compare</span>
+      </div>
+    </div>
+
+    <div class="prob-card">
+      <div class="prob-header">
+        <span class="prob-diff medium">Medium</span>
+        <h4>Reverse Linked List II (#92)</h4>
+      </div>
+      <p>عكس من position L لـ R فقط. امشي لـ L-1 ثم اعكس R-L مرات بـ insert at front.</p>
+      <div class="prob-tags">
+        <span class="tag">prev+curr</span>
+        <span class="tag">in-place</span>
+        <span class="tag">sublist</span>
+      </div>
+    </div>
+
+    <div class="prob-card">
+      <div class="prob-header">
+        <span class="prob-diff medium">Medium</span>
+        <h4>Odd Even Linked List (#328)</h4>
+      </div>
+      <p>فصل الـ nodes الفردية عن الزوجية. Pointer واحد للـ odd وواحد للـ even.</p>
+      <div class="prob-tags">
+        <span class="tag">in-place</span>
+        <span class="tag">two pointers</span>
+      </div>
+    </div>
+
+    <div class="prob-card">
+      <div class="prob-header">
+        <span class="prob-diff medium">Medium</span>
+        <h4>Add Two Numbers (#2)</h4>
+      </div>
+      <p>القائمتين بيمثلوا أعداد. اجمع مع الـ carry. dummy node + traversal.</p>
+      <div class="prob-tags">
+        <span class="tag">two lists</span>
+        <span class="tag">carry</span>
+        <span class="tag">dummy</span>
+      </div>
+    </div>
+
+    <div class="prob-card">
+      <div class="prob-header">
+        <span class="prob-diff medium">Medium</span>
+        <h4>Intersection of Two Lists (#160)</h4>
+      </div>
+      <p>لما A يخلص، يبدأ من B والعكس. هيلتقوا عند نقطة التقاطع.</p>
+      <div class="prob-tags">
+        <span class="tag">two pointers</span>
+        <span class="tag">O(1) space</span>
+        <span class="tag">elegant</span>
+      </div>
+    </div>
+
+    <div class="prob-card">
+      <div class="prob-header">
+        <span class="prob-diff hard">Hard</span>
+        <h4>Merge K Sorted Lists (#23)</h4>
+      </div>
+      <p>Min Heap بيحتوي على أول element من كل قائمة. خرج الأصغر وأضف التالي.</p>
+      <div class="prob-tags">
+        <span class="tag">min heap</span>
+        <span class="tag">O(nlogk)</span>
+        <span class="tag">divide+conquer</span>
+      </div>
+    </div>
+
+    <div class="prob-card">
+      <div class="prob-header">
+        <span class="prob-diff hard">Hard</span>
+        <h4>Reverse Nodes in K-Group (#25)</h4>
+      </div>
+      <p>اعكس كل K nodes مع بعض. تحقق إن فيه K nodes قبل كل عكس.</p>
+      <div class="prob-tags">
+        <span class="tag">reverse</span>
+        <span class="tag">recursion</span>
+        <span class="tag">K-group</span>
+      </div>
+    </div>
+
+    <div class="prob-card">
+      <div class="prob-header">
+        <span class="prob-diff hard">Hard</span>
+        <h4>Copy List with Random Pointer (#138)</h4>
+      </div>
+      <p>Deep copy لقائمة فيها random pointers. HashMap أو الـ interweaving technique.</p>
+      <div class="prob-tags">
+        <span class="tag">hashmap</span>
+        <span class="tag">deep copy</span>
+        <span class="tag">O(1) space trick</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 24px;">
+    <div class="card-title">Reverse K-Group — الكود الكامل</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — LeetCode #25 Hard</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="kw">def</span> <span class="fn">reverseKGroup</span>(head, k):
+    <span class="cm"># ① تحقق إن فيه k nodes</span>
+    count, curr <span class="op">=</span> <span class="num">0</span>, head
+    <span class="kw">while</span> curr <span class="kw">and</span> count <span class="op">&lt;</span> k:
+        curr <span class="op">=</span> curr.next
+        count <span class="op">+=</span> <span class="num">1</span>
+    <span class="kw">if</span> count <span class="op">&lt;</span> k: <span class="kw">return</span> head  <span class="cm"># أقل من k nodes، رجع كما هو</span>
+    
+    <span class="cm"># ② اعكس الـ k nodes</span>
+    prev, curr <span class="op">=</span> <span class="kw">None</span>, head
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(k):
+        next_node <span class="op">=</span> curr.next
+        curr.next <span class="op">=</span> prev
+        prev <span class="op">=</span> curr
+        curr <span class="op">=</span> next_node
+    
+    <span class="cm"># ③ head الأصلي بقى tail — اربطه بالباقي</span>
+    head.next <span class="op">=</span> <span class="fn">reverseKGroup</span>(curr, k)
+    <span class="kw">return</span> prev  <span class="cm"># prev = head الجديد للـ group</span></pre>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Operations Section -->
+<section class="lesson" id="operations">
+  <div class="lesson-header">
+    <div class="lesson-num">05</div>
+    <h2>ملخص Complexity للعمليات</h2>
+  </div>
+
+  <table class="compare-table">
+    <tr>
+      <th>العملية</th>
+      <th>Singly</th>
+      <th>Doubly</th>
+      <th>ملاحظة</th>
+    </tr>
+    <tr>
+      <td>Insert at Head</td>
+      <td class="good">O(1)</td>
+      <td class="good">O(1)</td>
+      <td>سهل دايماً</td>
+    </tr>
+    <tr>
+      <td>Insert at Tail</td>
+      <td class="mid">O(1)* بـ tail ptr</td>
+      <td class="good">O(1)</td>
+      <td>*بدون tail = O(n)</td>
+    </tr>
+    <tr>
+      <td>Insert at Position</td>
+      <td class="bad">O(n)</td>
+      <td class="bad">O(n)</td>
+      <td>لازم تدور الأول</td>
+    </tr>
+    <tr>
+      <td>Delete Head</td>
+      <td class="good">O(1)</td>
+      <td class="good">O(1)</td>
+      <td>سهل دايماً</td>
+    </tr>
+    <tr>
+      <td>Delete Tail</td>
+      <td class="bad">O(n)</td>
+      <td class="good">O(1)</td>
+      <td>Doubly أفضل بكتير!</td>
+    </tr>
+    <tr>
+      <td>Delete by Pointer</td>
+      <td class="bad">O(n)</td>
+      <td class="good">O(1)</td>
+      <td>Doubly لازم تعرف prev</td>
+    </tr>
+    <tr>
+      <td>Search</td>
+      <td class="bad">O(n)</td>
+      <td class="bad">O(n)</td>
+      <td>لازم تمشي كل القائمة</td>
+    </tr>
+    <tr>
+      <td>Access by Index</td>
+      <td class="bad">O(n)</td>
+      <td class="bad">O(n)</td>
+      <td>استخدم Array بدل كده</td>
+    </tr>
+  </table>
+</section>
+
+</div><!-- end .content -->
+
+<footer>
+  <p>Linked Lists A to Z — الدليل الشامل | Singly · Doubly · Circular · Cycle Detection · Reversal</p>
+  <p style="margin-top: 8px; color: rgba(255,255,255,0.3);">من صفر للاحتراف 🚀</p>
+</footer>
+
+<script>
+// ════════════════════════════
+// Intersection Observer — fade in
+// ════════════════════════════
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.lesson').forEach(l => observer.observe(l));
+
+// ════════════════════════════
+// SINGLY ANIMATION
+// ════════════════════════════
+let singlyData = [10, 20, 30];
+let singlyCounter = 40;
+
+function singlyRender() {
+  const stage = document.getElementById('singly-stage');
+  stage.innerHTML = '';
+  singlyData.forEach((val, i) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'a-node';
+    wrapper.style.animationDelay = (i * 0.08) + 's';
+    const nw = document.createElement('div');
+    nw.className = 'node-wrapper';
+    if(i === 0) {
+      const lbl = document.createElement('div');
+      lbl.className = 'pointer-label';
+      lbl.textContent = 'HEAD';
+      nw.appendChild(lbl);
+    }
+    const box = document.createElement('div');
+    box.className = 'a-node-box';
+    box.innerHTML = `<span class="nval">${val}</span><span class="nptr">next→</span>`;
+    nw.appendChild(box);
+    wrapper.appendChild(nw);
+    stage.appendChild(wrapper);
+
+    if(i < singlyData.length - 1) {
+      const arr = document.createElement('span');
+      arr.className = 'a-arrow';
+      arr.textContent = '→';
+      stage.appendChild(arr);
+    } else {
+      const arr = document.createElement('span');
+      arr.className = 'a-arrow';
+      arr.textContent = '→';
+      stage.appendChild(arr);
+      const nl = document.createElement('div');
+      nl.className = 'a-null';
+      nl.textContent = 'NULL';
+      stage.appendChild(nl);
+    }
+  });
+}
+
+function singlyMsg(msg) {
+  document.getElementById('singly-msg').textContent = msg;
+}
+
+function singlyAddFront() {
+  singlyData.unshift(singlyCounter);
+  singlyCounter += 10;
+  singlyMsg(`✅ أضفنا ${singlyCounter-10} في البداية — O(1): بس غيرنا الـ HEAD`);
+  singlyRender();
+}
+
+function singlyAddEnd() {
+  singlyData.push(singlyCounter);
+  singlyCounter += 10;
+  singlyMsg(`✅ أضفنا ${singlyCounter-10} في النهاية — O(n): مشينا على كل الـ nodes`);
+  singlyRender();
+}
+
+function singlyDeleteHead() {
+  if(singlyData.length === 0) return;
+  const v = singlyData.shift();
+  singlyMsg(`❌ حذفنا ${v} من البداية — O(1): بس حركنا الـ HEAD للـ next`);
+  singlyRender();
+}
+
+function singlyDeleteTail() {
+  if(singlyData.length === 0) return;
+  const v = singlyData.pop();
+  singlyMsg(`❌ حذفنا ${v} من النهاية — O(n): مشينا على كل الـ nodes للوصول للـ prev`);
+  singlyRender();
+}
+
+function singlyReset() {
+  singlyData = [10, 20, 30]; singlyCounter = 40;
+  singlyMsg('↺ تم الإعادة');
+  singlyRender();
+}
+
+singlyRender();
+
+// ════════════════════════════
+// DOUBLY ANIMATION
+// ════════════════════════════
+let doublyData = [10, 20, 30];
+let doublyCounter = 40;
+
+function doublyRender() {
+  const stage = document.getElementById('doubly-stage');
+  stage.innerHTML = '';
+  doublyData.forEach((val, i) => {
+    if(i > 0) {
+      const arr = document.createElement('span');
+      arr.className = 'a-arrow back';
+      arr.textContent = '←';
+      stage.appendChild(arr);
+    }
+    const wrapper = document.createElement('div');
+    wrapper.className = 'a-node';
+    const nw = document.createElement('div');
+    nw.className = 'node-wrapper';
+    if(i === 0) {
+      const lbl = document.createElement('div');
+      lbl.className = 'pointer-label';
+      lbl.style.background = 'var(--accent5)';
+      lbl.textContent = 'HEAD';
+      nw.appendChild(lbl);
+    }
+    if(i === doublyData.length - 1) {
+      const lbl = document.createElement('div');
+      lbl.className = 'pointer-label';
+      lbl.style.background = 'var(--accent2)';
+      lbl.textContent = 'TAIL';
+      nw.appendChild(lbl);
+    }
+    const box = document.createElement('div');
+    box.className = 'a-node-box doubly';
+    box.innerHTML = `<span style="color:var(--accent5);font-size:10px">←prev</span><span class="nval">${val}</span><span style="color:var(--accent1);font-size:10px">next→</span>`;
+    nw.appendChild(box);
+    wrapper.appendChild(nw);
+    stage.appendChild(wrapper);
+
+    if(i < doublyData.length - 1) {
+      const arr = document.createElement('span');
+      arr.className = 'a-arrow';
+      arr.textContent = '→';
+      stage.appendChild(arr);
+    }
+  });
+}
+
+function doublyMsg(msg) {
+  document.getElementById('doubly-msg').textContent = msg;
+}
+
+function doublyAddFront() {
+  doublyData.unshift(doublyCounter); doublyCounter+=10;
+  doublyMsg(`✅ أضفنا ${doublyCounter-10} للبداية — O(1): ضبطنا next وprev للـ node الجديد`);
+  doublyRender();
+}
+function doublyAddEnd() {
+  doublyData.push(doublyCounter); doublyCounter+=10;
+  doublyMsg(`✅ أضفنا ${doublyCounter-10} للنهاية — O(1): لأن عندنا TAIL pointer!`);
+  doublyRender();
+}
+function doublyDeleteHead() {
+  if(!doublyData.length) return;
+  const v = doublyData.shift();
+  doublyMsg(`❌ حذفنا ${v} — O(1): عدلنا 2 pointers فقط`);
+  doublyRender();
+}
+function doublyDeleteTail() {
+  if(!doublyData.length) return;
+  const v = doublyData.pop();
+  doublyMsg(`❌ حذفنا ${v} من النهاية — O(1) مع doubly! بنستخدم TAIL.prev مباشرة`);
+  doublyRender();
+}
+function doublyReset() {
+  doublyData=[10,20,30]; doublyCounter=40;
+  doublyMsg('↺ تم الإعادة');
+  doublyRender();
+}
+doublyRender();
+
+// ════════════════════════════
+// CIRCULAR ANIMATION
+// ════════════════════════════
+let circData = [10, 20, 30, 40];
+let circCounter = 50;
+
+function circRender() {
+  const linear = document.getElementById('circular-linear');
+  linear.innerHTML = '';
+  circData.forEach((val, i) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'a-node';
+    const nw = document.createElement('div');
+    nw.className = 'node-wrapper';
+    if(i === 0) {
+      const lbl = document.createElement('div');
+      lbl.className = 'pointer-label';
+      lbl.textContent = 'HEAD';
+      nw.appendChild(lbl);
+    }
+    const box = document.createElement('div');
+    box.className = 'a-node-box cycle-node';
+    box.innerHTML = `<span class="nval">${val}</span><span class="nptr">next→</span>`;
+    nw.appendChild(box);
+    wrapper.appendChild(nw);
+    linear.appendChild(wrapper);
+
+    const arr = document.createElement('span');
+    arr.className = 'a-arrow cycle';
+    if(i === circData.length - 1) {
+      arr.textContent = '↩';
+      arr.title = 'يشير للـ HEAD';
+      arr.style.color = 'var(--accent3)';
+      arr.style.fontSize = '20px';
+    } else {
+      arr.textContent = '→';
+    }
+    linear.appendChild(arr);
+  });
+}
+
+function circularAdd() {
+  circData.push(circCounter); circCounter+=10;
+  document.getElementById('circular-msg').textContent = `✅ أضفنا node جديد — tail.next يشير للـ HEAD`;
+  circRender();
+}
+function circularDelete() {
+  if(!circData.length) return;
+  const v = circData.shift();
+  document.getElementById('circular-msg').textContent = `❌ حذفنا HEAD (${v}) — الـ tail.next اتحدث للـ head الجديد`;
+  circRender();
+}
+function circularReset() {
+  circData=[10,20,30,40]; circCounter=50;
+  document.getElementById('circular-msg').textContent = '↺ تم الإعادة';
+  circRender();
+}
+circRender();
+
+// ════════════════════════════
+// REVERSAL ANIMATION
+// ════════════════════════════
+let revOriginal = [1,2,3,4,5];
+let revState = {
+  list: [1,2,3,4,5],
+  prev: null,
+  curr: 0,
+  done: false,
+  reversed: []
+};
+
+function revReset() {
+  revState = { list:[1,2,3,4,5], prev:null, curr:0, done:false, reversed:[] };
+  document.getElementById('rev-info').textContent = 'اضغط "خطوة للأمام" لبدء الـ Reversal';
+  revRenderState();
+}
+
+function revRenderState() {
+  const listEl = document.getElementById('rev-list');
+  const ptrsEl = document.getElementById('rev-pointers');
+  listEl.innerHTML = '';
+  ptrsEl.innerHTML = '';
+
+  if(revState.done) {
+    // Show reversed list
+    const revd = [...revOriginal].reverse();
+    revd.forEach((val, i) => {
+      const nw = document.createElement('div');
+      nw.className = 'node-wrapper';
+      if(i===0){const l=document.createElement('div');l.className='pointer-label';l.textContent='HEAD';nw.appendChild(l);}
+      const box = document.createElement('div');
+      box.className = 'a-node-box head-node';
+      box.innerHTML = `<span class="nval">${val}</span><span class="nptr">next→</span>`;
+      nw.appendChild(box);
+      listEl.appendChild(nw);
+      if(i<revd.length-1){const a=document.createElement('span');a.className='a-arrow';a.textContent='→';listEl.appendChild(a);}
+      else{const a=document.createElement('span');a.className='a-arrow';a.textContent='→';listEl.appendChild(a);const nl=document.createElement('div');nl.className='a-null';nl.textContent='NULL';listEl.appendChild(nl);}
+    });
+    document.getElementById('rev-info').textContent = '✅ انتهى الـ Reversal! prev = HEAD الجديد';
+    return;
+  }
+
+  revState.list.forEach((val, i) => {
+    const nw = document.createElement('div');
+    nw.className = 'node-wrapper';
+    if(i === revState.curr) {
+      const l = document.createElement('div'); l.className='pointer-label'; l.textContent='curr'; nw.appendChild(l);
+    }
+    const box = document.createElement('div');
+    box.className = 'a-node-box';
+    if(i === revState.curr) box.style.borderColor = 'var(--accent3)';
+    box.innerHTML = `<span class="nval">${val}</span><span class="nptr">next→</span>`;
+    nw.appendChild(box);
+    listEl.appendChild(nw);
+    if(i < revState.list.length-1){const a=document.createElement('span');a.className='a-arrow';a.textContent='→';listEl.appendChild(a);}
+    else{const a=document.createElement('span');a.className='a-arrow';a.textContent='→';listEl.appendChild(a);const nl=document.createElement('div');nl.className='a-null';nl.textContent='NULL';listEl.appendChild(nl);}
+  });
+
+  // Show reversed so far
+  if(revState.reversed.length > 0) {
+    const label = document.createElement('div');
+    label.style.color = 'var(--text-dim)'; label.style.fontSize='11px'; label.style.margin='4px 0';
+    label.textContent = 'تم عكسها حتى الآن:';
+    ptrsEl.appendChild(label);
+    revState.reversed.slice().reverse().forEach((val, i) => {
+      const nw = document.createElement('div'); nw.className='node-wrapper';
+      if(i===0){const l=document.createElement('div');l.className='pointer-label';l.style.background='var(--accent5)';l.textContent='prev';nw.appendChild(l);}
+      const box = document.createElement('div');
+      box.className = 'a-node-box doubly';
+      box.innerHTML = `<span class="nval">${val}</span>`;
+      nw.appendChild(box);
+      ptrsEl.appendChild(nw);
+      if(i<revState.reversed.length-1){const a=document.createElement('span');a.className='a-arrow';a.textContent='→';ptrsEl.appendChild(a);}
+    });
+  }
+}
+
+function revStep() {
+  if(revState.done) return;
+  if(revState.curr >= revState.list.length) {
+    revState.done = true;
+    revRenderState();
+    return;
+  }
+  const val = revState.list[revState.curr];
+  revState.reversed.push(val);
+  revState.curr++;
+  const step = revState.curr;
+  const total = revState.list.length;
+  document.getElementById('rev-info').textContent =
+    `الخطوة ${step}/${total}: حفظنا next → عكسنا pointer → حركنا prev وcurr`;
+  if(revState.curr >= revState.list.length) revState.done = true;
+  revRenderState();
+}
+
+let revAutoInterval = null;
+function revAuto() {
+  if(revAutoInterval) { clearInterval(revAutoInterval); revAutoInterval = null; return; }
+  revReset();
+  revAutoInterval = setInterval(() => {
+    if(revState.done) { clearInterval(revAutoInterval); revAutoInterval = null; return; }
+    revStep();
+  }, 900);
+}
+
+revReset();
+
+// ════════════════════════════
+// CYCLE DETECTION ANIMATION
+// ════════════════════════════
+const cycleNodes = [1, 2, 3, 4, 5, 6];
+const cycleEntry = 2; // index where cycle begins (0-based)
+let slowIdx = 0;
+let fastIdx = 0;
+let cycleStepCount = 0;
+let cycleMet = false;
+
+function cycleReset() {
+  slowIdx = 0; fastIdx = 0; cycleStepCount = 0; cycleMet = false;
+  document.getElementById('cycle-info').textContent = '🐢 slow = node[0]   🐰 fast = node[0]   — اضغط "خطوة"';
+  cycleRender();
+}
+
+function getNext(idx) {
+  if(idx === cycleNodes.length - 1) return cycleEntry; // cycle!
+  return idx + 1;
+}
+
+function cycleRender() {
+  const listEl = document.getElementById('cycle-list');
+  const ptrsEl = document.getElementById('cycle-ptrs');
+  listEl.innerHTML = '';
+  ptrsEl.innerHTML = '';
+
+  cycleNodes.forEach((val, i) => {
+    const nw = document.createElement('div');
+    nw.className = 'node-wrapper';
+    const labels = [];
+    if(i === slowIdx) labels.push({t:'🐢slow', c:'var(--accent4)'});
+    if(i === fastIdx && fastIdx !== slowIdx) labels.push({t:'🐰fast', c:'var(--accent2)'});
+    if(i === slowIdx && i === fastIdx) labels.push({t:'🐢+🐰', c:'var(--accent3)'});
+    labels.forEach(lb => {
+      const l = document.createElement('div');
+      l.className = 'pointer-label';
+      l.style.background = lb.c;
+      l.textContent = lb.t;
+      nw.appendChild(l);
+    });
+    if(i === cycleEntry) {
+      const entryL = document.createElement('div');
+      entryL.style.fontSize = '9px'; entryL.style.color = 'var(--accent3)'; entryL.style.fontFamily = 'Fira Code';
+      entryL.textContent = '← cycle';
+      nw.appendChild(entryL);
+    }
+    const box = document.createElement('div');
+    box.className = 'a-node-box';
+    if(i === slowIdx && i === fastIdx && cycleStepCount > 0) {
+      box.style.borderColor = 'var(--accent3)';
+      box.style.boxShadow = '0 0 20px rgba(255,217,61,0.5)';
+    } else if(i === slowIdx) {
+      box.style.borderColor = 'var(--accent4)';
+    } else if(i === fastIdx) {
+      box.style.borderColor = 'var(--accent2)';
+    }
+    box.innerHTML = `<span class="nval">${val}</span>`;
+    nw.appendChild(box);
+    listEl.appendChild(nw);
+
+    const arr = document.createElement('span');
+    arr.className = 'a-arrow';
+    if(i === cycleNodes.length - 1) {
+      arr.textContent = '↩';
+      arr.style.color = 'var(--accent3)';
+      arr.title = `cycle → node[${cycleEntry}]`;
+    } else {
+      arr.textContent = '→';
+    }
+    listEl.appendChild(arr);
+  });
+
+  if(cycleMet) {
+    document.getElementById('cycle-info').textContent =
+      `✅ التقوا عند node[${slowIdx}] = ${cycleNodes[slowIdx]}! → فيه CYCLE! (بعد ${cycleStepCount} خطوات)`;
+  }
+}
+
+function cycleStep() {
+  if(cycleMet) return;
+  slowIdx = getNext(slowIdx);
+  fastIdx = getNext(getNext(fastIdx));
+  cycleStepCount++;
+  if(slowIdx === fastIdx) {
+    cycleMet = true;
+  }
+  if(!cycleMet) {
+    document.getElementById('cycle-info').textContent =
+      `الخطوة ${cycleStepCount}: 🐢slow→node[${slowIdx}]=${cycleNodes[slowIdx]}   🐰fast→node[${fastIdx}]=${cycleNodes[fastIdx]}`;
+  }
+  cycleRender();
+}
+
+let cycleAutoInt = null;
+function cycleAuto() {
+  if(cycleAutoInt) { clearInterval(cycleAutoInt); cycleAutoInt=null; return; }
+  cycleReset();
+  cycleAutoInt = setInterval(() => {
+    if(cycleMet) { clearInterval(cycleAutoInt); cycleAutoInt=null; return; }
+    cycleStep();
+  }, 800);
+}
+
+cycleReset();
+</script>
+
+</body>
+</html>

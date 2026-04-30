@@ -1,1226 +1,1226 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arrays & Strings | Two Pointers | Sliding Window | Prefix Sums</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0a0e1a;
-    --bg2: #0f1524;
-    --bg3: #141929;
-    --card: #161d30;
-    --card2: #1b2338;
-    --border: #252d45;
-    --accent1: #00d4ff;
-    --accent2: #7c3aed;
-    --accent3: #f59e0b;
-    --accent4: #10b981;
-    --accent5: #f43f5e;
-    --accent6: #818cf8;
-    --text: #e2e8f0;
-    --text2: #94a3b8;
-    --text3: #64748b;
-    --code-bg: #0d1117;
-    --green: #00ff88;
-    --orange: #ff8c00;
-    --pink: #ff6eb4;
-    --yellow: #ffd700;
-  }
-
-  pre, code {
-    direction: ltr !important;
-    text-align: left !important;
-    unicode-bidi: bidi-override !important;
-  }
-
-  pre span {
-    direction: ltr !important;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Cairo', sans-serif;
-    line-height: 1.8;
-    overflow-x: hidden;
-  }
-
-  /* ── HERO ── */
-  .hero {
-    background: linear-gradient(135deg, #0a0e1a 0%, #0f1a3e 50%, #0a0e1a 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 60px 40px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse at 30% 50%, rgba(0,212,255,.07) 0%, transparent 60%),
-                radial-gradient(ellipse at 70% 50%, rgba(124,58,237,.07) 0%, transparent 60%);
-  }
-  .hero-badge {
-    display: inline-block;
-    background: linear-gradient(90deg, rgba(0,212,255,.15), rgba(124,58,237,.15));
-    border: 1px solid rgba(0,212,255,.3);
-    color: var(--accent1);
-    padding: 6px 18px;
-    border-radius: 50px;
-    font-size: .8rem;
-    letter-spacing: 2px;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-  }
-  .hero h1 {
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    font-weight: 900;
-    line-height: 1.2;
-    margin-bottom: 16px;
-    position: relative;
-  }
-  .hero h1 .g1 { background: linear-gradient(90deg, var(--accent1), var(--accent6)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .hero h1 .g2 { background: linear-gradient(90deg, var(--accent3), var(--accent5)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .hero p { color: var(--text2); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
-  .hero-chips { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
-  .chip {
-    padding: 5px 14px; border-radius: 20px; font-size: .8rem; font-weight: 600; border: 1px solid;
-  }
-  .chip.c1 { color: var(--accent1); border-color: rgba(0,212,255,.4); background: rgba(0,212,255,.08); }
-  .chip.c2 { color: var(--accent2); border-color: rgba(124,58,237,.4); background: rgba(124,58,237,.08); }  
-  .chip.c3 { color: var(--accent3); border-color: rgba(245,158,11,.4); background: rgba(245,158,11,.08); }
-  .chip.c4 { color: var(--accent4); border-color: rgba(16,185,129,.4); background: rgba(16,185,129,.08); }
-
-  /* ── NAV ── */
-  .toc {
-    background: var(--bg2);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 40px;
-    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
-    position: sticky; top: 0; z-index: 100;
-    backdrop-filter: blur(10px);
-  }
-  .toc a {
-    color: var(--text2); text-decoration: none; font-size: .82rem; font-weight: 600;
-    padding: 5px 12px; border-radius: 6px; border: 1px solid transparent;
-    transition: all .2s;
-  }
-  .toc a:hover { color: var(--accent1); border-color: rgba(0,212,255,.3); background: rgba(0,212,255,.06); }
-
-  /* ── LAYOUT ── */
-  .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
-
-  /* ── SECTIONS ── */
-  .section { margin-bottom: 70px; }
-  .section-header {
-    display: flex; align-items: center; gap: 16px;
-    margin-bottom: 32px; padding-bottom: 16px;
-    border-bottom: 1px solid var(--border);
-  }
-  .section-icon {
-    width: 48px; height: 48px; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.4rem; flex-shrink: 0;
-  }
-  .section-header h2 { font-size: 1.7rem; font-weight: 700; }
-  .section-header p { color: var(--text2); font-size: .9rem; margin-top: 2px; }
-
-  /* Colors per section */
-  .s-arrays .section-icon { background: rgba(0,212,255,.12); border: 1px solid rgba(0,212,255,.25); }
-  .s-arrays h2 { color: var(--accent1); }
-  .s-tp .section-icon { background: rgba(124,58,237,.12); border: 1px solid rgba(124,58,237,.25); }
-  .s-tp h2 { color: #a78bfa; }
-  .s-sw .section-icon { background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.25); }
-  .s-sw h2 { color: var(--accent3); }
-  .s-ps .section-icon { background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.25); }
-  .s-ps h2 { color: var(--accent4); }
-  .s-signs .section-icon { background: rgba(244,63,94,.12); border: 1px solid rgba(244,63,94,.25); }
-  .s-signs h2 { color: var(--accent5); }
-  .s-prob .section-icon { background: rgba(255,214,0,.12); border: 1px solid rgba(255,214,0,.25); }
-  .s-prob h2 { color: var(--yellow); }
-
-  /* ── CARDS ── */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 24px;
-    margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
-  }
-  .card::before {
-    content: ''; position: absolute; inset: 0; opacity: 0;
-    transition: opacity .3s;
-  }
-  .card:hover::before { opacity: 1; }
-
-  .card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-  .card p, .card li { color: var(--text2); font-size: .92rem; }
-  .card ul { padding-right: 20px; }
-  .card li { margin-bottom: 6px; }
-
-  /* accent left border */
-  .card.a1 { border-right: 3px solid var(--accent1); }
-  .card.a2 { border-right: 3px solid #a78bfa; }
-  .card.a3 { border-right: 3px solid var(--accent3); }
-  .card.a4 { border-right: 3px solid var(--accent4); }
-  .card.a5 { border-right: 3px solid var(--accent5); }
-  .card.a6 { border-right: 3px solid var(--yellow); }
-
-  /* ── CODE BLOCKS ── */
-  pre {
-    background: var(--code-bg);
-    border: 1px solid #1e2d3d;
-    border-radius: 10px;
-    padding: 20px 24px;
-    overflow-x: auto;
-    margin: 14px 0;
-    font-family: 'Fira Code', monospace;
-    font-size: .82rem;
-    line-height: 1.7;
-    position: relative;
-    direction: ltr !important;
-    text-align: left !important;
-  }
-  pre .lang-tag {
-    position: absolute; top: 8px; left: 12px;
-    font-size: .65rem; color: var(--text3); text-transform: uppercase; letter-spacing: 1px;
-  }
-  .kw { color: #ff79c6; }
-  .fn { color: #50fa7b; }
-  .cn { color: #bd93f9; }
-  .st { color: #f1fa8c; }
-  .cm { color: #6272a4; font-style: italic; }
-  .nm { color: #ffb86c; }
-  .op { color: #ff5555; }
-  .var { color: var(--accent1); }
-
-  /* ── COMPLEXITY TABLE ── */
-  .table-wrap { overflow-x: auto; margin: 14px 0; }
-  table { width: 100%; border-collapse: collapse; font-size: .88rem; }
-  thead tr { background: rgba(255,255,255,.04); }
-  th { padding: 10px 14px; text-align: left; color: var(--text2); font-weight: 600; border-bottom: 1px solid var(--border); direction: ltr !important; }
-  td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.04); color: var(--text2); text-align: left; direction: ltr !important; }
-  tr:last-child td { border-bottom: none; }
-  .badge-o1 { color: #00ff88; font-weight: 700; font-family: 'Fira Code'; }
-  .badge-on { color: #ffd700; font-weight: 700; font-family: 'Fira Code'; }
-  .badge-on2 { color: #ff6b6b; font-weight: 700; font-family: 'Fira Code'; }
-  .badge-olog { color: #00d4ff; font-weight: 700; font-family: 'Fira Code'; }
-
-  /* ── ALERT / TIP BOXES ── */
-  .tip, .warn, .info, .success {
-    border-radius: 10px; padding: 14px 18px; margin: 14px 0;
-    font-size: .9rem; display: flex; gap: 12px; align-items: flex-start;
-  }
-  .tip { background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.25); color: #6ee7b7; }
-  .warn { background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.25); color: #fcd34d; }
-  .info { background: rgba(0,212,255,.08); border: 1px solid rgba(0,212,255,.25); color: #7dd3fc; }
-  .success { background: rgba(124,58,237,.08); border: 1px solid rgba(124,58,237,.25); color: #c4b5fd; }
-  .tip-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
-  .tip p, .warn p, .info p, .success p { margin: 0; color: inherit; }
-
-  /* ── STEPS ── */
-  .steps { counter-reset: step; }
-  .step {
-    display: flex; gap: 14px; margin-bottom: 16px; align-items: flex-start;
-  }
-  .step-num {
-    counter-increment: step;
-    width: 28px; height: 28px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent2), var(--accent1));
-    color: white; font-size: .75rem; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; margin-top: 4px;
-  }
-  .step-num::before { content: counter(step); }
-  .step-body { color: var(--text2); font-size: .92rem; }
-  .step-body strong { color: var(--text); }
-
-  /* ── GRID ── */
-  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
-  .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
-
-  /* ── SIGN CARDS ── */
-  .sign-card {
-    background: var(--card2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px;
-  }
-  .sign-card h4 { font-size: .95rem; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-  .sign-card ul { padding-right: 16px; }
-  .sign-card li { font-size: .85rem; color: var(--text2); margin-bottom: 5px; }
-
-  /* ── PROBLEM CARDS ── */
-  .prob-card {
-    background: var(--card2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    transition: transform .2s, border-color .2s;
-  }
-  .prob-card:hover { transform: translateY(-3px); }
-  .prob-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-  .prob-title { font-size: .98rem; font-weight: 700; }
-  .diff { font-size: .72rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
-  .easy { background: rgba(16,185,129,.15); color: #34d399; border: 1px solid rgba(16,185,129,.3); }
-  .med { background: rgba(245,158,11,.15); color: #fbbf24; border: 1px solid rgba(245,158,11,.3); }
-  .hard { background: rgba(244,63,94,.15); color: #f87171; border: 1px solid rgba(244,63,94,.3); }
-  .prob-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-  .tag { font-size: .7rem; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,.05); color: var(--text3); border: 1px solid var(--border); }
-  .prob-desc { font-size: .85rem; color: var(--text2); }
-  .prob-card:hover { border-color: rgba(0,212,255,.3); }
-
-  /* ── VISUAL DIAGRAMS ── */
-  .diagram {
-    background: var(--code-bg);
-    border: 1px solid #1e2d3d;
-    border-radius: 10px;
-    padding: 20px;
-    margin: 14px 0;
-    font-family: 'Fira Code', monospace;
-    font-size: .8rem;
-    color: var(--text2);
-    overflow-x: auto;
-    direction: ltr !important;
-    text-align: left !important;
-  }
-  .diagram .arr-box {
-    display: inline-flex; gap: 2px; margin: 6px 0;
-    direction: ltr !important;
-  }
-  .box {
-    width: 38px; height: 38px; border: 1px solid #2a3a52;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 4px; background: #131b2e;
-    font-size: .8rem; font-weight: 600; color: var(--text);
-    transition: all .3s;
-  }
-  .box.hi1 { background: rgba(0,212,255,.2); border-color: var(--accent1); color: var(--accent1); }
-  .box.hi2 { background: rgba(124,58,237,.2); border-color: #a78bfa; color: #a78bfa; }
-  .box.hi3 { background: rgba(16,185,129,.2); border-color: var(--accent4); color: var(--accent4); }
-  .box.hi4 { background: rgba(245,158,11,.2); border-color: var(--accent3); color: var(--accent3); }
-  .pointer-row { display: flex; gap: 2px; margin-bottom: 4px; direction: ltr !important; }
-  .ptr { width: 38px; text-align: center; font-size: .7rem; }
-  .ptr.L { color: var(--accent1); }
-  .ptr.R { color: #a78bfa; }
-
-  /* ── INLINE CODE ── */
-  code { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); padding: 1px 6px; border-radius: 4px; font-family: 'Fira Code'; font-size: .82em; color: var(--green); }
-
-  /* ── FOOTER ── */
-  .footer {
-    text-align: center; padding: 40px 24px;
-    border-top: 1px solid var(--border);
-    color: var(--text3); font-size: .85rem;
-  }
-
-  /* ── SCROLL ANIMATION ── */
-  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .5s, transform .5s; }
-  .revealed { opacity: 1; transform: none; }
-
-  .highlight-text { color: var(--accent1); font-weight: 600; }
-  .highlight-purple { color: #a78bfa; font-weight: 600; }
-  .highlight-green { color: var(--green); font-weight: 600; }
-  .highlight-orange { color: var(--accent3); font-weight: 600; }
-  .highlight-red { color: var(--accent5); font-weight: 600; }
-
-  h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; }
-</style>
-<link rel="stylesheet" href="../styles/theme.css">
-<script>var s=localStorage.getItem('aaos_theme')||'dark';document.documentElement.setAttribute('data-theme',s);</script></head>
-<body>
-
-<!-- HERO -->
-<header class="hero">
-  <div class="hero-badge">🚀 DSA MASTERY GUIDE — A to Z</div>
-  <h1>
-    <span class="g1">Arrays & Strings</span><br>
-    <span class="g2">Two Pointers · Sliding Window · Prefix Sums</span>
-  </h1>
-  <p>شرح مفصل شامل من الصفر للاحتراف — patterns, problems, complexity, signs</p>
-  <div class="hero-chips">
-    <span class="chip c1">Two Pointers</span>
-    <span class="chip c2">Sliding Window</span>
-    <span class="chip c3">Prefix Sums</span>
-    <span class="chip c4">Arrays & Strings</span>
-  </div>
-</header>
-
-<!-- NAV -->
-<nav class="toc">
-  <a href="#arrays">📦 Arrays & Strings</a>
-  <a href="#two-pointers">👆 Two Pointers</a>
-  <a href="#sliding-window">🪟 Sliding Window</a>
-  <a href="#prefix-sums">➕ Prefix Sums</a>
-  <a href="#signs">🔍 Signs & Patterns</a>
-  <a href="#problems">📋 المسائل</a>
-</nav>
-
-<div class="container">
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- SECTION 1: ARRAYS & STRINGS -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<section id="arrays" class="section s-arrays reveal">
-  <div class="section-header">
-    <div class="section-icon">📦</div>
-    <div>
-      <h2>Arrays & Strings — الأساسيات</h2>
-      <p>البنية الأساسية اللي كل الـ patterns بتتبنى عليها</p>
-    </div>
-  </div>
-
-  <div class="grid2">
-    <div class="card a1">
-      <h3>🔷 ما هو الـ Array؟</h3>
-      <p>Array هو مجموعة من العناصر متخزنة في أماكن متتالية في الذاكرة (contiguous memory). كل عنصر بيتوصله بـ index في O(1).</p>
-      <div class="diagram">
-        <div>index:  &nbsp;0 &nbsp;&nbsp;1 &nbsp;&nbsp;2 &nbsp;&nbsp;3 &nbsp;&nbsp;4</div>
-        <div class="arr-box">
-          <div class="box">2</div><div class="box">5</div><div class="box">1</div><div class="box">8</div><div class="box">3</div>
-        </div>
-        <div style="margin-top:6px; color:#6272a4">arr[0]=2, arr[2]=1, arr[4]=3</div>
-      </div>
-    </div>
-
-    <div class="card a1">
-      <h3>⚡ Complexity — Arrays</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Operation</th><th>Time</th><th>Space</th></tr></thead>
-          <tbody>
-            <tr><td>Access by index</td><td><span class="badge-o1">O(1)</span></td><td><span class="badge-o1">O(1)</span></td></tr>
-            <tr><td>Search (unsorted)</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-o1">O(1)</span></td></tr>
-            <tr><td>Insert at end</td><td><span class="badge-o1">O(1)*</span></td><td><span class="badge-o1">O(1)</span></td></tr>
-            <tr><td>Insert at middle</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-o1">O(1)</span></td></tr>
-            <tr><td>Delete at middle</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-o1">O(1)</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <div class="card a1">
-    <h3>🔤 Strings — خصائص مهمة</h3>
-    <div class="grid2">
-      <div>
-        <p>في Python/Java: Strings <span class="highlight-red">immutable</span> (مش بتتغير، لو عملت تغيير بيتعمل copy جديدة)</p>
-        <div class="warn"><div class="tip-icon">⚠️</div><p><strong>Gotcha:</strong> string concatenation في loop = O(n²)! استخدم list ثم join</p></div>
-      </div>
-      <div>
-        <pre><span class="cm">// Bad: O(n²)</span>
-<span class="kw">string</span> <span class="var">result</span> = <span class="st">""</span>;
-<span class="kw">for</span> (<span class="kw">char</span> <span class="var">c</span> : <span class="var">chars</span>) {
-    <span class="var">result</span> += <span class="var">c</span>;
-}
-
-<span class="cm">// Good: O(n) in C++ (string append is amortized O(1))</span>
-<span class="cm">// Or use stringstream for many small parts</span>
-<span class="kw">string</span> <span class="var">result</span>;
-<span class="var">result</span>.<span class="fn">reserve</span>(<span class="var">chars</span>.<span class="fn">size</span>());
-<span class="kw">for</span> (<span class="kw">char</span> <span class="var">c</span> : <span class="var">chars</span>) <span class="var">result</span> += <span class="var">c</span>;</pre>
-      </div>
-    </div>
-  </div>
-
-  <div class="card a1">
-    <h3>📌 أهم حاجات في Arrays لازم تعرفها</h3>
-    <div class="grid3">
-      <div>
-        <h4 style="color:var(--accent1); margin-bottom:8px">Iteration Patterns</h4>
-        <pre><span class="cm">// Forward</span>
-<span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">0</span>; <span class="var">i</span> < <span class="var">arr</span>.<span class="fn">size</span>(); ++<span class="var">i</span>) {
-    <span class="cm">// use arr[i]</span>
-}
-
-<span class="cm">// Backward</span>
-<span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="var">arr</span>.<span class="fn">size</span>() - <span class="nm">1</span>; <span class="var">i</span> >= <span class="nm">0</span>; --<span class="var">i</span>) {
-    <span class="cm">// use arr[i]</span>
-}
-
-<span class="cm">// Range-based (Modern)</span>
-<span class="kw">for</span> (<span class="kw">auto</span>& <span class="var">val</span> : <span class="var">arr</span>) {
-    <span class="cm">// use val</span>
-}</pre>
-      </div>
-      <div>
-        <h4 style="color:var(--accent1); margin-bottom:8px">Useful Operations</h4>
-        <pre><span class="cm">// Swap</span>
-<span class="fn">swap</span>(<span class="var">arr</span>[<span class="var">i</span>], <span class="var">arr</span>[<span class="var">j</span>]);
-
-<span class="cm">// Substring / Slice</span>
-<span class="kw">string</span> <span class="var">sub</span> = <span class="var">s</span>.<span class="fn">substr</span>(<span class="var">start</span>, <span class="var">len</span>);
-
-<span class="cm">// Sort</span>
-<span class="fn">sort</span>(<span class="var">arr</span>.<span class="fn">begin</span>(), <span class="var">arr</span>.<span class="fn">end</span>()); <span class="cm">// O(n log n)</span>
-
-<span class="cm">// Reverse</span>
-<span class="fn">reverse</span>(<span class="var">arr</span>.<span class="fn">begin</span>(), <span class="var">arr</span>.<span class="fn">end</span>());</pre>
-      </div>
-      <div>
-        <h4 style="color:var(--accent1); margin-bottom:8px">HashMap في Arrays</h4>
-        <pre><span class="cm">// Frequency count</span>
-<span class="kw">unordered_map</span><<span class="kw">int</span>, <span class="kw">int</span>> <span class="var">freq</span>;
-<span class="kw">for</span> (<span class="kw">int</span> <span class="var">x</span> : <span class="var">arr</span>) {
-    <span class="var">freq</span>[<span class="var">x</span>]++;
-}
-
-<span class="cm">// Index lookup</span>
-<span class="kw">unordered_map</span><<span class="kw">int</span>, <span class="kw">int</span>> <span class="var">seen</span>;
-<span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">0</span>; <span class="var">i</span> < <span class="var">arr</span>.<span class="fn">size</span>(); ++<span class="var">i</span>) {
-    <span class="var">seen</span>[<span class="var">arr</span>[<span class="var">i</span>]] = <span class="var">i</span>;
-}</pre>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- SECTION 2: TWO POINTERS -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<section id="two-pointers" class="section s-tp reveal">
-  <div class="section-header">
-    <div class="section-icon">👆</div>
-    <div>
-      <h2>Two Pointers — المؤشران</h2>
-      <p>Technique قوية بتحول O(n²) → O(n)</p>
-    </div>
-  </div>
-
-  <div class="info">
-    <div class="tip-icon">💡</div>
-    <p><strong>الفكرة الأساسية:</strong> بدل ما تعمل nested loop وتقارن كل عنصر بكل عنصر = O(n²)، بتستخدم مؤشرين (left & right) بيتحركوا باتجاهات معينة = O(n)</p>
-  </div>
-
-  <div class="grid2">
-    <div class="card a2">
-      <h3>🔄 Pattern 1: Opposite Ends (من الطرفين)</h3>
-      <p>الأشهر — L من اليسار، R من اليمين، بيتحركوا للوسط</p>
-      <div class="diagram">
-        <div class="pointer-row">
-          <div class="ptr L">L</div><div class="ptr"></div><div class="ptr"></div><div class="ptr"></div><div class="ptr R">R</div>
-        </div>
-        <div class="arr-box">
-          <div class="box hi1">1</div><div class="box">3</div><div class="box">5</div><div class="box">7</div><div class="box hi2">9</div>
-        </div>
-        <div style="margin-top:8px; color:#6272a4">↔ بيتحركوا لبعض حتى يلتقوا</div>
-      </div>
-      <pre><span class="kw">int</span> <span class="var">left</span> = <span class="nm">0</span>, <span class="var">right</span> = <span class="var">arr</span>.<span class="fn">size</span>() - <span class="nm">1</span>;
-<span class="kw">while</span> (<span class="var">left</span> < <span class="var">right</span>) {
-    <span class="cm">// do something with arr[left] and arr[right]</span>
-    <span class="kw">if</span> (<span class="var">condition</span>) {
-        <span class="var">left</span>++;
-    } <span class="kw">else</span> {
-        <span class="var">right</span>--;
-    }
-}</pre>
-      <p style="margin-top:8px">📌 <strong>يُستخدم مع:</strong> sorted arrays, palindrome, two sum sorted</p>
-    </div>
-
-    <div class="card a2">
-      <h3>➡️ Pattern 2: Same Direction (نفس الاتجاه)</h3>
-      <p>Fast & Slow — أو Slow & Fast Writer</p>
-      <div class="diagram">
-        <div class="pointer-row">
-          <div class="ptr L">S</div><div class="ptr"></div><div class="ptr R">F</div><div class="ptr"></div><div class="ptr"></div>
-        </div>
-        <div class="arr-box">
-          <div class="box hi1">1</div><div class="box">1</div><div class="box hi2">2</div><div class="box">3</div><div class="box">3</div>
-        </div>
-        <div style="margin-top:8px; color:#6272a4">→ Fast يمشي أسرع، Slow يكتب النتيجة</div>
-      </div>
-      <pre><span class="kw">int</span> <span class="var">slow</span> = <span class="nm">0</span>;
-<span class="kw">for</span> (<span class="kw">int</span> <span class="var">fast</span> = <span class="nm">0</span>; <span class="var">fast</span> < <span class="var">arr</span>.<span class="fn">size</span>(); ++<span class="var">fast</span>) {
-    <span class="kw">if</span> (<span class="var">arr</span>[<span class="var">fast</span>] != <span class="var">arr</span>[<span class="var">slow</span>]) {
-        <span class="var">slow</span>++;
-        <span class="var">arr</span>[<span class="var">slow</span>] = <span class="var">arr</span>[<span class="var">fast</span>];
-    }
-}
-<span class="kw">return</span> <span class="var">slow</span> + <span class="nm">1</span>;</pre>
-    </div>
-  </div>
-
-  <div class="card a2">
-    <h3>📖 مثال شامل: Two Sum في Sorted Array</h3>
-    <div class="info"><div class="tip-icon">📝</div><p><strong>المسألة:</strong> array مرتب، إيجاد اتنين عناصر مجموعهم = target</p></div>
-    <div class="grid2">
-      <div>
-        <p style="color:var(--text2); margin-bottom:10px"><strong>الحل:</strong> L من اليسار، R من اليمين. لو المجموع أكبر من target نقلل R، لو أصغر نزود L</p>
-        <div class="diagram">
-          <div style="margin-bottom:4px">Target = <span style="color:var(--accent3)">9</span></div>
-          <div class="pointer-row">
-            <div class="ptr L">L</div><div class="ptr"></div><div class="ptr"></div><div class="ptr"></div><div class="ptr R">R</div>
-          </div>
-          <div class="arr-box">
-            <div class="box hi1">2</div><div class="box">3</div><div class="box">4</div><div class="box">5</div><div class="box hi2">7</div>
-          </div>
-          <div style="margin-top:6px; color:#6272a4">2+7=9 ✓ Found!</div>
-        </div>
-      </div>
-      <div>
-        <pre><span class="kw">vector</span><<span class="kw">int</span>> <span class="fn">twoSum</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">arr</span>, <span class="kw">int</span> <span class="var">target</span>) {
-    <span class="kw">int</span> <span class="var">L</span> = <span class="nm">0</span>, <span class="var">R</span> = <span class="var">arr</span>.<span class="fn">size</span>() - <span class="nm">1</span>;
-    <span class="kw">while</span> (<span class="var">L</span> < <span class="var">R</span>) {
-        <span class="kw">int</span> <span class="var">curr</span> = <span class="var">arr</span>[<span class="var">L</span>] + <span class="var">arr</span>[<span class="var">R</span>];
-        <span class="kw">if</span> (<span class="var">curr</span> == <span class="var">target</span>) {
-            <span class="kw">return</span> {<span class="var">L</span>, <span class="var">R</span>};
-        } <span class="kw">else</span> <span class="kw">if</span> (<span class="var">curr</span> < <span class="var">target</span>) {
-            <span class="var">L</span>++;
-        } <span class="kw">else</span> {
-            <span class="var">R</span>--;
-        }
-    }
-    <span class="kw">return</span> {};
-}
-<span class="cm">// Time: O(n) | Space: O(1)</span></pre>
-      </div>
-    </div>
-  </div>
-
-  <div class="card a2">
-    <h3>📖 مثال: Container With Most Water</h3>
-    <div class="grid2">
-      <div>
-        <div class="info"><div class="tip-icon">📝</div><p>إيجاد أكبر كمية مياه بين عمودين</p></div>
-        <div class="steps">
-          <div class="step"><div class="step-num"></div><div class="step-body">L من اليسار، R من اليمين</div></div>
-          <div class="step"><div class="step-num"></div><div class="step-body">نحسب المساحة = <code>min(h[L], h[R]) × (R - L)</code></div></div>
-          <div class="step"><div class="step-num"></div><div class="step-body">نحرك المؤشر الأقصر → لأنه هو اللي بيحدد الارتفاع</div></div>
-          <div class="step"><div class="step-num"></div><div class="step-body">نكرر حتى يلتقوا</div></div>
-        </div>
-      </div>
-      <pre><span class="kw">int</span> <span class="fn">maxWater</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">heights</span>) {
-    <span class="kw">int</span> <span class="var">L</span> = <span class="nm">0</span>, <span class="var">R</span> = <span class="var">heights</span>.<span class="fn">size</span>() - <span class="nm">1</span>;
-    <span class="kw">int</span> <span class="var">maxW</span> = <span class="nm">0</span>;
-    <span class="kw">while</span> (<span class="var">L</span> < <span class="var">R</span>) {
-        <span class="kw">int</span> <span class="var">h</span> = <span class="fn">min</span>(<span class="var">heights</span>[<span class="var">L</span>], <span class="var">heights</span>[<span class="var">R</span>]);
-        <span class="var">maxW</span> = <span class="fn">max</span>(<span class="var">maxW</span>, <span class="var">h</span> * (<span class="var">R</span> - <span class="var">L</span>));
-        <span class="kw">if</span> (<span class="var">heights</span>[<span class="var">L</span>] < <span class="var">heights</span>[<span class="var">R</span>]) {
-            <span class="var">L</span>++;
-        } <span class="kw">else</span> {
-            <span class="var">R</span>--;
-        }
-    }
-    <span class="kw">return</span> <span class="var">maxW</span>;
-}
-<span class="cm">// Time: O(n) | Space: O(1)</span></pre>
-    </div>
-  </div>
-
-  <div class="card a2">
-    <h3>📖 مثال: 3Sum = Three Pointers!</h3>
-    <pre><span class="kw">vector</span><<span class="kw">vector</span><<span class="kw">int</span>>> <span class="fn">threeSum</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">nums</span>) {
-    <span class="fn">sort</span>(<span class="var">nums</span>.<span class="fn">begin</span>(), <span class="var">nums</span>.<span class="fn">end</span>());
-    <span class="kw">vector</span><<span class="kw">vector</span><<span class="kw">int</span>>> <span class="var">result</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">0</span>; <span class="kw">i</span> < (<span class="kw">int</span>)<span class="var">nums</span>.<span class="fn">size</span>() - <span class="nm">2</span>; ++<span class="var">i</span>) {
-        <span class="kw">if</span> (<span class="var">i</span> > <span class="nm">0</span> && <span class="var">nums</span>[<span class="var">i</span>] == <span class="var">nums</span>[<span class="var">i</span>-<span class="nm">1</span>]) <span class="kw">continue</span>;
-        <span class="kw">int</span> <span class="var">L</span> = <span class="var">i</span> + <span class="nm">1</span>, <span class="var">R</span> = <span class="var">nums</span>.<span class="fn">size</span>() - <span class="nm">1</span>;
-        <span class="kw">while</span> (<span class="var">L</span> < <span class="var">R</span>) {
-            <span class="kw">int</span> <span class="var">sum</span> = <span class="var">nums</span>[<span class="var">i</span>] + <span class="var">nums</span>[<span class="var">L</span>] + <span class="var">nums</span>[<span class="var">R</span>];
-            <span class="kw">if</span> (<span class="var">sum</span> == <span class="nm">0</span>) {
-                <span class="var">result</span>.<span class="fn">push_back</span>({<span class="var">nums</span>[<span class="var">i</span>], <span class="var">nums</span>[<span class="var">L</span>], <span class="var">nums</span>[<span class="var">R</span>]});
-                <span class="kw">while</span> (<span class="var">L</span> < <span class="var">R</span> && <span class="var">nums</span>[<span class="var">L</span>] == <span class="var">nums</span>[<span class="var">L</span>+<span class="nm">1</span>]) <span class="var">L</span>++;
-                <span class="kw">while</span> (<span class="var">L</span> < <span class="var">R</span> && <span class="var">nums</span>[<span class="var">R</span>] == <span class="var">nums</span>[<span class="var">R</span>-<span class="nm">1</span>]) <span class="var">R</span>--;
-                <span class="var">L</span>++; <span class="var">R</span>--;
-            } <span class="kw">else</span> <span class="kw">if</span> (<span class="var">sum</span> < <span class="nm">0</span>) <span class="var">L</span>++;
-            <span class="kw">else</span> <span class="var">R</span>--;
-        }
-    }
-    <span class="kw">return</span> <span class="var">result</span>;
-}
-<span class="cm">// Time: O(n²) | Space: O(1)</span></pre>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- SECTION 3: SLIDING WINDOW -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<section id="sliding-window" class="section s-sw reveal">
-  <div class="section-header">
-    <div class="section-icon">🪟</div>
-    <div>
-      <h2>Sliding Window — النافذة المتحركة</h2>
-      <p>الـ pattern الأقوى للـ subarrays والـ substrings</p>
-    </div>
-  </div>
-
-  <div class="info">
-    <div class="tip-icon">💡</div>
-    <p><strong>الفكرة:</strong> بدل ما نحسب كل subarray من الصفر، بنحرك "نافذة" على الـ array ونحدّث الحساب تدريجياً. من O(n²) أو O(n³) → O(n)</p>
-  </div>
-
-  <div class="grid2">
-    <div class="card a3">
-      <h3>📏 Fixed Size Window</h3>
-      <p>حجم النافذة ثابت = k</p>
-      <div class="diagram">
-        <div style="margin-bottom:6px; color:#6272a4">window size = 3</div>
-        <div class="arr-box">
-          <div class="box hi4">1</div><div class="box hi4">3</div><div class="box hi4">5</div><div class="box">2</div><div class="box">8</div><div class="box">6</div>
-        </div>
-        <div style="margin-top:6px; color:var(--accent3)">→ تحرك بخطوة واحدة كل مرة</div>
-        <div class="arr-box" style="margin-top:6px">
-          <div class="box">1</div><div class="box hi4">3</div><div class="box hi4">5</div><div class="box hi4">2</div><div class="box">8</div><div class="box">6</div>
-        </div>
-      </div>
-      <pre><span class="kw">int</span> <span class="fn">maxSumFixed</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">arr</span>, <span class="kw">int</span> <span class="var">k</span>) {
-    <span class="cm">// First window</span>
-    <span class="kw">int</span> <span class="var">curr</span> = <span class="nm">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">0</span>; <span class="var">i</span> < <span class="var">k</span>; ++<span class="var">i</span>) <span class="var">curr</span> += <span class="var">arr</span>[<span class="var">i</span>];
-    
-    <span class="kw">int</span> <span class="var">best</span> = <span class="var">curr</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="var">k</span>; <span class="var">i</span> < <span class="var">arr</span>.<span class="fn">size</span>(); ++<span class="var">i</span>) {
-        <span class="cm">// Add new, remove old</span>
-        <span class="var">curr</span> += <span class="var">arr</span>[<span class="var">i</span>] - <span class="var">arr</span>[<span class="var">i</span> - <span class="var">k</span>];
-        <span class="var">best</span> = <span class="fn">max</span>(<span class="var">best</span>, <span class="var">curr</span>);
-    }
-    <span class="kw">return</span> <span class="var">best</span>;
-}
-<span class="cm">// Time: O(n) | Space: O(1)</span></pre>
-    </div>
-
-    <div class="card a3">
-      <h3>📐 Variable Size Window</h3>
-      <p>حجم النافذة بيتغير حسب شرط معين</p>
-      <div class="diagram">
-        <div style="margin-bottom:4px; color:#6272a4">target sum = 7</div>
-        <div class="pointer-row">
-          <div class="ptr L" style="color:var(--accent3)">L</div><div class="ptr"></div><div class="ptr R" style="color:var(--accent3)">R</div><div class="ptr"></div><div class="ptr"></div>
-        </div>
-        <div class="arr-box">
-          <div class="box hi4">2</div><div class="box hi4">3</div><div class="box hi4">1</div><div class="box">4</div><div class="box">5</div>
-        </div>
-        <div style="margin-top:6px; color:var(--accent3)">sum=6 → expand R</div>
-      </div>
-      <pre><span class="kw">int</span> <span class="var">L</span> = <span class="nm">0</span>, <span class="var">curr</span> = <span class="nm">0</span>;
-<span class="kw">for</span> (<span class="kw">int</span> <span class="var">R</span> = <span class="nm">0</span>; <span class="var">R</span> < <span class="var">arr</span>.<span class="fn">size</span>(); ++<span class="var">R</span>) {
-    <span class="var">curr</span> += <span class="var">arr</span>[<span class="var">R</span>];   <span class="cm">// expand</span>
-    <span class="kw">while</span> (<span class="var">curr</span> > <span class="var">target</span>) {
-        <span class="var">curr</span> -= <span class="var">arr</span>[<span class="var">L</span>];
-        <span class="var">L</span>++;          <span class="cm">// shrink</span>
-    }
-    <span class="cm">// window [L..R] is valid</span>
-}</pre>
-    </div>
-  </div>
-
-  <div class="card a3">
-    <h3>🏗️ Template عام للـ Sliding Window</h3>
-    <pre><span class="kw">int</span> <span class="fn">slidingWindow</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">arr</span>) {
-    <span class="kw">int</span> <span class="var">L</span> = <span class="nm">0</span>, <span class="var">result</span> = <span class="nm">0</span>;
-    <span class="kw">unordered_map</span><<span class="kw">int</span>, <span class="kw">int</span>> <span class="var">window_state</span>;
-
-    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">R</span> = <span class="nm">0</span>; <span class="var">R</span> < <span class="var">arr</span>.<span class="fn">size</span>(); ++<span class="var">R</span>) {
-        <span class="cm">// 1. ADD arr[R] to window</span>
-        <span class="var">window_state</span>[<span class="var">arr</span>[<span class="var">R</span>]]++;
-
-        <span class="cm">// 2. SHRINK if invalid</span>
-        <span class="kw">while</span> (<span class="cm">/* window invalid */</span>) {
-            <span class="var">window_state</span>[<span class="var">arr</span>[<span class="var">L</span>]]--;
-            <span class="kw">if</span> (<span class="var">window_state</span>[<span class="var">arr</span>[<span class="var">L</span>]] == <span class="nm">0</span>) {
-                <span class="var">window_state</span>.<span class="fn">erase</span>(<span class="var">arr</span>[<span class="var">L</span>]);
-            }
-            <span class="var">L</span>++;
-        }
-
-        <span class="cm">// 3. UPDATE result with valid window [L..R]</span>
-        <span class="var">result</span> = <span class="fn">max</span>(<span class="var">result</span>, <span class="var">R</span> - <span class="var">L</span> + <span class="nm">1</span>);
-    }
-    <span class="kw">return</span> <span class="var">result</span>;
-}</pre>
-    <div class="tip"><div class="tip-icon">✅</div><p>هذا الـ template بيحل معظم مسائل الـ Sliding Window — جوز بس غيّر الـ window_state والشرط!</p></div>
-  </div>
-
-  <div class="card a3">
-    <h3>📖 Longest Substring Without Repeating Characters</h3>
-    <div class="grid2">
-      <div>
-        <div class="info"><div class="tip-icon">📝</div><p>أطول substring مش فيها حروف متكررة</p></div>
-        <div class="steps">
-          <div class="step"><div class="step-num"></div><div class="step-body">R يمشي على كل حرف</div></div>
-          <div class="step"><div class="step-num"></div><div class="step-body">لو الحرف موجود في الـ window، حرك L لبعده</div></div>
-          <div class="step"><div class="step-num"></div><div class="step-body">حدّث max length</div></div>
-        </div>
-        <div class="diagram">
-          <div style="color:#6272a4; margin-bottom:4px">"abcabcbb"</div>
-          <div style="color:var(--accent3)">window "abc" → len=3</div>
-          <div style="color:#6272a4; margin-top:4px">when 'a' repeats → L moves</div>
-        </div>
-      </div>
-      <pre><span class="kw">int</span> <span class="fn">lengthOfLongest</span>(<span class="kw">string</span> <span class="var">s</span>) {
-    <span class="kw">int</span> <span class="var">L</span> = <span class="nm">0</span>, <span class="var">best</span> = <span class="nm">0</span>;
-    <span class="kw">unordered_map</span><<span class="kw">char</span>, <span class="kw">int</span>> <span class="var">seen</span>; <span class="cm">// char -> last index</span>
-
-    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">R</span> = <span class="nm">0</span>; <span class="var">R</span> < <span class="var">s</span>.<span class="fn">length</span>(); ++<span class="var">R</span>) {
-        <span class="kw">if</span> (<span class="var">seen</span>.<span class="fn">count</span>(<span class="var">s</span>[<span class="var">R</span>])) {
-            <span class="cm">// Move L past last occurrence</span>
-            <span class="var">L</span> = <span class="fn">max</span>(<span class="var">L</span>, <span class="var">seen</span>[<span class="var">s</span>[<span class="var">R</span>]] + <span class="nm">1</span>);
-        }
-        <span class="var">seen</span>[<span class="var">s</span>[<span class="var">R</span>]] = <span class="var">R</span>;
-        <span class="var">best</span> = <span class="fn">max</span>(<span class="var">best</span>, <span class="var">R</span> - <span class="var">L</span> + <span class="nm">1</span>);
-    }
-    <span class="kw">return</span> <span class="var">best</span>;
-}
-<span class="cm">// Time: O(n) | Space: O(min(n,k))</span></pre>
-    </div>
-  </div>
-
-  <div class="card a3">
-    <h3>📖 Minimum Window Substring (Hard)</h3>
-    <pre><span class="kw">string</span> <span class="fn">minWindow</span>(<span class="kw">string</span> <span class="var">s</span>, <span class="kw">string</span> <span class="var">t</span>) {
-    <span class="kw">unordered_map</span><<span class="kw">char</span>, <span class="kw">int</span>> <span class="var">need</span>, <span class="var">window</span>;
-    <span class="kw">for</span> (<span class="kw">char</span> <span class="var">c</span> : <span class="var">t</span>) <span class="var">need</span>[<span class="var">c</span>]++;
-    
-    <span class="kw">int</span> <span class="var">have</span> = <span class="nm">0</span>, <span class="var">total</span> = <span class="var">need</span>.<span class="fn">size</span>();
-    <span class="kw">int</span> <span class="var">resL</span> = -<span class="nm">1</span>, <span class="var">minLen</span> = <span class="nm">INT_MAX</span>, <span class="var">L</span> = <span class="nm">0</span>;
-
-    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">R</span> = <span class="nm">0</span>; <span class="var">R</span> < <span class="var">s</span>.<span class="fn">length</span>(); ++<span class="var">R</span>) {
-        <span class="kw">char</span> <span class="var">c</span> = <span class="var">s</span>[<span class="var">R</span>];
-        <span class="kw">if</span> (<span class="var">need</span>.<span class="fn">count</span>(<span class="var">c</span>)) {
-            <span class="var">window</span>[<span class="var">c</span>]++;
-            <span class="kw">if</span> (<span class="var">window</span>[<span class="var">c</span>] == <span class="var">need</span>[<span class="var">c</span>]) <span class="var">have</span>++;
-        }
-
-        <span class="kw">while</span> (<span class="var">have</span> == <span class="var">total</span>) {
-            <span class="kw">if</span> (<span class="var">R</span> - <span class="var">L</span> + <span class="nm">1</span> < <span class="var">minLen</span>) {
-                <span class="var">minLen</span> = <span class="var">R</span> - <span class="var">L</span> + <span class="nm">1</span>;
-                <span class="var">resL</span> = <span class="var">L</span>;
-            }
-            <span class="kw">char</span> <span class="var">leftChar</span> = <span class="var">s</span>[<span class="var">L</span>];
-            <span class="kw">if</span> (<span class="var">need</span>.<span class="fn">count</span>(<span class="var">leftChar</span>)) {
-                <span class="kw">if</span> (<span class="var">window</span>[<span class="var">leftChar</span>] == <span class="var">need</span>[<span class="var">leftChar</span>]) <span class="var">have</span>--;
-                <span class="var">window</span>[<span class="var">leftChar</span>]--;
-            }
-            <span class="var">L</span>++;
-        }
-    }
-    <span class="kw">return</span> <span class="var">minLen</span> == <span class="nm">INT_MAX</span> ? <span class="st">""</span> : <span class="var">s</span>.<span class="fn">substr</span>(<span class="var">resL</span>, <span class="var">minLen</span>);
-}
-<span class="cm">// Time: O(n+m) | Space: O(n+m)</span></pre>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- SECTION 4: PREFIX SUMS -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<section id="prefix-sums" class="section s-ps reveal">
-  <div class="section-header">
-    <div class="section-icon">➕</div>
-    <div>
-      <h2>Prefix Sums — المجاميع التراكمية</h2>
-      <p>Preprocessing technique تحول O(n) per query → O(1)</p>
-    </div>
-  </div>
-
-  <div class="info">
-    <div class="tip-icon">💡</div>
-    <p><strong>الفكرة:</strong> نبني array جديد <code>prefix</code> بحيث <code>prefix[i] = sum(arr[0..i])</code>. بعدين أي range sum بيتحسب في O(1) بـ: <code>prefix[r] - prefix[l-1]</code></p>
-  </div>
-
-  <div class="card a4">
-    <h3>🔧 بناء الـ Prefix Sum Array</h3>
-    <pre><span class="kw">vector</span><<span class="kw">int</span>> <span class="fn">buildPrefix</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">arr</span>) {
-    <span class="kw">int</span> <span class="var">n</span> = <span class="var">arr</span>.<span class="fn">size</span>();
-    <span class="kw">vector</span><<span class="kw">int</span>> <span class="var">prefix</span>(<span class="var">n</span> + <span class="nm">1</span>, <span class="nm">0</span>);  <span class="cm">// +1 trick!</span>
-    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">0</span>; <span class="var">i</span> < <span class="var">n</span>; ++<span class="var">i</span>) {
-        <span class="var">prefix</span>[<span class="var">i</span> + <span class="nm">1</span>] = <span class="var">prefix</span>[<span class="var">i</span>] + <span class="var">arr</span>[<span class="var">i</span>];
-    }
-    <span class="kw">return</span> <span class="var">prefix</span>;
-}
-
-<span class="kw">int</span> <span class="fn">rangeSum</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">prefix</span>, <span class="kw">int</span> <span class="var">l</span>, <span class="kw">int</span> <span class="var">r</span>) {
-    <span class="cm">// sum of arr[l..r] inclusive</span>
-    <span class="kw">return</span> <span class="var">prefix</span>[<span class="var">r</span> + <span class="nm">1</span>] - <span class="var">prefix</span>[<span class="var">l</span>];
-}
-<span class="cm">// Build: O(n) | Query: O(1)</span></pre>
-  </div>
-
-  <div class="card a4">
-    <h3>🗺️ 2D Prefix Sum</h3>
-    <p>لـ matrices! نفس الفكرة بس في بعدين</p>
-    <pre><span class="cm">// Build 2D prefix</span>
-<span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">1</span>; <span class="var">i</span> <= <span class="var">m</span>; ++<span class="var">i</span>) {
-    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">j</span> = <span class="nm">1</span>; <span class="var">j</span> <= <span class="var">n</span>; ++<span class="var">j</span>) {
-        <span class="var">P</span>[<span class="var">i</span>][<span class="var">j</span>] = <span class="var">P</span>[<span class="var">i</span>-<span class="nm">1</span>][<span class="var">j</span>] + <span class="var">P</span>[<span class="var">i</span>][<span class="var">j</span>-<span class="nm">1</span>]
-                - <span class="var">P</span>[<span class="var">i</span>-<span class="nm">1</span>][<span class="var">j</span>-<span class="nm">1</span>] + <span class="var">grid</span>[<span class="var">i</span>-<span class="nm">1</span>][<span class="var">j</span>-<span class="nm">1</span>];
-    }
-}
-
-<span class="cm">// Query: sum of rectangle (r1,c1) to (r2,c2)</span>
-<span class="kw">int</span> <span class="fn">query</span>(<span class="kw">int</span> <span class="var">r1</span>, <span class="kw">int</span> <span class="var">c1</span>, <span class="kw">int</span> <span class="var">r2</span>, <span class="kw">int</span> <span class="var">c2</span>) {
-    <span class="kw">return</span> <span class="var">P</span>[<span class="var">r2</span>+<span class="nm">1</span>][<span class="var">c2</span>+<span class="nm">1</span>] - <span class="var">P</span>[<span class="var">r1</span>][<span class="var">c2</span>+<span class="nm">1</span>]
-         - <span class="var">P</span>[<span class="var">r2</span>+<span class="nm">1</span>][<span class="var">c1</span>] + <span class="var">P</span>[<span class="var">r1</span>][<span class="var">c1</span>];
-}</pre>
-  </div>
-
-  <div class="card a4">
-    <h3>📖 Subarray Sum Equals K — الأقوى!</h3>
-    <div class="info"><div class="tip-icon">📝</div><p>عدد الـ subarrays اللي مجموعها = k</p></div>
-    <div class="grid2">
-      <div>
-        <div class="steps">
-          <div class="step"><div class="step-num"></div><div class="step-body">نبني prefix sum وهنا بنحتاج <strong>HashMap</strong></div></div>
-          <div class="step"><div class="step-num"></div><div class="step-body">لو <code>prefix[r] - prefix[l] = k</code> → يعني <code>prefix[l] = prefix[r] - k</code></div></div>
-          <div class="step"><div class="step-num"></div><div class="step-body">نبحث في الـ HashMap عن <code>curr - k</code></div></div>
-          <div class="step"><div class="step-num"></div><div class="step-body">هذا بيحول O(n²) → O(n)!</div></div>
-        </div>
-      </div>
-      <pre><span class="kw">int</span> <span class="fn">subarraySum</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">nums</span>, <span class="kw">int</span> <span class="var">k</span>) {
-    <span class="kw">int</span> <span class="var">count</span> = <span class="nm">0</span>, <span class="var">curr</span> = <span class="nm">0</span>;
-    <span class="kw">unordered_map</span><<span class="kw">int</span>, <span class="kw">int</span>> <span class="var">seen</span>;
-    <span class="var">seen</span>[<span class="nm">0</span>] = <span class="nm">1</span>; <span class="cm">// important!</span>
-
-    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">num</span> : <span class="var">nums</span>) {
-        <span class="var">curr</span> += <span class="var">num</span>;
-        <span class="kw">if</span> (<span class="var">seen</span>.<span class="fn">count</span>(<span class="var">curr</span> - <span class="var">k</span>)) {
-            <span class="var">count</span> += <span class="var">seen</span>[<span class="var">curr</span> - <span class="var">k</span>];
-        }
-        <span class="var">seen</span>[<span class="var">curr</span>]++;
-    }
-    <span class="kw">return</span> <span class="var">count</span>;
-}
-<span class="cm">// Time: O(n) | Space: O(n)</span></pre>
-    </div>
-  </div>
-
-  <div class="card a4">
-    <h3>📖 Find Pivot Index</h3>
-    <pre><span class="kw">int</span> <span class="fn">pivotIndex</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">nums</span>) {
-    <span class="kw">int</span> <span class="var">total</span> = <span class="fn">accumulate</span>(<span class="var">nums</span>.<span class="fn">begin</span>(), <span class="var">nums</span>.<span class="fn">end</span>(), <span class="nm">0</span>);
-    <span class="kw">int</span> <span class="var">left</span> = <span class="nm">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">0</span>; <span class="var">i</span> < <span class="var">nums</span>.<span class="fn">size</span>(); ++<span class="var">i</span>) {
-        <span class="cm">// right sum = total - left - nums[i]</span>
-        <span class="kw">if</span> (<span class="var">left</span> == <span class="var">total</span> - <span class="var">left</span> - <span class="var">nums</span>[<span class="var">i</span>]) {
-            <span class="kw">return</span> <span class="var">i</span>;
-        }
-        <span class="var">left</span> += <span class="var">nums</span>[<span class="var">i</span>];
-    }
-    <span class="kw">return</span> -<span class="nm">1</span>;
-}
-<span class="cm">// Time: O(n) | Space: O(1)</span></pre>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- SECTION 5: SIGNS & PATTERNS (الإشارات)  -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<section id="signs" class="section s-signs reveal">
-  <div class="section-header">
-    <div class="section-icon">🔍</div>
-    <div>
-      <h2>Signs & Recognition — كيف تعرف تحل المسألة؟</h2>
-      <p>الإشارات اللي بتقولك تستخدم أي technique</p>
-    </div>
-  </div>
-
-  <div class="warn">
-    <div class="tip-icon">🎯</div>
-    <p><strong>المهارة الأهم:</strong> مش حفظ الحلول — ده تعلم تشوف الـ pattern في المسألة. اقرأ الجزء ده كويس!</p>
-  </div>
-
-  <div class="grid2">
-    <div class="sign-card">
-      <h4 style="color:var(--accent1)">👆 إشارات Two Pointers</h4>
-      <ul>
-        <li>🔑 الـ array أو string <strong>مرتب (sorted)</strong></li>
-        <li>🔑 "find pair/triplet that sum to X"</li>
-        <li>🔑 "in-place reversal" أو palindrome</li>
-        <li>🔑 "remove duplicates from sorted array"</li>
-        <li>🔑 "merge two sorted arrays"</li>
-        <li>🔑 المطلوب O(1) space</li>
-        <li>🔑 "two numbers" مع sorted condition</li>
-        <li>🔑 Cycle detection في linked list</li>
-      </ul>
-    </div>
-
-    <div class="sign-card">
-      <h4 style="color:var(--accent3)">🪟 إشارات Sliding Window</h4>
-      <ul>
-        <li>🔑 "longest/shortest subarray/substring that..."</li>
-        <li>🔑 "subarray with max/min sum of size k"</li>
-        <li>🔑 "at most k distinct characters"</li>
-        <li>🔑 "contiguous" أو "consecutive"</li>
-        <li>🔑 كلام عن window أو subrange</li>
-        <li>🔑 String أو array + condition على elements</li>
-        <li>🔑 "no repeating characters"</li>
-        <li>🔑 "contains all characters of t"</li>
-      </ul>
-    </div>
-
-    <div class="sign-card">
-      <h4 style="color:var(--accent4)">➕ إشارات Prefix Sums</h4>
-      <ul>
-        <li>🔑 "range sum queries" (أكثر من query)</li>
-        <li>🔑 "number of subarrays with sum = k"</li>
-        <li>🔑 "subarray sum divisible by k"</li>
-        <li>🔑 "find subarray with equal 0s and 1s"</li>
-        <li>🔑 Matrix rectangle sum queries</li>
-        <li>🔑 "count subarrays where condition on sum"</li>
-        <li>🔑 الـ array فيه negative numbers + sum queries</li>
-        <li>🔑 "running total" أو "cumulative"</li>
-      </ul>
-    </div>
-
-    <div class="sign-card">
-      <h4 style="color:#a78bfa">🤔 امتى تستخدم HashMap مع Prefix?</h4>
-      <ul>
-        <li>🔑 "count subarrays with sum = k" (مش max أو min)</li>
-        <li>🔑 عايز تبحث عن <code>prefix[r] - k</code></li>
-        <li>🔑 Subarray sum divisible by k (modulo trick)</li>
-        <li>🔑 Longest subarray with equal 0s & 1s</li>
-        <li>🔑 "balanced" subarray problems</li>
-        <li>🔑 أي وقت تحتاج تبحث عن prefix سابق بسرعة</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="card a5" style="margin-top: 20px">
-    <h3>🆚 Sliding Window vs Prefix Sum — الفرق</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>المعيار</th><th>Sliding Window</th><th>Prefix Sum</th></tr></thead>
-        <tbody>
-          <tr><td>Max/Min subarray sum</td><td><span class="badge-o1">✅ أفضل</span></td><td><span class="badge-on">ممكن</span></td></tr>
-          <tr><td>Count subarrays = k</td><td><span class="badge-on">لا</span></td><td><span class="badge-o1">✅ أفضل</span></td></tr>
-          <tr><td>Negative numbers</td><td><span class="badge-on2">❌ صعب</span></td><td><span class="badge-o1">✅ يشتغل</span></td></tr>
-          <tr><td>Fixed window size</td><td><span class="badge-o1">✅ طبيعي</span></td><td><span class="badge-on">ممكن</span></td></tr>
-          <tr><td>Multiple queries</td><td><span class="badge-on">O(n) each</span></td><td><span class="badge-o1">O(1) each</span></td></tr>
-          <tr><td>Space</td><td><span class="badge-o1">O(1)</span></td><td><span class="badge-on">O(n)</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="card a5">
-    <h3>🧠 Decision Tree — اختر الـ technique</h3>
-    <pre style="color:var(--text2)">المسألة على subarray/substring؟
-├── Fixed size k؟
-│   └── → Sliding Window Fixed
-├── "longest/shortest" مع شرط؟
-│   ├── All positive numbers؟ → Sliding Window Variable
-│   └── Has negatives؟ → Prefix Sum + HashMap
-├── "count subarrays where sum = k"؟
-│   └── → Prefix Sum + HashMap
-├── Array مرتب + pair/triplet؟
-│   └── → Two Pointers
-├── Range queries (multiple)?
-│   └── → Prefix Sum Array
-└── In-place أو O(1) space مطلوب؟
-    └── → Two Pointers</pre>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- SECTION 6: PROBLEMS -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<section id="problems" class="section s-prob reveal">
-  <div class="section-header">
-    <div class="section-icon">📋</div>
-    <div>
-      <h2>أهم المسائل — Must-Know Problems</h2>
-      <p>كل المسائل اللي ممكن تيجي في الـ interview</p>
-    </div>
-  </div>
-
-  <h3 style="color:#a78bfa; margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid var(--border)">👆 Two Pointers Problems</h3>
-  <div class="grid2">
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Two Sum II (Sorted)</span><span class="diff easy">Easy</span></div>
-      <div class="prob-tags"><span class="tag">Two Pointers</span><span class="tag">Sorted</span></div>
-      <p class="prob-desc">إيجاد اتنين أرقام مجموعهم = target في array مرتب. L+R من الطرفين.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Valid Palindrome</span><span class="diff easy">Easy</span></div>
-      <div class="prob-tags"><span class="tag">Two Pointers</span><span class="tag">String</span></div>
-      <p class="prob-desc">التحقق إذا كان الـ string palindrome بتجاهل non-alphanumeric. L وR يلتقوا.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">3Sum</span><span class="diff med">Medium</span></div>
-      <div class="prob-tags"><span class="tag">Two Pointers</span><span class="tag">Sorting</span></div>
-      <p class="prob-desc">كل تلاتة أرقام مجموعهم صفر. Sort ثم Two Pointers داخل loop. التحدي: skip duplicates.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Container With Most Water</span><span class="diff med">Medium</span></div>
-      <div class="prob-tags"><span class="tag">Two Pointers</span><span class="tag">Greedy</span></div>
-      <p class="prob-desc">أكبر مساحة مياه بين عمودين. حرّك الـ pointer الأقصر دايماً.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Trapping Rain Water</span><span class="diff hard">Hard</span></div>
-      <div class="prob-tags"><span class="tag">Two Pointers</span><span class="tag">DP</span></div>
-      <p class="prob-desc">حساب المياه المتراكمة. Two Pointers مع max_left و max_right.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Remove Duplicates (Sorted)</span><span class="diff easy">Easy</span></div>
-      <div class="prob-tags"><span class="tag">Two Pointers</span><span class="tag">In-place</span></div>
-      <p class="prob-desc">حذف المكرر in-place. Slow writer + Fast reader pattern.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Move Zeros</span><span class="diff easy">Easy</span></div>
-      <div class="prob-tags"><span class="tag">Two Pointers</span><span class="tag">In-place</span></div>
-      <p class="prob-desc">نقل الأصفار لآخر الـ array. Slow pointer يكتب non-zeros، Fast يمشي.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Sort Colors (Dutch Flag)</span><span class="diff med">Medium</span></div>
-      <div class="prob-tags"><span class="tag">Three Pointers</span><span class="tag">In-place</span></div>
-      <p class="prob-desc">ترتيب 0,1,2 بـ one pass. ثلاث pointers: low, mid, high.</p>
-    </div>
-  </div>
-
-  <h3 style="color:var(--accent3); margin:28px 0 16px; padding-bottom:8px; border-bottom:1px solid var(--border)">🪟 Sliding Window Problems</h3>
-  <div class="grid2">
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Max Sum Subarray of Size K</span><span class="diff easy">Easy</span></div>
-      <div class="prob-tags"><span class="tag">Fixed Window</span></div>
-      <p class="prob-desc">أكبر مجموع لـ subarray بحجم k. Fixed window أبسط مثال.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Longest Substring No Repeat</span><span class="diff med">Medium</span></div>
-      <div class="prob-tags"><span class="tag">Variable Window</span><span class="tag">HashMap</span></div>
-      <p class="prob-desc">أطول substring بدون حروف مكررة. Variable window + HashMap للـ index.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Permutation in String</span><span class="diff med">Medium</span></div>
-      <div class="prob-tags"><span class="tag">Fixed Window</span><span class="tag">Frequency</span></div>
-      <p class="prob-desc">هل s2 فيها permutation من s1؟ Fixed window بحجم len(s1) + frequency count.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Minimum Window Substring</span><span class="diff hard">Hard</span></div>
-      <div class="prob-tags"><span class="tag">Variable Window</span><span class="tag">HashMap</span></div>
-      <p class="prob-desc">أصغر window في s تحتوي كل حروف t. Variable window + have/need counters.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Fruits Into Baskets</span><span class="diff med">Medium</span></div>
-      <div class="prob-tags"><span class="tag">Variable Window</span><span class="tag">At most K</span></div>
-      <p class="prob-desc">أطول subarray بـ at most 2 distinct values. Window + HashMap.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Longest Repeating Char Replacement</span><span class="diff med">Medium</span></div>
-      <div class="prob-tags"><span class="tag">Variable Window</span><span class="tag">Tricky</span></div>
-      <p class="prob-desc">أطول substring بعد k replacements. Window صالحة لو: len - maxFreq ≤ k.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Sliding Window Maximum</span><span class="diff hard">Hard</span></div>
-      <div class="prob-tags"><span class="tag">Fixed Window</span><span class="tag">Deque</span></div>
-      <p class="prob-desc">أكبر عنصر في كل window بحجم k. Monotonic Deque للـ O(n).</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Min Size Subarray Sum</span><span class="diff med">Medium</span></div>
-      <div class="prob-tags"><span class="tag">Variable Window</span></div>
-      <p class="prob-desc">أصغر subarray مجموعه ≥ target. Variable window تكبر وتصغر.</p>
-    </div>
-  </div>
-
-  <h3 style="color:var(--accent4); margin:28px 0 16px; padding-bottom:8px; border-bottom:1px solid var(--border)">➕ Prefix Sum Problems</h3>
-  <div class="grid2">
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Range Sum Query</span><span class="diff easy">Easy</span></div>
-      <div class="prob-tags"><span class="tag">Prefix Sum</span><span class="tag">Classic</span></div>
-      <p class="prob-desc">الـ classic — build prefix once, answer each query in O(1).</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Subarray Sum Equals K</span><span class="diff med">Medium</span></div>
-      <div class="prob-tags"><span class="tag">Prefix Sum</span><span class="tag">HashMap</span></div>
-      <p class="prob-desc">عدد الـ subarrays مجموعها k. Prefix + HashMap. الأهم في النوع ده.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Find Pivot Index</span><span class="diff easy">Easy</span></div>
-      <div class="prob-tags"><span class="tag">Prefix Sum</span></div>
-      <p class="prob-desc">index بحيث left sum = right sum. Total sum مرة واحدة.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Subarray Divisible by K</span><span class="diff med">Medium</span></div>
-      <div class="prob-tags"><span class="tag">Prefix Sum</span><span class="tag">Modulo</span></div>
-      <p class="prob-desc">عدد الـ subarrays قابلة للقسمة على k. Prefix modulo + HashMap. Trick: mod negative.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Longest Subarray with Sum 0</span><span class="diff med">Medium</span></div>
-      <div class="prob-tags"><span class="tag">Prefix Sum</span><span class="tag">HashMap</span></div>
-      <p class="prob-desc">أطول subarray مجموعه صفر. prefix + HashMap لأول occurrence.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Count Subarray with Equal 0&1</span><span class="diff med">Medium</span></div>
-      <div class="prob-tags"><span class="tag">Prefix Sum</span><span class="tag">Transform</span></div>
-      <p class="prob-desc">حول 0→-1 ثم بقت مسألة "sum = 0". Prefix + HashMap.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Product Except Self</span><span class="diff med">Medium</span></div>
-      <div class="prob-tags"><span class="tag">Prefix Product</span></div>
-      <p class="prob-desc">Prefix product من اليسار ثم Suffix product من اليمين. O(n) O(1) space.</p>
-    </div>
-    <div class="prob-card">
-      <div class="prob-header"><span class="prob-title">Range Sum Query 2D</span><span class="diff med">Medium</span></div>
-      <div class="prob-tags"><span class="tag">2D Prefix</span><span class="tag">Matrix</span></div>
-      <p class="prob-desc">2D prefix sum. Build O(mn), Query O(1). Inclusion-exclusion formula.</p>
-    </div>
-  </div>
-
-  <!-- COMPLEXITY SUMMARY -->
-  <div class="card a6" style="margin-top:32px">
-    <h3>⚡ Complexity Quick Reference</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Technique</th><th>Time</th><th>Space</th><th>Best For</th></tr></thead>
-        <tbody>
-          <tr><td>Two Pointers (opposite)</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-o1">O(1)</span></td><td>Sorted arrays, pairs/triplets</td></tr>
-          <tr><td>Two Pointers (same dir)</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-o1">O(1)</span></td><td>In-place modification</td></tr>
-          <tr><td>Sliding Window Fixed</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-o1">O(k)</span></td><td>Fixed-size subarrays</td></tr>
-          <tr><td>Sliding Window Variable</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-on">O(n)</span></td><td>Longest/shortest with condition</td></tr>
-          <tr><td>Prefix Sum Build</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-on">O(n)</span></td><td>Preprocessing for queries</td></tr>
-          <tr><td>Prefix Sum Query</td><td><span class="badge-o1">O(1)</span></td><td><span class="badge-o1">O(1)</span></td><td>After preprocessing</td></tr>
-          <tr><td>Prefix + HashMap</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-on">O(n)</span></td><td>Count subarrays = k</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="footer">
-  <p style="color:var(--accent1); font-weight:700; margin-bottom:8px">🚀 Arrays · Two Pointers · Sliding Window · Prefix Sums</p>
-  <p>Master these patterns and you'll solve 80%+ of array/string interview problems</p>
-  <p style="margin-top:8px; color:var(--text3); font-size:.8rem">Practice daily — consistency beats intensity</p>
-</footer>
-
-</div><!-- /container -->
-
-<script>
-  // Scroll reveal
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('revealed');
-        observer.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.05 });
-
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-  // Nav highlight
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.toc a');
-  window.addEventListener('scroll', () => {
-    let current = '';
-    sections.forEach(s => {
-      if (window.scrollY >= s.offsetTop - 100) current = s.id;
-    });
-    navLinks.forEach(a => {
-      a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent1)' : '';
-      a.style.background = a.getAttribute('href') === '#' + current ? 'rgba(0,212,255,.06)' : '';
-    });
-  });
-</script>
-<div class="aaos-theme-bar">
-  <button class="aaos-fab theme-toggle-btn" onclick="aaosToggleTheme()" title="تبديل الوضع">☀️</button>
-  <a class="aaos-fab" href="../index.html" title="الرئيسية">🏠</a>
-</div>
-<script src="../scripts/theme.js"></script></body>
-</html>
-
-
+﻿﻿﻿﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arrays & Strings | Two Pointers | Sliding Window | Prefix Sums</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg2: #0f1524;
+    --bg3: #141929;
+    --card: #161d30;
+    --card2: #1b2338;
+    --border: #252d45;
+    --accent1: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #f59e0b;
+    --accent4: #10b981;
+    --accent5: #f43f5e;
+    --accent6: #818cf8;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --code-bg: #0d1117;
+    --green: #00ff88;
+    --orange: #ff8c00;
+    --pink: #ff6eb4;
+    --yellow: #ffd700;
+  }
+
+  pre, code {
+    direction: ltr !important;
+    text-align: left !important;
+    unicode-bidi: bidi-override !important;
+  }
+
+  pre span {
+    direction: ltr !important;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Cairo', sans-serif;
+    line-height: 1.8;
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #0a0e1a 0%, #0f1a3e 50%, #0a0e1a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(0,212,255,.07) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 50%, rgba(124,58,237,.07) 0%, transparent 60%);
+  }
+  .hero-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, rgba(0,212,255,.15), rgba(124,58,237,.15));
+    border: 1px solid rgba(0,212,255,.3);
+    color: var(--accent1);
+    padding: 6px 18px;
+    border-radius: 50px;
+    font-size: .8rem;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .hero h1 .g1 { background: linear-gradient(90deg, var(--accent1), var(--accent6)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero h1 .g2 { background: linear-gradient(90deg, var(--accent3), var(--accent5)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p { color: var(--text2); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+  .hero-chips { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+  .chip {
+    padding: 5px 14px; border-radius: 20px; font-size: .8rem; font-weight: 600; border: 1px solid;
+  }
+  .chip.c1 { color: var(--accent1); border-color: rgba(0,212,255,.4); background: rgba(0,212,255,.08); }
+  .chip.c2 { color: var(--accent2); border-color: rgba(124,58,237,.4); background: rgba(124,58,237,.08); }  
+  .chip.c3 { color: var(--accent3); border-color: rgba(245,158,11,.4); background: rgba(245,158,11,.08); }
+  .chip.c4 { color: var(--accent4); border-color: rgba(16,185,129,.4); background: rgba(16,185,129,.08); }
+
+  /* ── NAV ── */
+  .toc {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 40px;
+    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+  .toc a {
+    color: var(--text2); text-decoration: none; font-size: .82rem; font-weight: 600;
+    padding: 5px 12px; border-radius: 6px; border: 1px solid transparent;
+    transition: all .2s;
+  }
+  .toc a:hover { color: var(--accent1); border-color: rgba(0,212,255,.3); background: rgba(0,212,255,.06); }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+
+  /* ── SECTIONS ── */
+  .section { margin-bottom: 70px; }
+  .section-header {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 32px; padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; flex-shrink: 0;
+  }
+  .section-header h2 { font-size: 1.7rem; font-weight: 700; }
+  .section-header p { color: var(--text2); font-size: .9rem; margin-top: 2px; }
+
+  /* Colors per section */
+  .s-arrays .section-icon { background: rgba(0,212,255,.12); border: 1px solid rgba(0,212,255,.25); }
+  .s-arrays h2 { color: var(--accent1); }
+  .s-tp .section-icon { background: rgba(124,58,237,.12); border: 1px solid rgba(124,58,237,.25); }
+  .s-tp h2 { color: #a78bfa; }
+  .s-sw .section-icon { background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.25); }
+  .s-sw h2 { color: var(--accent3); }
+  .s-ps .section-icon { background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.25); }
+  .s-ps h2 { color: var(--accent4); }
+  .s-signs .section-icon { background: rgba(244,63,94,.12); border: 1px solid rgba(244,63,94,.25); }
+  .s-signs h2 { color: var(--accent5); }
+  .s-prob .section-icon { background: rgba(255,214,0,.12); border: 1px solid rgba(255,214,0,.25); }
+  .s-prob h2 { color: var(--yellow); }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; inset: 0; opacity: 0;
+    transition: opacity .3s;
+  }
+  .card:hover::before { opacity: 1; }
+
+  .card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .card p, .card li { color: var(--text2); font-size: .92rem; }
+  .card ul { padding-right: 20px; }
+  .card li { margin-bottom: 6px; }
+
+  /* accent left border */
+  .card.a1 { border-right: 3px solid var(--accent1); }
+  .card.a2 { border-right: 3px solid #a78bfa; }
+  .card.a3 { border-right: 3px solid var(--accent3); }
+  .card.a4 { border-right: 3px solid var(--accent4); }
+  .card.a5 { border-right: 3px solid var(--accent5); }
+  .card.a6 { border-right: 3px solid var(--yellow); }
+
+  /* ── CODE BLOCKS ── */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid #1e2d3d;
+    border-radius: 10px;
+    padding: 20px 24px;
+    overflow-x: auto;
+    margin: 14px 0;
+    font-family: 'Fira Code', monospace;
+    font-size: .82rem;
+    line-height: 1.7;
+    position: relative;
+    direction: ltr !important;
+    text-align: left !important;
+  }
+  pre .lang-tag {
+    position: absolute; top: 8px; left: 12px;
+    font-size: .65rem; color: var(--text3); text-transform: uppercase; letter-spacing: 1px;
+  }
+  .kw { color: #ff79c6; }
+  .fn { color: #50fa7b; }
+  .cn { color: #bd93f9; }
+  .st { color: #f1fa8c; }
+  .cm { color: #6272a4; font-style: italic; }
+  .nm { color: #ffb86c; }
+  .op { color: #ff5555; }
+  .var { color: var(--accent1); }
+
+  /* ── COMPLEXITY TABLE ── */
+  .table-wrap { overflow-x: auto; margin: 14px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+  thead tr { background: rgba(255,255,255,.04); }
+  th { padding: 10px 14px; text-align: left; color: var(--text2); font-weight: 600; border-bottom: 1px solid var(--border); direction: ltr !important; }
+  td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.04); color: var(--text2); text-align: left; direction: ltr !important; }
+  tr:last-child td { border-bottom: none; }
+  .badge-o1 { color: #00ff88; font-weight: 700; font-family: 'Fira Code'; }
+  .badge-on { color: #ffd700; font-weight: 700; font-family: 'Fira Code'; }
+  .badge-on2 { color: #ff6b6b; font-weight: 700; font-family: 'Fira Code'; }
+  .badge-olog { color: #00d4ff; font-weight: 700; font-family: 'Fira Code'; }
+
+  /* ── ALERT / TIP BOXES ── */
+  .tip, .warn, .info, .success {
+    border-radius: 10px; padding: 14px 18px; margin: 14px 0;
+    font-size: .9rem; display: flex; gap: 12px; align-items: flex-start;
+  }
+  .tip { background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.25); color: #6ee7b7; }
+  .warn { background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.25); color: #fcd34d; }
+  .info { background: rgba(0,212,255,.08); border: 1px solid rgba(0,212,255,.25); color: #7dd3fc; }
+  .success { background: rgba(124,58,237,.08); border: 1px solid rgba(124,58,237,.25); color: #c4b5fd; }
+  .tip-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+  .tip p, .warn p, .info p, .success p { margin: 0; color: inherit; }
+
+  /* ── STEPS ── */
+  .steps { counter-reset: step; }
+  .step {
+    display: flex; gap: 14px; margin-bottom: 16px; align-items: flex-start;
+  }
+  .step-num {
+    counter-increment: step;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent1));
+    color: white; font-size: .75rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 4px;
+  }
+  .step-num::before { content: counter(step); }
+  .step-body { color: var(--text2); font-size: .92rem; }
+  .step-body strong { color: var(--text); }
+
+  /* ── GRID ── */
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+
+  /* ── SIGN CARDS ── */
+  .sign-card {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .sign-card h4 { font-size: .95rem; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .sign-card ul { padding-right: 16px; }
+  .sign-card li { font-size: .85rem; color: var(--text2); margin-bottom: 5px; }
+
+  /* ── PROBLEM CARDS ── */
+  .prob-card {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: transform .2s, border-color .2s;
+  }
+  .prob-card:hover { transform: translateY(-3px); }
+  .prob-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .prob-title { font-size: .98rem; font-weight: 700; }
+  .diff { font-size: .72rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
+  .easy { background: rgba(16,185,129,.15); color: #34d399; border: 1px solid rgba(16,185,129,.3); }
+  .med { background: rgba(245,158,11,.15); color: #fbbf24; border: 1px solid rgba(245,158,11,.3); }
+  .hard { background: rgba(244,63,94,.15); color: #f87171; border: 1px solid rgba(244,63,94,.3); }
+  .prob-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .tag { font-size: .7rem; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,.05); color: var(--text3); border: 1px solid var(--border); }
+  .prob-desc { font-size: .85rem; color: var(--text2); }
+  .prob-card:hover { border-color: rgba(0,212,255,.3); }
+
+  /* ── VISUAL DIAGRAMS ── */
+  .diagram {
+    background: var(--code-bg);
+    border: 1px solid #1e2d3d;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 14px 0;
+    font-family: 'Fira Code', monospace;
+    font-size: .8rem;
+    color: var(--text2);
+    overflow-x: auto;
+    direction: ltr !important;
+    text-align: left !important;
+  }
+  .diagram .arr-box {
+    display: inline-flex; gap: 2px; margin: 6px 0;
+    direction: ltr !important;
+  }
+  .box {
+    width: 38px; height: 38px; border: 1px solid #2a3a52;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; background: #131b2e;
+    font-size: .8rem; font-weight: 600; color: var(--text);
+    transition: all .3s;
+  }
+  .box.hi1 { background: rgba(0,212,255,.2); border-color: var(--accent1); color: var(--accent1); }
+  .box.hi2 { background: rgba(124,58,237,.2); border-color: #a78bfa; color: #a78bfa; }
+  .box.hi3 { background: rgba(16,185,129,.2); border-color: var(--accent4); color: var(--accent4); }
+  .box.hi4 { background: rgba(245,158,11,.2); border-color: var(--accent3); color: var(--accent3); }
+  .pointer-row { display: flex; gap: 2px; margin-bottom: 4px; direction: ltr !important; }
+  .ptr { width: 38px; text-align: center; font-size: .7rem; }
+  .ptr.L { color: var(--accent1); }
+  .ptr.R { color: #a78bfa; }
+
+  /* ── INLINE CODE ── */
+  code { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); padding: 1px 6px; border-radius: 4px; font-family: 'Fira Code'; font-size: .82em; color: var(--green); }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center; padding: 40px 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text3); font-size: .85rem;
+  }
+
+  /* ── SCROLL ANIMATION ── */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .5s, transform .5s; }
+  .revealed { opacity: 1; transform: none; }
+
+  .highlight-text { color: var(--accent1); font-weight: 600; }
+  .highlight-purple { color: #a78bfa; font-weight: 600; }
+  .highlight-green { color: var(--green); font-weight: 600; }
+  .highlight-orange { color: var(--accent3); font-weight: 600; }
+  .highlight-red { color: var(--accent5); font-weight: 600; }
+
+  h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; }
+</style>
+<link rel="stylesheet" href="../styles/theme.css">
+<script>var s=localStorage.getItem('aaos_theme')||'dark';document.documentElement.setAttribute('data-theme',s);</script></head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-badge">🚀 DSA MASTERY GUIDE — A to Z</div>
+  <h1>
+    <span class="g1">Arrays & Strings</span><br>
+    <span class="g2">Two Pointers · Sliding Window · Prefix Sums</span>
+  </h1>
+  <p>شرح مفصل شامل من الصفر للاحتراف — patterns, problems, complexity, signs</p>
+  <div class="hero-chips">
+    <span class="chip c1">Two Pointers</span>
+    <span class="chip c2">Sliding Window</span>
+    <span class="chip c3">Prefix Sums</span>
+    <span class="chip c4">Arrays & Strings</span>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="toc">
+  <a href="#arrays">📦 Arrays & Strings</a>
+  <a href="#two-pointers">👆 Two Pointers</a>
+  <a href="#sliding-window">🪟 Sliding Window</a>
+  <a href="#prefix-sums">➕ Prefix Sums</a>
+  <a href="#signs">🔍 Signs & Patterns</a>
+  <a href="#problems">📋 المسائل</a>
+</nav>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 1: ARRAYS & STRINGS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="arrays" class="section s-arrays reveal">
+  <div class="section-header">
+    <div class="section-icon">📦</div>
+    <div>
+      <h2>Arrays & Strings — الأساسيات</h2>
+      <p>البنية الأساسية اللي كل الـ patterns بتتبنى عليها</p>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card a1">
+      <h3>🔷 ما هو الـ Array؟</h3>
+      <p>Array هو مجموعة من العناصر متخزنة في أماكن متتالية في الذاكرة (contiguous memory). كل عنصر بيتوصله بـ index في O(1).</p>
+      <div class="diagram">
+        <div>index:  &nbsp;0 &nbsp;&nbsp;1 &nbsp;&nbsp;2 &nbsp;&nbsp;3 &nbsp;&nbsp;4</div>
+        <div class="arr-box">
+          <div class="box">2</div><div class="box">5</div><div class="box">1</div><div class="box">8</div><div class="box">3</div>
+        </div>
+        <div style="margin-top:6px; color:#6272a4">arr[0]=2, arr[2]=1, arr[4]=3</div>
+      </div>
+    </div>
+
+    <div class="card a1">
+      <h3>⚡ Complexity — Arrays</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Operation</th><th>Time</th><th>Space</th></tr></thead>
+          <tbody>
+            <tr><td>Access by index</td><td><span class="badge-o1">O(1)</span></td><td><span class="badge-o1">O(1)</span></td></tr>
+            <tr><td>Search (unsorted)</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-o1">O(1)</span></td></tr>
+            <tr><td>Insert at end</td><td><span class="badge-o1">O(1)*</span></td><td><span class="badge-o1">O(1)</span></td></tr>
+            <tr><td>Insert at middle</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-o1">O(1)</span></td></tr>
+            <tr><td>Delete at middle</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-o1">O(1)</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card a1">
+    <h3>🔤 Strings — خصائص مهمة</h3>
+    <div class="grid2">
+      <div>
+        <p>في Python/Java: Strings <span class="highlight-red">immutable</span> (مش بتتغير، لو عملت تغيير بيتعمل copy جديدة)</p>
+        <div class="warn"><div class="tip-icon">⚠️</div><p><strong>Gotcha:</strong> string concatenation في loop = O(n²)! استخدم list ثم join</p></div>
+      </div>
+      <div>
+        <pre><span class="cm">// Bad: O(n²)</span>
+<span class="kw">string</span> <span class="var">result</span> = <span class="st">""</span>;
+<span class="kw">for</span> (<span class="kw">char</span> <span class="var">c</span> : <span class="var">chars</span>) {
+    <span class="var">result</span> += <span class="var">c</span>;
+}
+
+<span class="cm">// Good: O(n) in C++ (string append is amortized O(1))</span>
+<span class="cm">// Or use stringstream for many small parts</span>
+<span class="kw">string</span> <span class="var">result</span>;
+<span class="var">result</span>.<span class="fn">reserve</span>(<span class="var">chars</span>.<span class="fn">size</span>());
+<span class="kw">for</span> (<span class="kw">char</span> <span class="var">c</span> : <span class="var">chars</span>) <span class="var">result</span> += <span class="var">c</span>;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card a1">
+    <h3>📌 أهم حاجات في Arrays لازم تعرفها</h3>
+    <div class="grid3">
+      <div>
+        <h4 style="color:var(--accent1); margin-bottom:8px">Iteration Patterns</h4>
+        <pre><span class="cm">// Forward</span>
+<span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">0</span>; <span class="var">i</span> < <span class="var">arr</span>.<span class="fn">size</span>(); ++<span class="var">i</span>) {
+    <span class="cm">// use arr[i]</span>
+}
+
+<span class="cm">// Backward</span>
+<span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="var">arr</span>.<span class="fn">size</span>() - <span class="nm">1</span>; <span class="var">i</span> >= <span class="nm">0</span>; --<span class="var">i</span>) {
+    <span class="cm">// use arr[i]</span>
+}
+
+<span class="cm">// Range-based (Modern)</span>
+<span class="kw">for</span> (<span class="kw">auto</span>& <span class="var">val</span> : <span class="var">arr</span>) {
+    <span class="cm">// use val</span>
+}</pre>
+      </div>
+      <div>
+        <h4 style="color:var(--accent1); margin-bottom:8px">Useful Operations</h4>
+        <pre><span class="cm">// Swap</span>
+<span class="fn">swap</span>(<span class="var">arr</span>[<span class="var">i</span>], <span class="var">arr</span>[<span class="var">j</span>]);
+
+<span class="cm">// Substring / Slice</span>
+<span class="kw">string</span> <span class="var">sub</span> = <span class="var">s</span>.<span class="fn">substr</span>(<span class="var">start</span>, <span class="var">len</span>);
+
+<span class="cm">// Sort</span>
+<span class="fn">sort</span>(<span class="var">arr</span>.<span class="fn">begin</span>(), <span class="var">arr</span>.<span class="fn">end</span>()); <span class="cm">// O(n log n)</span>
+
+<span class="cm">// Reverse</span>
+<span class="fn">reverse</span>(<span class="var">arr</span>.<span class="fn">begin</span>(), <span class="var">arr</span>.<span class="fn">end</span>());</pre>
+      </div>
+      <div>
+        <h4 style="color:var(--accent1); margin-bottom:8px">HashMap في Arrays</h4>
+        <pre><span class="cm">// Frequency count</span>
+<span class="kw">unordered_map</span><<span class="kw">int</span>, <span class="kw">int</span>> <span class="var">freq</span>;
+<span class="kw">for</span> (<span class="kw">int</span> <span class="var">x</span> : <span class="var">arr</span>) {
+    <span class="var">freq</span>[<span class="var">x</span>]++;
+}
+
+<span class="cm">// Index lookup</span>
+<span class="kw">unordered_map</span><<span class="kw">int</span>, <span class="kw">int</span>> <span class="var">seen</span>;
+<span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">0</span>; <span class="var">i</span> < <span class="var">arr</span>.<span class="fn">size</span>(); ++<span class="var">i</span>) {
+    <span class="var">seen</span>[<span class="var">arr</span>[<span class="var">i</span>]] = <span class="var">i</span>;
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 2: TWO POINTERS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="two-pointers" class="section s-tp reveal">
+  <div class="section-header">
+    <div class="section-icon">👆</div>
+    <div>
+      <h2>Two Pointers — المؤشران</h2>
+      <p>Technique قوية بتحول O(n²) → O(n)</p>
+    </div>
+  </div>
+
+  <div class="info">
+    <div class="tip-icon">💡</div>
+    <p><strong>الفكرة الأساسية:</strong> بدل ما تعمل nested loop وتقارن كل عنصر بكل عنصر = O(n²)، بتستخدم مؤشرين (left & right) بيتحركوا باتجاهات معينة = O(n)</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card a2">
+      <h3>🔄 Pattern 1: Opposite Ends (من الطرفين)</h3>
+      <p>الأشهر — L من اليسار، R من اليمين، بيتحركوا للوسط</p>
+      <div class="diagram">
+        <div class="pointer-row">
+          <div class="ptr L">L</div><div class="ptr"></div><div class="ptr"></div><div class="ptr"></div><div class="ptr R">R</div>
+        </div>
+        <div class="arr-box">
+          <div class="box hi1">1</div><div class="box">3</div><div class="box">5</div><div class="box">7</div><div class="box hi2">9</div>
+        </div>
+        <div style="margin-top:8px; color:#6272a4">↔ بيتحركوا لبعض حتى يلتقوا</div>
+      </div>
+      <pre><span class="kw">int</span> <span class="var">left</span> = <span class="nm">0</span>, <span class="var">right</span> = <span class="var">arr</span>.<span class="fn">size</span>() - <span class="nm">1</span>;
+<span class="kw">while</span> (<span class="var">left</span> < <span class="var">right</span>) {
+    <span class="cm">// do something with arr[left] and arr[right]</span>
+    <span class="kw">if</span> (<span class="var">condition</span>) {
+        <span class="var">left</span>++;
+    } <span class="kw">else</span> {
+        <span class="var">right</span>--;
+    }
+}</pre>
+      <p style="margin-top:8px">📌 <strong>يُستخدم مع:</strong> sorted arrays, palindrome, two sum sorted</p>
+    </div>
+
+    <div class="card a2">
+      <h3>➡️ Pattern 2: Same Direction (نفس الاتجاه)</h3>
+      <p>Fast & Slow — أو Slow & Fast Writer</p>
+      <div class="diagram">
+        <div class="pointer-row">
+          <div class="ptr L">S</div><div class="ptr"></div><div class="ptr R">F</div><div class="ptr"></div><div class="ptr"></div>
+        </div>
+        <div class="arr-box">
+          <div class="box hi1">1</div><div class="box">1</div><div class="box hi2">2</div><div class="box">3</div><div class="box">3</div>
+        </div>
+        <div style="margin-top:8px; color:#6272a4">→ Fast يمشي أسرع، Slow يكتب النتيجة</div>
+      </div>
+      <pre><span class="kw">int</span> <span class="var">slow</span> = <span class="nm">0</span>;
+<span class="kw">for</span> (<span class="kw">int</span> <span class="var">fast</span> = <span class="nm">0</span>; <span class="var">fast</span> < <span class="var">arr</span>.<span class="fn">size</span>(); ++<span class="var">fast</span>) {
+    <span class="kw">if</span> (<span class="var">arr</span>[<span class="var">fast</span>] != <span class="var">arr</span>[<span class="var">slow</span>]) {
+        <span class="var">slow</span>++;
+        <span class="var">arr</span>[<span class="var">slow</span>] = <span class="var">arr</span>[<span class="var">fast</span>];
+    }
+}
+<span class="kw">return</span> <span class="var">slow</span> + <span class="nm">1</span>;</pre>
+    </div>
+  </div>
+
+  <div class="card a2">
+    <h3>📖 مثال شامل: Two Sum في Sorted Array</h3>
+    <div class="info"><div class="tip-icon">📝</div><p><strong>المسألة:</strong> array مرتب، إيجاد اتنين عناصر مجموعهم = target</p></div>
+    <div class="grid2">
+      <div>
+        <p style="color:var(--text2); margin-bottom:10px"><strong>الحل:</strong> L من اليسار، R من اليمين. لو المجموع أكبر من target نقلل R، لو أصغر نزود L</p>
+        <div class="diagram">
+          <div style="margin-bottom:4px">Target = <span style="color:var(--accent3)">9</span></div>
+          <div class="pointer-row">
+            <div class="ptr L">L</div><div class="ptr"></div><div class="ptr"></div><div class="ptr"></div><div class="ptr R">R</div>
+          </div>
+          <div class="arr-box">
+            <div class="box hi1">2</div><div class="box">3</div><div class="box">4</div><div class="box">5</div><div class="box hi2">7</div>
+          </div>
+          <div style="margin-top:6px; color:#6272a4">2+7=9 ✓ Found!</div>
+        </div>
+      </div>
+      <div>
+        <pre><span class="kw">vector</span><<span class="kw">int</span>> <span class="fn">twoSum</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">arr</span>, <span class="kw">int</span> <span class="var">target</span>) {
+    <span class="kw">int</span> <span class="var">L</span> = <span class="nm">0</span>, <span class="var">R</span> = <span class="var">arr</span>.<span class="fn">size</span>() - <span class="nm">1</span>;
+    <span class="kw">while</span> (<span class="var">L</span> < <span class="var">R</span>) {
+        <span class="kw">int</span> <span class="var">curr</span> = <span class="var">arr</span>[<span class="var">L</span>] + <span class="var">arr</span>[<span class="var">R</span>];
+        <span class="kw">if</span> (<span class="var">curr</span> == <span class="var">target</span>) {
+            <span class="kw">return</span> {<span class="var">L</span>, <span class="var">R</span>};
+        } <span class="kw">else</span> <span class="kw">if</span> (<span class="var">curr</span> < <span class="var">target</span>) {
+            <span class="var">L</span>++;
+        } <span class="kw">else</span> {
+            <span class="var">R</span>--;
+        }
+    }
+    <span class="kw">return</span> {};
+}
+<span class="cm">// Time: O(n) | Space: O(1)</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card a2">
+    <h3>📖 مثال: Container With Most Water</h3>
+    <div class="grid2">
+      <div>
+        <div class="info"><div class="tip-icon">📝</div><p>إيجاد أكبر كمية مياه بين عمودين</p></div>
+        <div class="steps">
+          <div class="step"><div class="step-num"></div><div class="step-body">L من اليسار، R من اليمين</div></div>
+          <div class="step"><div class="step-num"></div><div class="step-body">نحسب المساحة = <code>min(h[L], h[R]) × (R - L)</code></div></div>
+          <div class="step"><div class="step-num"></div><div class="step-body">نحرك المؤشر الأقصر → لأنه هو اللي بيحدد الارتفاع</div></div>
+          <div class="step"><div class="step-num"></div><div class="step-body">نكرر حتى يلتقوا</div></div>
+        </div>
+      </div>
+      <pre><span class="kw">int</span> <span class="fn">maxWater</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">heights</span>) {
+    <span class="kw">int</span> <span class="var">L</span> = <span class="nm">0</span>, <span class="var">R</span> = <span class="var">heights</span>.<span class="fn">size</span>() - <span class="nm">1</span>;
+    <span class="kw">int</span> <span class="var">maxW</span> = <span class="nm">0</span>;
+    <span class="kw">while</span> (<span class="var">L</span> < <span class="var">R</span>) {
+        <span class="kw">int</span> <span class="var">h</span> = <span class="fn">min</span>(<span class="var">heights</span>[<span class="var">L</span>], <span class="var">heights</span>[<span class="var">R</span>]);
+        <span class="var">maxW</span> = <span class="fn">max</span>(<span class="var">maxW</span>, <span class="var">h</span> * (<span class="var">R</span> - <span class="var">L</span>));
+        <span class="kw">if</span> (<span class="var">heights</span>[<span class="var">L</span>] < <span class="var">heights</span>[<span class="var">R</span>]) {
+            <span class="var">L</span>++;
+        } <span class="kw">else</span> {
+            <span class="var">R</span>--;
+        }
+    }
+    <span class="kw">return</span> <span class="var">maxW</span>;
+}
+<span class="cm">// Time: O(n) | Space: O(1)</span></pre>
+    </div>
+  </div>
+
+  <div class="card a2">
+    <h3>📖 مثال: 3Sum = Three Pointers!</h3>
+    <pre><span class="kw">vector</span><<span class="kw">vector</span><<span class="kw">int</span>>> <span class="fn">threeSum</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">nums</span>) {
+    <span class="fn">sort</span>(<span class="var">nums</span>.<span class="fn">begin</span>(), <span class="var">nums</span>.<span class="fn">end</span>());
+    <span class="kw">vector</span><<span class="kw">vector</span><<span class="kw">int</span>>> <span class="var">result</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">0</span>; <span class="kw">i</span> < (<span class="kw">int</span>)<span class="var">nums</span>.<span class="fn">size</span>() - <span class="nm">2</span>; ++<span class="var">i</span>) {
+        <span class="kw">if</span> (<span class="var">i</span> > <span class="nm">0</span> && <span class="var">nums</span>[<span class="var">i</span>] == <span class="var">nums</span>[<span class="var">i</span>-<span class="nm">1</span>]) <span class="kw">continue</span>;
+        <span class="kw">int</span> <span class="var">L</span> = <span class="var">i</span> + <span class="nm">1</span>, <span class="var">R</span> = <span class="var">nums</span>.<span class="fn">size</span>() - <span class="nm">1</span>;
+        <span class="kw">while</span> (<span class="var">L</span> < <span class="var">R</span>) {
+            <span class="kw">int</span> <span class="var">sum</span> = <span class="var">nums</span>[<span class="var">i</span>] + <span class="var">nums</span>[<span class="var">L</span>] + <span class="var">nums</span>[<span class="var">R</span>];
+            <span class="kw">if</span> (<span class="var">sum</span> == <span class="nm">0</span>) {
+                <span class="var">result</span>.<span class="fn">push_back</span>({<span class="var">nums</span>[<span class="var">i</span>], <span class="var">nums</span>[<span class="var">L</span>], <span class="var">nums</span>[<span class="var">R</span>]});
+                <span class="kw">while</span> (<span class="var">L</span> < <span class="var">R</span> && <span class="var">nums</span>[<span class="var">L</span>] == <span class="var">nums</span>[<span class="var">L</span>+<span class="nm">1</span>]) <span class="var">L</span>++;
+                <span class="kw">while</span> (<span class="var">L</span> < <span class="var">R</span> && <span class="var">nums</span>[<span class="var">R</span>] == <span class="var">nums</span>[<span class="var">R</span>-<span class="nm">1</span>]) <span class="var">R</span>--;
+                <span class="var">L</span>++; <span class="var">R</span>--;
+            } <span class="kw">else</span> <span class="kw">if</span> (<span class="var">sum</span> < <span class="nm">0</span>) <span class="var">L</span>++;
+            <span class="kw">else</span> <span class="var">R</span>--;
+        }
+    }
+    <span class="kw">return</span> <span class="var">result</span>;
+}
+<span class="cm">// Time: O(n²) | Space: O(1)</span></pre>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 3: SLIDING WINDOW -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="sliding-window" class="section s-sw reveal">
+  <div class="section-header">
+    <div class="section-icon">🪟</div>
+    <div>
+      <h2>Sliding Window — النافذة المتحركة</h2>
+      <p>الـ pattern الأقوى للـ subarrays والـ substrings</p>
+    </div>
+  </div>
+
+  <div class="info">
+    <div class="tip-icon">💡</div>
+    <p><strong>الفكرة:</strong> بدل ما نحسب كل subarray من الصفر، بنحرك "نافذة" على الـ array ونحدّث الحساب تدريجياً. من O(n²) أو O(n³) → O(n)</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card a3">
+      <h3>📏 Fixed Size Window</h3>
+      <p>حجم النافذة ثابت = k</p>
+      <div class="diagram">
+        <div style="margin-bottom:6px; color:#6272a4">window size = 3</div>
+        <div class="arr-box">
+          <div class="box hi4">1</div><div class="box hi4">3</div><div class="box hi4">5</div><div class="box">2</div><div class="box">8</div><div class="box">6</div>
+        </div>
+        <div style="margin-top:6px; color:var(--accent3)">→ تحرك بخطوة واحدة كل مرة</div>
+        <div class="arr-box" style="margin-top:6px">
+          <div class="box">1</div><div class="box hi4">3</div><div class="box hi4">5</div><div class="box hi4">2</div><div class="box">8</div><div class="box">6</div>
+        </div>
+      </div>
+      <pre><span class="kw">int</span> <span class="fn">maxSumFixed</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">arr</span>, <span class="kw">int</span> <span class="var">k</span>) {
+    <span class="cm">// First window</span>
+    <span class="kw">int</span> <span class="var">curr</span> = <span class="nm">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">0</span>; <span class="var">i</span> < <span class="var">k</span>; ++<span class="var">i</span>) <span class="var">curr</span> += <span class="var">arr</span>[<span class="var">i</span>];
+    
+    <span class="kw">int</span> <span class="var">best</span> = <span class="var">curr</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="var">k</span>; <span class="var">i</span> < <span class="var">arr</span>.<span class="fn">size</span>(); ++<span class="var">i</span>) {
+        <span class="cm">// Add new, remove old</span>
+        <span class="var">curr</span> += <span class="var">arr</span>[<span class="var">i</span>] - <span class="var">arr</span>[<span class="var">i</span> - <span class="var">k</span>];
+        <span class="var">best</span> = <span class="fn">max</span>(<span class="var">best</span>, <span class="var">curr</span>);
+    }
+    <span class="kw">return</span> <span class="var">best</span>;
+}
+<span class="cm">// Time: O(n) | Space: O(1)</span></pre>
+    </div>
+
+    <div class="card a3">
+      <h3>📐 Variable Size Window</h3>
+      <p>حجم النافذة بيتغير حسب شرط معين</p>
+      <div class="diagram">
+        <div style="margin-bottom:4px; color:#6272a4">target sum = 7</div>
+        <div class="pointer-row">
+          <div class="ptr L" style="color:var(--accent3)">L</div><div class="ptr"></div><div class="ptr R" style="color:var(--accent3)">R</div><div class="ptr"></div><div class="ptr"></div>
+        </div>
+        <div class="arr-box">
+          <div class="box hi4">2</div><div class="box hi4">3</div><div class="box hi4">1</div><div class="box">4</div><div class="box">5</div>
+        </div>
+        <div style="margin-top:6px; color:var(--accent3)">sum=6 → expand R</div>
+      </div>
+      <pre><span class="kw">int</span> <span class="var">L</span> = <span class="nm">0</span>, <span class="var">curr</span> = <span class="nm">0</span>;
+<span class="kw">for</span> (<span class="kw">int</span> <span class="var">R</span> = <span class="nm">0</span>; <span class="var">R</span> < <span class="var">arr</span>.<span class="fn">size</span>(); ++<span class="var">R</span>) {
+    <span class="var">curr</span> += <span class="var">arr</span>[<span class="var">R</span>];   <span class="cm">// expand</span>
+    <span class="kw">while</span> (<span class="var">curr</span> > <span class="var">target</span>) {
+        <span class="var">curr</span> -= <span class="var">arr</span>[<span class="var">L</span>];
+        <span class="var">L</span>++;          <span class="cm">// shrink</span>
+    }
+    <span class="cm">// window [L..R] is valid</span>
+}</pre>
+    </div>
+  </div>
+
+  <div class="card a3">
+    <h3>🏗️ Template عام للـ Sliding Window</h3>
+    <pre><span class="kw">int</span> <span class="fn">slidingWindow</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">arr</span>) {
+    <span class="kw">int</span> <span class="var">L</span> = <span class="nm">0</span>, <span class="var">result</span> = <span class="nm">0</span>;
+    <span class="kw">unordered_map</span><<span class="kw">int</span>, <span class="kw">int</span>> <span class="var">window_state</span>;
+
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">R</span> = <span class="nm">0</span>; <span class="var">R</span> < <span class="var">arr</span>.<span class="fn">size</span>(); ++<span class="var">R</span>) {
+        <span class="cm">// 1. ADD arr[R] to window</span>
+        <span class="var">window_state</span>[<span class="var">arr</span>[<span class="var">R</span>]]++;
+
+        <span class="cm">// 2. SHRINK if invalid</span>
+        <span class="kw">while</span> (<span class="cm">/* window invalid */</span>) {
+            <span class="var">window_state</span>[<span class="var">arr</span>[<span class="var">L</span>]]--;
+            <span class="kw">if</span> (<span class="var">window_state</span>[<span class="var">arr</span>[<span class="var">L</span>]] == <span class="nm">0</span>) {
+                <span class="var">window_state</span>.<span class="fn">erase</span>(<span class="var">arr</span>[<span class="var">L</span>]);
+            }
+            <span class="var">L</span>++;
+        }
+
+        <span class="cm">// 3. UPDATE result with valid window [L..R]</span>
+        <span class="var">result</span> = <span class="fn">max</span>(<span class="var">result</span>, <span class="var">R</span> - <span class="var">L</span> + <span class="nm">1</span>);
+    }
+    <span class="kw">return</span> <span class="var">result</span>;
+}</pre>
+    <div class="tip"><div class="tip-icon">✅</div><p>هذا الـ template بيحل معظم مسائل الـ Sliding Window — جوز بس غيّر الـ window_state والشرط!</p></div>
+  </div>
+
+  <div class="card a3">
+    <h3>📖 Longest Substring Without Repeating Characters</h3>
+    <div class="grid2">
+      <div>
+        <div class="info"><div class="tip-icon">📝</div><p>أطول substring مش فيها حروف متكررة</p></div>
+        <div class="steps">
+          <div class="step"><div class="step-num"></div><div class="step-body">R يمشي على كل حرف</div></div>
+          <div class="step"><div class="step-num"></div><div class="step-body">لو الحرف موجود في الـ window، حرك L لبعده</div></div>
+          <div class="step"><div class="step-num"></div><div class="step-body">حدّث max length</div></div>
+        </div>
+        <div class="diagram">
+          <div style="color:#6272a4; margin-bottom:4px">"abcabcbb"</div>
+          <div style="color:var(--accent3)">window "abc" → len=3</div>
+          <div style="color:#6272a4; margin-top:4px">when 'a' repeats → L moves</div>
+        </div>
+      </div>
+      <pre><span class="kw">int</span> <span class="fn">lengthOfLongest</span>(<span class="kw">string</span> <span class="var">s</span>) {
+    <span class="kw">int</span> <span class="var">L</span> = <span class="nm">0</span>, <span class="var">best</span> = <span class="nm">0</span>;
+    <span class="kw">unordered_map</span><<span class="kw">char</span>, <span class="kw">int</span>> <span class="var">seen</span>; <span class="cm">// char -> last index</span>
+
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">R</span> = <span class="nm">0</span>; <span class="var">R</span> < <span class="var">s</span>.<span class="fn">length</span>(); ++<span class="var">R</span>) {
+        <span class="kw">if</span> (<span class="var">seen</span>.<span class="fn">count</span>(<span class="var">s</span>[<span class="var">R</span>])) {
+            <span class="cm">// Move L past last occurrence</span>
+            <span class="var">L</span> = <span class="fn">max</span>(<span class="var">L</span>, <span class="var">seen</span>[<span class="var">s</span>[<span class="var">R</span>]] + <span class="nm">1</span>);
+        }
+        <span class="var">seen</span>[<span class="var">s</span>[<span class="var">R</span>]] = <span class="var">R</span>;
+        <span class="var">best</span> = <span class="fn">max</span>(<span class="var">best</span>, <span class="var">R</span> - <span class="var">L</span> + <span class="nm">1</span>);
+    }
+    <span class="kw">return</span> <span class="var">best</span>;
+}
+<span class="cm">// Time: O(n) | Space: O(min(n,k))</span></pre>
+    </div>
+  </div>
+
+  <div class="card a3">
+    <h3>📖 Minimum Window Substring (Hard)</h3>
+    <pre><span class="kw">string</span> <span class="fn">minWindow</span>(<span class="kw">string</span> <span class="var">s</span>, <span class="kw">string</span> <span class="var">t</span>) {
+    <span class="kw">unordered_map</span><<span class="kw">char</span>, <span class="kw">int</span>> <span class="var">need</span>, <span class="var">window</span>;
+    <span class="kw">for</span> (<span class="kw">char</span> <span class="var">c</span> : <span class="var">t</span>) <span class="var">need</span>[<span class="var">c</span>]++;
+    
+    <span class="kw">int</span> <span class="var">have</span> = <span class="nm">0</span>, <span class="var">total</span> = <span class="var">need</span>.<span class="fn">size</span>();
+    <span class="kw">int</span> <span class="var">resL</span> = -<span class="nm">1</span>, <span class="var">minLen</span> = <span class="nm">INT_MAX</span>, <span class="var">L</span> = <span class="nm">0</span>;
+
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">R</span> = <span class="nm">0</span>; <span class="var">R</span> < <span class="var">s</span>.<span class="fn">length</span>(); ++<span class="var">R</span>) {
+        <span class="kw">char</span> <span class="var">c</span> = <span class="var">s</span>[<span class="var">R</span>];
+        <span class="kw">if</span> (<span class="var">need</span>.<span class="fn">count</span>(<span class="var">c</span>)) {
+            <span class="var">window</span>[<span class="var">c</span>]++;
+            <span class="kw">if</span> (<span class="var">window</span>[<span class="var">c</span>] == <span class="var">need</span>[<span class="var">c</span>]) <span class="var">have</span>++;
+        }
+
+        <span class="kw">while</span> (<span class="var">have</span> == <span class="var">total</span>) {
+            <span class="kw">if</span> (<span class="var">R</span> - <span class="var">L</span> + <span class="nm">1</span> < <span class="var">minLen</span>) {
+                <span class="var">minLen</span> = <span class="var">R</span> - <span class="var">L</span> + <span class="nm">1</span>;
+                <span class="var">resL</span> = <span class="var">L</span>;
+            }
+            <span class="kw">char</span> <span class="var">leftChar</span> = <span class="var">s</span>[<span class="var">L</span>];
+            <span class="kw">if</span> (<span class="var">need</span>.<span class="fn">count</span>(<span class="var">leftChar</span>)) {
+                <span class="kw">if</span> (<span class="var">window</span>[<span class="var">leftChar</span>] == <span class="var">need</span>[<span class="var">leftChar</span>]) <span class="var">have</span>--;
+                <span class="var">window</span>[<span class="var">leftChar</span>]--;
+            }
+            <span class="var">L</span>++;
+        }
+    }
+    <span class="kw">return</span> <span class="var">minLen</span> == <span class="nm">INT_MAX</span> ? <span class="st">""</span> : <span class="var">s</span>.<span class="fn">substr</span>(<span class="var">resL</span>, <span class="var">minLen</span>);
+}
+<span class="cm">// Time: O(n+m) | Space: O(n+m)</span></pre>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 4: PREFIX SUMS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="prefix-sums" class="section s-ps reveal">
+  <div class="section-header">
+    <div class="section-icon">➕</div>
+    <div>
+      <h2>Prefix Sums — المجاميع التراكمية</h2>
+      <p>Preprocessing technique تحول O(n) per query → O(1)</p>
+    </div>
+  </div>
+
+  <div class="info">
+    <div class="tip-icon">💡</div>
+    <p><strong>الفكرة:</strong> نبني array جديد <code>prefix</code> بحيث <code>prefix[i] = sum(arr[0..i])</code>. بعدين أي range sum بيتحسب في O(1) بـ: <code>prefix[r] - prefix[l-1]</code></p>
+  </div>
+
+  <div class="card a4">
+    <h3>🔧 بناء الـ Prefix Sum Array</h3>
+    <pre><span class="kw">vector</span><<span class="kw">int</span>> <span class="fn">buildPrefix</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">arr</span>) {
+    <span class="kw">int</span> <span class="var">n</span> = <span class="var">arr</span>.<span class="fn">size</span>();
+    <span class="kw">vector</span><<span class="kw">int</span>> <span class="var">prefix</span>(<span class="var">n</span> + <span class="nm">1</span>, <span class="nm">0</span>);  <span class="cm">// +1 trick!</span>
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">0</span>; <span class="var">i</span> < <span class="var">n</span>; ++<span class="var">i</span>) {
+        <span class="var">prefix</span>[<span class="var">i</span> + <span class="nm">1</span>] = <span class="var">prefix</span>[<span class="var">i</span>] + <span class="var">arr</span>[<span class="var">i</span>];
+    }
+    <span class="kw">return</span> <span class="var">prefix</span>;
+}
+
+<span class="kw">int</span> <span class="fn">rangeSum</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">prefix</span>, <span class="kw">int</span> <span class="var">l</span>, <span class="kw">int</span> <span class="var">r</span>) {
+    <span class="cm">// sum of arr[l..r] inclusive</span>
+    <span class="kw">return</span> <span class="var">prefix</span>[<span class="var">r</span> + <span class="nm">1</span>] - <span class="var">prefix</span>[<span class="var">l</span>];
+}
+<span class="cm">// Build: O(n) | Query: O(1)</span></pre>
+  </div>
+
+  <div class="card a4">
+    <h3>🗺️ 2D Prefix Sum</h3>
+    <p>لـ matrices! نفس الفكرة بس في بعدين</p>
+    <pre><span class="cm">// Build 2D prefix</span>
+<span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">1</span>; <span class="var">i</span> <= <span class="var">m</span>; ++<span class="var">i</span>) {
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">j</span> = <span class="nm">1</span>; <span class="var">j</span> <= <span class="var">n</span>; ++<span class="var">j</span>) {
+        <span class="var">P</span>[<span class="var">i</span>][<span class="var">j</span>] = <span class="var">P</span>[<span class="var">i</span>-<span class="nm">1</span>][<span class="var">j</span>] + <span class="var">P</span>[<span class="var">i</span>][<span class="var">j</span>-<span class="nm">1</span>]
+                - <span class="var">P</span>[<span class="var">i</span>-<span class="nm">1</span>][<span class="var">j</span>-<span class="nm">1</span>] + <span class="var">grid</span>[<span class="var">i</span>-<span class="nm">1</span>][<span class="var">j</span>-<span class="nm">1</span>];
+    }
+}
+
+<span class="cm">// Query: sum of rectangle (r1,c1) to (r2,c2)</span>
+<span class="kw">int</span> <span class="fn">query</span>(<span class="kw">int</span> <span class="var">r1</span>, <span class="kw">int</span> <span class="var">c1</span>, <span class="kw">int</span> <span class="var">r2</span>, <span class="kw">int</span> <span class="var">c2</span>) {
+    <span class="kw">return</span> <span class="var">P</span>[<span class="var">r2</span>+<span class="nm">1</span>][<span class="var">c2</span>+<span class="nm">1</span>] - <span class="var">P</span>[<span class="var">r1</span>][<span class="var">c2</span>+<span class="nm">1</span>]
+         - <span class="var">P</span>[<span class="var">r2</span>+<span class="nm">1</span>][<span class="var">c1</span>] + <span class="var">P</span>[<span class="var">r1</span>][<span class="var">c1</span>];
+}</pre>
+  </div>
+
+  <div class="card a4">
+    <h3>📖 Subarray Sum Equals K — الأقوى!</h3>
+    <div class="info"><div class="tip-icon">📝</div><p>عدد الـ subarrays اللي مجموعها = k</p></div>
+    <div class="grid2">
+      <div>
+        <div class="steps">
+          <div class="step"><div class="step-num"></div><div class="step-body">نبني prefix sum وهنا بنحتاج <strong>HashMap</strong></div></div>
+          <div class="step"><div class="step-num"></div><div class="step-body">لو <code>prefix[r] - prefix[l] = k</code> → يعني <code>prefix[l] = prefix[r] - k</code></div></div>
+          <div class="step"><div class="step-num"></div><div class="step-body">نبحث في الـ HashMap عن <code>curr - k</code></div></div>
+          <div class="step"><div class="step-num"></div><div class="step-body">هذا بيحول O(n²) → O(n)!</div></div>
+        </div>
+      </div>
+      <pre><span class="kw">int</span> <span class="fn">subarraySum</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">nums</span>, <span class="kw">int</span> <span class="var">k</span>) {
+    <span class="kw">int</span> <span class="var">count</span> = <span class="nm">0</span>, <span class="var">curr</span> = <span class="nm">0</span>;
+    <span class="kw">unordered_map</span><<span class="kw">int</span>, <span class="kw">int</span>> <span class="var">seen</span>;
+    <span class="var">seen</span>[<span class="nm">0</span>] = <span class="nm">1</span>; <span class="cm">// important!</span>
+
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">num</span> : <span class="var">nums</span>) {
+        <span class="var">curr</span> += <span class="var">num</span>;
+        <span class="kw">if</span> (<span class="var">seen</span>.<span class="fn">count</span>(<span class="var">curr</span> - <span class="var">k</span>)) {
+            <span class="var">count</span> += <span class="var">seen</span>[<span class="var">curr</span> - <span class="var">k</span>];
+        }
+        <span class="var">seen</span>[<span class="var">curr</span>]++;
+    }
+    <span class="kw">return</span> <span class="var">count</span>;
+}
+<span class="cm">// Time: O(n) | Space: O(n)</span></pre>
+    </div>
+  </div>
+
+  <div class="card a4">
+    <h3>📖 Find Pivot Index</h3>
+    <pre><span class="kw">int</span> <span class="fn">pivotIndex</span>(<span class="kw">vector</span><<span class="kw">int</span>>& <span class="var">nums</span>) {
+    <span class="kw">int</span> <span class="var">total</span> = <span class="fn">accumulate</span>(<span class="var">nums</span>.<span class="fn">begin</span>(), <span class="var">nums</span>.<span class="fn">end</span>(), <span class="nm">0</span>);
+    <span class="kw">int</span> <span class="var">left</span> = <span class="nm">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="nm">0</span>; <span class="var">i</span> < <span class="var">nums</span>.<span class="fn">size</span>(); ++<span class="var">i</span>) {
+        <span class="cm">// right sum = total - left - nums[i]</span>
+        <span class="kw">if</span> (<span class="var">left</span> == <span class="var">total</span> - <span class="var">left</span> - <span class="var">nums</span>[<span class="var">i</span>]) {
+            <span class="kw">return</span> <span class="var">i</span>;
+        }
+        <span class="var">left</span> += <span class="var">nums</span>[<span class="var">i</span>];
+    }
+    <span class="kw">return</span> -<span class="nm">1</span>;
+}
+<span class="cm">// Time: O(n) | Space: O(1)</span></pre>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 5: SIGNS & PATTERNS (الإشارات)  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="signs" class="section s-signs reveal">
+  <div class="section-header">
+    <div class="section-icon">🔍</div>
+    <div>
+      <h2>Signs & Recognition — كيف تعرف تحل المسألة؟</h2>
+      <p>الإشارات اللي بتقولك تستخدم أي technique</p>
+    </div>
+  </div>
+
+  <div class="warn">
+    <div class="tip-icon">🎯</div>
+    <p><strong>المهارة الأهم:</strong> مش حفظ الحلول — ده تعلم تشوف الـ pattern في المسألة. اقرأ الجزء ده كويس!</p>
+  </div>
+
+  <div class="grid2">
+    <div class="sign-card">
+      <h4 style="color:var(--accent1)">👆 إشارات Two Pointers</h4>
+      <ul>
+        <li>🔑 الـ array أو string <strong>مرتب (sorted)</strong></li>
+        <li>🔑 "find pair/triplet that sum to X"</li>
+        <li>🔑 "in-place reversal" أو palindrome</li>
+        <li>🔑 "remove duplicates from sorted array"</li>
+        <li>🔑 "merge two sorted arrays"</li>
+        <li>🔑 المطلوب O(1) space</li>
+        <li>🔑 "two numbers" مع sorted condition</li>
+        <li>🔑 Cycle detection في linked list</li>
+      </ul>
+    </div>
+
+    <div class="sign-card">
+      <h4 style="color:var(--accent3)">🪟 إشارات Sliding Window</h4>
+      <ul>
+        <li>🔑 "longest/shortest subarray/substring that..."</li>
+        <li>🔑 "subarray with max/min sum of size k"</li>
+        <li>🔑 "at most k distinct characters"</li>
+        <li>🔑 "contiguous" أو "consecutive"</li>
+        <li>🔑 كلام عن window أو subrange</li>
+        <li>🔑 String أو array + condition على elements</li>
+        <li>🔑 "no repeating characters"</li>
+        <li>🔑 "contains all characters of t"</li>
+      </ul>
+    </div>
+
+    <div class="sign-card">
+      <h4 style="color:var(--accent4)">➕ إشارات Prefix Sums</h4>
+      <ul>
+        <li>🔑 "range sum queries" (أكثر من query)</li>
+        <li>🔑 "number of subarrays with sum = k"</li>
+        <li>🔑 "subarray sum divisible by k"</li>
+        <li>🔑 "find subarray with equal 0s and 1s"</li>
+        <li>🔑 Matrix rectangle sum queries</li>
+        <li>🔑 "count subarrays where condition on sum"</li>
+        <li>🔑 الـ array فيه negative numbers + sum queries</li>
+        <li>🔑 "running total" أو "cumulative"</li>
+      </ul>
+    </div>
+
+    <div class="sign-card">
+      <h4 style="color:#a78bfa">🤔 امتى تستخدم HashMap مع Prefix?</h4>
+      <ul>
+        <li>🔑 "count subarrays with sum = k" (مش max أو min)</li>
+        <li>🔑 عايز تبحث عن <code>prefix[r] - k</code></li>
+        <li>🔑 Subarray sum divisible by k (modulo trick)</li>
+        <li>🔑 Longest subarray with equal 0s & 1s</li>
+        <li>🔑 "balanced" subarray problems</li>
+        <li>🔑 أي وقت تحتاج تبحث عن prefix سابق بسرعة</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card a5" style="margin-top: 20px">
+    <h3>🆚 Sliding Window vs Prefix Sum — الفرق</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>المعيار</th><th>Sliding Window</th><th>Prefix Sum</th></tr></thead>
+        <tbody>
+          <tr><td>Max/Min subarray sum</td><td><span class="badge-o1">✅ أفضل</span></td><td><span class="badge-on">ممكن</span></td></tr>
+          <tr><td>Count subarrays = k</td><td><span class="badge-on">لا</span></td><td><span class="badge-o1">✅ أفضل</span></td></tr>
+          <tr><td>Negative numbers</td><td><span class="badge-on2">❌ صعب</span></td><td><span class="badge-o1">✅ يشتغل</span></td></tr>
+          <tr><td>Fixed window size</td><td><span class="badge-o1">✅ طبيعي</span></td><td><span class="badge-on">ممكن</span></td></tr>
+          <tr><td>Multiple queries</td><td><span class="badge-on">O(n) each</span></td><td><span class="badge-o1">O(1) each</span></td></tr>
+          <tr><td>Space</td><td><span class="badge-o1">O(1)</span></td><td><span class="badge-on">O(n)</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card a5">
+    <h3>🧠 Decision Tree — اختر الـ technique</h3>
+    <pre style="color:var(--text2)">المسألة على subarray/substring؟
+├── Fixed size k؟
+│   └── → Sliding Window Fixed
+├── "longest/shortest" مع شرط؟
+│   ├── All positive numbers؟ → Sliding Window Variable
+│   └── Has negatives؟ → Prefix Sum + HashMap
+├── "count subarrays where sum = k"؟
+│   └── → Prefix Sum + HashMap
+├── Array مرتب + pair/triplet؟
+│   └── → Two Pointers
+├── Range queries (multiple)?
+│   └── → Prefix Sum Array
+└── In-place أو O(1) space مطلوب؟
+    └── → Two Pointers</pre>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 6: PROBLEMS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="problems" class="section s-prob reveal">
+  <div class="section-header">
+    <div class="section-icon">📋</div>
+    <div>
+      <h2>أهم المسائل — Must-Know Problems</h2>
+      <p>كل المسائل اللي ممكن تيجي في الـ interview</p>
+    </div>
+  </div>
+
+  <h3 style="color:#a78bfa; margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid var(--border)">👆 Two Pointers Problems</h3>
+  <div class="grid2">
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Two Sum II (Sorted)</span><span class="diff easy">Easy</span></div>
+      <div class="prob-tags"><span class="tag">Two Pointers</span><span class="tag">Sorted</span></div>
+      <p class="prob-desc">إيجاد اتنين أرقام مجموعهم = target في array مرتب. L+R من الطرفين.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Valid Palindrome</span><span class="diff easy">Easy</span></div>
+      <div class="prob-tags"><span class="tag">Two Pointers</span><span class="tag">String</span></div>
+      <p class="prob-desc">التحقق إذا كان الـ string palindrome بتجاهل non-alphanumeric. L وR يلتقوا.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">3Sum</span><span class="diff med">Medium</span></div>
+      <div class="prob-tags"><span class="tag">Two Pointers</span><span class="tag">Sorting</span></div>
+      <p class="prob-desc">كل تلاتة أرقام مجموعهم صفر. Sort ثم Two Pointers داخل loop. التحدي: skip duplicates.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Container With Most Water</span><span class="diff med">Medium</span></div>
+      <div class="prob-tags"><span class="tag">Two Pointers</span><span class="tag">Greedy</span></div>
+      <p class="prob-desc">أكبر مساحة مياه بين عمودين. حرّك الـ pointer الأقصر دايماً.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Trapping Rain Water</span><span class="diff hard">Hard</span></div>
+      <div class="prob-tags"><span class="tag">Two Pointers</span><span class="tag">DP</span></div>
+      <p class="prob-desc">حساب المياه المتراكمة. Two Pointers مع max_left و max_right.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Remove Duplicates (Sorted)</span><span class="diff easy">Easy</span></div>
+      <div class="prob-tags"><span class="tag">Two Pointers</span><span class="tag">In-place</span></div>
+      <p class="prob-desc">حذف المكرر in-place. Slow writer + Fast reader pattern.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Move Zeros</span><span class="diff easy">Easy</span></div>
+      <div class="prob-tags"><span class="tag">Two Pointers</span><span class="tag">In-place</span></div>
+      <p class="prob-desc">نقل الأصفار لآخر الـ array. Slow pointer يكتب non-zeros، Fast يمشي.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Sort Colors (Dutch Flag)</span><span class="diff med">Medium</span></div>
+      <div class="prob-tags"><span class="tag">Three Pointers</span><span class="tag">In-place</span></div>
+      <p class="prob-desc">ترتيب 0,1,2 بـ one pass. ثلاث pointers: low, mid, high.</p>
+    </div>
+  </div>
+
+  <h3 style="color:var(--accent3); margin:28px 0 16px; padding-bottom:8px; border-bottom:1px solid var(--border)">🪟 Sliding Window Problems</h3>
+  <div class="grid2">
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Max Sum Subarray of Size K</span><span class="diff easy">Easy</span></div>
+      <div class="prob-tags"><span class="tag">Fixed Window</span></div>
+      <p class="prob-desc">أكبر مجموع لـ subarray بحجم k. Fixed window أبسط مثال.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Longest Substring No Repeat</span><span class="diff med">Medium</span></div>
+      <div class="prob-tags"><span class="tag">Variable Window</span><span class="tag">HashMap</span></div>
+      <p class="prob-desc">أطول substring بدون حروف مكررة. Variable window + HashMap للـ index.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Permutation in String</span><span class="diff med">Medium</span></div>
+      <div class="prob-tags"><span class="tag">Fixed Window</span><span class="tag">Frequency</span></div>
+      <p class="prob-desc">هل s2 فيها permutation من s1؟ Fixed window بحجم len(s1) + frequency count.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Minimum Window Substring</span><span class="diff hard">Hard</span></div>
+      <div class="prob-tags"><span class="tag">Variable Window</span><span class="tag">HashMap</span></div>
+      <p class="prob-desc">أصغر window في s تحتوي كل حروف t. Variable window + have/need counters.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Fruits Into Baskets</span><span class="diff med">Medium</span></div>
+      <div class="prob-tags"><span class="tag">Variable Window</span><span class="tag">At most K</span></div>
+      <p class="prob-desc">أطول subarray بـ at most 2 distinct values. Window + HashMap.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Longest Repeating Char Replacement</span><span class="diff med">Medium</span></div>
+      <div class="prob-tags"><span class="tag">Variable Window</span><span class="tag">Tricky</span></div>
+      <p class="prob-desc">أطول substring بعد k replacements. Window صالحة لو: len - maxFreq ≤ k.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Sliding Window Maximum</span><span class="diff hard">Hard</span></div>
+      <div class="prob-tags"><span class="tag">Fixed Window</span><span class="tag">Deque</span></div>
+      <p class="prob-desc">أكبر عنصر في كل window بحجم k. Monotonic Deque للـ O(n).</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Min Size Subarray Sum</span><span class="diff med">Medium</span></div>
+      <div class="prob-tags"><span class="tag">Variable Window</span></div>
+      <p class="prob-desc">أصغر subarray مجموعه ≥ target. Variable window تكبر وتصغر.</p>
+    </div>
+  </div>
+
+  <h3 style="color:var(--accent4); margin:28px 0 16px; padding-bottom:8px; border-bottom:1px solid var(--border)">➕ Prefix Sum Problems</h3>
+  <div class="grid2">
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Range Sum Query</span><span class="diff easy">Easy</span></div>
+      <div class="prob-tags"><span class="tag">Prefix Sum</span><span class="tag">Classic</span></div>
+      <p class="prob-desc">الـ classic — build prefix once, answer each query in O(1).</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Subarray Sum Equals K</span><span class="diff med">Medium</span></div>
+      <div class="prob-tags"><span class="tag">Prefix Sum</span><span class="tag">HashMap</span></div>
+      <p class="prob-desc">عدد الـ subarrays مجموعها k. Prefix + HashMap. الأهم في النوع ده.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Find Pivot Index</span><span class="diff easy">Easy</span></div>
+      <div class="prob-tags"><span class="tag">Prefix Sum</span></div>
+      <p class="prob-desc">index بحيث left sum = right sum. Total sum مرة واحدة.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Subarray Divisible by K</span><span class="diff med">Medium</span></div>
+      <div class="prob-tags"><span class="tag">Prefix Sum</span><span class="tag">Modulo</span></div>
+      <p class="prob-desc">عدد الـ subarrays قابلة للقسمة على k. Prefix modulo + HashMap. Trick: mod negative.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Longest Subarray with Sum 0</span><span class="diff med">Medium</span></div>
+      <div class="prob-tags"><span class="tag">Prefix Sum</span><span class="tag">HashMap</span></div>
+      <p class="prob-desc">أطول subarray مجموعه صفر. prefix + HashMap لأول occurrence.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Count Subarray with Equal 0&1</span><span class="diff med">Medium</span></div>
+      <div class="prob-tags"><span class="tag">Prefix Sum</span><span class="tag">Transform</span></div>
+      <p class="prob-desc">حول 0→-1 ثم بقت مسألة "sum = 0". Prefix + HashMap.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Product Except Self</span><span class="diff med">Medium</span></div>
+      <div class="prob-tags"><span class="tag">Prefix Product</span></div>
+      <p class="prob-desc">Prefix product من اليسار ثم Suffix product من اليمين. O(n) O(1) space.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-header"><span class="prob-title">Range Sum Query 2D</span><span class="diff med">Medium</span></div>
+      <div class="prob-tags"><span class="tag">2D Prefix</span><span class="tag">Matrix</span></div>
+      <p class="prob-desc">2D prefix sum. Build O(mn), Query O(1). Inclusion-exclusion formula.</p>
+    </div>
+  </div>
+
+  <!-- COMPLEXITY SUMMARY -->
+  <div class="card a6" style="margin-top:32px">
+    <h3>⚡ Complexity Quick Reference</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Technique</th><th>Time</th><th>Space</th><th>Best For</th></tr></thead>
+        <tbody>
+          <tr><td>Two Pointers (opposite)</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-o1">O(1)</span></td><td>Sorted arrays, pairs/triplets</td></tr>
+          <tr><td>Two Pointers (same dir)</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-o1">O(1)</span></td><td>In-place modification</td></tr>
+          <tr><td>Sliding Window Fixed</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-o1">O(k)</span></td><td>Fixed-size subarrays</td></tr>
+          <tr><td>Sliding Window Variable</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-on">O(n)</span></td><td>Longest/shortest with condition</td></tr>
+          <tr><td>Prefix Sum Build</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-on">O(n)</span></td><td>Preprocessing for queries</td></tr>
+          <tr><td>Prefix Sum Query</td><td><span class="badge-o1">O(1)</span></td><td><span class="badge-o1">O(1)</span></td><td>After preprocessing</td></tr>
+          <tr><td>Prefix + HashMap</td><td><span class="badge-on">O(n)</span></td><td><span class="badge-on">O(n)</span></td><td>Count subarrays = k</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p style="color:var(--accent1); font-weight:700; margin-bottom:8px">🚀 Arrays · Two Pointers · Sliding Window · Prefix Sums</p>
+  <p>Master these patterns and you'll solve 80%+ of array/string interview problems</p>
+  <p style="margin-top:8px; color:var(--text3); font-size:.8rem">Practice daily — consistency beats intensity</p>
+</footer>
+
+</div><!-- /container -->
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('revealed');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.05 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Nav highlight
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.toc a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 100) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent1)' : '';
+      a.style.background = a.getAttribute('href') === '#' + current ? 'rgba(0,212,255,.06)' : '';
+    });
+  });
+</script>
+<div class="aaos-theme-bar">
+  <button class="aaos-fab theme-toggle-btn" onclick="aaosToggleTheme()" title="تبديل الوضع">☀️</button>
+  <a class="aaos-fab" href="../index.html" title="الرئيسية">🏠</a>
+</div>
+<script src="../scripts/theme.js"></script></body>
+</html>
+
+

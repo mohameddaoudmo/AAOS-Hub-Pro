@@ -1,1618 +1,1585 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Compose for Automotive � ?????? ??????</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg:       #0f172a;
-  --bg2:      #1e293b;
-  --ink:      #f8fafc;
-  --ink2:     #e2e8f0;
-  --muted:    #94a3b8;
-  --rule:     rgba(255, 255, 255, 0.1);
-
-  --red:      #f87171;
-  --amber:    #fbbf24;
-  --green:    #34d399;
-  --blue:     #60a5fa;
-  --violet:   #a78bfa;
-  --teal:     #2dd4bf;
-
-  --red-bg:   rgba(248, 113, 113, 0.1);
-  --amber-bg: rgba(251, 191, 36, 0.1);
-  --green-bg: rgba(52, 211, 153, 0.1);
-  --blue-bg:  rgba(96, 165, 250, 0.1);
-  --violet-bg:rgba(167, 139, 250, 0.1);
-  --teal-bg:  rgba(45, 212, 191, 0.1);
-
-  --card:     rgba(30, 41, 59, 0.7);
-  --shadow:   0 4px 20px rgba(0, 0, 0, 0.3);
-}
-
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-
-body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: 'Tajawal', sans-serif;
-  line-height: 1.85;
-  overflow-x: hidden;
-}
-
-/* -- TEXTURE OVERLAY -- */
-body::after {
-  content:'';
-  position:fixed; inset:0; z-index:0; pointer-events:none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
-  opacity:.4;
-}
-
-/* -- HERO -- */
-.hero {
-  position: relative; z-index:1;
-  background: #020617;
-  color: #f8fafc;
-  padding: 100px 48px 80px;
-  overflow: hidden;
-  border-bottom: 1px solid var(--rule);
-}
-
-
-.hero::before {
-  content:'';
-  position:absolute; inset:0;
-  background:
-    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,.04) 40px),
-    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,.04) 40px);
-}
-
-.hero::after {
-  content:'';
-  position:absolute;
-  top:-120px; left:-120px;
-  width:500px; height:500px;
-  background: radial-gradient(circle, rgba(192,57,43,.25) 0%, transparent 70%);
-  pointer-events:none;
-}
-
-.hero-inner { position:relative; z-index:1; max-width:960px; margin:0 auto; }
-
-.hero-eyebrow {
-  display:inline-flex; align-items:center; gap:10px;
-  font-family:'IBM Plex Mono', monospace;
-  font-size:.72rem; letter-spacing:3px; text-transform:uppercase;
-  color: var(--red);
-  margin-bottom:24px;
-}
-
-.hero-eyebrow::before {
-  content:'';
-  display:inline-block;
-  width:28px; height:2px;
-  background: var(--red);
-}
-
-
-.hero h1 {
-  font-family:'Syne', sans-serif;
-  font-size: clamp(2.4rem, 6vw, 5rem);
-  font-weight:800;
-  line-height:1.05;
-  letter-spacing:-1px;
-  margin-bottom:20px;
-}
-
-.hero h1 em {
-  font-style:normal;
-  color: var(--red);
-}
-
-
-.hero-sub {
-  font-size:1.1rem;
-  color:rgba(245,240,232,.65);
-  max-width:580px;
-  margin-bottom:48px;
-  font-weight:300;
-}
-
-.hero-pills {
-  display:flex; gap:10px; flex-wrap:wrap;
-}
-
-.pill {
-  padding:6px 16px;
-  border-radius:3px;
-  font-family:'IBM Plex Mono',monospace;
-  font-size:.72rem; font-weight:600;
-  letter-spacing:1px;
-}
-
-.pill-red    { background: var(--red-bg);  color: var(--red); border:1px solid var(--rule); }
-.pill-amber  { background: var(--amber-bg);  color: var(--amber); border:1px solid var(--rule); }
-.pill-green  { background: var(--green-bg);  color: var(--green); border:1px solid var(--rule); }
-.pill-blue   { background: var(--blue-bg);   color: var(--blue); border:1px solid var(--rule); }
-.pill-violet { background: var(--violet-bg); color: var(--violet); border:1px solid var(--rule); }
-
-
-/* -- MAIN -- */
-main {
-  position:relative; z-index:1;
-  max-width:980px;
-  margin:0 auto;
-  padding:0 32px 80px;
-}
-
-/* -- SECTION HEADER -- */
-.section { margin:72px 0; }
-
-.s-label {
-  display:inline-flex; align-items:center; gap:10px;
-  font-family:'IBM Plex Mono',monospace;
-  font-size:.68rem; letter-spacing:3px; text-transform:uppercase;
-  color:var(--muted);
-  margin-bottom:14px;
-}
-
-.s-label::before {
-  content:'';
-  display:inline-block;
-  width:20px; height:1px;
-  background:var(--rule);
-}
-
-.s-title {
-  font-family:'Syne',sans-serif;
-  font-size:clamp(1.6rem,3vw,2.4rem);
-  font-weight:800;
-  color:var(--ink);
-  line-height:1.15;
-  margin-bottom:24px;
-  position:relative;
-}
-
-.s-title::after {
-  content:'';
-  display:block;
-  width:48px; height:3px;
-  background:var(--red);
-  margin-top:12px;
-  border-radius:2px;
-}
-
-/* -- DIVIDER -- */
-.rule { height:1px; background:var(--rule); margin:64px 0; position:relative; z-index:1; }
-
-/* -- CARDS -- */
-.card {
-  background:var(--card);
-  border:1px solid var(--rule);
-  border-radius:6px;
-  padding:28px 32px;
-  margin-bottom:16px;
-  box-shadow:var(--shadow);
-  transition:box-shadow .2s, transform .2s;
-}
-
-.card:hover {
-  box-shadow:0 6px 32px rgba(26,18,8,.12);
-  transform:translateY(-2px);
-}
-
-.card-title {
-  font-weight:700;
-  font-size:1rem;
-  color:var(--ink);
-  margin-bottom:10px;
-  display:flex; align-items:center; gap:10px;
-}
-
-/* -- GRID -- */
-.g2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
-.g3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
-
-/* -- ACCENT CARDS -- */
-.ac {
-  border-radius:6px;
-  padding:24px 28px;
-  margin-bottom:16px;
-}
-.ac-red    { background:var(--red-bg);    border-right:4px solid var(--red); }
-.ac-amber  { background:var(--amber-bg);  border-right:4px solid var(--amber); }
-.ac-green  { background:var(--green-bg);  border-right:4px solid var(--green); }
-.ac-blue   { background:var(--blue-bg);   border-right:4px solid var(--blue); }
-.ac-violet { background:var(--violet-bg); border-right:4px solid var(--violet); }
-.ac-teal   { background:var(--teal-bg);   border-right:4px solid var(--teal); }
-
-.ac-title { font-weight:800; font-size:.95rem; margin-bottom:8px; }
-.ac-red    .ac-title { color:var(--red); }
-.ac-amber  .ac-title { color:var(--amber); }
-.ac-green  .ac-title { color:var(--green); }
-.ac-blue   .ac-title { color:var(--blue); }
-.ac-violet .ac-title { color:var(--violet); }
-.ac-teal   .ac-title { color:var(--teal); }
-
-/* -- CODE -- */
-.code {
-  background: #020617;
-  color: #e2e8f0;
-  border-radius: 12px;
-  padding: 24px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.85rem;
-  line-height: 1.8;
-  overflow-x: auto;
-  margin: 24px 0;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(8px);
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  direction: ltr;
-  text-align: left;
-}
-
-
-
-.ck  { color: #f87171; font-weight: 600; }   /* keyword */
-.cv  { color: #60a5fa; font-weight: 600; }   /* value / composable name */
-.cs  { color: #34d399; }                     /* string */
-.cc  { color: #64748b; font-style: italic; } /* comment */
-.cp  { color: #fbbf24; }                     /* param */
-.cn  { color: #a78bfa; }                     /* number */
-
-
-/* -- TABLE -- */
-.tbl {
-  width:100%; border-collapse:collapse;
-  font-size:.88rem;
-  margin:16px 0;
-}
-
-.tbl th {
-  background: var(--bg2);
-  color: var(--amber);
-  padding: 12px 16px;
-  text-align: right;
-  font-weight: 700;
-  font-size: 0.75rem;
-  letter-spacing: 1px;
-  border-bottom: 2px solid var(--rule);
-}
-
-
-.tbl td {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--rule);
-  vertical-align: top;
-  line-height: 1.8;
-}
-
-
-.tbl tr:nth-child(even) td { background:var(--bg2); }
-.tbl tr:hover td { background:var(--amber-bg); }
-
-/* -- TAGS -- */
-.tag {
-  display:inline-block;
-  padding:2px 9px;
-  border-radius:2px;
-  font-size:.7rem; font-weight:700;
-  font-family:'IBM Plex Mono',monospace;
-  letter-spacing:.5px;
-}
-.t-red    { background:var(--red-bg);    color:var(--red); }
-.t-green  { background:var(--green-bg);  color:var(--green); }
-.t-blue   { background:var(--blue-bg);   color:var(--blue); }
-.t-amber  { background:var(--amber-bg);  color:var(--amber); }
-.t-violet { background:var(--violet-bg); color:var(--violet); }
-.t-teal   { background:var(--teal-bg);   color:var(--teal); }
-
-/* -- MONO INLINE -- */
-code {
-  font-family:'IBM Plex Mono',monospace;
-  font-size:.82em;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  padding: 2px 6px;
-  color: var(--amber);
-}
-
-
-/* -- HIGHLIGHT -- */
-.hl-r { color:var(--red);    font-weight:700; }
-.hl-a { color:var(--amber);  font-weight:700; }
-.hl-g { color:var(--green);  font-weight:700; }
-.hl-b { color:var(--blue);   font-weight:700; }
-.hl-v { color:var(--violet); font-weight:700; }
-.hl-t { color:var(--teal);   font-weight:700; }
-
-/* -- LAYER STACK -- */
-.stack { display:flex; flex-direction:column; gap:3px; margin:16px 0; }
-
-.layer {
-  display:flex; align-items:center; gap:16px;
-  padding:14px 20px;
-  border-radius:5px;
-  border:1px solid transparent;
-  font-size:.9rem;
-  transition:transform .2s;
-}
-
-.layer:hover { transform:translateX(-4px); }
-.layer-n { font-family:'IBM Plex Mono',monospace; font-size:.7rem; color:var(--muted); width:22px; }
-.layer-name { font-weight:700; min-width:180px; }
-.layer-desc { color:var(--muted); font-size:.85rem; }
-
-.ly-r { background:var(--red-bg);    border-color:rgba(192,57,43,.2); }
-.ly-a { background:var(--amber-bg);  border-color:rgba(217,119,6,.2); }
-.ly-g { background:var(--green-bg);  border-color:rgba(26,107,58,.2); }
-.ly-b { background:var(--blue-bg);   border-color:rgba(26,58,107,.2); }
-.ly-v { background:var(--violet-bg); border-color:rgba(91,45,142,.2); }
-.ly-t { background:var(--teal-bg);   border-color:rgba(13,107,107,.2); }
-.ly-i { background:var(--bg2);       border-color:var(--rule); }
-
-/* -- FLOW -- */
-.flow {
-  display:flex; align-items:center; flex-wrap:wrap;
-  gap:0; justify-content:center; padding:20px 0;
-}
-
-.fnode {
-  background:var(--card);
-  border:1px solid var(--rule);
-  border-radius:5px;
-  padding:12px 20px;
-  text-align:center;
-  font-size:.82rem; font-weight:700;
-  min-width:100px;
-  box-shadow:var(--shadow);
-}
-
-.farrow { color:var(--muted); padding:0 8px; font-size:1.1rem; }
-
-/* -- COMPARISON -- */
-.cmp {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
-  margin:16px 0;
-}
-
-.cmp-col {
-  border-radius:6px;
-  padding:20px 24px;
-}
-
-.cmp-old { background:var(--red-bg); border:1px solid rgba(192,57,43,.2); }
-.cmp-new { background:var(--green-bg); border:1px solid rgba(26,107,58,.2); }
-
-.cmp-label {
-  font-family:'IBM Plex Mono',monospace;
-  font-size:.7rem; letter-spacing:2px; text-transform:uppercase;
-  margin-bottom:12px; font-weight:600;
-}
-
-.cmp-old .cmp-label { color:var(--red); }
-.cmp-new .cmp-label { color:var(--green); }
-
-/* -- STAT STRIP -- */
-.stats {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-  gap:1px;
-  background:var(--rule);
-  border:1px solid var(--rule);
-  border-radius:6px;
-  overflow:hidden;
-  margin:24px 0;
-}
-
-.stat-cell {
-  background: var(--card);
-  padding: 32px 24px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-
-.stat-val {
-  font-family:'Syne',sans-serif;
-  font-size:2rem; font-weight:800;
-  color:var(--ink);
-  line-height:1;
-}
-
-.stat-lbl {
-  font-size:.78rem;
-  color:var(--muted);
-  margin-top:6px;
-}
-
-/* -- TOC -- */
-.toc {
-  background: var(--bg2);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: 12px;
-  padding: 32px 36px;
-  margin: 40px 0 60px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-
-
-.toc::before {
-  content:'';
-  position:absolute;
-  bottom:-40px; left:-40px;
-  width:200px; height:200px;
-  background:radial-gradient(circle, rgba(192,57,43,.2), transparent 70%);
-}
-
-.toc h3 {
-  font-family:'IBM Plex Mono',monospace;
-  font-size:.7rem; letter-spacing:3px; text-transform:uppercase;
-  color:var(--red);
-  margin-bottom:20px;
-}
-
-.toc ol {
-  list-style:none;
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-  gap:6px 32px;
-}
-
-.toc li {
-  display:flex; align-items:center; gap:12px;
-  padding:7px 0;
-  border-bottom:1px solid rgba(245,240,232,.08);
-  font-size:.88rem;
-}
-
-.toc-n {
-  font-family:'IBM Plex Mono',monospace;
-  font-size:.65rem; color:var(--red);
-  width:22px; flex-shrink:0;
-}
-
-.toc a { color:rgba(245,240,232,.75); text-decoration:none; transition:color .2s; }
-.toc a:hover { color: var(--amber); }
-
-/* -- SIDEBAR QUOTE -- */
-.pullquote {
-  border-right:4px solid var(--red);
-  padding:16px 20px;
-  margin:24px 0;
-  background:var(--red-bg);
-  border-radius:0 6px 6px 0;
-  font-size:1.05rem;
-  font-weight:500;
-  color:var(--ink2);
-  font-style:italic;
-}
-
-/* -- OEM BOX -- */
-.oem-grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-  gap:12px;
-  margin:16px 0;
-}
-
-.oem-card {
-  background:var(--card);
-  border:1px solid var(--rule);
-  border-radius:6px;
-  padding:16px;
-  text-align:center;
-  transition:border-color .2s;
-}
-
-.oem-card:hover { border-color:var(--red); }
-.oem-logo { font-size:1.6rem; margin-bottom:6px; }
-.oem-name { font-size:.82rem; font-weight:700; color:var(--ink); }
-.oem-since { font-size:.72rem; color:var(--muted); font-family:'IBM Plex Mono',monospace; }
-
-/* -- WARNING STRIP -- */
-.warn-strip {
-  background:var(--amber-bg);
-  border:1px solid rgba(217,119,6,.3);
-  border-radius:6px;
-  padding:16px 20px;
-  display:flex; gap:12px; align-items:flex-start;
-  margin:20px 0;
-  font-size:.9rem;
-}
-
-.warn-icon { font-size:1.2rem; flex-shrink:0; margin-top:2px; }
-
-/* -- PRINT -- */
-@media print {
-  body { background:#fff; }
-  .hero { background:#1a1208; -webkit-print-color-adjust:exact; }
-}
-
-/* -- ANIMATIONS -- */
-@keyframes slideIn {
-  from { opacity:0; transform:translateY(16px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-
-.section { animation:slideIn .4s ease both; }
-
-/* -- FOOTER -- */
-footer {
-  position:relative; z-index:1;
-  background:var(--ink);
-  color:rgba(245,240,232,.4);
-  text-align:center;
-  padding:36px 24px;
-  font-size:.8rem;
-}
-
-footer span { color:var(--red); }
-
-/* -- RESPONSIVE -- */
-@media(max-width:600px){
-  .hero { padding:48px 24px 40px; }
-  main { padding:0 16px 60px; }
-  .cmp { grid-template-columns:1fr; }
-}
-</style>
-<link rel="stylesheet" href="../styles/theme.css">
-<script>var s=localStorage.getItem('aaos_theme')||'dark';document.documentElement.setAttribute('data-theme',s);</script></head>
-<body>
-
-<!-- -------------------------- HERO -->
-<header class="hero">
-  <div class="hero-inner">
-    <div class="hero-eyebrow">Android Automotive � OEM Toolkit � 2024</div>
-    <h1>
-      Compose for<br><em>Automotive OS</em>
-    </h1>
-    <p class="hero-sub">
-      ?????? ?????? ????? ?????? ???????? ???? ??????? � ?? ????????? ????? ?????? ?? ?? ?? ?????? ??????? ????? ????? ????? ?????????.
-    </p>
-    <div class="hero-pills">
-      <span class="pill pill-red">Compose UI</span>
-      <span class="pill pill-amber">VHAL Integration</span>
-      <span class="pill pill-green">OEM Customization</span>
-      <span class="pill pill-blue">Car App Library</span>
-      <span class="pill pill-violet">Driver Safety</span>
-    </div>
-  </div>
-</header>
-
-<main>
-
-<!-- -------------------------- TOC -->
-<div class="toc">
-  <h3>?? ???? ???????</h3>
-  <ol>
-    <li><span class="toc-n">01</span><a href="#s1">????? Compose for Automotive?</a></li>
-    <li><span class="toc-n">02</span><a href="#s2">????????? ???????</a></li>
-    <li><span class="toc-n">03</span><a href="#s3">Car App Library vs Compose</a></li>
-    <li><span class="toc-n">04</span><a href="#s4">OEM Customization System</a></li>
-    <li><span class="toc-n">05</span><a href="#s5">Driver Distraction Guidelines</a></li>
-    <li><span class="toc-n">06</span><a href="#s6">CarUi Library & Themes</a></li>
-    <li><span class="toc-n">07</span><a href="#s7">??? Composables ????????</a></li>
-    <li><span class="toc-n">08</span><a href="#s8">??????? ?? VHAL ?? Compose</a></li>
-    <li><span class="toc-n">09</span><a href="#s9">???????? Safety & Testing</a></li>
-    <li><span class="toc-n">10</span><a href="#s10">???? ????? ???? ????</a></li>
-  </ol>
-</div>
-
-<!-- -------------------------- S1 -->
-<section class="section" id="s1">
-  <div class="s-label">01 � ???????</div>
-  <h2 class="s-title">????? Compose for Automotive?</h2>
-
-  <p style="color:var(--ink2); margin-bottom:20px;">
-    ??? Compose? ???? ?????? ??????? ??? ?????? ??????. ?? OEM ????? ???? ??? ???? ?????????? ?? portable? ???????? ????? ????. ???? ???? ????? ???????.
-  </p>
-
-  <div class="stats">
-    <div class="stat-cell">
-      <div class="stat-val">100+</div>
-      <div class="stat-lbl">OEM Partner ?? Google</div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-val">2022</div>
-      <div class="stat-lbl">????? Compose for Automotive</div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-val">API 29</div>
-      <div class="stat-lbl">Minimum Android Auto OS</div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-val">3�</div>
-      <div class="stat-lbl">???? ?? View-based UI</div>
-    </div>
-  </div>
-
-  <div class="cmp">
-    <div class="cmp-col cmp-old">
-      <div class="cmp-label">? ??? Compose</div>
-      <ul style="padding-right:16px; font-size:.88rem; color:var(--ink2);">
-        <li>XML Layouts ????? ????? ???????</li>
-        <li>?? OEM ??? ???? Theme ???</li>
-        <li>??????? ?? ????? ??? ????? ????????</li>
-        <li>Custom Views ??????? ??? ????</li>
-        <li>Testing ??? ????</li>
-        <li>?? ???? Design System ?????</li>
-      </ul>
-    </div>
-    <div class="cmp-col cmp-new">
-      <div class="cmp-label">? ?? Compose for Automotive</div>
-      <ul style="padding-right:16px; font-size:.88rem; color:var(--ink2);">
-        <li>Declarative UI � ??? ??? ??????</li>
-        <li>OEM Theme Layer ????? ????</li>
-        <li>????? ???? ????? ??? ?? ????????</li>
-        <li>Composables ????? ??? ???? ?????</li>
-        <li>Testing ??? ?? Compose Test Rules</li>
-        <li>Material Design ??????? ??? In-Vehicle</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="pullquote">
-    "Compose for Automotive OS ?? ??? Jetpack Compose ???????? ??? ???? ?? Components ?? Theme System ????? ?????? ???? ???????."
-  </div>
-
-  <div style="margin-top:24px;">
-    <p style="font-size:.9rem; color:var(--ink2); margin-bottom:16px;"><strong>OEMs ???? ????? ?????? ??????:</strong></p>
-    <div class="oem-grid">
-      <div class="oem-card"><div class="oem-logo">??</div><div class="oem-name">Volvo</div><div class="oem-since">since 2021</div></div>
-      <div class="oem-card"><div class="oem-logo">??</div><div class="oem-name">Polestar</div><div class="oem-since">since 2021</div></div>
-      <div class="oem-card"><div class="oem-logo">???</div><div class="oem-name">BMW</div><div class="oem-since">since 2023</div></div>
-      <div class="oem-card"><div class="oem-logo">??</div><div class="oem-name">Renault</div><div class="oem-since">since 2022</div></div>
-      <div class="oem-card"><div class="oem-logo">??</div><div class="oem-name">GM</div><div class="oem-since">since 2023</div></div>
-      <div class="oem-card"><div class="oem-logo">??</div><div class="oem-name">Ford</div><div class="oem-since">since 2023</div></div>
-      <div class="oem-card"><div class="oem-logo">?</div><div class="oem-name">Rivian</div><div class="oem-since">since 2022</div></div>
-      <div class="oem-card"><div class="oem-logo">??</div><div class="oem-name">Lucid</div><div class="oem-since">since 2023</div></div>
-    </div>
-  </div>
-</section>
-
-<div class="rule"></div>
-
-<!-- -------------------------- S2 -->
-<section class="section" id="s2">
-  <div class="s-label">02 � ??????</div>
-  <h2 class="s-title">????????? ??????? ?? Android Automotive + Compose</h2>
-
-  <p style="color:var(--ink2); margin-bottom:24px;">
-    ??? ??? Architecture ????? ??? ?? ???? ?? ??? ???. ?? ????? ????? ?? ???? ??????? ?????.
-  </p>
-
-  <div class="stack">
-    <div class="layer ly-b">
-      <div class="layer-n">7</div>
-      <div class="layer-name" style="color:var(--blue);">?? OEM Themes & Overlays</div>
-      <div class="layer-desc">????? ?? OEM � ?????? ????? animations ????</div>
-    </div>
-    <div class="layer ly-r">
-      <div class="layer-n">6</div>
-      <div class="layer-name" style="color:var(--red);">?? Automotive App (Compose)</div>
-      <div class="layer-desc">??? ??????? � Composables + ViewModel + State</div>
-    </div>
-    <div class="layer ly-v">
-      <div class="layer-n">5</div>
-      <div class="layer-name" style="color:var(--violet);">??? Car UI Library (CarUi)</div>
-      <div class="layer-desc">Automotive-specific Components � FocusArea, RotaryScrollView, CarUiToolbar</div>
-    </div>
-    <div class="layer ly-a">
-      <div class="layer-n">4</div>
-      <div class="layer-name" style="color:var(--amber);">?? Car App Library</div>
-      <div class="layer-desc">??? Templates ??????? ??? Phone Apps ??? ???? ???????</div>
-    </div>
-    <div class="layer ly-g">
-      <div class="layer-n">3</div>
-      <div class="layer-name" style="color:var(--green);">?? CarService + VHAL</div>
-      <div class="layer-desc">?????? ??????? ??????? � Speed, HVAC, Gear, Sensors</div>
-    </div>
-    <div class="layer ly-t">
-      <div class="layer-n">2</div>
-      <div class="layer-name" style="color:var(--teal);">?? Android Automotive OS</div>
-      <div class="layer-desc">AOSP ??????? ???????? � Input Manager, Multi-Display, Voice</div>
-    </div>
-    <div class="layer ly-i">
-      <div class="layer-n">1</div>
-      <div class="layer-name" style="color:var(--muted);">?? Hardware / ECU Network</div>
-      <div class="layer-desc">SoC? ?????? CAN Bus? Rotary Controller? Touch</div>
-    </div>
-  </div>
-
-  <div class="ac ac-amber" style="margin-top:24px;">
-    <div class="ac-title">? ???? ???? ????: Automotive ? Android Auto</div>
-    <table class="tbl" style="margin:12px 0 0;">
-      <tr><th>???????</th><th>Android Auto</th><th>Android Automotive OS</th></tr>
-      <tr><td>????? ???</td><td>???? ???? ????????</td><td>???? ?? ??????? ?????</td></tr>
-      <tr><td>????? ?????</td><td>? ???</td><td>? ??</td></tr>
-      <tr><td>??????</td><td>????? ?? Templates</td><td>???? � OS ?????</td></tr>
-      <tr><td>??? Apps</td><td>Car App Library ???</td><td>?? Android App (???????)</td></tr>
-      <tr><td>VHAL Access</td><td>?</td><td>? ?????</td></tr>
-    </table>
-  </div>
-</section>
-
-<div class="rule"></div>
-
-<!-- -------------------------- S3 -->
-<section class="section" id="s3">
-  <div class="s-label">03 � ????????</div>
-  <h2 class="s-title">Car App Library vs Compose for Automotive</h2>
-
-  <p style="color:var(--ink2); margin-bottom:24px;">
-    ?? ?????? ????? UI ???????. ??? ????? ??? ???? ??????? ?????? ??????.
-  </p>
-
-  <div class="g2">
-    <div class="card">
-      <div class="card-title">?? Car App Library (Template-based)</div>
-      <p style="font-size:.88rem; color:var(--ink2); margin-bottom:12px;">
-        ???????? ???? ????? Phone App ??????? ????? ??? ???? ??????? ???? re-write. ???? ?????? ?? ??? Layout ?????? ???????.
-      </p>
-      <div class="code" style="font-size:.76rem;">
-<span class="cc">// Car App Library � Template Approach</span>
-<span class="ck">class</span> <span class="cv">MyCarSession</span> : Session() {
-  <span class="ck">override fun</span> <span class="cv">onCreateScreen</span>(<span class="cp">intent: Intent</span>) =
-    <span class="cv">MapWithContentScreen</span>(carContext)
-}
-
-<span class="ck">class</span> <span class="cv">MyScreen</span>(ctx: CarContext) : Screen(ctx) {
-  <span class="ck">override fun</span> <span class="cv">onGetTemplate</span>() =
-    <span class="cv">ListTemplate</span>.Builder()
-      .setTitle(<span class="cs">"Navigation"</span>)
-      .setSingleList(
-        <span class="cv">ItemList</span>.Builder()
-          .addItem(<span class="cv">Row</span>.Builder()
-            .setTitle(<span class="cs">"Home"</span>)
-            .build())
-          .build()
-      ).build()
-}
-      </div>
-      <div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:6px;">
-        <span class="tag t-green">Phone ? Car</span>
-        <span class="tag t-blue">Safe by default</span>
-        <span class="tag t-amber">Template limited</span>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">?? Compose for Automotive OS</div>
-      <p style="font-size:.88rem; color:var(--ink2); margin-bottom:12px;">
-        ??? OEM ???? System Apps. ???? ???? ?? ??? UI ?? Composables ?????? ???????. ??? ????? ?? ???????? ???????.
-      </p>
-      <div class="code" style="font-size:.76rem;">
-<span class="cc">// Compose for Automotive � Full Control</span>
-<span class="ck">@Composable</span>
-<span class="ck">fun</span> <span class="cv">AutomotiveDashboard</span>() {
-  <span class="cv">CarTheme</span> {
-    <span class="cv">ConstraintLayout</span>(
-      modifier = Modifier
-        .<span class="cv">fillMaxSize</span>()
-        .<span class="cv">background</span>(MaterialTheme.colorScheme.background)
-    ) {
-      <span class="cv">SpeedometerWidget</span>()
-      <span class="cv">NavigationPanel</span>()
-      <span class="cv">HvacControls</span>()
-      <span class="cv">MediaPlayer</span>()
-    }
-  }
-}
-      </div>
-      <div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:6px;">
-        <span class="tag t-red">OEM / System</span>
-        <span class="tag t-violet">Full UI Control</span>
-        <span class="tag t-green">VHAL Access</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="warn-strip">
-    <span class="warn-icon">??</span>
-    <div>
-      <strong>??? ????? ????</strong> ?? ????? ????? Navigation ?? Music ?? Parking ???? ?????? ??? ?????? ?????? ? <span class="hl-b">Car App Library</span>. ?? ????? System App ?? OEM Custom UI ?? Dashboard ? <span class="hl-r">Compose for Automotive</span>.
-    </div>
-  </div>
-</section>
-
-<div class="rule"></div>
-
-<!-- -------------------------- S4 -->
-<section class="section" id="s4">
-  <div class="s-label">04 � ???????</div>
-  <h2 class="s-title">OEM Customization System � ??? ?? ????? ????? ??????</h2>
-
-  <p style="color:var(--ink2); margin-bottom:24px;">
-    ???? ???? ?? Compose for Automotive ?? ??? <span class="hl-r">OEM Overlay System</span>. ??? ??????? ????? ???? Volvo ?? ????? Volvo ????? BMW ?? ????? BMW � ???? ????? ??? ???.
-  </p>
-
-  <div class="ac ac-red" style="margin-bottom:20px;">
-    <div class="ac-title">?? ??? ???? ???? ??? Overlay?</div>
-    <p style="font-size:.88rem; color:var(--ink2);">
-      ??? OEM ????? APK ??? ???? <code>CarUiPorting</code> ?????? ??? Resources Overlay. Android ?????? ??? Resources ?? ???????? ??? ?? App ??????? CarUi Library.
-    </p>
-  </div>
-
-  <div class="g2">
-    <div>
-      <h4 style="font-size:.85rem; font-weight:700; margin-bottom:12px; color:var(--blue);">?? ?? ???? ??? OEM ??????</h4>
-      <div class="card" style="padding:20px 24px;">
-        <table class="tbl">
-          <tr><th>??????</th><th>????? ???????</th></tr>
-          <tr><td>???????</td><td><code>colorPrimary, colorSurface �</code></td></tr>
-          <tr><td>??????</td><td><code>fontFamily override in XML</code></td></tr>
-          <tr><td>?????????</td><td>Drawable replacement ?? APK</td></tr>
-          <tr><td>??? Radius</td><td><code>car_ui_corner_radius</code></td></tr>
-          <tr><td>??? Animations</td><td>Custom Interpolators</td></tr>
-          <tr><td>??? Toolbar</td><td>CarUiToolbar overlay</td></tr>
-          <tr><td>??? Rotary</td><td>Focus highlight color & shape</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <div>
-      <h4 style="font-size:.85rem; font-weight:700; margin-bottom:12px; color:var(--red);">?? ?? ?? ???? ??? OEM ??????</h4>
-      <div class="card" style="padding:20px 24px;">
-        <div style="font-size:.88rem; color:var(--ink2); line-height:2.2;">
-          ? ???? ??????? ????<br>
-          ? ???????? ??????? (Driver Distraction)<br>
-          ? ??? Data Flow ?? VHAL<br>
-          ? ????? ??????? ????????<br>
-          ? ??? Accessibility requirements<br>
-          ? Permission model<br>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <h4 style="font-size:.95rem; font-weight:700; margin:28px 0 12px; color:var(--ink);">?? ???? OEM CarTheme ?? Compose</h4>
-
-  <div class="code">
-<span class="cc">// 1. ????? OEM Color Scheme</span>
-<span class="ck">val</span> <span class="cv">VolvoColorScheme</span> = <span class="cv">darkColorScheme</span>(
-  primary        = Color(<span class="cn">0xFF1B3A6B</span>),  <span class="cc">// Volvo Blue</span>
-  onPrimary      = Color(<span class="cn">0xFFFFFFFF</span>),
-  secondary      = Color(<span class="cn">0xFF8B9EB7</span>),
-  background     = Color(<span class="cn">0xFF0D1117</span>),
-  surface        = Color(<span class="cn">0xFF1A2332</span>),
-  error          = Color(<span class="cn">0xFFE53935</span>),
-)
-
-<span class="cc">// 2. ????? OEM Typography</span>
-<span class="ck">val</span> <span class="cv">VolvoTypography</span> = <span class="cv">Typography</span>(
-  displayLarge = TextStyle(
-    fontFamily = <span class="cv">FontFamily</span>(Font(R.font.volvo_novum_bold)),
-    fontSize   = <span class="cn">57</span>.sp,
-    lineHeight = <span class="cn">64</span>.sp,
-  ),
-  bodyMedium = TextStyle(
-    fontFamily = <span class="cv">FontFamily</span>(Font(R.font.volvo_novum_regular)),
-    fontSize   = <span class="cn">14</span>.sp,
-  )
-)
-
-<span class="cc">// 3. OEM Theme Composable</span>
-<span class="ck">@Composable</span>
-<span class="ck">fun</span> <span class="cv">VolvoCarTheme</span>(
-  <span class="cp">isDriving: Boolean</span> = <span class="ck">false</span>,
-  <span class="cp">content: @Composable () -> Unit</span>
-) {
-  <span class="cc">// ???? ??????? ????? ???????</span>
-  <span class="ck">val</span> colors = <span class="ck">if</span> (isDriving)
-    <span class="cv">VolvoColorScheme</span>.<span class="cv">copy</span>(surface = Color(<span class="cn">0xFF0A0E14</span>))
-  <span class="ck">else</span>
-    <span class="cv">VolvoColorScheme</span>
-
-  MaterialTheme(
-    colorScheme = colors,
-    typography  = <span class="cv">VolvoTypography</span>,
-    content     = content
-  )
-}
-  </div>
-</section>
-
-<div class="rule"></div>
-
-<!-- -------------------------- S5 -->
-<section class="section" id="s5">
-  <div class="s-label">05 � ???????</div>
-  <h2 class="s-title">Driver Distraction Guidelines � ??????? ?????</h2>
-
-  <div class="ac ac-red" style="margin-bottom:24px;">
-    <div class="ac-title">?? ??? ??? ????????? � ?? ??? ??????</div>
-    <p style="font-size:.88rem; color:var(--ink2);">
-      ???? ????? ??? ????????? ????? ???? ?????? ?? ???? ????? Driver Distraction. ?? ??? ????? ?? ???? ?????? ????.
-    </p>
-  </div>
-
-  <div class="g2">
-    <div class="ac ac-red">
-      <div class="ac-title">? ????? ????? ???????</div>
-      <ul style="font-size:.88rem; color:var(--ink2); padding-right:16px; line-height:2.2;">
-        <li>???? ???? ?? <strong>30 ???</strong> (???????)</li>
-        <li>Keyboard ?? Input Text</li>
-        <li>Lists ???? ?? <strong>4 ?????</strong></li>
-        <li>Videos ?? Animations ?????</li>
-        <li>Maps interactive ???????</li>
-        <li>?? Action ????? ???? ?? <strong>2 ???</strong></li>
-        <li>Dialogs ????? ?? Multi-step</li>
-      </ul>
-    </div>
-    <div class="ac ac-green">
-      <div class="ac-title">? ????? ????? ???????</div>
-      <ul style="font-size:.88rem; color:var(--ink2); padding-right:16px; line-height:2.2;">
-        <li>????? ??????? ????? (Speed, Time)</li>
-        <li>????? ????? ????? (tap target = 76dp)</li>
-        <li>Accept/Reject calls</li>
-        <li>Media controls (Play/Pause/Skip)</li>
-        <li>Voice input ????? ?? Keyboard</li>
-        <li>Navigation simple (Turn by Turn)</li>
-        <li>HVAC simple controls</li>
-      </ul>
-    </div>
-  </div>
-
-  <h4 style="margin:28px 0 12px; font-weight:700; color:var(--ink);">?? ????? Driver Distraction ?? Compose</h4>
-
-  <div class="code">
-<span class="cc">// 1. ??????? ???? ??????? ?? CarService</span>
-<span class="ck">@Composable</span>
-<span class="ck">fun</span> <span class="cv">rememberDrivingState</span>(): <span class="cv">State</span>&lt;<span class="cv">DrivingState</span>&gt; {
-  <span class="ck">val</span> context = <span class="cv">LocalContext</span>.current
-  <span class="ck">return</span> <span class="cv">produceState</span>(initialValue = DrivingState.PARKED) {
-    <span class="ck">val</span> car = Car.createCar(context)
-    <span class="ck">val</span> drivingMgr = car.getCarManager(
-      Car.CAR_DRIVING_STATE_SERVICE
-    ) <span class="ck">as</span> <span class="cv">CarDrivingStateManager</span>
-
-    drivingMgr.registerListener { event ->
-      value = <span class="ck">when</span>(event.currentCarDrivingState) {
-        CarDrivingStateEvent.DRIVING_STATE_MOVING  -> DrivingState.DRIVING
-        CarDrivingStateEvent.DRIVING_STATE_IDLING  -> DrivingState.IDLING
-        <span class="ck">else</span> -> DrivingState.PARKED
-      }
-    }
-  }
-}
-
-<span class="cc">// 2. ????? ?????? ????????</span>
-<span class="ck">@Composable</span>
-<span class="ck">fun</span> <span class="cv">SettingsScreen</span>() {
-  <span class="ck">val</span> drivingState <span class="ck">by</span> <span class="cv">rememberDrivingState</span>()
-  <span class="ck">val</span> isDriving = drivingState == DrivingState.DRIVING
-
-  <span class="cv">Column</span> {
-    <span class="cc">// ??? ????? ??????</span>
-    <span class="cv">MediaControls</span>()
-
-    <span class="cc">// ??? ????? ????? ???????</span>
-    <span class="cv">AnimatedVisibility</span>(visible = !isDriving) {
-      <span class="cv">AdvancedSettings</span>()
-    }
-
-    <span class="cc">// ????? ?? ???????</span>
-    <span class="cv">OutlinedTextField</span>(
-      enabled = !isDriving,
-      value   = searchQuery,
-      label   = { Text(<span class="cs">"Search (parked only)"</span>) },
-      onValueChange = { <span class="ck">if</span>(!isDriving) searchQuery = it }
-    )
-  }
-}
-  </div>
-
-  <div class="g3" style="margin-top:20px;">
-    <div class="ac ac-blue">
-      <div class="ac-title">?? Tap Target Size</div>
-      <p style="font-size:.85rem; color:var(--ink2);">Minimum <strong>76dp � 76dp</strong> ??? ???? ??????. ???? ???? ??? ?????? ?????? ?? ???????.</p>
-    </div>
-    <div class="ac ac-violet">
-      <div class="ac-title">?? Font Size</div>
-      <p style="font-size:.85rem; color:var(--ink2);">Minimum <strong>24sp</strong> ?????? ????????. ??? Secondary text ?? ???? ???? visible ????? ???????.</p>
-    </div>
-    <div class="ac ac-teal">
-      <div class="ac-title">?? Response Time</div>
-      <p style="font-size:.85rem; color:var(--ink2);">??? UI ???? ?????? ?? ??? ?? <strong>200ms</strong>. ?????? ?? ???? ?????.</p>
-    </div>
-  </div>
-</section>
-
-<div class="rule"></div>
-
-<!-- -------------------------- S6 -->
-<section class="section" id="s6">
-  <div class="s-label">06 � ???????</div>
-  <h2 class="s-title">CarUi Library � ??? Components ??????? ???????</h2>
-
-  <p style="color:var(--ink2); margin-bottom:24px;">
-    ??? <span class="hl-r">CarUi Library</span> ?? ??????? ??????? ???? Google ???????. ?????? ??? Components ?????? ??? In-Vehicle UI.
-  </p>
-
-  <div class="code" style="margin-bottom:20px;">
-<span class="cc">// build.gradle.kts</span>
-<span class="cv">dependencies</span> {
-  implementation(<span class="cs">"com.android.car.ui:car-ui-lib:2.6.0"</span>)
-  implementation(<span class="cs">"androidx.car.app:app:1.4.0"</span>)
-  implementation(<span class="cs">"androidx.car.app:app-automotive:1.4.0"</span>)
-
-  <span class="cc">// Compose ??? Automotive</span>
-  implementation(<span class="cs">"androidx.compose.ui:ui:1.6.0"</span>)
-  implementation(<span class="cs">"androidx.compose.material3:material3:1.2.0"</span>)
-  implementation(<span class="cs">"com.google.android.car:car-compose:1.0.0"</span>)
-}
-  </div>
-
-  <div class="g2">
-    <div class="card">
-      <div class="card-title">?? RotaryScrollView</div>
-      <p style="font-size:.85rem; color:var(--ink2); margin-bottom:12px;">
-        ???? ??????? ???? Rotary Controller (????????) ????? ?? ?????. ????? ?? ???????? ????????? ????????.
-      </p>
-      <div class="code" style="font-size:.75rem;">
-<span class="ck">@Composable</span>
-<span class="ck">fun</span> <span class="cv">RotaryMenu</span>() {
-  <span class="cv">RotaryScrollColumn</span>(
-    modifier = Modifier.<span class="cv">fillMaxSize</span>()
-  ) {
-    items.forEach { item ->
-      <span class="cv">FocusableItem</span>(
-        onClick = { <span class="cv">navigate</span>(item.route) }
-      ) {
-        <span class="cv">MenuRow</span>(item)
-      }
-    }
-  }
-}
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">?? CarUiToolbar</div>
-      <p style="font-size:.85rem; color:var(--ink2); margin-bottom:12px;">
-        ???? ?????? ?????? ??????? ?? Android Automotive. ???? ??????? ?? ??? OEM ???????.
-      </p>
-      <div class="code" style="font-size:.75rem;">
-<span class="ck">@Composable</span>
-<span class="ck">fun</span> <span class="cv">SettingsPage</span>() {
-  <span class="cv">Scaffold</span>(
-    topBar = {
-      <span class="cv">CarUiToolbar</span>(
-        title       = <span class="cs">"?????????"</span>,
-        navIconMode = NavIconMode.BACK,
-        onNavIconClicked = { navController.popBackStack() },
-        menuItems = listOf(
-          <span class="cv">MenuItem</span>(title=<span class="cs">"???"</span>, icon=R.drawable.ic_search)
-        )
-      )
-    }
-  ) { padding -> <span class="cc">/* content */</span> }
-}
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">??? FocusArea</div>
-      <p style="font-size:.85rem; color:var(--ink2); margin-bottom:12px;">
-        ?????? ??? Focus ??? ???????? ??????? D-pad ?? Rotary. ??? ???? ??? Navigation ???? Touch.
-      </p>
-      <div class="code" style="font-size:.75rem;">
-<span class="ck">@Composable</span>
-<span class="ck">fun</span> <span class="cv">ClimatePanel</span>() {
-  <span class="cv">Row</span> {
-    <span class="cv">FocusArea</span> {  <span class="cc">// Zone 1: Temperature</span>
-      <span class="cv">TemperatureControl</span>()
-    }
-    <span class="cv">FocusArea</span> {  <span class="cc">// Zone 2: Fan</span>
-      <span class="cv">FanSpeedControl</span>()
-    }
-    <span class="cv">FocusArea</span> {  <span class="cc">// Zone 3: Mode</span>
-      <span class="cv">AirflowSelector</span>()
-    }
-  }
-}
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">?? CarUiRecyclerView</div>
-      <p style="font-size:.85rem; color:var(--ink2); margin-bottom:12px;">
-        ????? ???????? ???????. ???? Rotary Scroll ??????? Driver Distraction rules ????????.
-      </p>
-      <div class="code" style="font-size:.75rem;">
-<span class="ck">@Composable</span>
-<span class="ck">fun</span> <span class="cv">ContactsList</span>(contacts: List&lt;Contact&gt;) {
-  <span class="cv">LazyColumn</span>(
-    modifier = Modifier.<span class="cv">carUiRecyclerView</span>()
-  ) {
-    items(contacts) { contact ->
-      <span class="cv">ContactRow</span>(
-        contact = contact,
-        modifier = Modifier.<span class="cv">carUiTappable</span>()
-      )
-    }
-  }
-}
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="rule"></div>
-
-<!-- -------------------------- S7 -->
-<section class="section" id="s7">
-  <div class="s-label">07 � ?????????</div>
-  <h2 class="s-title">??? Composables ???????? ???????</h2>
-
-  <div class="code">
-<span class="cc">// -- 1. Speedometer Widget --</span>
-<span class="ck">@Composable</span>
-<span class="ck">fun</span> <span class="cv">Speedometer</span>(
-  <span class="cp">speed: Float</span>,
-  <span class="cp">maxSpeed: Float</span> = <span class="cn">240f</span>,
-  <span class="cp">unit: String</span>   = <span class="cs">"km/h"</span>
-) {
-  <span class="ck">val</span> sweepAngle = (speed / maxSpeed) * <span class="cn">270f</span>
-  <span class="ck">val</span> animAngle <span class="ck">by</span> <span class="cv">animateFloatAsState</span>(
-    targetValue   = sweepAngle,
-    animationSpec = <span class="cv">tween</span>(<span class="cn">300</span>, easing = FastOutSlowInEasing)
-  )
-
-  <span class="cv">Box</span>(contentAlignment = Alignment.Center) {
-    <span class="cv">Canvas</span>(modifier = Modifier.<span class="cv">size</span>(<span class="cn">240</span>.dp)) {
-      <span class="cc">// Arc ??????</span>
-      <span class="cv">drawArc</span>(
-        color      = Color.Gray.<span class="cv">copy</span>(alpha = <span class="cn">0.2f</span>),
-        startAngle = <span class="cn">135f</span>, sweepAngle = <span class="cn">270f</span>,
-        useCenter  = <span class="ck">false</span>,
-        style      = Stroke(width = <span class="cn">16</span>.dp.toPx(), cap = StrokeCap.Round)
-      )
-      <span class="cc">// Arc ??????</span>
-      <span class="cv">drawArc</span>(
-        brush      = <span class="cv">Brush</span>.<span class="cv">sweepGradient</span>(listOf(Color.Green, Color.Red)),
-        startAngle = <span class="cn">135f</span>, sweepAngle = animAngle,
-        useCenter  = <span class="ck">false</span>,
-        style      = Stroke(width = <span class="cn">16</span>.dp.toPx(), cap = StrokeCap.Round)
-      )
-    }
-    <span class="cv">Column</span>(horizontalAlignment = Alignment.CenterHorizontally) {
-      <span class="cv">Text</span>(text=<span class="cs">"${speed.toInt()}"</span>, style=MaterialTheme.typography.displayLarge)
-      <span class="cv">Text</span>(text=unit, style=MaterialTheme.typography.labelSmall)
-    }
-  }
-}
-
-<span class="cc">// -- 2. HVAC Temperature Knob --</span>
-<span class="ck">@Composable</span>
-<span class="ck">fun</span> <span class="cv">TemperatureKnob</span>(
-  <span class="cp">temp: Float</span>,
-  <span class="cp">onTempChange: (Float) -> Unit</span>,
-  <span class="cp">isDriving: Boolean</span>
-) {
-  <span class="ck">var</span> localTemp <span class="ck">by</span> <span class="cv">remember</span> { <span class="cv">mutableStateOf</span>(temp) }
-
-  <span class="cv">Column</span>(horizontalAlignment = Alignment.CenterHorizontally) {
-    <span class="cv">Text</span>(<span class="cs">"${localTemp.toInt()}�C"</span>, style = MaterialTheme.typography.headlineLarge)
-    <span class="cv">Row</span>(horizontalArrangement = Arrangement.spacedBy(<span class="cn">24</span>.dp)) {
-      <span class="cv">IconButton</span>(
-        onClick  = { <span class="ck">if</span>(localTemp > <span class="cn">16f</span>) { localTemp -= <span class="cn">0.5f</span>; onTempChange(localTemp) } },
-        modifier = Modifier.<span class="cv">size</span>(<span class="cn">76</span>.dp)  <span class="cc">// Minimum tap target!</span>
-      ) { <span class="cv">Icon</span>(Icons.Minus, contentDescription = <span class="cs">"?????"</span>) }
-
-      <span class="cv">IconButton</span>(
-        onClick  = { <span class="ck">if</span>(localTemp < <span class="cn">30f</span>) { localTemp += <span class="cn">0.5f</span>; onTempChange(localTemp) } },
-        modifier = Modifier.<span class="cv">size</span>(<span class="cn">76</span>.dp)
-      ) { <span class="cv">Icon</span>(Icons.Plus, contentDescription = <span class="cs">"???"</span>) }
-    }
-  }
-}
-
-<span class="cc">// -- 3. Gear Indicator --</span>
-<span class="ck">@Composable</span>
-<span class="ck">fun</span> <span class="cv">GearIndicator</span>(<span class="cp">gear: VehicleGear</span>) {
-  <span class="ck">val</span> label = <span class="ck">when</span>(gear) {
-    VehicleGear.GEAR_PARK    -> <span class="cs">"P"</span>
-    VehicleGear.GEAR_REVERSE -> <span class="cs">"R"</span>
-    VehicleGear.GEAR_NEUTRAL -> <span class="cs">"N"</span>
-    VehicleGear.GEAR_DRIVE   -> <span class="cs">"D"</span>
-    <span class="ck">else</span>                      -> <span class="cs">"${gear.value}"</span>
-  }
-  <span class="ck">val</span> color = <span class="ck">when</span>(gear) {
-    VehicleGear.GEAR_REVERSE -> Color(<span class="cn">0xFFFF6B35</span>)
-    VehicleGear.GEAR_DRIVE   -> Color(<span class="cn">0xFF22C55E</span>)
-    <span class="ck">else</span>                      -> MaterialTheme.colorScheme.onSurface
-  }
-  <span class="cv">Text</span>(text=label, color=color, style=MaterialTheme.typography.displayMedium)
-}
-  </div>
-</section>
-
-<div class="rule"></div>
-
-<!-- -------------------------- S8 -->
-<section class="section" id="s8">
-  <div class="s-label">08 � ???????</div>
-  <h2 class="s-title">??????? ?? VHAL ?? Compose</h2>
-
-  <p style="color:var(--ink2); margin-bottom:24px;">
-    ??? Compose UI ????? ???? VHAL ??? <span class="hl-b">CarPropertyManager</span>. ???? Pattern ???? ???? ???? ????? ???? ?? ??? ViewModel.
-  </p>
-
-  <div class="code">
-<span class="cc">// -- 1. Vehicle Repository --</span>
-<span class="ck">class</span> <span class="cv">VehicleRepository</span>(
-  <span class="cp">private val car: Car</span>
-) {
-  <span class="ck">private val</span> propMgr = car.getCarManager(
-    Car.PROPERTY_SERVICE
-  ) <span class="ck">as</span> <span class="cv">CarPropertyManager</span>
-
-  <span class="cc">// Speed ?? Flow</span>
-  <span class="ck">val</span> speedFlow: Flow&lt;Float&gt; = <span class="cv">callbackFlow</span> {
-    <span class="ck">val</span> callback = <span class="ck">object</span> : CarPropertyManager.CarPropertyEventCallback {
-      <span class="ck">override fun</span> <span class="cv">onChangeEvent</span>(value: CarPropertyValue&lt;*&gt;) {
-        trySend(value.value <span class="ck">as</span> Float)
-      }
-      <span class="ck">override fun</span> <span class="cv">onErrorEvent</span>(propId: Int, zone: Int) {}
-    }
-    propMgr.registerCallback(
-      callback,
-      VehiclePropertyIds.PERF_VEHICLE_SPEED,
-      CarPropertyManager.SENSOR_RATE_NORMAL
-    )
-    awaitClose { propMgr.unregisterCallback(callback) }
-  }
-
-  <span class="cc">// ??? ??? HVAC</span>
-  <span class="ck">fun</span> <span class="cv">setTemperature</span>(zone: Int, temp: Float) {
-    propMgr.setFloatProperty(
-      VehiclePropertyIds.HVAC_TEMPERATURE_SET,
-      zone, temp
-    )
-  }
-
-  <span class="cc">// ????? ??? Gear</span>
-  <span class="ck">fun</span> <span class="cv">getCurrentGear</span>(): Int =
-    propMgr.getIntProperty(VehiclePropertyIds.CURRENT_GEAR, <span class="cn">0</span>)
-}
-
-<span class="cc">// -- 2. ViewModel --</span>
-<span class="ck">class</span> <span class="cv">DashboardViewModel</span>(
-  <span class="cp">private val repo: VehicleRepository</span>
-) : ViewModel() {
-
-  <span class="ck">val</span> speed = repo.speedFlow
-    .<span class="cv">map</span> { it * <span class="cn">3.6f</span> }  <span class="cc">// m/s ? km/h</span>
-    .<span class="cv">stateIn</span>(viewModelScope, SharingStarted.WhileSubscribed(<span class="cn">5000</span>), <span class="cn">0f</span>)
-
-  <span class="ck">private val</span> _uiState = <span class="cv">MutableStateFlow</span>(DashboardUiState())
-  <span class="ck">val</span> uiState = _uiState.asStateFlow()
-
-  <span class="ck">fun</span> <span class="cv">setTemperature</span>(zone: Int, temp: Float) {
-    viewModelScope.launch { repo.setTemperature(zone, temp) }
-    _uiState.update { it.copy(targetTemp = temp) }
-  }
-}
-
-<span class="cc">// -- 3. Compose UI ?????? ??? ViewModel --</span>
-<span class="ck">@Composable</span>
-<span class="ck">fun</span> <span class="cv">DashboardScreen</span>(vm: DashboardViewModel = viewModel()) {
-  <span class="ck">val</span> speed <span class="ck">by</span> vm.speed.<span class="cv">collectAsStateWithLifecycle</span>()
-  <span class="ck">val</span> uiState <span class="ck">by</span> vm.uiState.<span class="cv">collectAsStateWithLifecycle</span>()
-
-  <span class="cv">Row</span>(modifier = Modifier.<span class="cv">fillMaxSize</span>()) {
-    <span class="cv">Speedometer</span>(speed = speed)
-    <span class="cv">TemperatureKnob</span>(
-      temp         = uiState.targetTemp,
-      onTempChange = { vm.setTemperature(VehicleAreaSeat.ROW_1_LEFT, it) },
-      isDriving    = uiState.isDriving
-    )
-  }
-}
-  </div>
-</section>
-
-<div class="rule"></div>
-
-<!-- -------------------------- S9 -->
-<section class="section" id="s9">
-  <div class="s-label">09 � ??????</div>
-  <h2 class="s-title">Safety, Testing & OEM Certification</h2>
-
-  <div class="g2">
-    <div class="card">
-      <div class="card-title">?? Compose Testing ?? Automotive</div>
-      <div class="code" style="font-size:.76rem; margin-top:12px;">
-<span class="ck">@RunWith</span>(AndroidJUnit4::class)
-<span class="ck">class</span> <span class="cv">DashboardTest</span> {
-  <span class="ck">@get:Rule val</span> rule = <span class="cv">createComposeRule</span>()
-
-  <span class="ck">@Test fun</span> <span class="cv">speedometer_shows_correct_value</span>() {
-    rule.setContent {
-      <span class="cv">VolvoCarTheme</span> {
-        <span class="cv">Speedometer</span>(speed = <span class="cn">120f</span>)
-      }
-    }
-    rule.onNodeWithText(<span class="cs">"120"</span>).<span class="cv">assertIsDisplayed</span>()
-  }
-
-  <span class="ck">@Test fun</span> <span class="cv">settings_hidden_while_driving</span>() {
-    rule.setContent {
-      <span class="cv">SettingsScreen</span>(isDriving = <span class="ck">true</span>)
-    }
-    rule.onNodeWithTag(<span class="cs">"AdvancedSettings"</span>)
-       .<span class="cv">assertDoesNotExist</span>()
-  }
-}
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">?? OEM Certification Checklist</div>
-      <div style="font-size:.85rem; color:var(--ink2); line-height:2.3; margin-top:8px;">
-        ? Driver Distraction requirements ??????<br>
-        ? Tap targets = 76dp ?? ?? ???????<br>
-        ? Dark Mode / Light Mode ?????<br>
-        ? Rotary Controller navigation ????<br>
-        ? Performance: 60fps ????<br>
-        ? Cold Start ??? ?? 5 ?????<br>
-        ? OEM Theme Overlay ??????? ??<br>
-        ? Voice command integration<br>
-        ? Multi-display support (?? ????)<br>
-        ? VHAL error handling ?????<br>
-      </div>
-    </div>
-  </div>
-
-  <div class="ac ac-violet" style="margin-top:16px;">
-    <div class="ac-title">?? Performance Targets ??? Automotive UI</div>
-    <div class="g3" style="margin-top:12px;">
-      <div style="text-align:center;">
-        <div style="font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; color:var(--violet);">60fps</div>
-        <div style="font-size:.8rem; color:var(--muted);">Frame Rate ?????</div>
-      </div>
-      <div style="text-align:center;">
-        <div style="font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; color:var(--violet);">&lt;200ms</div>
-        <div style="font-size:.8rem; color:var(--muted);">Input Latency</div>
-      </div>
-      <div style="text-align:center;">
-        <div style="font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; color:var(--violet);">&lt;5sec</div>
-        <div style="font-size:.8rem; color:var(--muted);">Cold Boot Time</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="rule"></div>
-
-<!-- -------------------------- S10 -->
-<section class="section" id="s10">
-  <div class="s-label">10 � ?????? ??????</div>
-  <h2 class="s-title">????? HVAC ???? � End-to-End</h2>
-
-  <div class="ac ac-green" style="margin-bottom:24px;">
-    <div class="ac-title">?? ?????</div>
-    <p style="font-size:.88rem; color:var(--ink2);">
-      ????? ???? ?? ??????? (HVAC) ???? ?? VHAL? ???? ??????? ???????? ????? OEM Theme? ??????? ??? Rotary Controller.
-    </p>
-  </div>
-
-  <div class="code">
-<span class="cc">// ----------------------------------------------
-// HVAC App � Complete Implementation
-// ----------------------------------------------</span>
-
-<span class="cc">// -- Data Layer --</span>
-<span class="ck">data class</span> <span class="cv">HvacState</span>(
-  <span class="cp">val driverTemp: Float</span>  = <span class="cn">22f</span>,
-  <span class="cp">val passengerTemp: Float</span>= <span class="cn">22f</span>,
-  <span class="cp">val fanSpeed: Int</span>       = <span class="cn">3</span>,
-  <span class="cp">val acOn: Boolean</span>       = <span class="ck">true</span>,
-  <span class="cp">val autoOn: Boolean</span>     = <span class="ck">false</span>,
-  <span class="cp">val isDriving: Boolean</span>  = <span class="ck">false</span>
-)
-
-<span class="cc">// -- ViewModel --</span>
-<span class="ck">class</span> <span class="cv">HvacViewModel</span>(app: Application) : AndroidViewModel(app) {
-  <span class="ck">private val</span> car = Car.createCar(app)
-  <span class="ck">private val</span> propMgr = car.getCarManager(Car.PROPERTY_SERVICE)
-    <span class="ck">as</span> CarPropertyManager
-
-  <span class="ck">private val</span> _state = <span class="cv">MutableStateFlow</span>(HvacState())
-  <span class="ck">val</span> state = _state.asStateFlow()
-
-  <span class="ck">init</span> {
-    <span class="cc">// Subscribe to VHAL changes</span>
-    propMgr.registerCallback(hvacCallback,
-      VehiclePropertyIds.HVAC_TEMPERATURE_CURRENT,
-      CarPropertyManager.SENSOR_RATE_ONCHANGE
-    )
-    loadInitialState()
-  }
-
-  <span class="ck">private fun</span> <span class="cv">loadInitialState</span>() {
-    _state.update { it.copy(
-      driverTemp   = propMgr.getFloatProperty(
-        VehiclePropertyIds.HVAC_TEMPERATURE_SET,
-        VehicleAreaSeat.ROW_1_LEFT
-      ),
-      acOn = propMgr.getBooleanProperty(
-        VehiclePropertyIds.HVAC_AC_ON,
-        VehicleAreaSeat.ROW_1_LEFT
-      )
-    )}
-  }
-
-  <span class="ck">fun</span> <span class="cv">setDriverTemp</span>(temp: Float) {
-    <span class="ck">val</span> clamped = temp.<span class="cv">coerceIn</span>(<span class="cn">16f</span>, <span class="cn">30f</span>)
-    propMgr.setFloatProperty(
-      VehiclePropertyIds.HVAC_TEMPERATURE_SET,
-      VehicleAreaSeat.ROW_1_LEFT, clamped
-    )
-    _state.update { it.copy(driverTemp = clamped) }
-  }
-
-  <span class="ck">fun</span> <span class="cv">toggleAC</span>() {
-    <span class="ck">val</span> newVal = !_state.value.acOn
-    propMgr.setBooleanProperty(
-      VehiclePropertyIds.HVAC_AC_ON,
-      VehicleAreaSeat.ROW_1_LEFT, newVal
-    )
-    _state.update { it.copy(acOn = newVal) }
-  }
-
-  <span class="ck">fun</span> <span class="cv">setFanSpeed</span>(speed: Int) {
-    <span class="ck">val</span> clamped = speed.<span class="cv">coerceIn</span>(<span class="cn">1</span>, <span class="cn">7</span>)
-    propMgr.setIntProperty(
-      VehiclePropertyIds.HVAC_FAN_SPEED,
-      VehicleAreaSeat.ROW_1_LEFT, clamped
-    )
-    _state.update { it.copy(fanSpeed = clamped) }
-  }
-}
-
-<span class="cc">// -- UI Layer --</span>
-<span class="ck">@Composable</span>
-<span class="ck">fun</span> <span class="cv">HvacScreen</span>(vm: HvacViewModel = viewModel()) {
-  <span class="ck">val</span> state <span class="ck">by</span> vm.state.<span class="cv">collectAsStateWithLifecycle</span>()
-
-  <span class="cv">CarTheme</span>(isDriving = state.isDriving) {
-    <span class="cv">Surface</span>(modifier = Modifier.<span class="cv">fillMaxSize</span>()) {
-      <span class="cv">Row</span>(
-        modifier = Modifier.<span class="cv">fillMaxSize</span>().<span class="cv">padding</span>(<span class="cn">24</span>.dp),
-        horizontalArrangement = Arrangement.spacedBy(<span class="cn">32</span>.dp)
-      ) {
-
-        <span class="cc">// Driver Zone</span>
-        <span class="cv">FocusArea</span>(modifier = Modifier.<span class="cv">weight</span>(<span class="cn">1f</span>)) {
-          <span class="cv">ZoneControl</span>(
-            label       = <span class="cs">"??????"</span>,
-            temp        = state.driverTemp,
-            onTempUp    = { vm.setDriverTemp(state.driverTemp + <span class="cn">0.5f</span>) },
-            onTempDown  = { vm.setDriverTemp(state.driverTemp - <span class="cn">0.5f</span>) },
-            isDriving   = state.isDriving
-          )
-        }
-
-        <span class="cc">// Center Controls</span>
-        <span class="cv">FocusArea</span>(modifier = Modifier.<span class="cv">weight</span>(<span class="cn">1.2f</span>)) {
-          <span class="cv">CenterHvacPanel</span>(
-            fanSpeed    = state.fanSpeed,
-            acOn        = state.acOn,
-            autoOn      = state.autoOn,
-            onFanChange = vm::setFanSpeed,
-            onACToggle  = vm::toggleAC,
-            isDriving   = state.isDriving
-          )
-        }
-
-        <span class="cc">// Passenger Zone</span>
-        <span class="cv">FocusArea</span>(modifier = Modifier.<span class="cv">weight</span>(<span class="cn">1f</span>)) {
-          <span class="cv">ZoneControl</span>(
-            label       = <span class="cs">"??????"</span>,
-            temp        = state.passengerTemp,
-            onTempUp    = { <span class="cc">/* similar */</span> },
-            onTempDown  = { <span class="cc">/* similar */</span> },
-            isDriving   = state.isDriving
-          )
-        }
-      }
-    }
-  }
-}
-
-<span class="cc">// -- AndroidManifest.xml --</span>
-<span class="cc">/*
-&lt;application
-    android:appCategory="audio"  &lt;!-- or "video", "productivity" --&gt;
-    ...&gt;
-    &lt;uses-feature android:name="android.hardware.type.automotive"
-                  android:required="true"/&gt;
-    &lt;meta-data android:name="com.android.automotive"
-               android:resource="@xml/automotive_app_desc"/&gt;
-&lt;/application&gt;
-
-&lt;!-- automotive_app_desc.xml --&gt;
-&lt;automotiveApp&gt;
-    &lt;uses name="template"/&gt;
-&lt;/automotiveApp&gt;
-*/</span>
-  </div>
-</section>
-
-<div class="rule"></div>
-
-<!-- -------------------------- SUMMARY -->
-<div class="card" style="background: var(--bg2); border: 1px solid var(--rule); border-radius: 12px; padding: 40px;">
-  <div style="font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800; margin-bottom:24px; color: var(--amber);">
-    ?? ???? ?????? ??????
-  </div>
-  <table class="tbl">
-    <tr>
-      <th>???????</th>
-      <th>??????</th>
-      <th>???????</th>
-    </tr>
-    <tr>
-      <td>Hardware Signal</td>
-      <td><code style="background:rgba(248, 113, 113, 0.1); border:none; color: var(--red);">CAN Bus</code></td>
-      <td>ECU / Tier-1</td>
-    </tr>
-    <tr>
-      <td>Data Abstraction</td>
-      <td><code style="background:rgba(52, 211, 153, 0.1); border:none; color: var(--green);">VHAL + CarService</code></td>
-      <td>OEM / Android</td>
-    </tr>
-    <tr>
-      <td>UI Components</td>
-      <td><code style="background:rgba(167, 139, 250, 0.1); border:none; color: var(--violet);">CarUi + Compose</code></td>
-      <td>App Developer</td>
-    </tr>
-    <tr>
-      <td>Visual Identity</td>
-      <td><code style="background:rgba(96, 165, 250, 0.1); border:none; color: var(--blue);">OEM Theme Overlay</code></td>
-      <td>OEM Design Team</td>
-    </tr>
-    <tr>
-      <td>Safety Layer</td>
-      <td><code style="background:rgba(251, 191, 36, 0.1); border:none; color: var(--amber);">DrivingState API</code></td>
-      <td>Developer (????????!)</td>
-    </tr>
-    <tr>
-      <td>Certification</td>
-      <td><code style="background:rgba(248, 113, 113, 0.1); border:none; color: var(--red);">Google CDD + OEM</code></td>
-      <td>Google / OEM</td>
-    </tr>
-  </table>
-</div>
-
-
-</main>
-
-<footer>
-  ???? ?? ?? ????????? ????? � <span>Compose for Automotive Complete Guide</span><br>
-  <span style="color:rgba(245,240,232,.3); display:block; margin-top:6px;">Android Automotive OS � Jetpack Compose � CarUi Library � VHAL</span>
-</footer>
-
-<div class="aaos-theme-bar">
-  <button class="aaos-fab theme-toggle-btn" onclick="aaosToggleTheme()" title="????? ?????">??</button>
-  <a class="aaos-fab" href="../index.html" title="????????">??</a>
-</div>
-<script src="../scripts/theme.js"></script></body>
-</html>
-
+﻿﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compose for Automotive — الدليل الشامل</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #f5f0e8;
+  --bg2:      #ede7d9;
+  --ink:      #1a1208;
+  --ink2:     #3d3120;
+  --muted:    #7a6a52;
+  --rule:     #c8b89a;
+
+  --red:      #c0392b;
+  --amber:    #d97706;
+  --green:    #1a6b3a;
+  --blue:     #1a3a6b;
+  --violet:   #5b2d8e;
+  --teal:     #0d6b6b;
+
+  --red-bg:   #fdecea;
+  --amber-bg: #fef3dc;
+  --green-bg: #e6f4ec;
+  --blue-bg:  #e6edf8;
+  --violet-bg:#f0e8f8;
+  --teal-bg:  #e0f4f4;
+
+  --card:     #faf7f1;
+  --shadow:   0 2px 20px rgba(26,18,8,.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Tajawal', sans-serif;
+  line-height: 1.85;
+  overflow-x: hidden;
+}
+
+/* ── TEXTURE OVERLAY ── */
+body::after {
+  content:'';
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  opacity:.4;
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative; z-index:1;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 80px 48px 70px;
+  overflow: hidden;
+}
+
+.hero::before {
+  content:'';
+  position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,.04) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,.04) 40px);
+}
+
+.hero::after {
+  content:'';
+  position:absolute;
+  top:-120px; left:-120px;
+  width:500px; height:500px;
+  background: radial-gradient(circle, rgba(192,57,43,.25) 0%, transparent 70%);
+  pointer-events:none;
+}
+
+.hero-inner { position:relative; z-index:1; max-width:960px; margin:0 auto; }
+
+.hero-eyebrow {
+  display:inline-flex; align-items:center; gap:10px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:.72rem; letter-spacing:3px; text-transform:uppercase;
+  color: #c0392b;
+  margin-bottom:24px;
+}
+
+.hero-eyebrow::before {
+  content:'';
+  display:inline-block;
+  width:28px; height:2px;
+  background: #c0392b;
+}
+
+.hero h1 {
+  font-family:'Syne', sans-serif;
+  font-size: clamp(2.4rem, 6vw, 5rem);
+  font-weight:800;
+  line-height:1.05;
+  letter-spacing:-1px;
+  margin-bottom:20px;
+}
+
+.hero h1 em {
+  font-style:normal;
+  color:#c0392b;
+}
+
+.hero-sub {
+  font-size:1.1rem;
+  color:rgba(245,240,232,.65);
+  max-width:580px;
+  margin-bottom:48px;
+  font-weight:300;
+}
+
+.hero-pills {
+  display:flex; gap:10px; flex-wrap:wrap;
+}
+
+.pill {
+  padding:6px 16px;
+  border-radius:3px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.72rem; font-weight:600;
+  letter-spacing:1px;
+}
+
+.pill-red    { background:rgba(192,57,43,.2);  color:#e07060; border:1px solid rgba(192,57,43,.3); }
+.pill-amber  { background:rgba(217,119,6,.2);  color:#d97706; border:1px solid rgba(217,119,6,.3); }
+.pill-green  { background:rgba(26,107,58,.2);  color:#4caf6e; border:1px solid rgba(26,107,58,.3); }
+.pill-blue   { background:rgba(26,58,107,.2);  color:#6090d0; border:1px solid rgba(26,58,107,.3); }
+.pill-violet { background:rgba(91,45,142,.2);  color:#a070d0; border:1px solid rgba(91,45,142,.3); }
+
+/* ── MAIN ── */
+main {
+  position:relative; z-index:1;
+  max-width:980px;
+  margin:0 auto;
+  padding:0 32px 80px;
+}
+
+/* ── SECTION HEADER ── */
+.section { margin:72px 0; }
+
+.s-label {
+  display:inline-flex; align-items:center; gap:10px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.68rem; letter-spacing:3px; text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:14px;
+}
+
+.s-label::before {
+  content:'';
+  display:inline-block;
+  width:20px; height:1px;
+  background:var(--rule);
+}
+
+.s-title {
+  font-family:'Syne',sans-serif;
+  font-size:clamp(1.6rem,3vw,2.4rem);
+  font-weight:800;
+  color:var(--ink);
+  line-height:1.15;
+  margin-bottom:24px;
+  position:relative;
+}
+
+.s-title::after {
+  content:'';
+  display:block;
+  width:48px; height:3px;
+  background:var(--red);
+  margin-top:12px;
+  border-radius:2px;
+}
+
+/* ── DIVIDER ── */
+.rule { height:1px; background:var(--rule); margin:64px 0; position:relative; z-index:1; }
+
+/* ── CARDS ── */
+.card {
+  background:var(--card);
+  border:1px solid var(--rule);
+  border-radius:6px;
+  padding:28px 32px;
+  margin-bottom:16px;
+  box-shadow:var(--shadow);
+  transition:box-shadow .2s, transform .2s;
+}
+
+.card:hover {
+  box-shadow:0 6px 32px rgba(26,18,8,.12);
+  transform:translateY(-2px);
+}
+
+.card-title {
+  font-weight:700;
+  font-size:1rem;
+  color:var(--ink);
+  margin-bottom:10px;
+  display:flex; align-items:center; gap:10px;
+}
+
+/* ── GRID ── */
+.g2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+.g3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+
+/* ── ACCENT CARDS ── */
+.ac {
+  border-radius:6px;
+  padding:24px 28px;
+  margin-bottom:16px;
+}
+.ac-red    { background:var(--red-bg);    border-right:4px solid var(--red); }
+.ac-amber  { background:var(--amber-bg);  border-right:4px solid var(--amber); }
+.ac-green  { background:var(--green-bg);  border-right:4px solid var(--green); }
+.ac-blue   { background:var(--blue-bg);   border-right:4px solid var(--blue); }
+.ac-violet { background:var(--violet-bg); border-right:4px solid var(--violet); }
+.ac-teal   { background:var(--teal-bg);   border-right:4px solid var(--teal); }
+
+.ac-title { font-weight:800; font-size:.95rem; margin-bottom:8px; }
+.ac-red    .ac-title { color:var(--red); }
+.ac-amber  .ac-title { color:var(--amber); }
+.ac-green  .ac-title { color:var(--green); }
+.ac-blue   .ac-title { color:var(--blue); }
+.ac-violet .ac-title { color:var(--violet); }
+.ac-teal   .ac-title { color:var(--teal); }
+
+/* ── CODE ── */
+.code {
+  background:#1a1208;
+  color:#e8dcc8;
+  border-radius:6px;
+  padding:20px 24px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.8rem;
+  line-height:1.75;
+  overflow-x:auto;
+  margin:16px 0;
+  border:1px solid rgba(200,184,154,.15);
+}
+
+.ck  { color:#c0392b; }   /* keyword */
+.cv  { color:#d97706; }   /* value / composable name */
+.cs  { color:#4caf6e; }   /* string */
+.cc  { color:#7a6a52; }   /* comment */
+.cp  { color:#6090d0; }   /* param */
+.cn  { color:#a070d0; }   /* number */
+
+/* ── TABLE ── */
+.tbl {
+  width:100%; border-collapse:collapse;
+  font-size:.88rem;
+  margin:16px 0;
+}
+
+.tbl th {
+  background:var(--ink);
+  color:var(--bg);
+  padding:10px 16px;
+  text-align:right;
+  font-weight:700;
+  font-size:.75rem;
+  letter-spacing:1px;
+}
+
+.tbl td {
+  padding:11px 16px;
+  border-bottom:1px solid var(--rule);
+  vertical-align:top;
+}
+
+.tbl tr:nth-child(even) td { background:var(--bg2); }
+.tbl tr:hover td { background:var(--amber-bg); }
+
+/* ── TAGS ── */
+.tag {
+  display:inline-block;
+  padding:2px 9px;
+  border-radius:2px;
+  font-size:.7rem; font-weight:700;
+  font-family:'IBM Plex Mono',monospace;
+  letter-spacing:.5px;
+}
+.t-red    { background:var(--red-bg);    color:var(--red); }
+.t-green  { background:var(--green-bg);  color:var(--green); }
+.t-blue   { background:var(--blue-bg);   color:var(--blue); }
+.t-amber  { background:var(--amber-bg);  color:var(--amber); }
+.t-violet { background:var(--violet-bg); color:var(--violet); }
+.t-teal   { background:var(--teal-bg);   color:var(--teal); }
+
+/* ── MONO INLINE ── */
+code {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.82em;
+  background:var(--bg2);
+  border:1px solid var(--rule);
+  border-radius:3px;
+  padding:1px 6px;
+  color:var(--red);
+}
+
+/* ── HIGHLIGHT ── */
+.hl-r { color:var(--red);    font-weight:700; }
+.hl-a { color:var(--amber);  font-weight:700; }
+.hl-g { color:var(--green);  font-weight:700; }
+.hl-b { color:var(--blue);   font-weight:700; }
+.hl-v { color:var(--violet); font-weight:700; }
+.hl-t { color:var(--teal);   font-weight:700; }
+
+/* ── LAYER STACK ── */
+.stack { display:flex; flex-direction:column; gap:3px; margin:16px 0; }
+
+.layer {
+  display:flex; align-items:center; gap:16px;
+  padding:14px 20px;
+  border-radius:5px;
+  border:1px solid transparent;
+  font-size:.9rem;
+  transition:transform .2s;
+}
+
+.layer:hover { transform:translateX(-4px); }
+.layer-n { font-family:'IBM Plex Mono',monospace; font-size:.7rem; color:var(--muted); width:22px; }
+.layer-name { font-weight:700; min-width:180px; }
+.layer-desc { color:var(--muted); font-size:.85rem; }
+
+.ly-r { background:var(--red-bg);    border-color:rgba(192,57,43,.2); }
+.ly-a { background:var(--amber-bg);  border-color:rgba(217,119,6,.2); }
+.ly-g { background:var(--green-bg);  border-color:rgba(26,107,58,.2); }
+.ly-b { background:var(--blue-bg);   border-color:rgba(26,58,107,.2); }
+.ly-v { background:var(--violet-bg); border-color:rgba(91,45,142,.2); }
+.ly-t { background:var(--teal-bg);   border-color:rgba(13,107,107,.2); }
+.ly-i { background:var(--bg2);       border-color:var(--rule); }
+
+/* ── FLOW ── */
+.flow {
+  display:flex; align-items:center; flex-wrap:wrap;
+  gap:0; justify-content:center; padding:20px 0;
+}
+
+.fnode {
+  background:var(--card);
+  border:1px solid var(--rule);
+  border-radius:5px;
+  padding:12px 20px;
+  text-align:center;
+  font-size:.82rem; font-weight:700;
+  min-width:100px;
+  box-shadow:var(--shadow);
+}
+
+.farrow { color:var(--muted); padding:0 8px; font-size:1.1rem; }
+
+/* ── COMPARISON ── */
+.cmp {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin:16px 0;
+}
+
+.cmp-col {
+  border-radius:6px;
+  padding:20px 24px;
+}
+
+.cmp-old { background:var(--red-bg); border:1px solid rgba(192,57,43,.2); }
+.cmp-new { background:var(--green-bg); border:1px solid rgba(26,107,58,.2); }
+
+.cmp-label {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.7rem; letter-spacing:2px; text-transform:uppercase;
+  margin-bottom:12px; font-weight:600;
+}
+
+.cmp-old .cmp-label { color:var(--red); }
+.cmp-new .cmp-label { color:var(--green); }
+
+/* ── STAT STRIP ── */
+.stats {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:1px;
+  background:var(--rule);
+  border:1px solid var(--rule);
+  border-radius:6px;
+  overflow:hidden;
+  margin:24px 0;
+}
+
+.stat-cell {
+  background:var(--card);
+  padding:24px 20px;
+  text-align:center;
+}
+
+.stat-val {
+  font-family:'Syne',sans-serif;
+  font-size:2rem; font-weight:800;
+  color:var(--ink);
+  line-height:1;
+}
+
+.stat-lbl {
+  font-size:.78rem;
+  color:var(--muted);
+  margin-top:6px;
+}
+
+/* ── TOC ── */
+.toc {
+  background:var(--ink);
+  color:var(--bg);
+  border-radius:6px;
+  padding:32px 36px;
+  margin:40px 0 60px;
+  position:relative;
+  overflow:hidden;
+}
+
+.toc::before {
+  content:'';
+  position:absolute;
+  bottom:-40px; left:-40px;
+  width:200px; height:200px;
+  background:radial-gradient(circle, rgba(192,57,43,.2), transparent 70%);
+}
+
+.toc h3 {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.7rem; letter-spacing:3px; text-transform:uppercase;
+  color:var(--red);
+  margin-bottom:20px;
+}
+
+.toc ol {
+  list-style:none;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:6px 32px;
+}
+
+.toc li {
+  display:flex; align-items:center; gap:12px;
+  padding:7px 0;
+  border-bottom:1px solid rgba(245,240,232,.08);
+  font-size:.88rem;
+}
+
+.toc-n {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.65rem; color:var(--red);
+  width:22px; flex-shrink:0;
+}
+
+.toc a { color:rgba(245,240,232,.75); text-decoration:none; transition:color .2s; }
+.toc a:hover { color:var(--bg); }
+
+/* ── SIDEBAR QUOTE ── */
+.pullquote {
+  border-right:4px solid var(--red);
+  padding:16px 20px;
+  margin:24px 0;
+  background:var(--red-bg);
+  border-radius:0 6px 6px 0;
+  font-size:1.05rem;
+  font-weight:500;
+  color:var(--ink2);
+  font-style:italic;
+}
+
+/* ── OEM BOX ── */
+.oem-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:12px;
+  margin:16px 0;
+}
+
+.oem-card {
+  background:var(--card);
+  border:1px solid var(--rule);
+  border-radius:6px;
+  padding:16px;
+  text-align:center;
+  transition:border-color .2s;
+}
+
+.oem-card:hover { border-color:var(--red); }
+.oem-logo { font-size:1.6rem; margin-bottom:6px; }
+.oem-name { font-size:.82rem; font-weight:700; color:var(--ink); }
+.oem-since { font-size:.72rem; color:var(--muted); font-family:'IBM Plex Mono',monospace; }
+
+/* ── WARNING STRIP ── */
+.warn-strip {
+  background:var(--amber-bg);
+  border:1px solid rgba(217,119,6,.3);
+  border-radius:6px;
+  padding:16px 20px;
+  display:flex; gap:12px; align-items:flex-start;
+  margin:20px 0;
+  font-size:.9rem;
+}
+
+.warn-icon { font-size:1.2rem; flex-shrink:0; margin-top:2px; }
+
+/* ── PRINT ── */
+@media print {
+  body { background:#fff; }
+  .hero { background:#1a1208; -webkit-print-color-adjust:exact; }
+}
+
+/* ── ANIMATIONS ── */
+@keyframes slideIn {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.section { animation:slideIn .4s ease both; }
+
+/* ── FOOTER ── */
+footer {
+  position:relative; z-index:1;
+  background:var(--ink);
+  color:rgba(245,240,232,.4);
+  text-align:center;
+  padding:36px 24px;
+  font-size:.8rem;
+}
+
+footer span { color:var(--red); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .hero { padding:48px 24px 40px; }
+  main { padding:0 16px 60px; }
+  .cmp { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════ HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Android Automotive · OEM Toolkit · 2024</div>
+    <h1>
+      Compose for<br><em>Automotive OS</em>
+    </h1>
+    <p class="hero-sub">
+      الإطار الجديد لبناء واجهات المستخدم داخل السيارة — من الأساسيات لأعلى مستوى، مع كل ما يحتاجه المهندس لبناء تجارب قيادة استثنائية.
+    </p>
+    <div class="hero-pills">
+      <span class="pill pill-red">Compose UI</span>
+      <span class="pill pill-amber">VHAL Integration</span>
+      <span class="pill pill-green">OEM Customization</span>
+      <span class="pill pill-blue">Car App Library</span>
+      <span class="pill pill-violet">Driver Safety</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ══════════════════════════ TOC -->
+<div class="toc">
+  <h3>📋 فهرس المحتوى</h3>
+  <ol>
+    <li><span class="toc-n">01</span><a href="#s1">لماذا Compose for Automotive؟</a></li>
+    <li><span class="toc-n">02</span><a href="#s2">المعمارية الكاملة</a></li>
+    <li><span class="toc-n">03</span><a href="#s3">Car App Library vs Compose</a></li>
+    <li><span class="toc-n">04</span><a href="#s4">OEM Customization System</a></li>
+    <li><span class="toc-n">05</span><a href="#s5">Driver Distraction Guidelines</a></li>
+    <li><span class="toc-n">06</span><a href="#s6">CarUi Library & Themes</a></li>
+    <li><span class="toc-n">07</span><a href="#s7">أهم Composables المتخصصة</a></li>
+    <li><span class="toc-n">08</span><a href="#s8">الاتصال بـ VHAL من Compose</a></li>
+    <li><span class="toc-n">09</span><a href="#s9">اشتراطات Safety & Testing</a></li>
+    <li><span class="toc-n">10</span><a href="#s10">مثال تطبيق عملي كامل</a></li>
+  </ol>
+</div>
+
+<!-- ══════════════════════════ S1 -->
+<section class="section" id="s1">
+  <div class="s-label">01 — الخلفية</div>
+  <h2 class="s-title">لماذا Compose for Automotive؟</h2>
+
+  <p style="color:var(--ink2); margin-bottom:20px;">
+    قبل Compose، بناء واجهات السيارة كان معاناة حقيقية. كل OEM بيعمل نظام خاص بيه، والتطبيقات مش portable، والتخصيص محدود جداً. جوجل قررت توحّد الموضوع.
+  </p>
+
+  <div class="stats">
+    <div class="stat-cell">
+      <div class="stat-val">100+</div>
+      <div class="stat-lbl">OEM Partner مع Google</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">2022</div>
+      <div class="stat-lbl">إطلاق Compose for Automotive</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">API 29</div>
+      <div class="stat-lbl">Minimum Android Auto OS</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">3×</div>
+      <div class="stat-lbl">أسرع من View-based UI</div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="cmp-col cmp-old">
+      <div class="cmp-label">❌ قبل Compose</div>
+      <ul style="padding-right:16px; font-size:.88rem; color:var(--ink2);">
+        <li>XML Layouts معقدة وصعبة الصيانة</li>
+        <li>كل OEM ليه نظام Theme خاص</li>
+        <li>التطبيق مش شغّال على مختلف السيارات</li>
+        <li>Custom Views بتستهلك وقت كتير</li>
+        <li>Testing صعب جداً</li>
+        <li>لا يوجد Design System موحّد</li>
+      </ul>
+    </div>
+    <div class="cmp-col cmp-new">
+      <div class="cmp-label">✅ مع Compose for Automotive</div>
+      <ul style="padding-right:16px; font-size:.88rem; color:var(--ink2);">
+        <li>Declarative UI — كود أقل ومقروء</li>
+        <li>OEM Theme Layer موحّد ومرن</li>
+        <li>تطبيق واحد يشتغل على كل السيارات</li>
+        <li>Composables جاهزة لكل عنصر سيارة</li>
+        <li>Testing سهل مع Compose Test Rules</li>
+        <li>Material Design مُكيَّف للـ In-Vehicle</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pullquote">
+    "Compose for Automotive OS هو نفس Jetpack Compose المعروف، لكن ممتد بـ Components وـ Theme System مخصوص للبيئة داخل السيارة."
+  </div>
+
+  <div style="margin-top:24px;">
+    <p style="font-size:.9rem; color:var(--ink2); margin-bottom:16px;"><strong>OEMs اللي تبنّت النظام الجديد:</strong></p>
+    <div class="oem-grid">
+      <div class="oem-card"><div class="oem-logo">🚗</div><div class="oem-name">Volvo</div><div class="oem-since">since 2021</div></div>
+      <div class="oem-card"><div class="oem-logo">🚙</div><div class="oem-name">Polestar</div><div class="oem-since">since 2021</div></div>
+      <div class="oem-card"><div class="oem-logo">🏎️</div><div class="oem-name">BMW</div><div class="oem-since">since 2023</div></div>
+      <div class="oem-card"><div class="oem-logo">🚐</div><div class="oem-name">Renault</div><div class="oem-since">since 2022</div></div>
+      <div class="oem-card"><div class="oem-logo">🚕</div><div class="oem-name">GM</div><div class="oem-since">since 2023</div></div>
+      <div class="oem-card"><div class="oem-logo">🛻</div><div class="oem-name">Ford</div><div class="oem-since">since 2023</div></div>
+      <div class="oem-card"><div class="oem-logo">⚡</div><div class="oem-name">Rivian</div><div class="oem-since">since 2022</div></div>
+      <div class="oem-card"><div class="oem-logo">🔋</div><div class="oem-name">Lucid</div><div class="oem-since">since 2023</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ══════════════════════════ S2 -->
+<section class="section" id="s2">
+  <div class="s-label">02 — البنية</div>
+  <h2 class="s-title">المعمارية الكاملة لـ Android Automotive + Compose</h2>
+
+  <p style="color:var(--ink2); margin-bottom:24px;">
+    فهم الـ Architecture ضروري قبل ما تكتب أي سطر كود. في طبقات واضحة كل منها مسؤولية محددة.
+  </p>
+
+  <div class="stack">
+    <div class="layer ly-b">
+      <div class="layer-n">7</div>
+      <div class="layer-name" style="color:var(--blue);">🎨 OEM Themes & Overlays</div>
+      <div class="layer-desc">شخصية كل OEM — ألوان، خطوط، animations خاصة</div>
+    </div>
+    <div class="layer ly-r">
+      <div class="layer-n">6</div>
+      <div class="layer-name" style="color:var(--red);">📱 Automotive App (Compose)</div>
+      <div class="layer-desc">كود التطبيق — Composables + ViewModel + State</div>
+    </div>
+    <div class="layer ly-v">
+      <div class="layer-n">5</div>
+      <div class="layer-name" style="color:var(--violet);">🏗️ Car UI Library (CarUi)</div>
+      <div class="layer-desc">Automotive-specific Components — FocusArea, RotaryScrollView, CarUiToolbar</div>
+    </div>
+    <div class="layer ly-a">
+      <div class="layer-n">4</div>
+      <div class="layer-name" style="color:var(--amber);">📦 Car App Library</div>
+      <div class="layer-desc">الـ Templates الجاهزة للـ Phone Apps على شاشة السيارة</div>
+    </div>
+    <div class="layer ly-g">
+      <div class="layer-n">3</div>
+      <div class="layer-name" style="color:var(--green);">🔧 CarService + VHAL</div>
+      <div class="layer-desc">الوصول لبيانات السيارة — Speed, HVAC, Gear, Sensors</div>
+    </div>
+    <div class="layer ly-t">
+      <div class="layer-n">2</div>
+      <div class="layer-name" style="color:var(--teal);">⚙️ Android Automotive OS</div>
+      <div class="layer-desc">AOSP مُعدَّل للسيارات — Input Manager, Multi-Display, Voice</div>
+    </div>
+    <div class="layer ly-i">
+      <div class="layer-n">1</div>
+      <div class="layer-name" style="color:var(--muted);">🔌 Hardware / ECU Network</div>
+      <div class="layer-desc">SoC، شاشات، CAN Bus، Rotary Controller، Touch</div>
+    </div>
+  </div>
+
+  <div class="ac ac-amber" style="margin-top:24px;">
+    <div class="ac-title">⚡ نقطة مهمة جداً: Automotive ≠ Android Auto</div>
+    <table class="tbl" style="margin:12px 0 0;">
+      <tr><th>الخاصية</th><th>Android Auto</th><th>Android Automotive OS</th></tr>
+      <tr><td>يشتغل على</td><td>هاتف متصل بالسيارة</td><td>مدمج في السيارة نفسها</td></tr>
+      <tr><td>يحتاج هاتف؟</td><td>✅ نعم</td><td>❌ لا</td></tr>
+      <tr><td>التحكم</td><td>محدود بـ Templates</td><td>كامل — OS مستقل</td></tr>
+      <tr><td>الـ Apps</td><td>Car App Library فقط</td><td>أي Android App (مُعدَّل)</td></tr>
+      <tr><td>VHAL Access</td><td>❌</td><td>✅ مباشر</td></tr>
+    </table>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ══════════════════════════ S3 -->
+<section class="section" id="s3">
+  <div class="s-label">03 — المقارنة</div>
+  <h2 class="s-title">Car App Library vs Compose for Automotive</h2>
+
+  <p style="color:var(--ink2); margin-bottom:24px;">
+    في خيارين لبناء UI للسيارة. فهم الفرق مهم جداً لاختيار الأنسب لحالتك.
+  </p>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">📦 Car App Library (Template-based)</div>
+      <p style="font-size:.88rem; color:var(--ink2); margin-bottom:12px;">
+        للمطورين اللي عندهم Phone App وعايزين تشتغل على شاشة السيارة بدون re-write. جوجل بتتحكم في الـ Layout لأسباب السلامة.
+      </p>
+      <div class="code" style="font-size:.76rem;">
+<span class="cc">// Car App Library — Template Approach</span>
+<span class="ck">class</span> <span class="cv">MyCarSession</span> : Session() {
+  <span class="ck">override fun</span> <span class="cv">onCreateScreen</span>(<span class="cp">intent: Intent</span>) =
+    <span class="cv">MapWithContentScreen</span>(carContext)
+}
+
+<span class="ck">class</span> <span class="cv">MyScreen</span>(ctx: CarContext) : Screen(ctx) {
+  <span class="ck">override fun</span> <span class="cv">onGetTemplate</span>() =
+    <span class="cv">ListTemplate</span>.Builder()
+      .setTitle(<span class="cs">"Navigation"</span>)
+      .setSingleList(
+        <span class="cv">ItemList</span>.Builder()
+          .addItem(<span class="cv">Row</span>.Builder()
+            .setTitle(<span class="cs">"Home"</span>)
+            .build())
+          .build()
+      ).build()
+}
+      </div>
+      <div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:6px;">
+        <span class="tag t-green">Phone → Car</span>
+        <span class="tag t-blue">Safe by default</span>
+        <span class="tag t-amber">Template limited</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🎨 Compose for Automotive OS</div>
+      <p style="font-size:.88rem; color:var(--ink2); margin-bottom:12px;">
+        للـ OEM وللـ System Apps. تحكم كامل في الـ UI مع Composables مخصوصة للسيارة. أنت مسؤول عن اشتراطات السلامة.
+      </p>
+      <div class="code" style="font-size:.76rem;">
+<span class="cc">// Compose for Automotive — Full Control</span>
+<span class="ck">@Composable</span>
+<span class="ck">fun</span> <span class="cv">AutomotiveDashboard</span>() {
+  <span class="cv">CarTheme</span> {
+    <span class="cv">ConstraintLayout</span>(
+      modifier = Modifier
+        .<span class="cv">fillMaxSize</span>()
+        .<span class="cv">background</span>(MaterialTheme.colorScheme.background)
+    ) {
+      <span class="cv">SpeedometerWidget</span>()
+      <span class="cv">NavigationPanel</span>()
+      <span class="cv">HvacControls</span>()
+      <span class="cv">MediaPlayer</span>()
+    }
+  }
+}
+      </div>
+      <div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:6px;">
+        <span class="tag t-red">OEM / System</span>
+        <span class="tag t-violet">Full UI Control</span>
+        <span class="tag t-green">VHAL Access</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="warn-strip">
+    <span class="warn-icon">⚠️</span>
+    <div>
+      <strong>متى تختار إيه؟</strong> لو بتعمل تطبيق Navigation أو Music أو Parking اللي هيشتغل على سيارات مختلفة ← <span class="hl-b">Car App Library</span>. لو بتعمل System App أو OEM Custom UI أو Dashboard ← <span class="hl-r">Compose for Automotive</span>.
+    </div>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ══════════════════════════ S4 -->
+<section class="section" id="s4">
+  <div class="s-label">04 — التخصيص</div>
+  <h2 class="s-title">OEM Customization System — كيف كل سيارة بتبدو مختلفة</h2>
+
+  <p style="color:var(--ink2); margin-bottom:24px;">
+    أقوى ميزة في Compose for Automotive هي الـ <span class="hl-r">OEM Overlay System</span>. نفس التطبيق بيظهر بشكل Volvo في سيارة Volvo وبشكل BMW في سيارة BMW — بدون تغيير سطر كود.
+  </p>
+
+  <div class="ac ac-red" style="margin-bottom:20px;">
+    <div class="ac-title">🎭 كيف يعمل نظام الـ Overlay؟</div>
+    <p style="font-size:.88rem; color:var(--ink2);">
+      الـ OEM بيعمل APK خاص اسمه <code>CarUiPorting</code> بيحتوي على Resources Overlay. Android بيطبّق الـ Resources دي تلقائياً على أي App بيستخدم CarUi Library.
+    </p>
+  </div>
+
+  <div class="g2">
+    <div>
+      <h4 style="font-size:.85rem; font-weight:700; margin-bottom:12px; color:var(--blue);">🎨 ما يقدر الـ OEM يخصّصه</h4>
+      <div class="card" style="padding:20px 24px;">
+        <table class="tbl">
+          <tr><th>العنصر</th><th>طريقة التخصيص</th></tr>
+          <tr><td>الألوان</td><td><code>colorPrimary, colorSurface …</code></td></tr>
+          <tr><td>الخطوط</td><td><code>fontFamily override in XML</code></td></tr>
+          <tr><td>الأيقونات</td><td>Drawable replacement في APK</td></tr>
+          <tr><td>الـ Radius</td><td><code>car_ui_corner_radius</code></td></tr>
+          <tr><td>الـ Animations</td><td>Custom Interpolators</td></tr>
+          <tr><td>الـ Toolbar</td><td>CarUiToolbar overlay</td></tr>
+          <tr><td>الـ Rotary</td><td>Focus highlight color & shape</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <h4 style="font-size:.85rem; font-weight:700; margin-bottom:12px; color:var(--red);">🔒 ما لا يقدر الـ OEM يغيّره</h4>
+      <div class="card" style="padding:20px 24px;">
+        <div style="font-size:.88rem; color:var(--ink2); line-height:2.2;">
+          ✅ منطق التطبيق نفسه<br>
+          ✅ اشتراطات السلامة (Driver Distraction)<br>
+          ✅ الـ Data Flow من VHAL<br>
+          ✅ وظائف الأزرار الأساسية<br>
+          ✅ الـ Accessibility requirements<br>
+          ✅ Permission model<br>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h4 style="font-size:.95rem; font-weight:700; margin:28px 0 12px; color:var(--ink);">🔧 بناء OEM CarTheme في Compose</h4>
+
+  <div class="code">
+<span class="cc">// 1. تعريف OEM Color Scheme</span>
+<span class="ck">val</span> <span class="cv">VolvoColorScheme</span> = <span class="cv">darkColorScheme</span>(
+  primary        = Color(<span class="cn">0xFF1B3A6B</span>),  <span class="cc">// Volvo Blue</span>
+  onPrimary      = Color(<span class="cn">0xFFFFFFFF</span>),
+  secondary      = Color(<span class="cn">0xFF8B9EB7</span>),
+  background     = Color(<span class="cn">0xFF0D1117</span>),
+  surface        = Color(<span class="cn">0xFF1A2332</span>),
+  error          = Color(<span class="cn">0xFFE53935</span>),
+)
+
+<span class="cc">// 2. تعريف OEM Typography</span>
+<span class="ck">val</span> <span class="cv">VolvoTypography</span> = <span class="cv">Typography</span>(
+  displayLarge = TextStyle(
+    fontFamily = <span class="cv">FontFamily</span>(Font(R.font.volvo_novum_bold)),
+    fontSize   = <span class="cn">57</span>.sp,
+    lineHeight = <span class="cn">64</span>.sp,
+  ),
+  bodyMedium = TextStyle(
+    fontFamily = <span class="cv">FontFamily</span>(Font(R.font.volvo_novum_regular)),
+    fontSize   = <span class="cn">14</span>.sp,
+  )
+)
+
+<span class="cc">// 3. OEM Theme Composable</span>
+<span class="ck">@Composable</span>
+<span class="ck">fun</span> <span class="cv">VolvoCarTheme</span>(
+  <span class="cp">isDriving: Boolean</span> = <span class="ck">false</span>,
+  <span class="cp">content: @Composable () -> Unit</span>
+) {
+  <span class="cc">// خفّف التعقيد أثناء القيادة</span>
+  <span class="ck">val</span> colors = <span class="ck">if</span> (isDriving)
+    <span class="cv">VolvoColorScheme</span>.<span class="cv">copy</span>(surface = Color(<span class="cn">0xFF0A0E14</span>))
+  <span class="ck">else</span>
+    <span class="cv">VolvoColorScheme</span>
+
+  MaterialTheme(
+    colorScheme = colors,
+    typography  = <span class="cv">VolvoTypography</span>,
+    content     = content
+  )
+}
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ══════════════════════════ S5 -->
+<section class="section" id="s5">
+  <div class="s-label">05 — السلامة</div>
+  <h2 class="s-title">Driver Distraction Guidelines — القانون الأهم</h2>
+
+  <div class="ac ac-red" style="margin-bottom:24px;">
+    <div class="ac-title">🚨 هذا ليس اختيارياً — هو شرط إلزامي</div>
+    <p style="font-size:.88rem; color:var(--ink2);">
+      جوجل بتحكم على التطبيقات وممكن ترفض تطبيقك لو خالف قواعد Driver Distraction. في بعض الدول ده مطلب قانوني كمان.
+    </p>
+  </div>
+
+  <div class="g2">
+    <div class="ac ac-red">
+      <div class="ac-title">❌ ممنوع أثناء القيادة</div>
+      <ul style="font-size:.88rem; color:var(--ink2); padding-right:16px; line-height:2.2;">
+        <li>نصوص أكتر من <strong>30 حرف</strong> (تقريباً)</li>
+        <li>Keyboard أو Input Text</li>
+        <li>Lists أكتر من <strong>4 عناصر</strong></li>
+        <li>Videos أو Animations كتيرة</li>
+        <li>Maps interactive بالكامل</li>
+        <li>أي Action بتاخد أكتر من <strong>2 تاب</strong></li>
+        <li>Dialogs معقدة أو Multi-step</li>
+      </ul>
+    </div>
+    <div class="ac ac-green">
+      <div class="ac-title">✅ مسموح أثناء القيادة</div>
+      <ul style="font-size:.88rem; color:var(--ink2); padding-right:16px; line-height:2.2;">
+        <li>قراءة معلومات بسيطة (Speed, Time)</li>
+        <li>أزرار كبيرة واضحة (tap target ≥ 76dp)</li>
+        <li>Accept/Reject calls</li>
+        <li>Media controls (Play/Pause/Skip)</li>
+        <li>Voice input بدلاً من Keyboard</li>
+        <li>Navigation simple (Turn by Turn)</li>
+        <li>HVAC simple controls</li>
+      </ul>
+    </div>
+  </div>
+
+  <h4 style="margin:28px 0 12px; font-weight:700; color:var(--ink);">⚙️ تطبيق Driver Distraction في Compose</h4>
+
+  <div class="code">
+<span class="cc">// 1. استقبال حالة القيادة من CarService</span>
+<span class="ck">@Composable</span>
+<span class="ck">fun</span> <span class="cv">rememberDrivingState</span>(): <span class="cv">State</span>&lt;<span class="cv">DrivingState</span>&gt; {
+  <span class="ck">val</span> context = <span class="cv">LocalContext</span>.current
+  <span class="ck">return</span> <span class="cv">produceState</span>(initialValue = DrivingState.PARKED) {
+    <span class="ck">val</span> car = Car.createCar(context)
+    <span class="ck">val</span> drivingMgr = car.getCarManager(
+      Car.CAR_DRIVING_STATE_SERVICE
+    ) <span class="ck">as</span> <span class="cv">CarDrivingStateManager</span>
+
+    drivingMgr.registerListener { event ->
+      value = <span class="ck">when</span>(event.currentCarDrivingState) {
+        CarDrivingStateEvent.DRIVING_STATE_MOVING  -> DrivingState.DRIVING
+        CarDrivingStateEvent.DRIVING_STATE_IDLING  -> DrivingState.IDLING
+        <span class="ck">else</span> -> DrivingState.PARKED
+      }
+    }
+  }
+}
+
+<span class="cc">// 2. تطبيق القيود تلقائياً</span>
+<span class="ck">@Composable</span>
+<span class="ck">fun</span> <span class="cv">SettingsScreen</span>() {
+  <span class="ck">val</span> drivingState <span class="ck">by</span> <span class="cv">rememberDrivingState</span>()
+  <span class="ck">val</span> isDriving = drivingState == DrivingState.DRIVING
+
+  <span class="cv">Column</span> {
+    <span class="cc">// هذا مسموح دائماً</span>
+    <span class="cv">MediaControls</span>()
+
+    <span class="cc">// هذا يُخفى أثناء القيادة</span>
+    <span class="cv">AnimatedVisibility</span>(visible = !isDriving) {
+      <span class="cv">AdvancedSettings</span>()
+    }
+
+    <span class="cc">// مقيّد في القيادة</span>
+    <span class="cv">OutlinedTextField</span>(
+      enabled = !isDriving,
+      value   = searchQuery,
+      label   = { Text(<span class="cs">"Search (parked only)"</span>) },
+      onValueChange = { <span class="ck">if</span>(!isDriving) searchQuery = it }
+    )
+  }
+}
+  </div>
+
+  <div class="g3" style="margin-top:20px;">
+    <div class="ac ac-blue">
+      <div class="ac-title">📐 Tap Target Size</div>
+      <p style="font-size:.85rem; color:var(--ink2);">Minimum <strong>76dp × 76dp</strong> لكل عنصر تفاعلي. أكبر أفضل لأن الشاشة بتتحرك مع السيارة.</p>
+    </div>
+    <div class="ac ac-violet">
+      <div class="ac-title">🔤 Font Size</div>
+      <p style="font-size:.85rem; color:var(--ink2);">Minimum <strong>24sp</strong> للنصوص الأساسية. الـ Secondary text مش لازم يكون visible أثناء القيادة.</p>
+    </div>
+    <div class="ac ac-teal">
+      <div class="ac-title">⏱️ Response Time</div>
+      <p style="font-size:.85rem; color:var(--ink2);">الـ UI لازم يستجيب في أقل من <strong>200ms</strong>. السائق مش عارف ينتظر.</p>
+    </div>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ══════════════════════════ S6 -->
+<section class="section" id="s6">
+  <div class="s-label">06 — المكتبة</div>
+  <h2 class="s-title">CarUi Library — الـ Components الجاهزة للسيارة</h2>
+
+  <p style="color:var(--ink2); margin-bottom:24px;">
+    الـ <span class="hl-r">CarUi Library</span> هي المكتبة الرسمية اللي Google وفّرتها. بتحتوي على Components مخصوصة للـ In-Vehicle UI.
+  </p>
+
+  <div class="code" style="margin-bottom:20px;">
+<span class="cc">// build.gradle.kts</span>
+<span class="cv">dependencies</span> {
+  implementation(<span class="cs">"com.android.car.ui:car-ui-lib:2.6.0"</span>)
+  implementation(<span class="cs">"androidx.car.app:app:1.4.0"</span>)
+  implementation(<span class="cs">"androidx.car.app:app-automotive:1.4.0"</span>)
+
+  <span class="cc">// Compose للـ Automotive</span>
+  implementation(<span class="cs">"androidx.compose.ui:ui:1.6.0"</span>)
+  implementation(<span class="cs">"androidx.compose.material3:material3:1.2.0"</span>)
+  implementation(<span class="cs">"com.google.android.car:car-compose:1.0.0"</span>)
+}
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">🔄 RotaryScrollView</div>
+      <p style="font-size:.85rem; color:var(--ink2); margin-bottom:12px;">
+        تحكم بالشاشة بالـ Rotary Controller (الدوّارة) بدلاً من اللمس. شائعة في السيارات الألمانية والفاخرة.
+      </p>
+      <div class="code" style="font-size:.75rem;">
+<span class="ck">@Composable</span>
+<span class="ck">fun</span> <span class="cv">RotaryMenu</span>() {
+  <span class="cv">RotaryScrollColumn</span>(
+    modifier = Modifier.<span class="cv">fillMaxSize</span>()
+  ) {
+    items.forEach { item ->
+      <span class="cv">FocusableItem</span>(
+        onClick = { <span class="cv">navigate</span>(item.route) }
+      ) {
+        <span class="cv">MenuRow</span>(item)
+      }
+    }
+  }
+}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 CarUiToolbar</div>
+      <p style="font-size:.85rem; color:var(--ink2); margin-bottom:12px;">
+        شريط التنقل العلوي القياسي في Android Automotive. قابل للتخصيص من الـ OEM بالكامل.
+      </p>
+      <div class="code" style="font-size:.75rem;">
+<span class="ck">@Composable</span>
+<span class="ck">fun</span> <span class="cv">SettingsPage</span>() {
+  <span class="cv">Scaffold</span>(
+    topBar = {
+      <span class="cv">CarUiToolbar</span>(
+        title       = <span class="cs">"الإعدادات"</span>,
+        navIconMode = NavIconMode.BACK,
+        onNavIconClicked = { navController.popBackStack() },
+        menuItems = listOf(
+          <span class="cv">MenuItem</span>(title=<span class="cs">"بحث"</span>, icon=R.drawable.ic_search)
+        )
+      )
+    }
+  ) { padding -> <span class="cc">/* content */</span> }
+}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🎛️ FocusArea</div>
+      <p style="font-size:.85rem; color:var(--ink2); margin-bottom:12px;">
+        لإدارة الـ Focus لما المستخدم بيستخدم D-pad أو Rotary. مهم جداً للـ Navigation بدون Touch.
+      </p>
+      <div class="code" style="font-size:.75rem;">
+<span class="ck">@Composable</span>
+<span class="ck">fun</span> <span class="cv">ClimatePanel</span>() {
+  <span class="cv">Row</span> {
+    <span class="cv">FocusArea</span> {  <span class="cc">// Zone 1: Temperature</span>
+      <span class="cv">TemperatureControl</span>()
+    }
+    <span class="cv">FocusArea</span> {  <span class="cc">// Zone 2: Fan</span>
+      <span class="cv">FanSpeedControl</span>()
+    }
+    <span class="cv">FocusArea</span> {  <span class="cc">// Zone 3: Mode</span>
+      <span class="cv">AirflowSelector</span>()
+    }
+  }
+}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 CarUiRecyclerView</div>
+      <p style="font-size:.85rem; color:var(--ink2); margin-bottom:12px;">
+        قائمة مُحسَّنة للسيارة. تدعم Rotary Scroll وبتطبّق Driver Distraction rules تلقائياً.
+      </p>
+      <div class="code" style="font-size:.75rem;">
+<span class="ck">@Composable</span>
+<span class="ck">fun</span> <span class="cv">ContactsList</span>(contacts: List&lt;Contact&gt;) {
+  <span class="cv">LazyColumn</span>(
+    modifier = Modifier.<span class="cv">carUiRecyclerView</span>()
+  ) {
+    items(contacts) { contact ->
+      <span class="cv">ContactRow</span>(
+        contact = contact,
+        modifier = Modifier.<span class="cv">carUiTappable</span>()
+      )
+    }
+  }
+}
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ══════════════════════════ S7 -->
+<section class="section" id="s7">
+  <div class="s-label">07 — المكوّنات</div>
+  <h2 class="s-title">أهم Composables المخصوصة للسيارة</h2>
+
+  <div class="code">
+<span class="cc">// ══ 1. Speedometer Widget ══</span>
+<span class="ck">@Composable</span>
+<span class="ck">fun</span> <span class="cv">Speedometer</span>(
+  <span class="cp">speed: Float</span>,
+  <span class="cp">maxSpeed: Float</span> = <span class="cn">240f</span>,
+  <span class="cp">unit: String</span>   = <span class="cs">"km/h"</span>
+) {
+  <span class="ck">val</span> sweepAngle = (speed / maxSpeed) * <span class="cn">270f</span>
+  <span class="ck">val</span> animAngle <span class="ck">by</span> <span class="cv">animateFloatAsState</span>(
+    targetValue   = sweepAngle,
+    animationSpec = <span class="cv">tween</span>(<span class="cn">300</span>, easing = FastOutSlowInEasing)
+  )
+
+  <span class="cv">Box</span>(contentAlignment = Alignment.Center) {
+    <span class="cv">Canvas</span>(modifier = Modifier.<span class="cv">size</span>(<span class="cn">240</span>.dp)) {
+      <span class="cc">// Arc الخلفي</span>
+      <span class="cv">drawArc</span>(
+        color      = Color.Gray.<span class="cv">copy</span>(alpha = <span class="cn">0.2f</span>),
+        startAngle = <span class="cn">135f</span>, sweepAngle = <span class="cn">270f</span>,
+        useCenter  = <span class="ck">false</span>,
+        style      = Stroke(width = <span class="cn">16</span>.dp.toPx(), cap = StrokeCap.Round)
+      )
+      <span class="cc">// Arc السرعة</span>
+      <span class="cv">drawArc</span>(
+        brush      = <span class="cv">Brush</span>.<span class="cv">sweepGradient</span>(listOf(Color.Green, Color.Red)),
+        startAngle = <span class="cn">135f</span>, sweepAngle = animAngle,
+        useCenter  = <span class="ck">false</span>,
+        style      = Stroke(width = <span class="cn">16</span>.dp.toPx(), cap = StrokeCap.Round)
+      )
+    }
+    <span class="cv">Column</span>(horizontalAlignment = Alignment.CenterHorizontally) {
+      <span class="cv">Text</span>(text=<span class="cs">"${speed.toInt()}"</span>, style=MaterialTheme.typography.displayLarge)
+      <span class="cv">Text</span>(text=unit, style=MaterialTheme.typography.labelSmall)
+    }
+  }
+}
+
+<span class="cc">// ══ 2. HVAC Temperature Knob ══</span>
+<span class="ck">@Composable</span>
+<span class="ck">fun</span> <span class="cv">TemperatureKnob</span>(
+  <span class="cp">temp: Float</span>,
+  <span class="cp">onTempChange: (Float) -> Unit</span>,
+  <span class="cp">isDriving: Boolean</span>
+) {
+  <span class="ck">var</span> localTemp <span class="ck">by</span> <span class="cv">remember</span> { <span class="cv">mutableStateOf</span>(temp) }
+
+  <span class="cv">Column</span>(horizontalAlignment = Alignment.CenterHorizontally) {
+    <span class="cv">Text</span>(<span class="cs">"${localTemp.toInt()}°C"</span>, style = MaterialTheme.typography.headlineLarge)
+    <span class="cv">Row</span>(horizontalArrangement = Arrangement.spacedBy(<span class="cn">24</span>.dp)) {
+      <span class="cv">IconButton</span>(
+        onClick  = { <span class="ck">if</span>(localTemp > <span class="cn">16f</span>) { localTemp -= <span class="cn">0.5f</span>; onTempChange(localTemp) } },
+        modifier = Modifier.<span class="cv">size</span>(<span class="cn">76</span>.dp)  <span class="cc">// Minimum tap target!</span>
+      ) { <span class="cv">Icon</span>(Icons.Minus, contentDescription = <span class="cs">"تخفيض"</span>) }
+
+      <span class="cv">IconButton</span>(
+        onClick  = { <span class="ck">if</span>(localTemp < <span class="cn">30f</span>) { localTemp += <span class="cn">0.5f</span>; onTempChange(localTemp) } },
+        modifier = Modifier.<span class="cv">size</span>(<span class="cn">76</span>.dp)
+      ) { <span class="cv">Icon</span>(Icons.Plus, contentDescription = <span class="cs">"رفع"</span>) }
+    }
+  }
+}
+
+<span class="cc">// ══ 3. Gear Indicator ══</span>
+<span class="ck">@Composable</span>
+<span class="ck">fun</span> <span class="cv">GearIndicator</span>(<span class="cp">gear: VehicleGear</span>) {
+  <span class="ck">val</span> label = <span class="ck">when</span>(gear) {
+    VehicleGear.GEAR_PARK    -> <span class="cs">"P"</span>
+    VehicleGear.GEAR_REVERSE -> <span class="cs">"R"</span>
+    VehicleGear.GEAR_NEUTRAL -> <span class="cs">"N"</span>
+    VehicleGear.GEAR_DRIVE   -> <span class="cs">"D"</span>
+    <span class="ck">else</span>                      -> <span class="cs">"${gear.value}"</span>
+  }
+  <span class="ck">val</span> color = <span class="ck">when</span>(gear) {
+    VehicleGear.GEAR_REVERSE -> Color(<span class="cn">0xFFFF6B35</span>)
+    VehicleGear.GEAR_DRIVE   -> Color(<span class="cn">0xFF22C55E</span>)
+    <span class="ck">else</span>                      -> MaterialTheme.colorScheme.onSurface
+  }
+  <span class="cv">Text</span>(text=label, color=color, style=MaterialTheme.typography.displayMedium)
+}
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ══════════════════════════ S8 -->
+<section class="section" id="s8">
+  <div class="s-label">08 — التكامل</div>
+  <h2 class="s-title">الاتصال بـ VHAL من Compose</h2>
+
+  <p style="color:var(--ink2); margin-bottom:24px;">
+    الـ Compose UI بيتصل بالـ VHAL عبر <span class="hl-b">CarPropertyManager</span>. اتبع Pattern معين عشان تعمل تكامل نظيف مع الـ ViewModel.
+  </p>
+
+  <div class="code">
+<span class="cc">// ══ 1. Vehicle Repository ══</span>
+<span class="ck">class</span> <span class="cv">VehicleRepository</span>(
+  <span class="cp">private val car: Car</span>
+) {
+  <span class="ck">private val</span> propMgr = car.getCarManager(
+    Car.PROPERTY_SERVICE
+  ) <span class="ck">as</span> <span class="cv">CarPropertyManager</span>
+
+  <span class="cc">// Speed كـ Flow</span>
+  <span class="ck">val</span> speedFlow: Flow&lt;Float&gt; = <span class="cv">callbackFlow</span> {
+    <span class="ck">val</span> callback = <span class="ck">object</span> : CarPropertyManager.CarPropertyEventCallback {
+      <span class="ck">override fun</span> <span class="cv">onChangeEvent</span>(value: CarPropertyValue&lt;*&gt;) {
+        trySend(value.value <span class="ck">as</span> Float)
+      }
+      <span class="ck">override fun</span> <span class="cv">onErrorEvent</span>(propId: Int, zone: Int) {}
+    }
+    propMgr.registerCallback(
+      callback,
+      VehiclePropertyIds.PERF_VEHICLE_SPEED,
+      CarPropertyManager.SENSOR_RATE_NORMAL
+    )
+    awaitClose { propMgr.unregisterCallback(callback) }
+  }
+
+  <span class="cc">// ضبط الـ HVAC</span>
+  <span class="ck">fun</span> <span class="cv">setTemperature</span>(zone: Int, temp: Float) {
+    propMgr.setFloatProperty(
+      VehiclePropertyIds.HVAC_TEMPERATURE_SET,
+      zone, temp
+    )
+  }
+
+  <span class="cc">// قراءة الـ Gear</span>
+  <span class="ck">fun</span> <span class="cv">getCurrentGear</span>(): Int =
+    propMgr.getIntProperty(VehiclePropertyIds.CURRENT_GEAR, <span class="cn">0</span>)
+}
+
+<span class="cc">// ══ 2. ViewModel ══</span>
+<span class="ck">class</span> <span class="cv">DashboardViewModel</span>(
+  <span class="cp">private val repo: VehicleRepository</span>
+) : ViewModel() {
+
+  <span class="ck">val</span> speed = repo.speedFlow
+    .<span class="cv">map</span> { it * <span class="cn">3.6f</span> }  <span class="cc">// m/s → km/h</span>
+    .<span class="cv">stateIn</span>(viewModelScope, SharingStarted.WhileSubscribed(<span class="cn">5000</span>), <span class="cn">0f</span>)
+
+  <span class="ck">private val</span> _uiState = <span class="cv">MutableStateFlow</span>(DashboardUiState())
+  <span class="ck">val</span> uiState = _uiState.asStateFlow()
+
+  <span class="ck">fun</span> <span class="cv">setTemperature</span>(zone: Int, temp: Float) {
+    viewModelScope.launch { repo.setTemperature(zone, temp) }
+    _uiState.update { it.copy(targetTemp = temp) }
+  }
+}
+
+<span class="cc">// ══ 3. Compose UI تستهلك الـ ViewModel ══</span>
+<span class="ck">@Composable</span>
+<span class="ck">fun</span> <span class="cv">DashboardScreen</span>(vm: DashboardViewModel = viewModel()) {
+  <span class="ck">val</span> speed <span class="ck">by</span> vm.speed.<span class="cv">collectAsStateWithLifecycle</span>()
+  <span class="ck">val</span> uiState <span class="ck">by</span> vm.uiState.<span class="cv">collectAsStateWithLifecycle</span>()
+
+  <span class="cv">Row</span>(modifier = Modifier.<span class="cv">fillMaxSize</span>()) {
+    <span class="cv">Speedometer</span>(speed = speed)
+    <span class="cv">TemperatureKnob</span>(
+      temp         = uiState.targetTemp,
+      onTempChange = { vm.setTemperature(VehicleAreaSeat.ROW_1_LEFT, it) },
+      isDriving    = uiState.isDriving
+    )
+  }
+}
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ══════════════════════════ S9 -->
+<section class="section" id="s9">
+  <div class="s-label">09 — الجودة</div>
+  <h2 class="s-title">Safety, Testing & OEM Certification</h2>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">🧪 Compose Testing في Automotive</div>
+      <div class="code" style="font-size:.76rem; margin-top:12px;">
+<span class="ck">@RunWith</span>(AndroidJUnit4::class)
+<span class="ck">class</span> <span class="cv">DashboardTest</span> {
+  <span class="ck">@get:Rule val</span> rule = <span class="cv">createComposeRule</span>()
+
+  <span class="ck">@Test fun</span> <span class="cv">speedometer_shows_correct_value</span>() {
+    rule.setContent {
+      <span class="cv">VolvoCarTheme</span> {
+        <span class="cv">Speedometer</span>(speed = <span class="cn">120f</span>)
+      }
+    }
+    rule.onNodeWithText(<span class="cs">"120"</span>).<span class="cv">assertIsDisplayed</span>()
+  }
+
+  <span class="ck">@Test fun</span> <span class="cv">settings_hidden_while_driving</span>() {
+    rule.setContent {
+      <span class="cv">SettingsScreen</span>(isDriving = <span class="ck">true</span>)
+    }
+    rule.onNodeWithTag(<span class="cs">"AdvancedSettings"</span>)
+       .<span class="cv">assertDoesNotExist</span>()
+  }
+}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 OEM Certification Checklist</div>
+      <div style="font-size:.85rem; color:var(--ink2); line-height:2.3; margin-top:8px;">
+        ☐ Driver Distraction requirements مكتملة<br>
+        ☐ Tap targets ≥ 76dp في كل الحالات<br>
+        ☐ Dark Mode / Light Mode مدعوم<br>
+        ☐ Rotary Controller navigation يعمل<br>
+        ☐ Performance: 60fps ثابت<br>
+        ☐ Cold Start أقل من 5 ثوانٍ<br>
+        ☐ OEM Theme Overlay مُطبَّق صح<br>
+        ☐ Voice command integration<br>
+        ☐ Multi-display support (إن وُجد)<br>
+        ☐ VHAL error handling مكتمل<br>
+      </div>
+    </div>
+  </div>
+
+  <div class="ac ac-violet" style="margin-top:16px;">
+    <div class="ac-title">🎯 Performance Targets للـ Automotive UI</div>
+    <div class="g3" style="margin-top:12px;">
+      <div style="text-align:center;">
+        <div style="font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; color:var(--violet);">60fps</div>
+        <div style="font-size:.8rem; color:var(--muted);">Frame Rate مستمر</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; color:var(--violet);">&lt;200ms</div>
+        <div style="font-size:.8rem; color:var(--muted);">Input Latency</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; color:var(--violet);">&lt;5sec</div>
+        <div style="font-size:.8rem; color:var(--muted);">Cold Boot Time</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ══════════════════════════ S10 -->
+<section class="section" id="s10">
+  <div class="s-label">10 — المثال العملي</div>
+  <h2 class="s-title">تطبيق HVAC كامل — End-to-End</h2>
+
+  <div class="ac ac-green" style="margin-bottom:24px;">
+    <div class="ac-title">🎯 الهدف</div>
+    <p style="font-size:.88rem; color:var(--ink2);">
+      تطبيق تحكم في التكييف (HVAC) يقرأ من VHAL، يدعم القيادة والوقوف، يطبّق OEM Theme، ويستجيب للـ Rotary Controller.
+    </p>
+  </div>
+
+  <div class="code">
+<span class="cc">// ══════════════════════════════════════════════
+// HVAC App — Complete Implementation
+// ══════════════════════════════════════════════</span>
+
+<span class="cc">// ── Data Layer ──</span>
+<span class="ck">data class</span> <span class="cv">HvacState</span>(
+  <span class="cp">val driverTemp: Float</span>  = <span class="cn">22f</span>,
+  <span class="cp">val passengerTemp: Float</span>= <span class="cn">22f</span>,
+  <span class="cp">val fanSpeed: Int</span>       = <span class="cn">3</span>,
+  <span class="cp">val acOn: Boolean</span>       = <span class="ck">true</span>,
+  <span class="cp">val autoOn: Boolean</span>     = <span class="ck">false</span>,
+  <span class="cp">val isDriving: Boolean</span>  = <span class="ck">false</span>
+)
+
+<span class="cc">// ── ViewModel ──</span>
+<span class="ck">class</span> <span class="cv">HvacViewModel</span>(app: Application) : AndroidViewModel(app) {
+  <span class="ck">private val</span> car = Car.createCar(app)
+  <span class="ck">private val</span> propMgr = car.getCarManager(Car.PROPERTY_SERVICE)
+    <span class="ck">as</span> CarPropertyManager
+
+  <span class="ck">private val</span> _state = <span class="cv">MutableStateFlow</span>(HvacState())
+  <span class="ck">val</span> state = _state.asStateFlow()
+
+  <span class="ck">init</span> {
+    <span class="cc">// Subscribe to VHAL changes</span>
+    propMgr.registerCallback(hvacCallback,
+      VehiclePropertyIds.HVAC_TEMPERATURE_CURRENT,
+      CarPropertyManager.SENSOR_RATE_ONCHANGE
+    )
+    loadInitialState()
+  }
+
+  <span class="ck">private fun</span> <span class="cv">loadInitialState</span>() {
+    _state.update { it.copy(
+      driverTemp   = propMgr.getFloatProperty(
+        VehiclePropertyIds.HVAC_TEMPERATURE_SET,
+        VehicleAreaSeat.ROW_1_LEFT
+      ),
+      acOn = propMgr.getBooleanProperty(
+        VehiclePropertyIds.HVAC_AC_ON,
+        VehicleAreaSeat.ROW_1_LEFT
+      )
+    )}
+  }
+
+  <span class="ck">fun</span> <span class="cv">setDriverTemp</span>(temp: Float) {
+    <span class="ck">val</span> clamped = temp.<span class="cv">coerceIn</span>(<span class="cn">16f</span>, <span class="cn">30f</span>)
+    propMgr.setFloatProperty(
+      VehiclePropertyIds.HVAC_TEMPERATURE_SET,
+      VehicleAreaSeat.ROW_1_LEFT, clamped
+    )
+    _state.update { it.copy(driverTemp = clamped) }
+  }
+
+  <span class="ck">fun</span> <span class="cv">toggleAC</span>() {
+    <span class="ck">val</span> newVal = !_state.value.acOn
+    propMgr.setBooleanProperty(
+      VehiclePropertyIds.HVAC_AC_ON,
+      VehicleAreaSeat.ROW_1_LEFT, newVal
+    )
+    _state.update { it.copy(acOn = newVal) }
+  }
+
+  <span class="ck">fun</span> <span class="cv">setFanSpeed</span>(speed: Int) {
+    <span class="ck">val</span> clamped = speed.<span class="cv">coerceIn</span>(<span class="cn">1</span>, <span class="cn">7</span>)
+    propMgr.setIntProperty(
+      VehiclePropertyIds.HVAC_FAN_SPEED,
+      VehicleAreaSeat.ROW_1_LEFT, clamped
+    )
+    _state.update { it.copy(fanSpeed = clamped) }
+  }
+}
+
+<span class="cc">// ── UI Layer ──</span>
+<span class="ck">@Composable</span>
+<span class="ck">fun</span> <span class="cv">HvacScreen</span>(vm: HvacViewModel = viewModel()) {
+  <span class="ck">val</span> state <span class="ck">by</span> vm.state.<span class="cv">collectAsStateWithLifecycle</span>()
+
+  <span class="cv">CarTheme</span>(isDriving = state.isDriving) {
+    <span class="cv">Surface</span>(modifier = Modifier.<span class="cv">fillMaxSize</span>()) {
+      <span class="cv">Row</span>(
+        modifier = Modifier.<span class="cv">fillMaxSize</span>().<span class="cv">padding</span>(<span class="cn">24</span>.dp),
+        horizontalArrangement = Arrangement.spacedBy(<span class="cn">32</span>.dp)
+      ) {
+
+        <span class="cc">// Driver Zone</span>
+        <span class="cv">FocusArea</span>(modifier = Modifier.<span class="cv">weight</span>(<span class="cn">1f</span>)) {
+          <span class="cv">ZoneControl</span>(
+            label       = <span class="cs">"السائق"</span>,
+            temp        = state.driverTemp,
+            onTempUp    = { vm.setDriverTemp(state.driverTemp + <span class="cn">0.5f</span>) },
+            onTempDown  = { vm.setDriverTemp(state.driverTemp - <span class="cn">0.5f</span>) },
+            isDriving   = state.isDriving
+          )
+        }
+
+        <span class="cc">// Center Controls</span>
+        <span class="cv">FocusArea</span>(modifier = Modifier.<span class="cv">weight</span>(<span class="cn">1.2f</span>)) {
+          <span class="cv">CenterHvacPanel</span>(
+            fanSpeed    = state.fanSpeed,
+            acOn        = state.acOn,
+            autoOn      = state.autoOn,
+            onFanChange = vm::setFanSpeed,
+            onACToggle  = vm::toggleAC,
+            isDriving   = state.isDriving
+          )
+        }
+
+        <span class="cc">// Passenger Zone</span>
+        <span class="cv">FocusArea</span>(modifier = Modifier.<span class="cv">weight</span>(<span class="cn">1f</span>)) {
+          <span class="cv">ZoneControl</span>(
+            label       = <span class="cs">"الراكب"</span>,
+            temp        = state.passengerTemp,
+            onTempUp    = { <span class="cc">/* similar */</span> },
+            onTempDown  = { <span class="cc">/* similar */</span> },
+            isDriving   = state.isDriving
+          )
+        }
+      }
+    }
+  }
+}
+
+<span class="cc">// ── AndroidManifest.xml ──</span>
+<span class="cc">/*
+&lt;application
+    android:appCategory="audio"  &lt;!-- or "video", "productivity" --&gt;
+    ...&gt;
+    &lt;uses-feature android:name="android.hardware.type.automotive"
+                  android:required="true"/&gt;
+    &lt;meta-data android:name="com.android.automotive"
+               android:resource="@xml/automotive_app_desc"/&gt;
+&lt;/application&gt;
+
+&lt;!-- automotive_app_desc.xml --&gt;
+&lt;automotiveApp&gt;
+    &lt;uses name="template"/&gt;
+&lt;/automotiveApp&gt;
+*/</span>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ══════════════════════════ SUMMARY -->
+<div class="card" style="background:var(--ink); color:var(--bg); border:none; border-radius:8px; padding:36px 40px;">
+  <div style="font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800; margin-bottom:20px; color:var(--bg);">
+    📊 ملخص المسار الكامل
+  </div>
+  <table class="tbl" style="color:var(--bg);">
+    <tr>
+      <th style="background:rgba(255,255,255,.1); color:rgba(245,240,232,.6);">المرحلة</th>
+      <th style="background:rgba(255,255,255,.1); color:rgba(245,240,232,.6);">الأداة</th>
+      <th style="background:rgba(255,255,255,.1); color:rgba(245,240,232,.6);">المسؤول</th>
+    </tr>
+    <tr>
+      <td style="border-color:rgba(255,255,255,.1);">Hardware Signal</td>
+      <td style="border-color:rgba(255,255,255,.1);"><code style="background:rgba(192,57,43,.3); border:none; color:#e07060;">CAN Bus</code></td>
+      <td style="border-color:rgba(255,255,255,.1); color:rgba(245,240,232,.6);">ECU / Tier-1</td>
+    </tr>
+    <tr>
+      <td style="border-color:rgba(255,255,255,.1);">Data Abstraction</td>
+      <td style="border-color:rgba(255,255,255,.1);"><code style="background:rgba(26,107,58,.3); border:none; color:#4caf6e;">VHAL + CarService</code></td>
+      <td style="border-color:rgba(255,255,255,.1); color:rgba(245,240,232,.6);">OEM / Android</td>
+    </tr>
+    <tr>
+      <td style="border-color:rgba(255,255,255,.1);">UI Components</td>
+      <td style="border-color:rgba(255,255,255,.1);"><code style="background:rgba(91,45,142,.3); border:none; color:#a070d0;">CarUi + Compose</code></td>
+      <td style="border-color:rgba(255,255,255,.1); color:rgba(245,240,232,.6);">App Developer</td>
+    </tr>
+    <tr>
+      <td style="border-color:rgba(255,255,255,.1);">Visual Identity</td>
+      <td style="border-color:rgba(255,255,255,.1);"><code style="background:rgba(26,58,107,.3); border:none; color:#6090d0;">OEM Theme Overlay</code></td>
+      <td style="border-color:rgba(255,255,255,.1); color:rgba(245,240,232,.6);">OEM Design Team</td>
+    </tr>
+    <tr>
+      <td style="border-color:rgba(255,255,255,.1);">Safety Layer</td>
+      <td style="border-color:rgba(255,255,255,.1);"><code style="background:rgba(217,119,6,.3); border:none; color:#d97706;">DrivingState API</code></td>
+      <td style="border-color:rgba(255,255,255,.1); color:rgba(245,240,232,.6);">Developer (مسؤوليتك!)</td>
+    </tr>
+    <tr>
+      <td style="border-color:rgba(255,255,255,.1);">Certification</td>
+      <td style="border-color:rgba(255,255,255,.1);"><code style="background:rgba(192,57,43,.3); border:none; color:#e07060;">Google CDD + OEM</code></td>
+      <td style="border-color:rgba(255,255,255,.1); color:rgba(245,240,232,.6);">Google / OEM</td>
+    </tr>
+  </table>
+</div>
+
+</main>
+
+<footer>
+  صُنع بـ ❤️ للمهندسين العرب — <span>Compose for Automotive Complete Guide</span><br>
+  <span style="color:rgba(245,240,232,.3); display:block; margin-top:6px;">Android Automotive OS · Jetpack Compose · CarUi Library · VHAL</span>
+</footer>
+
+</body>
+</html>
