@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>??????? AAOS | ??? ?????</title>
+    
+    <!-- ???? ????: Cairo ??????? JetBrains Mono ??????? -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ???? ??????? ?????????? */
+        :root {
+            --bg-main: #0f172a;        /* ???? ???? ???? */
+            --bg-card: #1e293b;        /* ???? ???? ???????? */
+            --bg-elevated: #334155;    /* ????? ??? ???????? */
+            
+            --text-primary: #f8fafc;   /* ???? ???? */
+            --text-secondary: #cbd5e1; /* ????? ???? */
+            --text-muted: #94a3b8;     /* ????? ????? */
+            
+            --accent-blue: #3b82f6;    /* ???? ???? ?????? */
+            --accent-purple: #8b5cf6;  /* ?????? ??????? ???????? */
+            --accent-green: #10b981;   /* ?????? */
+            --accent-orange: #f59e0b;  /* ??????? */
+            --accent-red: #ef4444;     /* ????? */
+
+            --border-light: rgba(255, 255, 255, 0.1);
+            --border-strong: rgba(255, 255, 255, 0.2);
+
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-full: 9999px;
+
+            --font-sans: 'Cairo', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --glow-blue: 0 0 15px rgba(59, 130, 246, 0.4);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ????? ?????? ????? */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle at center, rgba(59,130,246,0.05) 0%, transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ????? ??????: ???? ????? + ????? */
+        .app-container {
+            display: flex;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ?????? ??????? ?????? */
+        .sidebar {
+            width: 280px;
+            padding: 2rem 1.5rem;
+            border-left: 1px solid var(--border-light);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+        }
+
+        .sidebar-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .nav { display: flex; flex-direction: column; gap: 0.5rem; }
+        
+        .nav button {
+            padding: 1rem 1.2rem;
+            border-radius: var(--radius-md);
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            font-size: 15px;
+            font-weight: 600;
+            text-align: right;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav button::before {
+            content: '';
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background-color: var(--border-strong);
+            transition: var(--transition-smooth);
+        }
+
+        .nav button:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .nav button.on {
+            background: var(--bg-card);
+            color: var(--accent-blue);
+            border-color: var(--border-light);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .nav button.on::before {
+            background-color: var(--accent-blue);
+            box-shadow: var(--glow-blue);
+        }
+
+        /* ????? ??????? */
+        .content {
+            flex: 1;
+            padding: 3rem 4rem;
+            max-width: 900px;
+        }
+
+        /* ??????? ???????? */
+        .pg { display: none; }
+        .pg.on { display: block; animation: slideUpFade 0.5s ease forwards; }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ???????? */
+        .pg-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        .pg-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+        }
+
+        /* ???????? (Cards) */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+            opacity: 0; transition: var(--transition-smooth);
+        }
+
+        .card:hover { transform: translateY(-3px); border-color: var(--border-strong); }
+        .card:hover::before { opacity: 1; }
+
+        .hd {
+            font-size: 1.25rem; font-weight: 700; color: var(--accent-blue);
+            margin-bottom: 1.2rem; display: flex; align-items: center; gap: 10px;
+        }
+
+        /* ????????? ???????? ??????? */
+        .note {
+            background: rgba(59, 130, 246, 0.1);
+            border-right: 4px solid var(--accent-blue);
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .row {
+            display: flex; align-items: baseline; gap: 1rem;
+            padding: 0.75rem 0; border-bottom: 1px solid var(--border-light);
+        }
+        .row:last-child { border-bottom: none; }
+        .lbl { color: var(--text-muted); font-weight: 600; min-width: 140px; font-size: 0.95rem; }
+        .val { color: var(--text-primary); flex: 1; }
+
+        /* ??????? ???????? (Code Blocks) - ????? ???? */
+        .code-container {
+            background: #0f111a;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+            margin: 1.2rem 0;
+            overflow: hidden;
+        }
+        .code-header {
+            background: #1a1d27;
+            padding: 8px 16px;
+            display: flex;
+            gap: 6px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .mac-btn { width: 12px; height: 12px; border-radius: 50%; }
+        .mac-r { background: #ff5f56; } .mac-y { background: #ffbd2e; } .mac-g { background: #27c93f; }
+        
+        .code {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            padding: 1.2rem;
+            color: #a6accd;
+            line-height: 1.6;
+            white-space: pre;
+            overflow-x: auto;
+            direction: ltr;
+            text-align: left;
+        }
+        /* ????? ???? ????? */
+        .code .kw { color: #89ddff; font-style: italic; } /* Keyword */
+        .code .type { color: #ffcb6b; } /* Type/Class */
+        .code .func { color: #82aaff; } /* Function */
+        .code .str { color: #c3e88d; } /* String */
+        .code .cm { color: #676e95; font-style: italic; } /* Comment */
+
+        .mono {
+            font-family: var(--font-mono); font-size: 0.85em;
+            background: var(--bg-elevated); padding: 0.2rem 0.5rem;
+            border-radius: 4px; color: #89ddff;
+        }
+
+        /* ??????? (Badges) */
+        .badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 0.2rem 0.8rem; border-radius: var(--radius-full);
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px; margin-right: 8px;
+        }
+        .bi { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+        .bs { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+        .bw { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+        .bd { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+
+        /* ?????? ????????? ??????? ????? */
+        .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+        
+        .mc {
+            background: var(--bg-elevated); border: 1px solid var(--border-light);
+            border-radius: var(--radius-md); padding: 1.2rem; cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+        .mc:hover, .mc.on {
+            background: rgba(59,130,246,0.1); border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+        .mt { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary); }
+        .mc.on .mt { color: var(--accent-blue); }
+        .md { font-size: 0.9rem; color: var(--text-muted); }
+
+        /* ??????? (Steps Architecture) */
+        .step {
+            display: flex; gap: 1.2rem; padding: 1.5rem;
+            border: 1px solid var(--border-light); border-radius: var(--radius-md);
+            background: var(--bg-elevated); margin-bottom: 1rem; cursor: pointer;
+            transition: var(--transition-smooth); position: relative;
+        }
+        .step:hover { border-color: var(--text-muted); }
+        .step.on { border-color: var(--accent-blue); background: rgba(59, 130, 246, 0.05); }
+        
+        .sn {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--bg-main); border: 2px solid var(--text-muted);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; font-weight: 800; color: var(--text-secondary);
+            flex-shrink: 0; transition: var(--transition-smooth);
+        }
+        .step.on .sn { background: var(--accent-blue); border-color: var(--accent-blue); color: white; box-shadow: var(--glow-blue); }
+        
+        .step-content { flex: 1; }
+        .st { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text-primary); }
+        .step.on .st { color: var(--accent-blue); }
+        .sd { font-size: 0.95rem; color: var(--text-secondary); }
+        
+        .sc { display: none; margin-top: 1rem; }
+        .step.on .sc { display: block; animation: slideUpFade 0.3s; }
+
+        /* ????????? (Tabs) */
+        .tabs { display: flex; border-bottom: 1px solid var(--border-light); margin-bottom: 1.5rem; gap: 1rem; }
+        .tab {
+            padding: 0.8rem 1rem; font-size: 1rem; font-weight: 600; border: none;
+            background: transparent; cursor: pointer; color: var(--text-muted); font-family: var(--font-sans);
+            border-bottom: 3px solid transparent; transition: var(--transition-smooth);
+        }
+        .tab:hover { color: var(--text-primary); }
+        .tab.on { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+        .tp { display: none; animation: slideUpFade 0.3s; }
+        .tp.on { display: block; }
+
+        /* ??????? ???????? (Accordion) */
+        .acc { border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 0.8rem; background: var(--bg-elevated); }
+        .ahd {
+            padding: 1rem 1.5rem; cursor: pointer; display: flex; justify-content: space-between;
+            align-items: center; font-size: 1.1rem; font-weight: 700; color: var(--text-primary);
+        }
+        .ahd:hover { color: var(--accent-blue); }
+        .abody { display: none; padding: 1.5rem; border-top: 1px solid var(--border-light); background: rgba(0,0,0,0.2); }
+        .abody.on { display: block; animation: slideUpFade 0.3s; }
+        .arr-icon { font-size: 0.8rem; transition: transform 0.3s ease; }
+        .arr-icon.on { transform: rotate(180deg); color: var(--accent-blue); }
+
+        /* ??? ?????? (Logs) */
+        .log-container {
+            background: #0f111a; border-radius: var(--radius-md); border: 1px solid var(--border-light);
+            padding: 1rem; margin-top: 1.5rem; height: 300px; display: flex; flex-direction: column;
+        }
+        .log {
+            flex: 1; overflow-y: auto; font-family: var(--font-mono); font-size: 13px;
+            direction: ltr; text-align: left; scroll-behavior: smooth;
+        }
+        .le { padding: 6px 10px; border-radius: 4px; margin-bottom: 4px; display: flex; gap: 10px; animation: slideUpFade 0.2s; }
+        .le-time { color: #64748b; font-size: 11px; min-width: 60px; }
+        .le-msg { flex: 1; }
+        .la .le-msg { color: #82aaff; } .lb .le-msg { color: #c3e88d; } 
+        .lc .le-msg { color: #ffcb6b; } .ld .le-msg { color: #a6accd; } 
+        .bd .le-msg { color: #ff5370; }
+
+        /* ????? ?????? ??????? */
+        .flow-btns { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+        .flow-btns button {
+            padding: 0.8rem; border-radius: var(--radius-sm); border: 1px solid;
+            background: transparent; color: var(--text-primary); font-family: var(--font-sans);
+            font-weight: 700; cursor: pointer; transition: var(--transition-smooth);
+        }
+        .btn-get { border-color: var(--accent-blue); } .btn-get:hover { background: rgba(59,130,246,0.1); }
+        .btn-set { border-color: var(--accent-green); } .btn-set:hover { background: rgba(16,185,129,0.1); }
+        .btn-sub { border-color: var(--accent-orange); } .btn-sub:hover { background: rgba(245,158,11,0.1); }
+        .btn-err { border-color: var(--accent-red); } .btn-err:hover { background: rgba(239,68,68,0.1); }
+
+        /* ????? ??????? (Live Values) */
+        .sensor-display {
+            background: #0f111a; border: 1px solid var(--accent-blue); border-radius: var(--radius-md);
+            padding: 1.5rem; text-align: center; position: relative; overflow: hidden;
+        }
+        .sensor-display::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 50%);
+            animation: pulseGlow 4s infinite alternate;
+        }
+        @keyframes pulseGlow { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+        .sensor-title { font-size: 0.9rem; color: var(--accent-blue); margin-bottom: 0.5rem; font-weight: 700; font-family: var(--font-mono); }
+        .sensor-val { font-size: 2.5rem; font-weight: 800; color: white; text-shadow: var(--glow-blue); font-family: var(--font-mono); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .app-container { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: relative; border-left: none; border-bottom: 1px solid var(--border-light); padding: 1.5rem; }
+            .nav { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+            .content { padding: 2rem 1.5rem; }
+        }
+    </style>
+<link rel="stylesheet" href="../styles/theme.css">
+<script>var s=localStorage.getItem('aaos_theme')||'dark';document.documentElement.setAttribute('data-theme',s);</script></head>
+<body>
+
+<div class="app-container">
+    
+    <!-- ???? ?????? ??????? -->
+    <aside class="sidebar">
+        <div class="sidebar-title">AAOS Deep Dive</div>
+        <nav class="nav">
+            <button class="on" onclick="go('intro',this)">????? ???????</button>
+            <button onclick="go('arch',this)">????????? (Architecture)</button>
+            <button onclick="go('carservice',this)">???? CarService</button>
+            <button onclick="go('cpm',this)">????? ??????? (CPM)</button>
+            <button onclick="go('hal',this)">???? ?????? (HAL)</button>
+            <button onclick="go('binder',this)">????? ???????? (Binder)</button>
+            <button onclick="go('perms',this)">???? ?????????</button>
+            <button onclick="go('flow',this)">????? ??????? ????</button>
+            <button onclick="go('advanced',this)">?????? ??????</button>
+        </nav>
+    </aside>
+
+    <!-- ????? ??????? -->
+    <main class="content">
+
+        <!-- ?????? 1: ??????? -->
+        <div id="pg-intro" class="pg on">
+            <h1 class="pg-title">????? AAOS?</h1>
+            <p class="pg-subtitle">?? ????? ??? ??????? ?? ????? ???????? ???? ???? ????? ????????</p>
+
+            <div class="card">
+                <div class="hd">?????? ?????</div>
+                <div class="note">??????? ?????? ???? ???????? ??? ????? ?? ?????? ?????? (APIs) ??????? ?? ???????? ??????? ?? ???????. AAOS ???? ???? ????? (Car Stack) ??? ??? ???????.</div>
+                <div class="row"><span class="lbl">??????? ???????</span><span class="val">???? ????? ??? — ?? ???? ????? ?? "???????".</span></div>
+                <div class="row"><span class="lbl">AAOS</span><span class="val">???? ????? ???? ?? ??????? ????? <span class="mono">CarService</span> ????? ???????.</span></div>
+                <div class="row"><span class="lbl">Android Auto</span><span class="val">???? ????? ???? ???? ????? ??? ???? ??????? (Projection) — ??? ???? ????? ???????.</span></div>
+            </div>
+
+            <h2 class="hd" style="margin-top: 2rem;">???????? ???????? ??????</h2>
+            <div class="grid2">
+                <div class="mc on" id="ic0" onclick="selIntro(0)">
+                    <div class="mt">CarService</div>
+                    <div class="md">????? ?????? ?????? — ???? ???? ???? ?????? ??????? ????? ?????????.</div>
+                </div>
+                <div class="mc" id="ic1" onclick="selIntro(1)">
+                    <div class="mt">CarPropertyManager</div>
+                    <div class="md">??????? ???? ???????? ????????? ?????? ?????? ???? ??????? (??? ??????).</div>
+                </div>
+                <div class="mc" id="ic2" onclick="selIntro(2)">
+                    <div class="mt">HAL Layer</div>
+                    <div class="md">????? ??? ????????? ??????? (Hardware). ????? ??????? ??????? ???????.</div>
+                </div>
+                <div class="mc" id="ic3" onclick="selIntro(3)">
+                    <div class="mt">Car APIs</div>
+                    <div class="md">??????? ???????? <span class="mono">android.car</span> ???? ???????? ????????.</div>
+                </div>
+            </div>
+            <div class="card" id="intro-detail" style="margin-top:1rem;"></div>
+
+            <div class="card">
+                <div class="hd">????? ???????? (Process Model)</div>
+                <div class="row"><span class="lbl">system_server</span><span class="val">??????? ???????? ???????? — ?????? <span class="mono">CarService</span> ???????.</span></div>
+                <div class="row"><span class="lbl">vehicle_default_hw</span><span class="val">????? ??? VHAL ?????? ??????? ??????? — ?????? ?????? ??????.</span></div>
+                <div class="row"><span class="lbl">com.example.app</span><span class="val">?????? — ?????? ?? <span class="mono">CarService</span> ??? ??? <span class="mono">Binder IPC</span>.</span></div>
+            </div>
+        </div>
+
+        <!-- ?????? 2: ????????? -->
+        <div id="pg-arch" class="pg">
+            <h1 class="pg-title">????????? ???????</h1>
+            <p class="pg-subtitle">?????? ?? ??????? (?? ??????) ??? ?????? (?? ??????)</p>
+
+            <div class="card">
+                <div class="hd">??????? (???? ??? ?? ???? ???????? ?????)</div>
+                
+                <div class="step on" onclick="this.classList.toggle('on')">
+                    <div class="sn">1</div>
+                    <div class="step-content">
+                        <div class="st">??????? ???????? (App Layer)</div>
+                        <div class="sd">??????? ???? ?????? ??????? ???????? ????? Car API.</div>
+                        <div class="sc code-container"><div class="code-header"><div class="mac-btn mac-r"></div><div class="mac-btn mac-y"></div><div class="mac-btn mac-g"></div></div><div class="code"><span class="cm">// ???? ???? ???? ???????</span>
+<span class="type">Car</span> car = <span class="type">Car</span>.<span class="func">createCar</span>(context);
+<span class="type">CarPropertyManager</span> mgr = (<span class="type">CarPropertyManager</span>) car.<span class="func">getCarManager</span>(<span class="type">Car</span>.CAR_PROPERTY_SERVICE);
+<span class="kw">float</span> speed = mgr.<span class="func">getProperty</span>(<span class="type">Float</span>.class, <span class="type">VehiclePropertyIds</span>.VEHICLE_SPEED, 0).<span class="func">getValue</span>();</div></div>
+                    </div>
+                </div>
+
+                <div class="step" onclick="this.classList.toggle('on')">
+                    <div class="sn">2</div>
+                    <div class="step-content">
+                        <div class="st">????? android.car</div>
+                        <div class="sd">???? ??? Managers ???????? ??????? (Property, Hvac, Sensor).</div>
+                        <div class="sc code-container"><div class="code-header"><div class="mac-btn mac-r"></div><div class="mac-btn mac-y"></div><div class="mac-btn mac-g"></div></div><div class="code"><span class="cm">// ????? ??? ??? Managers</span>
+car.<span class="func">getCarManager</span>(<span class="type">Car</span>.CAR_HVAC_SERVICE)     <span class="cm">// ??????? ????????</span>
+car.<span class="func">getCarManager</span>(<span class="type">Car</span>.CAR_SENSOR_SERVICE)   <span class="cm">// ????????</span>
+car.<span class="func">getCarManager</span>(<span class="type">Car</span>.CAR_INFO_SERVICE)     <span class="cm">// ???????? ??????? ????????</span></div></div>
+                    </div>
+                </div>
+
+                <div class="step" onclick="this.classList.toggle('on')">
+                    <div class="sn">3</div>
+                    <div class="step-content">
+                        <div class="st">CarService (System Service)</div>
+                        <div class="sd">????? ?? ????????? ????? ??????? ??? ??????? ??????.</div>
+                        <div class="sc code-container"><div class="code-header"><div class="mac-btn mac-r"></div><div class="mac-btn mac-y"></div><div class="mac-btn mac-g"></div></div><div class="code"><span class="cm">// ???? ??? ???? ??????? (AOSP)</span>
+<span class="cm">// ??? ?????? ?? ????????? ???</span>
+<span class="kw">if</span> (!<span class="func">checkCallerPermission</span>(<span class="type">Car</span>.PERMISSION_SPEED)) {
+    <span class="kw">throw new</span> <span class="type">SecurityException</span>(<span class="str">"Access Denied"</span>);
+}</div></div>
+                    </div>
+                </div>
+
+                <div class="step" onclick="this.classList.toggle('on')">
+                    <div class="sn">4</div>
+                    <div class="step-content">
+                        <div class="st">AIDL HAL Interface</div>
+                        <div class="sd">??? (Contract) ???? ??? ??????? ??????? ??????? ???????.</div>
+                        <div class="sc code-container"><div class="code-header"><div class="mac-btn mac-r"></div><div class="mac-btn mac-y"></div><div class="mac-btn mac-g"></div></div><div class="code"><span class="cm">// android/hardware/automotive/vehicle/IVehicle.aidl</span>
+<span class="kw">interface</span> <span class="type">IVehicle</span> {
+    <span class="type">VehiclePropConfigs</span> <span class="func">getAllPropConfigs</span>();
+    oneway <span class="kw">void</span> <span class="func">getValues</span>(<span class="type">IVehicleCallback</span> cb, <span class="type">PropIdAreaIds</span> p);
+    oneway <span class="kw">void</span> <span class="func">setValues</span>(<span class="type">IVehicleCallback</span> cb, <span class="type">VehiclePropValues</span> v);
+}</div></div>
+                    </div>
+                </div>
+
+                <div class="step" onclick="this.classList.toggle('on')">
+                    <div class="sn">5</div>
+                    <div class="step-content">
+                        <div class="st">VHAL Vendor Implementation (C++)</div>
+                        <div class="sd">??? ????? ???? ???????? ?????? ??????? ??? ?????? CAN Bus.</div>
+                        <div class="sc code-container"><div class="code-header"><div class="mac-btn mac-r"></div><div class="mac-btn mac-y"></div><div class="mac-btn mac-g"></div></div><div class="code"><span class="kw">class</span> <span class="type">VehicleHalImpl</span> : <span class="kw">public</span> <span class="type">IVehicle</span> {
+    ndk::ScopedAStatus <span class="func">getValues</span>(...) <span class="kw">override</span> {
+        <span class="cm">// ????? ??? ??? ???? CAN</span>
+        mHardware-><span class="func">sendCanMessage</span>(CAN_ID_SPEED);
+        <span class="kw">return</span> ndk::ScopedAStatus::<span class="func">ok</span>();
+    }
+};</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ?????? 3: CarService -->
+        <div id="pg-carservice" class="pg">
+            <h1 class="pg-title">CarService</h1>
+            <p class="pg-subtitle">??????? ??????? ????? ?????? ???????.</p>
+
+            <div class="card">
+                <div class="hd">??????? ??????? (Sub-Services)</div>
+                <div class="note">????? CarService ??? ????? ??????? ?? ???? ???? ????? ?? ???????. ???? ?????? ?????.</div>
+                <div id="cs-list"></div>
+            </div>
+            <div class="card" id="cs-detail" style="display:none; border-color: var(--accent-blue);">
+                <div class="hd" id="csd-title"></div>
+                <div id="csd-body"></div>
+            </div>
+        </div>
+
+        <!-- ?????? 4: CPM -->
+        <div id="pg-cpm" class="pg">
+            <h1 class="pg-title">CarPropertyManager (CPM)</h1>
+            <p class="pg-subtitle">????? ????????? ?????? ?????? ???? ???????.</p>
+
+            <div class="card">
+                <div class="hd">???????? ????????</div>
+                <div class="tabs">
+                    <button class="tab on" onclick="selTab('cpm','c0',this)">getProperty</button>
+                    <button class="tab" onclick="selTab('cpm','c1',this)">setProperty</button>
+                    <button class="tab" onclick="selTab('cpm','c2',this)">registerCallback</button>
+                </div>
+                
+                <div id="c0" class="tp on">
+                    <div class="row"><span class="lbl">???????</span><span class="val">????? ???? ????? (One-time read)</span></div>
+                    <div class="row"><span class="lbl">???????</span><span class="val"><span class="badge bd">Synchronous (Blocking)</span> - ???? ??? Thread ??? ???? ????</span></div>
+                    <div class="code-container"><div class="code-header"><div class="mac-btn mac-r"></div><div class="mac-btn mac-y"></div><div class="mac-btn mac-g"></div></div><div class="code"><span class="type">CarPropertyValue</span>&lt;<span class="type">Float</span>&gt; val = mgr.<span class="func">getProperty</span>(
+    <span class="type">Float</span>.class, 
+    <span class="type">VehiclePropertyIds</span>.VEHICLE_SPEED, 
+    0 <span class="cm">// ??????? (0 = ??????? ???????)</span>
+);
+<span class="kw">float</span> speed = val.<span class="func">getValue</span>();</div></div>
+                </div>
+                
+                <div id="c1" class="tp">
+                    <div class="row"><span class="lbl">???????</span><span class="val">????? ??? ??????? (????: ????? ???????)</span></div>
+                    <div class="row"><span class="lbl">???????</span><span class="val"><span class="badge bs">Asynchronous (Non-blocking)</span></span></div>
+                    <div class="code-container"><div class="code-header"><div class="mac-btn mac-r"></div><div class="mac-btn mac-y"></div><div class="mac-btn mac-g"></div></div><div class="code">mgr.<span class="func">setProperty</span>(
+    <span class="type">Float</span>.class,
+    <span class="type">VehiclePropertyIds</span>.HVAC_TEMPERATURE_SET,
+    <span class="type">VehicleAreaSeat</span>.ROW_1_LEFT,
+    24.0f <span class="cm">// ??? ??????? ??? 24</span>
+);</div></div>
+                </div>
+                
+                <div id="c2" class="tp">
+                    <div class="row"><span class="lbl">???????</span><span class="val">???????? ???????? ????????? ???????? (????: ???? ??????)</span></div>
+                    <div class="row"><span class="lbl">??????</span><span class="val">???? ???? ??????? ???????? (????: 10Hz = 10 ???? ????????)</span></div>
+                    <div class="code-container"><div class="code-header"><div class="mac-btn mac-r"></div><div class="mac-btn mac-y"></div><div class="mac-btn mac-g"></div></div><div class="code">mgr.<span class="func">registerCallback</span>(new <span class="type">CarPropertyEventCallback</span>() {
+    <span class="kw">@Override</span>
+    <span class="kw">public void</span> <span class="func">onChangeEvent</span>(<span class="type">CarPropertyValue</span> value) {
+        <span class="cm">// ??????? ???? ????? ??????</span>
+        <span class="kw">float</span> speed = (<span class="kw">float</span>) value.<span class="func">getValue</span>();
+    }
+}, <span class="type">VehiclePropertyIds</span>.VEHICLE_SPEED, 10.0f);</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ??????? ?????? (????? ???? ????? ????? ??????) -->
+        <div id="pg-hal" class="pg"><h1 class="pg-title">???? HAL</h1><p class="pg-subtitle">Hardware Abstraction Layer</p><div id="hal-list"></div><div class="card" id="hal-detail" style="display:none; border-color: var(--accent-green);"><div class="hd" id="hald-title"></div><div id="hald-body"></div></div></div>
+        <div id="pg-binder" class="pg"><h1 class="pg-title">Binder IPC</h1><p class="pg-subtitle">???? ??????? ??? ???????? ?? ???????</p><div class="card"><div class="note">Binder ?? ?????? ????? ???? ???? ???????? ??? ?????? ? CarService ???? ??????? ??????? ???????? ???????? ??? ???????.</div></div></div>
+        <div id="pg-perms" class="pg"><h1 class="pg-title">????????? (Permissions)</h1><p class="pg-subtitle">????? ?????? ?????? ???????</p><div id="perms-list"></div><div class="card" id="perm-detail" style="display:none; border-color: var(--accent-orange);"><div class="hd" id="pd2-title"></div><div id="pd2-body"></div></div></div>
+        
+        <div id="pg-advanced" class="pg"><h1 class="pg-title">?????? ??????</h1><p class="pg-subtitle">???? ???? ?? ???? ??????</p><div id="adv-list"></div></div>
+
+        <!-- ?????? 8: ????? ??????? (Live Flow) -->
+        <div id="pg-flow" class="pg">
+            <h1 class="pg-title">????? ???? ???????? ????</h1>
+            <p class="pg-subtitle">???? ???? ????? ?? ??????? ??? ?????? ?????? (ECU).</p>
+
+            <div class="card">
+                <div class="hd">???? ????? ??????:</div>
+                <div class="flow-btns">
+                    <button class="btn-get" onclick="startFlow('get')">????? ???? ??????? (GET)</button>
+                    <button class="btn-set" onclick="startFlow('set')">????? ????? ??????? (SET)</button>
+                    <button class="btn-sub" onclick="startFlow('sub')">?????? ?? ???? (SUBSCRIBE)</button>
+                    <button class="btn-err" onclick="startFlow('err')">?????? ??? ??????? (ERROR)</button>
+                </div>
+                
+                <div class="log-container">
+                    <div class="log" id="flow-log">
+                        <div class="le ld"><span class="le-time">00:00:00</span><span class="le-msg">?????? ?? ??? ?????????. ???? ????? ?? ?????? ?????.</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid2">
+                <div class="sensor-display">
+                    <div class="sensor-title">VEHICLE_SPEED</div>
+                    <div class="sensor-val" id="sv1">0 <span style="font-size:1rem">km/h</span></div>
+                </div>
+                <div class="sensor-display" style="border-color: var(--accent-green)">
+                    <div class="sensor-title" style="color: var(--accent-green)">HVAC_TEMPERATURE (FRONT_LEFT)</div>
+                    <div class="sensor-val" id="sv2">22 <span style="font-size:1rem">°C</span></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+    // ???????? 
+    const INTRO_DATA =[
+        {title:'CarService',body:'<div class="row"><span class="lbl">?????</span><span class="val">System Service ???? ????????.</span></div><div class="row"><span class="lbl">?????</span><span class="val">????? ?????? ??????? ?? ?????? ??????? (HAL).</span></div>'},
+        {title:'CarPropertyManager',body:'<div class="row"><span class="lbl">??????</span><span class="val">??? <span class="mono">car.getCarManager()</span>.</span></div><div class="row"><span class="lbl">?????????</span><span class="val">?????/????? ????? ???????.</span></div>'},
+        {title:'HAL Layer',body:'<div class="row"><span class="lbl">???????</span><span class="val">AIDL Interface ????.</span></div><div class="row"><span class="lbl">???????</span><span class="val">??? C++ ?? ?????? ??????? ????? ????? CAN.</span></div>'},
+        {title:'Car APIs',body:'<div class="row"><span class="lbl">??????</span><span class="val"><span class="mono">android.car.*</span></span></div><div class="row"><span class="lbl">??????</span><span class="val">???? ??? ?????? AAOS.</span></div>'},
+    ];
+
+    const CS_SERVICES =[
+        {name:'CarPropertyService', badge:'bi', bl:'?????', desc:'???? ??????? ??????? (????? ??????? ?????).'},
+        {name:'CarHvacService', badge:'bs', bl:'????', desc:'????? ????? ??????? ???????? ????????.'},
+        {name:'CarPowerManagement', badge:'bw', bl:'????', desc:'????? ????? ?????? (Sleep) ????????.'},
+        {name:'CarAudioService', badge:'bn', bl:'???', desc:'????? ????? ????? (Audio Zones) ????????.'}
+    ];
+
+    const HAL_DATA =[
+        {name:'Vehicle HAL (VHAL)', badge:'bi', desc:'??? HAL ??????? ????? ?? ???? ????? ??????? ???????????.'},
+        {name:'Audio HAL', badge:'bs', desc:'???? ?????? ?????? ????? ?????? ?? ??????? ???????.'},
+        {name:'EVS HAL', badge:'bw', desc:'???? ?????? ???????? (????????? ???????? ????????).'}
+    ];
+
+    const PERMS =[
+        {name:'CAR_SPEED', level:'normal', props:'VEHICLE_SPEED', desc:'????? ???? ???????.'},
+        {name:'CONTROL_CAR_CLIMATE', level:'normal', props:'HVAC_TEMPERATURE', desc:'?????? ?? ??????.'},
+        {name:'CAR_DOOR', level:'signature', props:'DOOR_LOCK', desc:'?????? ?? ??????? (????? ????? ??????).'}
+    ];
+
+    const ADV =[
+        {name:'Property Caching', code:'// CarService ????? ????? ?? ???? ????? ?? ??????? ?????? ???? ????? ????? ??? CAN Bus.'},
+        {name:'Subscription Multiplexing', code:'// ??? ????? ??????? ?? ??????? CarService ????? ??? ????? ?? VHAL ????? ???????? ?????????.'},
+        {name:'Thread Model', code:'// ??? ???? ??? ????????? ???????? Thread Pool ??? ????? ????? ??????? (ANR).'}
+    ];
+
+    // ???? ???? ??????? ???????????
+    function buildList(containerId, data, detailId, titleId, bodyId, colorClass) {
+        const container = document.getElementById(containerId);
+        data.forEach((item, i) => {
+            const div = document.createElement('div');
+            div.className = 'mc';
+            div.innerHTML = `<div class="mt">${item.badge ? `<span class="badge ${item.badge}">${item.bl || item.level}</span>` : ''} ${item.name}</div><div class="md">${item.desc || item.props}</div>`;
+            div.onclick = () => {
+                container.querySelectorAll('.mc').forEach(el => el.classList.remove('on'));
+                div.classList.add('on');
+                const detail = document.getElementById(detailId);
+                detail.style.display = 'block';
+                document.getElementById(titleId).textContent = item.name;
+                document.getElementById(bodyId).innerHTML = `<p class="md" style="margin-bottom:10px">${item.desc || ''}</p>`;
+                if(item.code) {
+                    document.getElementById(bodyId).innerHTML += `<div class="code-container"><div class="code-header"><div class="mac-btn mac-r"></div><div class="mac-btn mac-y"></div><div class="mac-btn mac-g"></div></div><div class="code">${item.code}</div></div>`;
+                }
+            };
+            container.appendChild(div);
+        });
+    }
+
+    // ????? ????????
+    buildList('cs-list', CS_SERVICES, 'cs-detail', 'csd-title', 'csd-body');
+    buildList('hal-list', HAL_DATA, 'hal-detail', 'hald-title', 'hald-body');
+    buildList('perms-list', PERMS, 'perm-detail', 'pd2-title', 'pd2-body');
+    
+    const al = document.getElementById('adv-list');
+    ADV.forEach(a => {
+        const d = document.createElement('div');
+        d.className = 'acc';
+        d.innerHTML = `<div class="ahd" onclick="this.nextElementSibling.classList.toggle('on'); this.querySelector('.arr-icon').classList.toggle('on')">${a.name}<span class="arr-icon">?</span></div><div class="abody"><div class="code-container"><div class="code">${a.code}</div></div></div>`;
+        al.appendChild(d);
+    });
+
+    // ?????? ??? ???????
+    function go(id, btn) {
+        document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+        document.querySelectorAll('.nav button').forEach(b => b.classList.remove('on'));
+        document.getElementById('pg-' + id).classList.add('on');
+        btn.classList.add('on');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function selIntro(i) {
+        [0,1,2,3].forEach(j => document.getElementById('ic'+j).classList.toggle('on', j === i));
+        document.getElementById('intro-detail').innerHTML = `<div class="hd">${INTRO_DATA[i].title}</div>${INTRO_DATA[i].body}`;
+    }
+    selIntro(0);
+
+    function selTab(g, id, btn) {
+        const pg = btn.closest('.pg');
+        pg.querySelectorAll('.tp').forEach(t => t.classList.remove('on'));
+        pg.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+        document.getElementById(id).classList.add('on');
+        btn.classList.add('on');
+    }
+
+    // ????? ?????? ????
+    const FLOWS = {
+        get:[
+            {m:'[App] ??? ????? ?????? getProperty(VEHICLE_SPEED)', c:'la'},
+            {m:'[Binder] ????? ????? ??? CarService Process', c:'ld'},
+            {m:'[CarService] ?????? ?? ????????? (Permission Check) -> ?????', c:'lb'},
+            {m:'[CarService] ?? ??? ?????? ??? ???? ????? ?? ??????? ??????? (Cache Miss)', c:'lc'},
+            {m:'[Binder] ????? ????? ??? Vehicle HAL Process', c:'ld'},
+            {m:'[VHAL] ????? ??? ??? ???? CAN Bus', c:'lc'},
+            {m:'[ECU] ???? ?????? ???: ?????? = 120 ??/?', c:'lb'},
+            {m:'[VHAL] ????? ???? ??????? ??? Callback', c:'lb'},
+            {m:'[CarService] ????? Cache ?????? ????? ???????? (App Thread)', c:'la'},
+            {m:'[App] ?????? ?????? ?????.', c:'lb'}
+        ],
+        set: [
+            {m:'[App] ??? ????? ??????? setProperty(HVAC_TEMP, 24.0)', c:'lb'},
+            {m:'[CarService] ?????? (Permission & Range Check) -> ?????', c:'lb'},
+            {m:'[VHAL] ????? ?????? (24.0) ??? ????? CAN ?????', c:'lc'},
+            {m:'[ECU] ???? ??????? ?????? ????? ????? ????????', c:'ld'},
+            {m:'[ECU] ????? ????? ??????? ????? 24', c:'lb'},
+            {m:'[App] ??????? ??? ??????? OnChange', c:'la'}
+        ],
+        err: [
+            {m:'[App] ??? ??? ??????? setProperty(DOOR_LOCK, false)', c:'la'},
+            {m:'[CarService] ??? ?????? CAR_DOOR_CONTROL', c:'ld'},
+            {m:'[CarService] ??????? ?? ???? ?????? Signature!', c:'bd'},
+            {m:'[CarService] ??? ?????: SecurityException', c:'bd'},
+            {m:'[App] ???? ??????? (Crash) ??? ?? ??? ?????? ?????????', c:'bd'}
+        ]
+    };
+
+    function getTime() {
+        const now = new Date();
+        return `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}.${now.getMilliseconds().toString().padStart(3,'0')}`;
+    }
+
+    let currentFlowTimeout =[];
+    function startFlow(type) {
+        // ????? ?? ???? ????
+        currentFlowTimeout.forEach(t => clearTimeout(t));
+        currentFlowTimeout =[];
+        
+        const log = document.getElementById('flow-log');
+        log.innerHTML = '';
+        
+        const msgs = FLOWS[type] || FLOWS['get'];
+        let speedInterval;
+
+        // ?????? ????? ????? ???????
+        if(type === 'get') {
+            document.getElementById('sv1').innerHTML = `<span style="color:var(--text-muted)">???? ???????...</span>`;
+        } else if (type === 'set') {
+            document.getElementById('sv2').innerHTML = `<span style="color:var(--text-muted)">???? ?????...</span>`;
+        } else if (type === 'err') {
+            document.getElementById('sv1').style.color = "var(--accent-red)";
+            setTimeout(() => document.getElementById('sv1').style.color = "white", 2000);
+        }
+
+        msgs.forEach((m, i) => {
+            const timeout = setTimeout(() => {
+                const d = document.createElement('div');
+                d.className = 'le ' + m.c;
+                d.innerHTML = `<span class="le-time">${getTime()}</span><span class="le-msg">${m.m}</span>`;
+                log.appendChild(d);
+                log.scrollTop = log.scrollHeight;
+
+                // ????? ????? ????????
+                if (i === msgs.length - 1) {
+                    if(type === 'get') {
+                        let speed = 0;
+                        speedInterval = setInterval(()=>{
+                            speed+=10;
+                            document.getElementById('sv1').innerHTML = `${speed} <span style="font-size:1rem;color:var(--text-muted)">km/h</span>`;
+                            if(speed >= 120) clearInterval(speedInterval);
+                        }, 50);
+                    }
+                    if(type === 'set') document.getElementById('sv2').innerHTML = `24 <span style="font-size:1rem;color:var(--text-muted)">°C</span>`;
+                }
+            }, i * 600); // ????? ????? ?????? ?????? ????
+            currentFlowTimeout.push(timeout);
+        });
+    }
+</script>
+<div class="aaos-theme-bar">
+  <button class="aaos-fab theme-toggle-btn" onclick="aaosToggleTheme()" title="????? ?????">??</button>
+  <a class="aaos-fab" href="../index.html" title="????????">??</a>
+</div>
+<script src="../scripts/theme.js"></script></body>
+</html>

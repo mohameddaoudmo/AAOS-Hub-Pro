@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OOP Advanced Questions — الأسئلة المتقدمة</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c14;
+    --surface: #0d1420;
+    --surface2: #121a2e;
+    --border: #1e2d4a;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #f59e0b;
+    --accent4: #10b981;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --glow: rgba(0,212,255,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 20%, rgba(0,212,255,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(124,58,237,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 50% 50%, rgba(16,185,129,0.03) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Grid lines */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 60px 20px 40px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    font-weight: 900;
+    line-height: 1.1;
+    animation: fadeDown 0.6s ease 0.1s both;
+  }
+
+  h1 span.cyan { color: var(--accent); }
+  h1 span.purple { color: #a78bfa; }
+
+  .header-sub {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-top: 12px;
+    animation: fadeDown 0.6s ease 0.2s both;
+  }
+
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    animation: fadeDown 0.6s ease 0.3s both;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* CONTROLS */
+  .controls {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(8,12,20,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+  }
+
+  .search-wrap {
+    max-width: 600px;
+    margin: 0 auto 14px;
+    position: relative;
+  }
+
+  .search-icon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 16px;
+  }
+
+  #search {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 44px 12px 16px;
+    color: var(--text);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-align: right;
+  }
+
+  #search:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+  }
+
+  .filter-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .tab {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 0.8rem;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab:hover { border-color: var(--accent); color: var(--accent); }
+
+  .tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+    font-weight: 700;
+  }
+
+  /* MAIN */
+  main {
+    position: relative;
+    z-index: 5;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 48px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .section-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-right: auto;
+  }
+
+  /* QUESTION CARD */
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.15s;
+    cursor: pointer;
+  }
+
+  .q-card:hover {
+    border-color: rgba(0,212,255,0.3);
+    transform: translateX(-2px);
+  }
+
+  .q-card.answered {
+    border-color: rgba(16,185,129,0.3);
+  }
+
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 18px;
+    user-select: text; /* Enable copying */
+  }
+
+  .q-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    min-width: 38px;
+    text-align: center;
+  }
+
+  .q-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    flex: 1;
+    color: var(--text);
+    direction: ltr !important;
+    text-align: left !important;
+    unicode-bidi: bidi-override !important;
+  }
+
+  .q-check {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    margin-top: 1px;
+  }
+
+  .q-card.answered .q-check {
+    background: var(--accent4);
+    border-color: var(--accent4);
+    color: #000;
+    font-size: 12px;
+  }
+
+  .q-expand {
+    padding: 0 18px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+  }
+
+  .q-card.open .q-expand {
+    max-height: 600px;
+    padding: 0 18px 16px;
+  }
+
+  .q-expand-inner {
+    background: var(--surface2);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+    position: relative;
+  }
+
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    margin-left: 10px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .copy-btn:hover { background: rgba(0,212,255,0.1); }
+
+  .mark-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--accent4);
+    background: transparent;
+    color: var(--accent4);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .mark-btn:hover { background: rgba(16,185,129,0.1); }
+
+  /* PROGRESS BAR */
+  .progress-bar-wrap {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(8,12,20,0.95);
+    border-top: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .progress-info {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .progress-info span { color: var(--accent); }
+
+  .progress-track {
+    flex: 1;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .reset-btn {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .reset-btn:hover { border-color: #ef4444; color: #ef4444; }
+
+  /* COUNT BADGE */
+  #result-count {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  #result-count span { color: var(--accent); }
+
+  /* NO RESULTS */
+  .no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+    display: none;
+  }
+
+  .no-results .icon { font-size: 3rem; margin-bottom: 12px; }
+
+  /* ANIMATIONS */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SCROLL TO TOP */
+  #scroll-top {
+    position: fixed;
+    bottom: 70px;
+    left: 20px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 99;
+    font-size: 18px;
+  }
+
+  #scroll-top.visible { opacity: 1; pointer-events: all; }
+  #scroll-top:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-badge">// ADVANCED OOP STUDY GUIDE</div>
+  <h1><span class="cyan">120+</span> سؤال متقدم في <span class="purple">OOP</span></h1>
+  <p class="header-sub">Kotlin · Android · Design Patterns · Architecture · SOLID · Generics</p>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-num" id="total-count">120</div><div class="stat-label">إجمالي الأسئلة</div></div>
+    <div class="stat"><div class="stat-num" id="done-count">0</div><div class="stat-label">تمت الإجابة</div></div>
+    <div class="stat"><div class="stat-num" id="section-count">13</div><div class="stat-label">تصنيف</div></div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search" placeholder="ابحث في الأسئلة..." />
+  </div>
+  <div class="filter-tabs" id="filter-tabs">
+    <button class="tab active" data-filter="all">الكل</button>
+    <button class="tab" data-filter="fundamentals">Fundamentals</button>
+    <button class="tab" data-filter="encapsulation">Encapsulation</button>
+    <button class="tab" data-filter="inheritance">Inheritance</button>
+    <button class="tab" data-filter="polymorphism">Polymorphism</button>
+    <button class="tab" data-filter="abstraction">Abstraction</button>
+    <button class="tab" data-filter="generics">Generics</button>
+    <button class="tab" data-filter="patterns">Design Patterns</button>
+    <button class="tab" data-filter="solid">SOLID</button>
+    <button class="tab" data-filter="kotlin">Kotlin OOP</button>
+    <button class="tab" data-filter="memory">Performance & Memory</button>
+    <button class="tab" data-filter="concurrency">Concurrency</button>
+    <button class="tab" data-filter="testing">Testing</button>
+    <button class="tab" data-filter="architecture">Architecture</button>
+    <button class="tab" data-filter="scenarios">System Design</button>
+    <button class="tab" data-filter="deep-dives">Deep Dives</button>
+    <button class="tab" data-filter="challenges">Coding Challenges</button>
+    <button class="tab" data-filter="professional">Trade-offs</button>
+  </div>
+</div>
+
+<main>
+  <div id="result-count">عرض <span id="shown">0</span> سؤال</div>
+  <div id="questions-container"></div>
+  <div class="no-results" id="no-results">
+    <div class="icon">🔍</div>
+    <p>لا توجد أسئلة تطابق بحثك</p>
+  </div>
+</main>
+
+<div class="progress-bar-wrap">
+  <div class="progress-info">تقدمك: <span id="prog-text">0 / 0</span></div>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  <button class="reset-btn" onclick="resetProgress()">إعادة تعيين</button>
+</div>
+
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+const SECTIONS = [
+  {
+    id: "fundamentals",
+    title: "OOP Fundamentals & Pillars",
+    icon: "🏛️",
+    color: "#00d4ff",
+    bg: "rgba(0,212,255,0.08)",
+    questions: [
+      "Explain the four pillars of OOP and provide real-world examples for each.",
+      "What's the difference between abstraction and encapsulation? Give practical examples.",
+      "How does inheritance promote code reusability? What are its limitations?",
+      "Explain polymorphism with method overloading vs method overriding examples.",
+      "What's the difference between a class and an object? Can you have a class without objects?",
+      "Explain the object lifecycle from creation to destruction.",
+      "What are static members? When would you use them and what are the trade-offs?",
+      "Difference between instance variables and class variables with memory implications.",
+      "Can you make a Kotlin class truly immutable? What are all the things you must check — fields, collections, referenced objects?",
+      "What is the difference between shallow copy and deep copy in object cloning?"
+    ]
+  },
+  {
+    id: "encapsulation",
+    title: "Encapsulation & Access Control",
+    icon: "🔒",
+    color: "#00d4ff",
+    bg: "rgba(0,212,255,0.08)",
+    questions: [
+      "What is the difference between private set and a fully private property in Kotlin? When does each break encapsulation?",
+      "How can encapsulation be violated without using reflection — give 3 different ways?",
+      "What is an invariant? Write a class that protects 3 invariants simultaneously and show what happens when you try to break each one.",
+      "What is the difference between encapsulation and information hiding? Are they the same concept?",
+      "How does internal visibility work across modules in a multi-module Android project? What problem does it solve that public and private cannot?",
+      "Why is returning a mutable collection from a method an encapsulation violation even if the field itself is private?",
+      "What is a 'god object' anti-pattern? How does it violate encapsulation and SRP simultaneously?",
+      "If a data class has all val properties, is it truly encapsulated? What can still go wrong?",
+      "How does defensive copying protect encapsulation? Write a class where skipping it causes a real bug.",
+      "What is the difference between object encapsulation and module encapsulation? How does Kotlin's module system support both?",
+      "Can you break encapsulation using Kotlin's copy() on a data class? Give a concrete example where this causes a bug.",
+      "Why is exposing an ArrayList through an interface that returns List still an encapsulation risk?",
+      { q: "How to implement immutable classes properly?", a: "Follow these rules:<br>1. Class must be <code>final</code>.<br>2. Fields must be <code>private final</code>.<br>3. No setters.<br>4. Defensive copying for mutable fields.<br><pre><code>public final class ImmutablePerson {\n    private final List&lt;String&gt; hobbies;\n    public ImmutablePerson(List&lt;String&gt; h) {\n        this.hobbies = new ArrayList&lt;&gt;(h);\n    }\n    public List&lt;String&gt; getHobbies() {\n        return new ArrayList&lt;&gt;(hobbies);\n    }\n}</code></pre>" },
+      { q: "What's the difference between composition and aggregation?", a: "<strong>Composition:</strong> Strong ownership (Parent owns Child). If Parent is destroyed, Child is destroyed.<br><strong>Aggregation:</strong> Weak ownership. Child can exist independently of Parent." }
+    ]
+  },
+  {
+    id: "inheritance",
+    title: "Inheritance Pitfalls",
+    icon: "🧬",
+    color: "#a78bfa",
+    bg: "rgba(167,139,250,0.08)",
+    questions: [
+      "What happens when you call an open method from a constructor? Write code that demonstrates the exact bug this causes.",
+      "Why does Kotlin disallow calling non-final methods on a partially constructed object? How does the JVM construct objects step by step?",
+      "What is constructor chaining with this() vs super()? Write a 3-level hierarchy and trace the exact order of constructor calls.",
+      "What is the difference between abstract override and open override? Can you re-abstract a concrete method?",
+      "Explain the exact scenario where deep inheritance (5+ levels) causes a maintenance nightmare. What is the refactored OOP solution?",
+      "Can a sealed class subclass be open? What does this enable and what risks does it introduce?",
+      "What is the 'yo-yo problem' in OOP? How does it manifest in Android with deep Activity/Fragment hierarchies?",
+      "How does final in Java (and classes by default in Kotlin) prevent the fragile base class problem?",
+      "What is the difference between behavioral subtyping and syntactic subtyping? Which one does Kotlin enforce?",
+      "When two interfaces both declare a method with the same name but different default implementations, trace exactly what Kotlin compiles them to at the bytecode level.",
+      "Can you inherit from a class and narrow (make more restrictive) the visibility of an overridden method? What does OOP theory say about this?",
+      "What is mixin inheritance and how do Kotlin interfaces with default methods simulate it? What are the limitations?",
+      "Explain the diamond problem in multiple inheritance. How do different languages solve it?",
+      "What's the difference between composition and inheritance? When would you choose one over the other?",
+      "Explain method resolution order (MRO) and its importance.",
+      "What are the problems with deep inheritance hierarchies?",
+      "Explain the fragile base class problem and how to avoid it.",
+      { q: "Can I throw different exceptions in an overridden method?", a: "You can only throw: The same exception, a subclass of it, no exception, or any Unchecked exception (RuntimeException).<br><pre><code>class Child extends Parent {\n    // ✅ Valid: Subclass exception\n    void method() throws FileNotFoundException { }\n    // ❌ Invalid: Broader exception\n    // void method() throws Exception { }\n}</code></pre>" },
+      { q: "What's the difference between method overriding and method hiding?", a: "<strong>Overriding:</strong> Applies to instance methods (Runtime polymorphism).<br><strong>Hiding:</strong> Applies to static methods (Compile-time binding).<br><pre><code>Parent p = new Child();\np.staticMethod(); // Calls Parent's version</code></pre>" },
+      { q: "Can constructors be overridden?", a: "No. They are not inherited and must have the same name as the class. They don't participate in polymorphism." },
+      { q: "How is the diamond problem solved in Java?", a: "Java doesn't allow multiple class inheritance. For interfaces with conflicting default methods, the subclass must explicitly override and choose: <code>B.super.method();</code>" }
+    ]
+  },
+  {
+    id: "polymorphism",
+    title: "Polymorphism Deep",
+    icon: "🔀",
+    color: "#f59e0b",
+    bg: "rgba(245,158,11,0.08)",
+    questions: [
+      "Explain dynamic dispatch step by step at the JVM vtable level. What is a vtable and how does the JVM use it to call the right overridden method?",
+      "What is double dispatch and why does the Visitor pattern exist to solve it?",
+      "What is the difference between subtype polymorphism, parametric polymorphism, and ad-hoc polymorphism? Give a Kotlin example of each.",
+      "Why does casting (as) break polymorphism? What should you do instead and what pattern does it indicate you need?",
+      "What is covariant return type? Write a Kotlin example and explain how it works at the bytecode level.",
+      "How does when on a sealed class achieve exhaustive polymorphism? What does the compiler check and what happens when you add a new subclass?",
+      "What is the difference between method overriding and method hiding in terms of which object the JVM looks at when resolving the call?",
+      "Write a polymorphic RecyclerView adapter that handles 5 different item types using sealed classes and zero instanceof checks.",
+      "What is the expression problem in OOP? Why is it hard to add both new types and new operations to a hierarchy simultaneously?",
+      "How does the Visitor pattern solve the expression problem? Write a full example with an AST (abstract syntax tree).",
+      "Explain duck typing and its relationship to polymorphism.",
+      "What's the difference between compile-time and runtime polymorphism?",
+      "How does method overriding work with access modifiers?",
+      "Explain covariance and contravariance in method parameters and return types.",
+      "How do generics/templates affect polymorphism?",
+      "Explain the performance implications of virtual method calls.",
+      { q: "What's the difference between compile-time and runtime polymorphism?", a: "<strong>Compile-time:</strong> Method overloading (same name, different params).<br><strong>Runtime:</strong> Method overriding (Dynamic dispatch).<br><pre><code>// Overloading (Compile-time)\nint add(int a, int b)\nint add(double a, double b)\n\n// Overriding (Runtime)\nShape s = new Circle();\ns.draw(); // Calls Circle's draw</code></pre>" },
+      { q: "How does method resolution work in polymorphism?", a: "Java uses <strong>Dynamic Method Dispatch</strong>. The compiler checks the reference type, but the JVM calls the most specific version based on the actual runtime object type." },
+      { q: "What are covariant return types?", a: "They allow overridden methods to return a subtype of the original return type.<br><pre><code>class Animal { Animal reproduce() { ... } }\nclass Dog extends Animal { Dog reproduce() { ... } }</code></pre>" }
+    ]
+  },
+  {
+    id: "abstraction",
+    title: "Abstraction Design",
+    icon: "🏗️",
+    color: "#10b981",
+    bg: "rgba(16,185,129,0.08)",
+    questions: [
+      "What is a leaky abstraction? Give 3 real Android examples where the abstraction underneath bleeds through.",
+      "What is the difference between accidental complexity and essential complexity? How does good abstraction reduce accidental complexity?",
+      "Why is List a better return type than ArrayList even when the implementation uses ArrayList internally?",
+      "What is the Law of Demeter (LoD)? Show a class that violates it and refactor it to comply. How does it relate to Android ViewModel design?",
+      "What is cohesion? What is coupling? Write examples of high/low cohesion and tight/loose coupling and explain why high cohesion + loose coupling is the goal.",
+      "How do you design an abstraction layer between your ViewModel and a third-party library so that replacing the library requires zero changes to the ViewModel?",
+      "What is the difference between a use case (interactor) and a repository? Why must they be separate in Clean Architecture?",
+      "What is an anti-corruption layer (ACL) in DDD? How would you implement one in Android when integrating a poorly designed SDK?",
+      "What is the difference between an abstract class that has all abstract methods and an interface? When would you still choose the abstract class?",
+      "How do you design abstractions that are stable under change? What is the 'stable dependencies principle'?",
+      "When would you use an abstract class vs an interface?",
+      "Can an abstract class have constructors? Why or why not?",
+      "Explain default methods in interfaces and their implications.",
+      "How do you handle versioning when adding methods to interfaces?",
+      { q: "When should I use abstract classes vs interfaces?", a: "<strong>Abstract Classes:</strong> Share code among related classes, need non-public members, provide default implementations.<br><strong>Interfaces:</strong> Define a contract for unrelated classes, multiple inheritance, loose coupling." },
+      { q: "Can abstract classes have constructors?", a: "Yes. They are used to initialize protected fields that subclasses will use. You cannot instantiate the abstract class, but <code>super()</code> calls the constructor from the subclass." }
+    ]
+  },
+  {
+    id: "generics",
+    title: "Generics (Very Hard)",
+    icon: "🧩",
+    color: "#ec4899",
+    bg: "rgba(236,72,153,0.08)",
+    questions: [
+      "What is type erasure? Write 3 scenarios in Android where type erasure causes a runtime crash and show the fix for each.",
+      "What is the difference between declaration-site variance (out T / in T) and use-site variance (List<out T>)? When can you only use one?",
+      "Write a fully generic, type-safe event bus in Kotlin without any unchecked casts.",
+      "What is a phantom type and how can it enforce state machine constraints at compile time?",
+      "Explain why List<Dog> is not a subtype of List<Animal> even though Dog is a subtype of Animal. What is this called and what are the 3 possible variance options?",
+      "What is a higher-kinded type? Does Kotlin support them natively? How does Arrow library simulate them?",
+      "Write a generic repository interface where the ID type and the model type are both generic, with a constraint that the model must implement a Identifiable<ID> interface.",
+      "What is a reified type parameter? Write a function that uses it to safely deserialize any JSON type without passing Class<T> explicitly.",
+      "What is the difference between Nothing, Unit, Any, and Any? in Kotlin's type hierarchy? Where does each sit?",
+      "What is a contravariant generic? Write a real example where contravariance is necessary and explain why covariance would break it.",
+      "How does Comparable<T> use contravariance? Why is it Comparable<in T> and not Comparable<out T>?",
+      "What is a type projector? How does star projection (*) differ from out Any??"
+    ]
+  },
+  {
+    id: "patterns",
+    title: "Design Patterns (Expert Level)",
+    icon: "🎨",
+    color: "#f97316",
+    bg: "rgba(249,115,22,0.08)",
+    questions: [
+      "Implement the full Visitor pattern for an expression evaluator (Add, Multiply, Number nodes) with two visitors: one that evaluates, one that pretty-prints.",
+      "What is the difference between the Proxy and Decorator patterns at the structural level? When does one become the other?",
+      "Implement an Undo/Redo system using the Command pattern. The system must support grouping multiple commands into a single undoable transaction.",
+      "What is the Specification pattern? Implement it for filtering a product list with combinable specifications (AndSpec, OrSpec, NotSpec).",
+      "What is the difference between the Strategy and State patterns? They look identical in structure — what conceptually separates them?",
+      "Implement the Composite pattern for a file system (File and Folder both implement Node) with recursive size calculation and deep print.",
+      "What is the Null Object pattern? Implement it for a Logger that can be disabled at runtime without any null checks in the calling code.",
+      "What is the difference between Abstract Factory and Factory Method? Draw the class relationships mentally and explain when each applies.",
+      "Implement the Interpreter pattern for a simple Boolean expression parser: 'true AND (false OR true)'.",
+      "What is the Pipeline pattern? How does it differ from Chain of Responsibility? Implement a data transformation pipeline in Kotlin.",
+      "What is the Memento pattern? Implement save/restore for a multi-step form in Android where each step's state can be independently rolled back.",
+      "Implement the Observer pattern from scratch (without LiveData or Flow) with support for multiple event types and automatic unsubscription when the subscriber is destroyed.",
+      "What is the Flyweight pattern? Write a text rendering system where character style objects are shared across thousands of characters.",
+      "What is the difference between Mediator and Facade? They both centralize — what separates them structurally and in intent?",
+      { q: "When should I use Factory Pattern in Android?", a: "Use Factory Pattern when creating different types of objects based on conditions. Example: Creating different ViewHolder types in RecyclerView based on item type (text post, image post, video post)." },
+      { q: "How do I create database instances efficiently?", a: "Use Singleton Pattern for Room database instance. This ensures only one database connection throughout the app lifecycle, preventing memory leaks and improving performance." },
+      { q: "What pattern helps with creating complex UI components?", a: "Use Builder Pattern for creating complex views or dialogs. Example: AlertDialog.Builder or custom dialog builders with multiple optional parameters." },
+      { q: "How do I handle user actions in RecyclerView?", a: "Use Command Pattern or Callback Pattern. Create interfaces for different actions (OnItemClick, OnItemLongClick) and pass them to the adapter. This separates action handling from view logic." },
+      { q: "What pattern should I use for form validation?", a: "Use Chain of Responsibility Pattern. Create validation chain where each validator checks specific criteria (email format, password strength, required fields) and passes to next validator." },
+      { q: "How do I implement undo functionality?", a: "Use Command Pattern with Memento Pattern. Command pattern encapsulates actions, while Memento stores previous states. Perfect for undo/redo in note-taking or photo editing apps." },
+      { q: "How do I adapt third-party libraries to my interface?", a: "Use Adapter Pattern. Create adapter classes that convert third-party library interfaces to your app's expected interface. Example: Adapting different image loading libraries (Glide, Picasso)." },
+      { q: "What pattern helps with backward compatibility?", a: "Use Facade Pattern. Create a simple interface that hides complexity of different API levels. Example: CameraFacade that handles Camera1 API for older devices and Camera2 for newer ones." },
+      { q: "How do I add features to existing classes without modifying them?", a: "Use Decorator Pattern. Wrap existing objects with decorator classes that add new functionality. Example: Adding logging or caching to existing network clients." },
+      { q: "How do I combine multiple patterns effectively?", a: "Example for a complete feature:<br>• MVVM for overall structure<br>• Repository for data management<br>• Observer for UI updates<br>• Factory for creating different objects<br>• Strategy for different behaviors" },
+      { q: "What patterns work well with Jetpack Compose?", a: "Use MVVM with State Pattern:<br>• ViewModel manages UI state<br>• Repository handles data<br>• State flows naturally through Compose<br>• Observer pattern built into Compose recomposition" },
+      "Implement a thread-safe Singleton pattern and explain why thread safety matters.",
+      "Explain the Factory pattern vs Abstract Factory pattern with examples.",
+      "When would you use the Observer pattern? Implement a simple version.",
+      "Explain the Strategy pattern and how it relates to polymorphism.",
+      "What's the difference between Decorator and Adapter patterns?",
+      { q: "I want to create a shopping cart app. Which patterns should I use?", a: "<strong>Singleton:</strong> For CartManager instance.<br><strong>Observer:</strong> Notify UI of cart changes.<br><strong>Repository:</strong> Manage API/DB data.<br><strong>Factory:</strong> Create product types (Physical/Digital)." },
+      { q: "What patterns are essential for a chat app?", a: "<strong>Adapter:</strong> Different message types.<br><strong>Observer:</strong> Real-time updates.<br><strong>State:</strong> Typing/Online/Offline states.<br><strong>Builder:</strong> Construct complex messages." },
+      { q: "Which patterns are best for a music player?", a: "<strong>State:</strong> Play/Pause states.<br><strong>Command:</strong> Playback actions (Skip/Shuffle).<br><strong>Mediator:</strong> Communication between player components." }
+    ]
+  },
+  {
+    id: "solid",
+    title: "SOLID (Master Level)",
+    icon: "⚡",
+    color: "#eab308",
+    bg: "rgba(234,179,8,0.08)",
+    questions: [
+      "A class has 400 lines and 15 methods. Walk through how you identify which responsibilities to extract and how you split it without breaking callers.",
+      "You have a notification system that currently only sends emails. Apply the Open/Closed principle so that adding SMS, push, and Slack notifications requires zero changes to existing code.",
+      "Give 3 concrete examples of Liskov Substitution violations that cause silent wrong behavior (not crashes) — the hardest kind to detect.",
+      "You have a Drawable interface with 12 methods. Half your implementing classes throw UnsupportedOperationException on 6 of them. Redesign it following ISP.",
+      "What is the difference between Dependency Inversion Principle and Dependency Injection? A senior developer says they are the same — how do you correct them?",
+      "How does violating DIP force you to rebuild the entire app just to swap a database? Show the tight-coupled code and the DIP-compliant refactor.",
+      "What is 'shotgun surgery'? How do you detect it and what OOP restructuring fixes it?",
+      "What is 'feature envy'? Which SOLID principle does it most directly violate?",
+      "Explain each SOLID principle with code examples.",
+      "How does the Dependency Inversion Principle relate to testing?",
+      "Give an example of violating the Single Responsibility Principle and how to fix it.",
+      "Explain the Liskov Substitution Principle with a practical example."
+    ]
+  },
+  {
+    id: "kotlin",
+    title: "Kotlin OOP Advanced",
+    icon: "🦊",
+    color: "#7c3aed",
+    bg: "rgba(124,58,237,0.08)",
+    questions: [
+      "What does inline do to a class method call at the bytecode level? How does it affect polymorphism?",
+      "What is a value class (@JvmInline value class) and how does it achieve zero-overhead abstraction? What are its limitations?",
+      "How does property delegation work internally? Write a custom delegate that rate-limits property writes.",
+      "What is the difference between Sequence and List in OOP terms? How does lazy evaluation change object creation behavior?",
+      "How do extension functions interact with inheritance? If a parent class and child class both have an extension function with the same name, which is called?",
+      "What is the difference between == and === in Kotlin and how do they relate to equals() and reference identity in OOP?",
+      "What is structural equality vs referential equality? How does data class change equals() behavior and what pitfalls does this introduce?",
+      "Can you make a Kotlin class truly immutable? What are all the things you must check — fields, collections, referenced objects?",
+      "What is an object expression in Kotlin? How does it differ from a named object and a lambda? When is each the right choice?",
+      "What is the difference between abstract property in an interface and abstract property in an abstract class?",
+      { q: "How does the 'in' operator work with different collection types?", a: "The <code>in</code> operator checks for existence. In <strong>Lists/Sets</strong>, it checks elements. In <strong>Maps</strong>, it checks <strong>keys</strong> (not values). In <strong>Ranges</strong>, it checks if a value is within bounds." },
+      { q: "What's the difference between List vs Sequence in Kotlin?", a: "<strong>List (Eager):</strong> Evaluates all operations immediately and creates intermediate collections. Better for small data.<br><strong>Sequence (Lazy):</strong> Evaluates on-demand (one element at a time). No intermediate collections. Better for large data or chained operations." }
+    ]
+  },
+  {
+    id: "memory",
+    title: "Memory, Object Lifecycle & GC",
+    icon: "🧠",
+    color: "#06b6d4",
+    bg: "rgba(6,182,212,0.08)",
+    questions: [
+      "What is an object graph? How does the GC trace it and what makes an object unreachable?",
+      "What is a reference queue? How does WeakReference + ReferenceQueue let you detect when an object is collected?",
+      "What is a retain cycle? Write a Kotlin example between two objects and prove neither gets collected.",
+      "How does the ViewModel store survive configuration changes at the object level? Trace from onRetainNonConfigurationInstance() to ViewModelStore.",
+      "Why does an inner class (non-static) in Java/Kotlin always hold a reference to the outer class? What is the fix?",
+      "What is finalization in Java? Why is it deprecated and what should you use instead (AutoCloseable / Cleaner)?",
+      "How does a static field cause a memory leak in Android? Write a concrete example with a Context reference.",
+      "What is the difference between shallow size and retained size of an object in memory profiler terms?",
+      { q: "How do I optimize image loading in lists?", a: "Use Object Pool Pattern with Lazy Loading Pattern. Pool reuses bitmap objects, while lazy loading loads images only when needed. Combine with image caching for better performance." },
+      { q: "What pattern helps with memory management?", a: "Use WeakReference Pattern for listeners and callbacks. This prevents memory leaks when activities/fragments are destroyed but callbacks still hold references." },
+      { q: "How to optimize RecyclerView performance?", a: "Use <strong>ViewHolder Pattern</strong>, <strong>Object Pool Pattern</strong> (View recycling), and <strong>Proxy Pattern</strong> for lazy image loading." }
+    ]
+  },
+  {
+    id: "concurrency",
+    title: "Concurrency & OOP State",
+    icon: "⚙️",
+    color: "#84cc16",
+    bg: "rgba(132,204,22,0.08)",
+    questions: [
+      "What is a race condition at the object level? Write a class where two threads simultaneously mutate state and produce inconsistent output.",
+      "What is the monitor pattern? How does @Synchronized implement it and what are its performance drawbacks?",
+      "What is the difference between volatile, AtomicInteger, and Mutex for protecting shared state? When does each fall short?",
+      "How does the actor model in Kotlin coroutines prevent race conditions without locks? What is the OOP analogy?",
+      "What is the difference between StateFlow and MutableStateFlow in OOP encapsulation terms? How does it mirror the LiveData pattern?",
+      "Why is viewModelScope safe to use without memory leaks? Trace the object chain from ViewModel to Job cancellation.",
+      "What is a deadlock in OOP terms? Write two objects that deadlock when calling each other's synchronized methods.",
+      "Design a producer-consumer system using OOP principles: multiple producers/consumers and a thread-safe queue.",
+      "Design a task scheduling system with priority-based scheduling, recurring tasks, and dependency handling."
+    ]
+  },
+  {
+    id: "testing",
+    title: "Testing & OOP Design",
+    icon: "🧪",
+    color: "#14b8a6",
+    bg: "rgba(20,184,166,0.08)",
+    questions: [
+      "What are the 3 laws of Test-Driven Development and how do they force better OOP design?",
+      "What is the difference between a mock and a stub? When does using a mock make a test brittle?",
+      "How do you test a class that depends on the current time without making the test non-deterministic?",
+      "What is a test seam? How does OOP injection create seams that allow substituting behavior in tests?",
+      "What is the difference between state verification and behavior verification in a unit test?",
+      "How does the Humble Object pattern separate testable logic from untestable Android framework code?",
+      "Write a full test suite for a LoginViewModel that covers success, network error, validation error, and loading state — using only fakes, no Mockito.",
+      { q: "How do I make my app more testable?", a: "Use Dependency Injection Pattern with Mock Pattern. DI allows injecting mock objects during testing, making unit tests isolated and reliable." },
+      { q: "What pattern should I use for test data creation?", a: "Use Test Data Builder Pattern or Factory Pattern. Create builders that generate test objects with default values, allowing easy customization for specific test scenarios." },
+      { q: "How do I implement unit tests for MVVM?", a: "Use <strong>Mock Pattern</strong> for dependencies, <strong>Builder Pattern</strong> for test data, and <strong>Strategy Pattern</strong> to test different logic scenarios." }
+    ]
+  },
+  {
+    id: "architecture",
+    title: "Architecture & Domain Modeling",
+    icon: "🏛️",
+    color: "#f43f5e",
+    bg: "rgba(244,63,94,0.08)",
+    questions: [
+      "What is an anemic domain model? Why do many Android apps have one and what problems does it cause?",
+      "What is a rich domain model? Rewrite an anemic Order class into a rich one that enforces business rules.",
+      "What is the difference between a Value Object and an Entity in DDD? Give 5 examples of each in an Android e-commerce app.",
+      "What is an aggregate root in DDD? How does it enforce consistency boundaries?",
+      "What is CQRS (Command Query Responsibility Segregation)? Implement it in an Android ViewModel with separate read and write paths.",
+      "What is event sourcing? Implement a shopping cart that stores all state as events and derives current state by replaying them.",
+      "How do you enforce the dependency rule in Clean Architecture using Kotlin module visibility?",
+      "What is the difference between application service, domain service, and infrastructure service in Clean Architecture?",
+      "What is a bounded context in DDD? How do you map it to Android module boundaries?",
+      "What is eventual consistency? How does it affect the OOP design of an offline-first Android app?",
+      { q: "When should I use MVP vs MVVM in Android?", a: "Use MVVM for modern Android apps with data binding and LiveData. Use MVP for legacy apps or when you need more control over view updates. MVVM is preferred for new projects." },
+      { q: "What's the best pattern for a news reading app?", a: "Use MVVM with Repository Pattern. Repository handles both local database (Room) and remote API calls. ViewModel exposes data through LiveData for automatic UI updates." },
+      { q: "How do I structure a social media app like Instagram?", a: "Use Clean Architecture with MVVM. Separate into layers: Presentation (Activities/Fragments), Domain (Use Cases), and Data (Repository, API, Database). This ensures scalability and testability." },
+      "How do OOP principles apply to microservices architecture? How do you design objects spanning multiple services?",
+      "How do you design classes that can evolve without breaking existing code? Explain OCP with a practical example.",
+      "How do you handle API versioning in class libraries and migrating legacy OOP code?",
+      { q: "Should I use MVP, MVVM, or MVI?", a: "<strong>MVP:</strong> Simple separation.<br><strong>MVVM:</strong> Standard for modern Android with LiveData/Flow.<br><strong>MVI:</strong> For complex state, ensures unidirectional data flow (Single Source of Truth)." },
+      { q: "How to implement Clean Architecture in Android?", a: "Combine: <strong>Repository Pattern</strong> (Data), <strong>Use Case Pattern</strong> (Logic), <strong>Dependency Injection</strong> (Coupling), and <strong>Adapter Pattern</strong> (External APIs)." }
+    ]
+  },
+  {
+    id: "ecommerce",
+    title: "Shopping Cart & E-commerce",
+    icon: "🛒",
+    color: "#fbbf24",
+    bg: "rgba(251,191,36,0.08)",
+    questions: [
+      { q: "Which design pattern should I use for a shopping cart app?", a: "For a shopping cart app, use MVVM (Model-View-ViewModel) combined with Repository Pattern and Observer Pattern. MVVM separates UI logic from business logic, Repository handles data operations, and Observer notifies UI of cart changes in real-time." },
+      { q: "How do I implement real-time cart updates across different screens?", a: "Use Observer Pattern with LiveData or StateFlow. When items are added/removed from cart, all observers (screens) get notified automatically. Example: Cart badge on toolbar updates when items are added from product detail screen." },
+      { q: "What pattern should I use for managing cart state globally?", a: "Use Singleton Pattern for CartManager or Repository Pattern with dependency injection. This ensures single source of truth for cart data across the entire app." },
+      { q: "How do I handle different payment methods in checkout?", a: "Use Strategy Pattern. Create different payment strategies (CreditCard, PayPal, GooglePay) that implement a common PaymentStrategy interface. This makes adding new payment methods easy." }
+    ]
+  },
+  {
+    id: "data-mgmt",
+    title: "Data Management Patterns",
+    icon: "💾",
+    color: "#3b82f6",
+    bg: "rgba(59,130,246,0.08)",
+    questions: [
+      { q: "How do I handle offline-first apps?", a: "Use Repository Pattern with Cache-Aside Pattern. Repository first checks local cache (Room database), then fetches from network if needed. This ensures app works offline." },
+      { q: "What pattern should I use for managing app settings?", a: "Use Singleton Pattern for PreferencesManager or Repository Pattern for complex settings. This provides centralized access to user preferences across the app." },
+      { q: "How do I sync data between local and remote sources?", a: "Use Synchronization Pattern with Observer Pattern. Implement sync manager that observes data changes and synchronizes with server. Use WorkManager for background sync." }
+    ]
+  },
+  {
+    id: "navigation",
+    title: "Navigation Patterns",
+    icon: "🗺️",
+    color: "#8b5cf6",
+    bg: "rgba(139,92,246,0.08)",
+    questions: [
+      { q: "What pattern should I use for complex navigation?", a: "Use State Pattern with Navigation Component. Each screen state handles its own navigation logic. This is especially useful for multi-step flows like checkout or onboarding." },
+      { q: "How do I handle deep linking in my app?", a: "Use Chain of Responsibility Pattern. Create chain of handlers where each handler checks if it can handle specific deep link pattern. If not, passes to next handler." }
+    ]
+  },
+  {
+    id: "real-world",
+    title: "Real-World App Examples",
+    icon: "🌍",
+    color: "#10b981",
+    bg: "rgba(16,185,129,0.08)",
+    questions: [
+      { q: "How would you structure a food delivery app?", a: "Use MVVM with Clean Architecture:<br>• Repository Pattern for restaurant/menu data<br>• Observer Pattern for order status updates<br>• Strategy Pattern for different delivery options<br>• State Pattern for order flow management" },
+      { q: "What patterns work best for a music streaming app?", a: "Combine multiple patterns:<br>• MVVM for overall architecture<br>• Singleton for MediaPlayer service<br>• Observer for playback state changes<br>• Command for playback controls<br>• Strategy for different audio quality settings" },
+      { q: "How do I implement a chat application?", a: "Use MVVM with Repository Pattern:<br>• Observer Pattern for real-time message updates<br>• Factory Pattern for different message types<br>• State Pattern for connection status<br>• Command Pattern for message actions (send, retry, delete)" },
+      { q: "What's the best approach for a photo editing app?", a: "Use Command Pattern for edit operations:<br>• Each edit action (crop, filter, rotate) is a command<br>• Memento Pattern for undo/redo functionality<br>• Strategy Pattern for different filters<br>• Factory Pattern for creating different tools" },
+      { q: "How do I handle a multi-module app architecture?", a: "Use Clean Architecture with Dependency Inversion:<br>• Each module follows MVVM pattern<br>• Repository Pattern for data layer<br>• Use Cases for business logic<br>• Dependency Injection for module communication" }
+    ]
+  },
+  {
+    id: "common-mistakes",
+    title: "Best Practices & Mistakes",
+    icon: "⚠️",
+    color: "#f43f5e",
+    bg: "rgba(244,63,94,0.08)",
+    questions: [
+      { q: "What's wrong with using God Objects in Android?", a: "God Objects violate Single Responsibility Principle. Instead, use Facade Pattern or break into smaller, focused classes. Example: Instead of one massive Activity, use Fragments and separate managers." },
+      { q: "How do I avoid memory leaks in listeners?", a: "Use WeakReference Pattern or Lifecycle-Aware Components. Always unregister listeners in appropriate lifecycle methods (onDestroy, onPause)." },
+      { q: "When should I NOT use Singleton pattern?", a: "Avoid Singleton for objects that:<br>• Hold Activity/Context references<br>• Need different configurations<br>• Are used for testing (hard to mock)<br>Use Dependency Injection instead for better testability." }
+    ]
+  },
+  {
+    id: "scenarios",
+    title: "System Design Scenarios",
+    icon: "🛠️",
+    color: "#10b981",
+    bg: "rgba(16,185,129,0.08)",
+    questions: [
+      "Design a class hierarchy for an e-commerce system with different product types (electronics, clothing, books). How would you handle pricing strategies and inventory management?",
+      "Design a banking system with different account types. How would you implement different account behaviors (savings, checking, credit) and handle interest?",
+      "Design a class structure for a role-playing game with character types (warrior, mage, archer), equipment system, and skill trees.",
+      "Design a document management system that handles PDF, Word, Excel with version control, access permissions, and processing.",
+      "Design a drawing application system that supports circle, rectangle, triangle, allows resizing/moving, and supports undo/redo.",
+      "Design a vehicle management system for a rental company with different vehicle types, pricing models, and maintenance scheduling.",
+      "Design a media player that handles audio, video, images, playlists, and different codecs/quality settings.",
+      "Design a caching system with LRU, LFU, FIFO policies, thread safety, and memory optimization.",
+      "Design an Object-Relational Mapping (ORM) system: mapping objects to tables, relationships, and lazy loading.",
+      { q: "What patterns are best for a food delivery app?", a: "<strong>State Pattern:</strong> For order tracking (preparing/delivering).<br><strong>Observer Pattern:</strong> Real-time tracking updates.<br><strong>Strategy Pattern:</strong> Different payment methods." },
+      { q: "What security patterns are used in banking apps?", a: "<strong>Proxy Pattern:</strong> Secure API calls.<br><strong>Facade Pattern:</strong> Hide complex security logic.<br><strong>Strategy Pattern:</strong> Different encryption methods." }
+    ]
+  },
+  {
+    id: "deep-dives",
+    title: "Tricky Concepts & Deep Dives",
+    icon: "🔬",
+    color: "#06b6d4",
+    bg: "rgba(6,182,212,0.08)",
+    questions: [
+      "What happens when you call a virtual method from a constructor?",
+      "Explain the fragile base class problem and how to avoid it.",
+      "What are the implications of overriding equals() without overriding hashCode()?",
+      "How do you handle circular dependencies between classes?",
+      "Explain how garbage collection affects object design decisions.",
+      "What are the implications of using reflection in OOP design?",
+      "How do generics/templates affect polymorphism?",
+      "Identify and explain these anti-patterns: God Object, Anemic Domain Model, Inappropriate Intimacy.",
+      "How would you refactor a class that has grown too large? What code smells do you look for?"
+    ]
+  },
+  {
+    id: "challenges",
+    title: "Practical Coding Challenges",
+    icon: "💻",
+    color: "#f59e0b",
+    bg: "rgba(245,158,11,0.08)",
+    questions: [
+      "Challenge: Implement a generic container class that can hold any type of object with iteration, searching, and sorting.",
+      "Challenge: Design and implement an event system with publishers and subscribers, supporting asynchronous processing.",
+      "Challenge: Implement a finite state machine using OOP principles with transitions, guards, and entry/exit actions.",
+      "Challenge: Design a plugin system where new functionality can be added dynamically with loading/unloading and isolation."
+    ]
+  },
+  {
+    id: "professional",
+    title: "Professional Trade-offs",
+    icon: "🤝",
+    color: "#8b5cf6",
+    bg: "rgba(139,92,246,0.08)",
+    questions: [
+      "How do OOP principles apply to microservices architecture? How do you design objects spanning multiple services?",
+      "What are the challenges of maintaining object relationships across service boundaries?",
+      "How does good OOP design facilitate unit testing? Explain dependency injection's role.",
+      "How would you design classes to make them easily mockable? What are testing challenges in inheritance?",
+      "How do you design classes that can evolve without breaking code? Explain OCP with refactoring examples.",
+      "How do you handle API versioning in class libraries and migrating legacy OOP code?",
+      "Trade-off Analysis: Choose between inheritance and composition for a specific problem. Walk through the decision process.",
+      "How do you balance code reusability with maintainability? When would you sacrifice principles for performance?",
+      "How do you handle conflicting requirements in class design and versioning conflicts in large codebases?"
+    ]
+  }
+];
+
+// State
+let answered = JSON.parse(localStorage.getItem('oop_answered') || '{}');
+let currentFilter = 'all';
+let searchQuery = '';
+
+function saveAnswered() {
+  localStorage.setItem('oop_answered', JSON.stringify(answered));
+}
+
+function renderAll() {
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+  let shown = 0;
+  let total = 0;
+  let globalIdx = 0;
+
+  SECTIONS.forEach(section => {
+    const filtered = section.questions.filter(q => {
+      const qText = typeof q === 'string' ? q : q.q;
+      const matchFilter = currentFilter === 'all' || currentFilter === section.id;
+      const matchSearch = !searchQuery || qText.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchFilter && matchSearch;
+    });
+
+    total += section.questions.length;
+
+    if (filtered.length === 0) return;
+    shown += filtered.length;
+
+    const sec = document.createElement('div');
+    sec.className = 'section';
+    sec.dataset.section = section.id;
+    sec.style.animationDelay = `${shown * 0.01}s`;
+
+    const doneCount = filtered.filter(q => answered[getQKey(section.id, q)]).length;
+
+    sec.innerHTML = `
+      <div class="section-header">
+        <div class="section-icon" style="background:${section.bg}; color:${section.color}">${section.icon}</div>
+        <div class="section-title">${section.title}</div>
+        <div class="section-count" style="background:${section.bg}; color:${section.color}; border:1px solid ${section.color}33">${doneCount}/${filtered.length}</div>
+      </div>
+    `;
+
+    filtered.forEach((q, i) => {
+      globalIdx++;
+      const key = getQKey(section.id, q);
+      const isDone = !!answered[key];
+      const card = document.createElement('div');
+      card.className = `q-card${isDone ? ' answered' : ''}`;
+      card.dataset.key = key;
+      card.innerHTML = `
+        <div class="q-header" onclick="toggleCard(this.parentElement)">
+          <div class="q-num">#${globalIdx.toString().padStart(3,'0')}</div>
+          <div class="q-text">${typeof q === 'string' ? q : q.q}</div>
+          <div class="q-check">${isDone ? '✓' : ''}</div>
+        </div>
+        <div class="q-expand">
+          <div class="q-expand-inner">
+            ${typeof q === 'string' 
+              ? `💡 اكتب إجابتك على ورقة أو بصوت عالٍ، ثم ابحث عنها في الـ documentation أو Kotlin docs.<br><br>
+                 إذا احتجت شرح كامل مع كود لهذا السؤال، اكتبه في المحادثة وسيتم شرحه بالتفصيل.`
+              : `<div class="answer-box"><strong>الإجابة النموذجية:</strong><br>${q.a}</div>`
+            }
+            <br><br>
+            <button class="mark-btn" onclick="toggleDone('${key}', event)">
+              ${isDone ? '✅ تمت الإجابة' : '⬜ اضغط لتحديد كـ "تمت الإجابة"'}
+            </button>
+            <button class="copy-btn" onclick="copyText(this, \`${(typeof q === 'string' ? q : q.q).replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`, event)">
+              📋 نسخ السؤال
+            </button>
+          </div>
+        </div>
+      `;
+      sec.appendChild(card);
+    });
+
+    container.appendChild(sec);
+  });
+
+  document.getElementById('shown').textContent = shown;
+  document.getElementById('no-results').style.display = shown === 0 ? 'block' : 'none';
+
+  updateProgress();
+  updateHeaderStats();
+}
+
+function getQKey(sectionId, q) {
+  const text = typeof q === 'string' ? q : q.q;
+  return sectionId + ':' + text.substring(0, 40).replace(/[^a-zA-Z0-9]/g,'_');
+}
+
+function toggleCard(card) {
+  const isOpen = card.classList.contains('open');
+  document.querySelectorAll('.q-card.open').forEach(c => c.classList.remove('open'));
+  if (!isOpen) card.classList.add('open');
+}
+
+function copyText(btn, text, e) {
+  e.stopPropagation();
+  navigator.clipboard.writeText(text).then(() => {
+    const original = btn.innerHTML;
+    btn.innerHTML = '✅ تم النسخ!';
+    setTimeout(() => { btn.innerHTML = original; }, 2000);
+  });
+}
+
+function toggleDone(key, e) {
+  e.stopPropagation();
+  answered[key] = !answered[key];
+  saveAnswered();
+  renderAll();
+}
+
+function updateProgress() {
+  let total = 0, done = 0;
+  SECTIONS.forEach(s => {
+    s.questions.forEach(q => {
+      total++;
+      if (answered[getQKey(s.id, q)]) done++;
+    });
+  });
+  document.getElementById('prog-text').textContent = `${done} / ${total}`;
+  document.getElementById('progress-fill').style.width = total > 0 ? (done/total*100)+'%' : '0%';
+  document.getElementById('done-count').textContent = done;
+}
+
+function updateHeaderStats() {
+  let total = 0;
+  SECTIONS.forEach(s => total += s.questions.length);
+  document.getElementById('total-count').textContent = total;
+}
+
+function resetProgress() {
+  if (confirm('إعادة تعيين كل تقدمك؟')) {
+    answered = {};
+    saveAnswered();
+    renderAll();
+  }
+}
+
+// Search
+document.getElementById('search').addEventListener('input', e => {
+  searchQuery = e.target.value.trim();
+  renderAll();
+});
+
+// Filters
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    renderAll();
+  });
+});
+
+// Scroll top
+window.addEventListener('scroll', () => {
+  const btn = document.getElementById('scroll-top');
+  if (window.scrollY > 400) btn.classList.add('visible');
+  else btn.classList.remove('visible');
+});
+
+// Init
+renderAll();
+</script>
+</body>
+</html>

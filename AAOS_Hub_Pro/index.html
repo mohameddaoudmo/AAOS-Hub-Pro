@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Automotive Platform — منصة أندرويد للسيارات</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050a12;--bg2:#080f1e;--card:#0c1528;--border:#182036;--a1:#00d4ff;--a2:#7c3aed;--a3:#f59e0b;--a4:#10b981;--a5:#f43f5e;--text:#e2e8f0;--text2:#94a3b8;--text3:#475569;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 40px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);}
+.back{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--a1);font-weight:600;font-size:.9rem;padding:6px 16px;border:1px solid rgba(0,212,255,.3);border-radius:8px;transition:.2s;}
+.back:hover{background:rgba(0,212,255,.1);}
+.search-bar{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 16px;width:280px;}
+.search-bar input{background:none;border:none;outline:none;color:var(--text);font-family:'Cairo',sans-serif;font-size:.88rem;width:100%;}
+.search-bar input::placeholder{color:var(--text3);}
+.hero{padding:60px 40px 40px;text-align:center;background:radial-gradient(ellipse at 50% 0%,rgba(0,212,255,.12) 0%,transparent 55%);}
+.badge{display:inline-block;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:var(--a1);padding:6px 20px;border-radius:50px;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:18px;}
+h1{font-size:clamp(1.8rem,5vw,3rem);font-weight:900;line-height:1.2;margin-bottom:10px;}
+.ga{background:linear-gradient(90deg,#00d4ff,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.ga2{background:linear-gradient(90deg,#f59e0b,#f43f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hero p{color:var(--text2);max-width:560px;margin:0 auto 28px;line-height:1.8;}
+.stats{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 22px;text-align:center;}
+.stat-n{font-size:1.4rem;font-weight:900;color:var(--a1);}
+.stat-l{font-size:.72rem;color:var(--text3);margin-top:2px;}
+.container{max-width:1100px;margin:0 auto;padding:36px 24px;}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;}
+.flt{padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;font-family:'Cairo',sans-serif;font-size:.8rem;transition:.2s;}
+.flt:hover,.flt.active{border-color:var(--a1);color:var(--a1);background:rgba(0,212,255,.08);}
+.guides-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:40px;}
+.gcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;text-decoration:none;color:var(--text);transition:.3s;position:relative;overflow:hidden;display:block;}
+.gcard::before{content:'';position:absolute;inset:0;opacity:0;transition:.3s;}
+.gcard:hover{transform:translateY(-3px);}
+.gcard:hover::before{opacity:1;}
+.gcard.cp{--gc:#00d4ff;} .gcard.cp::before{background:radial-gradient(circle at 20% 20%,rgba(0,212,255,.07),transparent 60%);}
+.gcard.cp:hover{border-color:var(--a1);box-shadow:0 12px 30px rgba(0,212,255,.12);}
+.gcard.cv{--gc:#a78bfa;} .gcard.cv::before{background:radial-gradient(circle at 20% 20%,rgba(124,58,237,.07),transparent 60%);}
+.gcard.cv:hover{border-color:#a78bfa;box-shadow:0 12px 30px rgba(124,58,237,.12);}
+.gcard.cg{--gc:#10b981;} .gcard.cg::before{background:radial-gradient(circle at 20% 20%,rgba(16,185,129,.07),transparent 60%);}
+.gcard.cg:hover{border-color:var(--a4);box-shadow:0 12px 30px rgba(16,185,129,.12);}
+.gcard.ca{--gc:#f59e0b;} .gcard.ca::before{background:radial-gradient(circle at 20% 20%,rgba(245,158,11,.07),transparent 60%);}
+.gcard.ca:hover{border-color:var(--a3);box-shadow:0 12px 30px rgba(245,158,11,.12);}
+.gcard.cr{--gc:#f43f5e;} .gcard.cr::before{background:radial-gradient(circle at 20% 20%,rgba(244,63,94,.07),transparent 60%);}
+.gcard.cr:hover{border-color:var(--a5);box-shadow:0 12px 30px rgba(244,63,94,.12);}
+.gcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.gcard-ico{font-size:2rem;}
+.gcard-badge{font-size:.65rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:10px;border:1px solid;color:var(--gc,var(--a1));border-color:rgba(var(--gc-rgb,0,212,255),.3);background:rgba(var(--gc-rgb,0,212,255),.08);}
+.cp .gcard-badge{color:var(--a1);border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.08);}
+.cv .gcard-badge{color:#a78bfa;border-color:rgba(124,58,237,.3);background:rgba(124,58,237,.08);}
+.cg .gcard-badge{color:var(--a4);border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.08);}
+.ca .gcard-badge{color:var(--a3);border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.08);}
+.cr .gcard-badge{color:var(--a5);border-color:rgba(244,63,94,.3);background:rgba(244,63,94,.08);}
+.gcard-title{font-size:1rem;font-weight:700;margin-bottom:7px;}
+.gcard-desc{color:var(--text2);font-size:.82rem;line-height:1.65;margin-bottom:12px;}
+.gcard-arr{text-align:left;font-size:1rem;transition:.3s;}
+.cp .gcard-arr{color:var(--a1);} .cv .gcard-arr{color:#a78bfa;} .cg .gcard-arr{color:var(--a4);} .ca .gcard-arr{color:var(--a3);} .cr .gcard-arr{color:var(--a5);}
+.gcard:hover .gcard-arr{transform:translateX(-5px);}
+footer{text-align:center;padding:28px;border-top:1px solid var(--border);color:var(--text3);font-size:.82rem;}
+.theme-fab{position:fixed;bottom:24px;left:24px;width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--a2),var(--a1));font-size:1.2rem;box-shadow:0 4px 18px rgba(0,0,0,.4);z-index:999;}
+[data-theme="light"] body{background:#f0f6ff;color:#1e293b;}
+[data-theme="light"] .gcard,[data-theme="light"] .stat{background:#fff;border-color:#e2e8f0;}
+[data-theme="light"] .topbar,.search-bar{background:#fff;border-color:#e2e8f0;}
+</style>
+<script>var s=localStorage.getItem('aaos_theme')||'dark';document.documentElement.setAttribute('data-theme',s);</script>
+</head>
+<body>
+<div class="topbar">
+  <a href="hub.html" class="back">🏠 الرئيسية</a>
+  <div class="search-bar"><span>🔍</span><input type="text" id="srch" placeholder="ابحث في الأدلة..."></div>
+</div>
+<div class="hero">
+  <div class="badge">ANDROID AUTOMOTIVE PLATFORM</div>
+  <h1><span class="ga">Android</span> <span class="ga2">Automotive</span></h1>
+  <p>الدليل الشامل لتطوير تطبيقات أندرويد للسيارات — من الـ VHAL حتى الـ OTA</p>
+  <div class="stats">
+    <div class="stat"><div class="stat-n">13</div><div class="stat-l">دليل تفصيلي</div></div>
+    <div class="stat"><div class="stat-n">500+</div><div class="stat-l">مثال عملي</div></div>
+    <div class="stat"><div class="stat-n">100%</div><div class="stat-l">عربي</div></div>
+  </div>
+</div>
+<div class="container">
+  <div class="filter-row" id="filters">
+    <button class="flt active" data-f="all">الكل</button>
+    <button class="flt" data-f="نظام">نظام</button>
+    <button class="flt" data-f="UI">UI</button>
+    <button class="flt" data-f="DevOps">DevOps</button>
+    <button class="flt" data-f="وسائط">وسائط</button>
+    <button class="flt" data-f="شبكات">شبكات</button>
+    <button class="flt" data-f="هارد">هارد</button>
+  </div>
+  <div class="guides-grid" id="grid"></div>
+</div>
+<footer>Automotive Platform — Tech Mastery Hub 🚗</footer>
+<button class="theme-fab" onclick="var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('aaos_theme',t);">🌙</button>
+<script>
+const G=[
+  {ico:'🚗',c:'cp',cat:'نظام',title:'دليل VHAL الشامل',desc:'CarPropertyManager، IPC، والتكامل الكامل مع الهارد وير.',path:'guides/vhal-guide-arabic.html'},
+  {ico:'⚛️',c:'cv',cat:'UI',title:'Compose for Automotive',desc:'Jetpack Compose وCarUi لبناء واجهات حديثة متوافقة مع القيادة.',path:'guides/compose_for_automotive_guide.html'},
+  {ico:'📡',c:'cr',cat:'نظام',title:'IPC & Binder & AIDL',desc:'التواصل بين العمليات — Binder Driver، AIDL، ربط الخدمات.',path:'guides/ipc-binder-aidl-guide.html'},
+  {ico:'🚀',c:'cg',cat:'DevOps',title:'Android CI/CD',desc:'أتمتة البناء والاختبار والنشر مع GitHub Actions وFastlane.',path:'guides/android-cicd-guide.html'},
+  {ico:'📲',c:'cg',cat:'نظام',title:'OTA Updates & A/B',desc:'تحديثات النظام الهوائية وإدارة تقسيم القرص.',path:'guides/android-ota-updates-guide.html'},
+  {ico:'🎵',c:'ca',cat:'وسائط',title:'Android Media Session',desc:'إدارة الوسائط والتحكم في تشغيل الصوت في بيئة السيارة.',path:'guides/android_media_vehicle_guide.html'},
+  {ico:'📶',c:'cp',cat:'شبكات',title:'Connectivity Stack',desc:'البلوتوث， الواي فاي， وتكامل Android Auto.',path:'guides/connectivity-bt-wifi-androidauto.html'},
+  {ico:'🛠️',c:'ca',cat:'DevOps',title:'Android Build System',desc:'أسرار AOSP Build — Soong， Makefile， وعملية البناء.',path:'guides/android-build-guide.html'},
+  {ico:'🔌',c:'cr',cat:'هارد',title:'CAN Bus & VHAL',desc:'ربط أندرويد بناقل بيانات السيارة الحقيقي.',path:'guides/can_bus_vhal_guide.html'},
+  {ico:'🖥️',c:'cv',cat:'UI',title:'CarUI Library',desc:'مكتبة CarUI لبناء واجهات متوافقة مع متطلبات الأمان.',path:'guides/caruilib_driving_deep_dive.html'},
+  {ico:'🤖',c:'cp',cat:'نظام',title:'AAOS Deep Dive',desc:'الغوص العميق في Android Automotive OS — المعمارية الداخلية.',path:'guides/aaos_deep_arabic.html'},
+  {ico:'🛡️',c:'cr',cat:'نظام',title:'SELinux for Automotive',desc:'إدارة الأمان والصلاحيات — Enforcing， Policies， و Security contexts.',path:'guides/selinux-guide.html'},
+  {ico:'💼',c:'cg',cat:'مهني',title:'Professional Hub',desc:'نصائح وموارد وخارطة طريق لتطوير مسارك المهني.',path:'guides/career-hub.html'},
+  {ico:'💎',c:'cv',cat:'مهني',title:'OOP Interview Mastery',desc:'أكثر من 300 سؤال وجواب احترافي في OOP وأنماط التصميم لأندرويد.',path:'guides/oop_questions.html'},
+];
+const grid=document.getElementById('grid');
+function render(items){
+  grid.innerHTML=items.map(g=>`
+    <a href="${g.path}" class="gcard ${g.c}">
+      <div class="gcard-top"><div class="gcard-ico">${g.ico}</div><span class="gcard-badge">${g.cat}</span></div>
+      <div class="gcard-title">${g.title}</div>
+      <div class="gcard-desc">${g.desc}</div>
+      <div class="gcard-arr">←</div>
+    </a>`).join('');
+}
+render(G);
+document.querySelectorAll('.flt').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.flt').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    const f=b.dataset.f;
+    render(f==='all'?G:G.filter(g=>g.cat===f));
+  });
+});
+document.getElementById('srch').addEventListener('input',e=>{
+  const q=e.target.value.toLowerCase();
+  render(q.length<2?G:G.filter(g=>g.title.toLowerCase().includes(q)||g.desc.toLowerCase().includes(q)));
+});
+</script>
+</body>
+</html>
