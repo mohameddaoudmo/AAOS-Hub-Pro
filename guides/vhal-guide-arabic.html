@@ -1,1541 +1,992 @@
-﻿﻿﻿<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VHAL — الدليل الشامل من الصفر للاحتراف</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Fira+Code:wght@400;600&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #080c14;
-  --bg2: #0d1526;
-  --bg3: #111d33;
-  --panel: #0f1e36;
-  --border: #1e3a5f;
-  --accent1: #00d4ff;
-  --accent2: #ff6b35;
-  --accent3: #7c3aed;
-  --accent4: #10b981;
-  --accent5: #f59e0b;
-  --accent6: #ef4444;
-  --text: #e2e8f0;
-  --text2: #94a3b8;
-  --text3: #64748b;
-  --glow1: rgba(0,212,255,0.15);
-  --glow2: rgba(255,107,53,0.15);
-  --glow3: rgba(124,58,237,0.15);
-}
-
-* { margin:0; padding:0; box-sizing:border-box; }
-
-html { scroll-behavior: smooth; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Cairo', 'Tajawal', sans-serif;
-  line-height: 1.7;
-  overflow-x: hidden;
-}
-
-/* ── ANIMATED BACKGROUND ── */
-.bg-grid {
-  position: fixed; inset: 0; z-index: 0;
-  background-image:
-    linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none;
-}
-.bg-orb {
-  position: fixed; border-radius: 50%; filter: blur(120px);
-  pointer-events: none; z-index: 0; animation: orbFloat 8s ease-in-out infinite;
-}
-.bg-orb.o1 { width:500px; height:500px; background:rgba(0,212,255,0.06); top:-100px; right:-100px; }
-.bg-orb.o2 { width:400px; height:400px; background:rgba(124,58,237,0.06); bottom:10%; left:-100px; animation-delay:-3s; }
-.bg-orb.o3 { width:300px; height:300px; background:rgba(255,107,53,0.05); top:50%; left:50%; animation-delay:-5s; }
-
-@keyframes orbFloat {
-  0%,100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-30px) scale(1.05); }
-}
-
-/* ── WRAPPER ── */
-.wrapper { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
-
-/* ── HERO ── */
-.hero {
-  min-height: 100vh; display: flex; flex-direction: column;
-  justify-content: center; align-items: center; text-align: center;
-  padding: 60px 20px;
-}
-
-.hero-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3);
-  padding: 6px 18px; border-radius: 100px; font-size: 13px;
-  color: var(--accent1); margin-bottom: 28px; letter-spacing: 2px;
-  animation: fadeDown 0.8s ease both;
-}
-.hero-badge span { width:6px; height:6px; background:var(--accent1); border-radius:50%; animation: blink 1.2s ease-in-out infinite; }
-
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
-@keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
-@keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
-@keyframes fadeIn { from{opacity:0} to{opacity:1} }
-@keyframes slideRight { from{opacity:0;transform:translateX(-40px)} to{opacity:1;transform:translateX(0)} }
-@keyframes slideLeft { from{opacity:0;transform:translateX(40px)} to{opacity:1;transform:translateX(0)} }
-@keyframes scaleIn { from{opacity:0;transform:scale(0.8)} to{opacity:1;transform:scale(1)} }
-@keyframes shimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
-@keyframes pulse-border { 0%,100%{box-shadow:0 0 0 0 rgba(0,212,255,0.4)} 50%{box-shadow:0 0 0 8px rgba(0,212,255,0)} }
-@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-@keyframes spin-slow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-@keyframes data-flow { 0%{stroke-dashoffset:200} 100%{stroke-dashoffset:0} }
-@keyframes reveal { from{width:0} to{width:100%} }
-
-.hero-title {
-  font-size: clamp(42px, 8vw, 88px);
-  font-weight: 900;
-  line-height: 1.1;
-  margin-bottom: 12px;
-  animation: fadeUp 0.9s 0.2s ease both;
-}
-.hero-title .grad {
-  background: linear-gradient(135deg, var(--accent1) 0%, #4fc3f7 40%, var(--accent3) 80%, var(--accent2) 100%);
-  background-size: 300% auto;
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: shimmer 4s linear infinite;
-}
-
-.hero-sub {
-  font-size: clamp(16px, 3vw, 22px); color: var(--text2);
-  margin-bottom: 20px; animation: fadeUp 0.9s 0.35s ease both;
-}
-
-.hero-desc {
-  max-width: 640px; color: var(--text3); font-size: 15px;
-  margin-bottom: 48px; animation: fadeUp 0.9s 0.5s ease both;
-}
-
-.hero-stats {
-  display: flex; gap: 32px; flex-wrap: wrap; justify-content: center;
-  animation: fadeUp 0.9s 0.65s ease both;
-}
-.stat-box {
-  text-align: center;
-  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-  padding: 16px 28px; border-radius: 12px; backdrop-filter: blur(10px);
-  transition: all 0.3s;
-}
-.stat-box:hover { border-color: var(--accent1); background: var(--glow1); transform: translateY(-4px); }
-.stat-box .num { font-size: 28px; font-weight: 900; color: var(--accent1); }
-.stat-box .lbl { font-size: 12px; color: var(--text3); margin-top: 2px; }
-
-.scroll-hint {
-  position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  color: var(--text3); font-size: 12px; animation: fadeIn 2s 1.5s ease both;
-}
-.scroll-arrow { width: 24px; height: 24px; border-right: 2px solid var(--text3); border-bottom: 2px solid var(--text3); transform: rotate(45deg); animation: float 1.5s ease-in-out infinite; }
-
-/* ── NAV ── */
-.sticky-nav {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(8,12,20,0.85); backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 24px;
-  display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
-  margin-bottom: 60px;
-}
-.nav-btn {
-  padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
-  border: 1px solid transparent; cursor: pointer; transition: all 0.2s;
-  background: transparent; color: var(--text2); font-family: 'Cairo', sans-serif;
-  text-decoration: none; display: inline-block;
-}
-.nav-btn:hover { border-color: var(--accent1); color: var(--accent1); background: var(--glow1); }
-
-/* ── SECTION ── */
-.section { margin-bottom: 80px; opacity: 0; transform: translateY(30px); transition: all 0.7s ease; }
-.section.visible { opacity: 1; transform: translateY(0); }
-
-.section-header {
-  display: flex; align-items: center; gap: 16px; margin-bottom: 32px;
-}
-.section-icon {
-  width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center;
-  justify-content: center; font-size: 24px; flex-shrink: 0;
-  animation: float 3s ease-in-out infinite;
-}
-.section-icon.c1 { background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(0,212,255,0.05)); border: 1px solid rgba(0,212,255,0.3); }
-.section-icon.c2 { background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.05)); border: 1px solid rgba(255,107,53,0.3); }
-.section-icon.c3 { background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(124,58,237,0.05)); border: 1px solid rgba(124,58,237,0.3); }
-.section-icon.c4 { background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05)); border: 1px solid rgba(16,185,129,0.3); }
-.section-icon.c5 { background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(245,158,11,0.05)); border: 1px solid rgba(245,158,11,0.3); }
-.section-icon.c6 { background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.05)); border: 1px solid rgba(239,68,68,0.3); }
-
-.section-title { font-size: 26px; font-weight: 800; }
-.section-title .tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-right: 8px; vertical-align: middle; }
-.tag-blue { background: rgba(0,212,255,0.15); color: var(--accent1); border: 1px solid rgba(0,212,255,0.3); }
-.tag-orange { background: rgba(255,107,53,0.15); color: var(--accent2); border: 1px solid rgba(255,107,53,0.3); }
-.tag-purple { background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
-.tag-green { background: rgba(16,185,129,0.15); color: var(--accent4); border: 1px solid rgba(16,185,129,0.3); }
-.tag-yellow { background: rgba(245,158,11,0.15); color: var(--accent5); border: 1px solid rgba(245,158,11,0.3); }
-.tag-red { background: rgba(239,68,68,0.15); color: var(--accent6); border: 1px solid rgba(239,68,68,0.3); }
-
-/* ── CARD ── */
-.card {
-  background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
-  padding: 24px 28px; margin-bottom: 20px;
-  transition: all 0.3s; position: relative; overflow: hidden;
-}
-.card::before {
-  content: ''; position: absolute; inset: 0; border-radius: 16px; opacity: 0;
-  background: linear-gradient(135deg, var(--glow1), transparent);
-  transition: opacity 0.3s;
-}
-.card:hover::before { opacity: 1; }
-.card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,212,255,0.08); }
-
-.card.orange:hover { border-color: rgba(255,107,53,0.3); box-shadow: 0 12px 40px rgba(255,107,53,0.08); }
-.card.orange::before { background: linear-gradient(135deg, var(--glow2), transparent); }
-.card.purple:hover { border-color: rgba(124,58,237,0.3); box-shadow: 0 12px 40px rgba(124,58,237,0.08); }
-.card.purple::before { background: linear-gradient(135deg, var(--glow3), transparent); }
-.card.green:hover { border-color: rgba(16,185,129,0.3); }
-.card.yellow:hover { border-color: rgba(245,158,11,0.3); }
-.card.red:hover { border-color: rgba(239,68,68,0.3); }
-
-.card-title { font-size: 17px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
-.card-title .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.dot-blue { background: var(--accent1); box-shadow: 0 0 8px var(--accent1); }
-.dot-orange { background: var(--accent2); box-shadow: 0 0 8px var(--accent2); }
-.dot-purple { background: #a78bfa; box-shadow: 0 0 8px #a78bfa; }
-.dot-green { background: var(--accent4); box-shadow: 0 0 8px var(--accent4); }
-.dot-yellow { background: var(--accent5); box-shadow: 0 0 8px var(--accent5); }
-.dot-red { background: var(--accent6); box-shadow: 0 0 8px var(--accent6); }
-
-.card p { color: var(--text2); font-size: 14px; line-height: 1.9; }
-
-/* ── GRID ── */
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-@media(max-width:768px) { .grid2,.grid3 { grid-template-columns:1fr; } }
-
-/* ── CODE BLOCK ── */
-.code-wrap { position: relative; margin: 16px 0; }
-.code-label {
-  position: absolute; top: 10px; right: 14px; font-size: 11px; font-family: 'Fira Code', monospace;
-  color: var(--text3); background: var(--bg); padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border);
-}
-pre {
-  background: #060a10; border: 1px solid var(--border); border-radius: 12px;
-  padding: 20px 18px; overflow-x: auto; font-family: 'Fira Code', monospace;
-  font-size: 13px; line-height: 1.8; color: #e2e8f0;
-}
-.kw { color: #c792ea; }
-.fn { color: #82aaff; }
-.str { color: #c3e88d; }
-.num { color: #f78c6c; }
-.cmt { color: #546e7a; font-style: italic; }
-.type { color: #ffcb6b; }
-.op { color: #89ddff; }
-.prop { color: #80cbc4; }
-
-/* ── ARCHITECTURE DIAGRAM ── */
-.arch-diagram {
-  background: var(--panel); border: 1px solid var(--border); border-radius: 20px;
-  padding: 32px; margin-bottom: 24px; overflow: hidden;
-}
-.arch-layer {
-  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
-  margin-bottom: 12px; position: relative;
-}
-.arch-box {
-  padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 700;
-  text-align: center; min-width: 120px; transition: all 0.3s; cursor: pointer;
-  animation: scaleIn 0.5s ease both;
-}
-.arch-box:hover { transform: scale(1.05); filter: brightness(1.2); }
-.arch-box.app { background: rgba(0,212,255,0.15); border: 1px solid rgba(0,212,255,0.4); color: var(--accent1); }
-.arch-box.vhal { background: rgba(124,58,237,0.2); border: 2px solid rgba(124,58,237,0.6); color: #a78bfa; font-size: 15px; min-width: 200px; }
-.arch-box.hal { background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.4); color: var(--accent2); }
-.arch-box.hw { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4); color: var(--accent4); }
-.arch-box.kern { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.4); color: var(--accent5); }
-
-.arch-arrow {
-  display: flex; justify-content: center; margin: 4px 0;
-}
-.arch-arrow svg { animation: float 2s ease-in-out infinite; }
-
-.layer-label {
-  text-align: center; font-size: 11px; color: var(--text3); margin-bottom: 6px;
-  letter-spacing: 1px; text-transform: uppercase;
-}
-
-/* ── PROPERTY CARD ── */
-.prop-card {
-  background: var(--bg3); border: 1px solid var(--border); border-radius: 10px;
-  padding: 14px 16px; margin-bottom: 10px; display: flex; gap: 14px; align-items: flex-start;
-  transition: all 0.2s;
-}
-.prop-card:hover { border-color: rgba(0,212,255,0.3); background: var(--panel); }
-.prop-id {
-  font-family: 'Fira Code', monospace; font-size: 11px; color: var(--accent1);
-  background: rgba(0,212,255,0.08); padding: 3px 8px; border-radius: 6px; white-space: nowrap;
-  flex-shrink: 0; border: 1px solid rgba(0,212,255,0.2);
-}
-.prop-info .pname { font-size: 13px; font-weight: 700; color: var(--text); }
-.prop-info .pdesc { font-size: 12px; color: var(--text3); margin-top: 2px; }
-.prop-badges { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
-.badge {
-  font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
-  letter-spacing: 0.5px; text-transform: uppercase;
-}
-.badge.rw { background: rgba(16,185,129,0.15); color: var(--accent4); border: 1px solid rgba(16,185,129,0.3); }
-.badge.ro { background: rgba(245,158,11,0.15); color: var(--accent5); border: 1px solid rgba(245,158,11,0.3); }
-.badge.wo { background: rgba(239,68,68,0.15); color: var(--accent6); border: 1px solid rgba(239,68,68,0.3); }
-.badge.cont { background: rgba(0,212,255,0.1); color: var(--accent1); border: 1px solid rgba(0,212,255,0.2); }
-.badge.on-ch { background: rgba(124,58,237,0.1); color: #a78bfa; border: 1px solid rgba(124,58,237,0.2); }
-.badge.int32 { background: rgba(255,107,53,0.1); color: var(--accent2); border: 1px solid rgba(255,107,53,0.2); }
-.badge.float { background: rgba(16,185,129,0.1); color: var(--accent4); border: 1px solid rgba(16,185,129,0.2); }
-.badge.bool { background: rgba(245,158,11,0.1); color: var(--accent5); border: 1px solid rgba(245,158,11,0.2); }
-.badge.str-t { background: rgba(124,58,237,0.1); color: #c4b5fd; border: 1px solid rgba(124,58,237,0.2); }
-.badge.bytes { background: rgba(239,68,68,0.1); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
-.badge.mixed { background: rgba(100,116,139,0.1); color: #94a3b8; border: 1px solid rgba(100,116,139,0.2); }
-
-/* ── ALERT BOXES ── */
-.alert {
-  border-radius: 12px; padding: 16px 20px; margin: 16px 0; display: flex; gap: 14px; align-items: flex-start;
-  border-right: 4px solid;
-}
-.alert-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
-.alert-body .alert-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-.alert-body p { font-size: 13px; line-height: 1.7; color: var(--text2); }
-.alert.info { background: rgba(0,212,255,0.07); border-color: var(--accent1); }
-.alert.info .alert-title { color: var(--accent1); }
-.alert.warn { background: rgba(245,158,11,0.07); border-color: var(--accent5); }
-.alert.warn .alert-title { color: var(--accent5); }
-.alert.danger { background: rgba(239,68,68,0.07); border-color: var(--accent6); }
-.alert.danger .alert-title { color: var(--accent6); }
-.alert.success { background: rgba(16,185,129,0.07); border-color: var(--accent4); }
-.alert.success .alert-title { color: var(--accent4); }
-
-/* ── EXAM SECTION ── */
-.exam-card {
-  background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
-  padding: 24px; margin-bottom: 20px; position: relative;
-}
-.exam-num {
-  position: absolute; top: -14px; right: 24px;
-  background: linear-gradient(135deg, var(--accent3), var(--accent1));
-  color: #fff; font-size: 12px; font-weight: 800; padding: 4px 16px;
-  border-radius: 20px; letter-spacing: 1px;
-}
-.exam-q { font-size: 15px; font-weight: 700; margin-bottom: 14px; color: var(--text); }
-.exam-hint {
-  background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.2);
-  border-radius: 10px; padding: 14px 16px; font-size: 13px; color: var(--text2);
-}
-.exam-hint .hint-title { font-size: 12px; font-weight: 700; color: var(--accent1); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
-.exam-steps { list-style: none; }
-.exam-steps li {
-  padding: 6px 0; font-size: 13px; color: var(--text2);
-  display: flex; gap: 10px; align-items: flex-start;
-}
-.exam-steps li::before { content: '→'; color: var(--accent1); font-weight: 700; flex-shrink: 0; }
-
-/* ── SIGNS SECTION ── */
-.sign-card {
-  background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
-  padding: 20px; margin-bottom: 14px; display: flex; gap: 16px; align-items: flex-start;
-}
-.sign-emoji { font-size: 28px; }
-.sign-body .sign-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: var(--accent5); }
-.sign-body p { font-size: 13px; color: var(--text2); line-height: 1.7; }
-.sign-body .sign-solve { font-size: 12px; color: var(--accent4); margin-top: 8px; font-weight: 600; }
-
-/* ── TABLE ── */
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th { background: rgba(0,212,255,0.1); color: var(--accent1); padding: 12px 16px; text-align: right; font-weight: 700; border-bottom: 1px solid var(--border); }
-td { padding: 11px 16px; border-bottom: 1px solid rgba(30,58,95,0.5); color: var(--text2); }
-tr:hover td { background: rgba(0,212,255,0.03); }
-.table-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin: 16px 0; }
-
-/* ── FLOW DIAGRAM ── */
-.flow {
-  display: flex; align-items: center; gap: 0; flex-wrap: wrap;
-  background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
-  padding: 24px; margin: 16px 0; justify-content: center;
-}
-.flow-step {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  background: var(--bg3); border: 1px solid var(--border); border-radius: 10px;
-  padding: 12px 16px; min-width: 110px; text-align: center;
-  transition: all 0.3s; cursor: default;
-}
-.flow-step:hover { border-color: var(--accent1); background: var(--glow1); transform: scale(1.05); }
-.flow-step .step-icon { font-size: 22px; }
-.flow-step .step-label { font-size: 11px; font-weight: 700; color: var(--text2); }
-.flow-step .step-sub { font-size: 10px; color: var(--text3); }
-.flow-arrow { color: var(--accent1); font-size: 20px; margin: 0 6px; flex-shrink: 0; animation: float 2s ease-in-out infinite; }
-
-/* ── PROGRESS / TIMELINE ── */
-.timeline { position: relative; padding-right: 24px; }
-.timeline::before {
-  content: ''; position: absolute; right: 11px; top: 0; bottom: 0;
-  width: 2px; background: linear-gradient(to bottom, var(--accent1), var(--accent3), var(--accent2));
-}
-.tl-item { position: relative; margin-bottom: 28px; }
-.tl-dot {
-  position: absolute; right: -14px; top: 6px;
-  width: 14px; height: 14px; border-radius: 50%;
-  border: 2px solid var(--bg); animation: pulse-border 2s ease-in-out infinite;
-}
-.tl-dot.d1 { background: var(--accent1); box-shadow: 0 0 8px var(--accent1); }
-.tl-dot.d2 { background: #4fc3f7; box-shadow: 0 0 8px #4fc3f7; }
-.tl-dot.d3 { background: #a78bfa; box-shadow: 0 0 8px #a78bfa; }
-.tl-dot.d4 { background: var(--accent2); box-shadow: 0 0 8px var(--accent2); }
-.tl-dot.d5 { background: var(--accent4); box-shadow: 0 0 8px var(--accent4); }
-.tl-content { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; }
-.tl-content h4 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
-.tl-content p { font-size: 13px; color: var(--text2); }
-
-/* ── FOOTER ── */
-.footer {
-  text-align: center; padding: 48px 24px; color: var(--text3); font-size: 13px;
-  border-top: 1px solid var(--border); margin-top: 40px;
-}
-.footer .logo { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
-.footer .logo span { background: linear-gradient(135deg, var(--accent1), var(--accent3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-
-/* ── INTERACTIVE QUIZ ── */
-.quiz-section { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 28px; margin-bottom: 20px; }
-.quiz-q { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
-.quiz-options { display: flex; flex-direction: column; gap: 10px; }
-.quiz-opt {
-  background: var(--bg3); border: 1px solid var(--border); border-radius: 10px;
-  padding: 12px 16px; cursor: pointer; font-size: 13px; transition: all 0.2s;
-  display: flex; gap: 12px; align-items: center;
-}
-.quiz-opt:hover { border-color: var(--accent1); background: var(--glow1); }
-.quiz-opt.correct { border-color: var(--accent4); background: rgba(16,185,129,0.1); }
-.quiz-opt.wrong { border-color: var(--accent6); background: rgba(239,68,68,0.1); }
-.quiz-opt .opt-letter { width: 24px; height: 24px; border-radius: 6px; background: var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0; }
-.quiz-feedback { margin-top: 14px; padding: 12px 16px; border-radius: 10px; font-size: 13px; display: none; }
-.quiz-feedback.show { display: block; }
-.quiz-feedback.good { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: var(--accent4); }
-.quiz-feedback.bad { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: var(--accent6); }
-.quiz-reset { margin-top: 12px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: var(--accent1); padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: 'Cairo',sans-serif; transition: all 0.2s; }
-.quiz-reset:hover { background: rgba(0,212,255,0.2); }
-</style>
-</head>
-<body>
-
-<div class="bg-grid"></div>
-<div class="bg-orb o1"></div>
-<div class="bg-orb o2"></div>
-<div class="bg-orb o3"></div>
-
-<!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
-<div style="position:relative; z-index:1;">
-<div class="hero wrapper" style="max-width:100%; padding: 60px 40px; position:relative;">
-  <div class="hero-badge"><span></span> AUTOMOTIVE ANDROID · VHAL MASTERCLASS</div>
-  <h1 class="hero-title"><span class="grad">VHAL</span><br><span style="font-size:0.45em; color:var(--text2); -webkit-text-fill-color:var(--text2);">Vehicle Hardware Abstraction Layer</span></h1>
-  <p class="hero-sub">الدليل الشامل من الصفر للاحتراف</p>
-  <p class="hero-desc">كل حاجة محتاج تعرفها عن VHAL — من المفاهيم الأساسية، معمارية النظام، أنواع الـ Properties، الـ HAL interface، حتى أصعب المسائل اللي بتيجي في الـ Automotive Android</p>
-  <div class="hero-stats">
-    <div class="stat-box"><div class="num">7</div><div class="lbl">أقسام رئيسية</div></div>
-    <div class="stat-box"><div class="num">50+</div><div class="lbl">Property مشروح</div></div>
-    <div class="stat-box"><div class="num">A→Z</div><div class="lbl">من البداية للاحتراف</div></div>
-    <div class="stat-box"><div class="num">🎓</div><div class="lbl">مسائل + حلول</div></div>
-  </div>
-  <div class="scroll-hint">
-    <span>ابدأ الرحلة</span>
-    <div class="scroll-arrow"></div>
-  </div>
-</div>
-</div>
-
-<!-- NAV -->
-<nav class="sticky-nav">
-  <a class="nav-btn" href="#s1">🏗️ ما هو VHAL</a>
-  <a class="nav-btn" href="#s2">🧱 المعمارية</a>
-  <a class="nav-btn" href="#s3">🔑 Properties</a>
-  <a class="nav-btn" href="#s4">⚡ HAL Interface</a>
-  <a class="nav-btn" href="#s5">🔄 Data Flow</a>
-  <a class="nav-btn" href="#s6">🚗 أنواع المسائل</a>
-  <a class="nav-btn" href="#s7">🎯 علامات المسائل</a>
-  <a class="nav-btn" href="#s8">📝 اختبر نفسك</a>
-</nav>
-
-<div class="wrapper">
-
-<!-- ═══════════════════════════════ SECTION 1 ═══════════════════════════════ -->
-<div class="section" id="s1">
-  <div class="section-header">
-    <div class="section-icon c1">🏗️</div>
-    <div>
-      <div class="section-title"><span class="tag tag-blue">الأساسيات</span> ما هو VHAL؟</div>
-      <div style="color:var(--text3); font-size:13px;">Vehicle Hardware Abstraction Layer — الطبقة اللي بتربط Android بالسيارة</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span class="dot dot-blue"></span>التعريف البسيط</div>
-    <p>VHAL هو طبقة برمجية في <strong style="color:var(--accent1)">Android Automotive OS (AAOS)</strong> — بتعمل كـ "مترجم" بين الـ Android Framework من فوق، والـ Hardware الحقيقي للسيارة من تحت. فكر فيه كـ "بوابة" بين عالم Android وعالم السيارة.</p>
-    <div class="alert info" style="margin-top:16px;">
-      <span class="alert-icon">💡</span>
-      <div class="alert-body">
-        <div class="alert-title">الفكرة الجوهرية</div>
-        <p>بدل ما كل تطبيق Android يتكلم مع الـ ECUs والحساسات مباشرةً (وهو مستحيل ومهين!)، الـ VHAL بيعمل Abstraction layer — نوحد الواجهة ونخلي Android apps تتكلم بلغة واحدة مع كل أنواع السيارات.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="grid2">
-    <div class="card orange">
-      <div class="card-title"><span class="dot dot-orange"></span>ليه محتاجينه؟</div>
-      <p>كل شركة سيارات (Toyota, BMW, Ford…) عندها hardware مختلف تماماً. بدون VHAL، كان لازم Android يتغير لكل سيارة. مع VHAL، الـ Android Framework ثابت، والـ VHAL بس هو اللي بيتغير.</p>
-    </div>
-    <div class="card purple">
-      <div class="card-title"><span class="dot dot-purple"></span>وين بيشتغل؟</div>
-      <p>بيشتغل في الـ <strong style="color:#a78bfa">IVI (In-Vehicle Infotainment)</strong> Head Unit — يعني الشاشة الرئيسية في السيارة. بيتواصل مع الـ Vehicle Network (CAN Bus, LIN, Ethernet) للوصول للـ ECUs والحساسات.</p>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span class="dot dot-blue"></span>التاريخ والإصدارات</div>
-    <div class="timeline">
-      <div class="tl-item">
-        <div class="tl-dot d1"></div>
-        <div class="tl-content">
-          <h4 style="color:var(--accent1)">Android 8.0 (Oreo) — 2017</h4>
-          <p>أول إصدار رسمي لـ VHAL كجزء من Android Automotive. الـ interface كانت HIDL-based.</p>
-        </div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-dot d2"></div>
-        <div class="tl-content">
-          <h4 style="color:#4fc3f7">Android 11 — 2020</h4>
-          <p>إضافة properties جديدة للـ EV والـ ADAS. تحسينات في الـ Subscription model.</p>
-        </div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-dot d3"></div>
-        <div class="tl-content">
-          <h4 style="color:#a78bfa">Android 13 — 2022</h4>
-          <p>التحول من HIDL إلى AIDL (Android Interface Definition Language) — أسرع وأسهل في التعامل.</p>
-        </div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-dot d4"></div>
-        <div class="tl-content">
-          <h4 style="color:var(--accent2)">Android 14+ — 2023 onwards</h4>
-          <p>دعم كامل لـ AIDL VHAL، properties للـ Android Automotive V2U، دعم محسن للـ Cluster Display.</p>
-        </div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-dot d5"></div>
-        <div class="tl-content">
-          <h4 style="color:var(--accent4)">المستقبل</h4>
-          <p>تكامل أعمق مع AI، دعم Over-the-Air updates لـ VHAL properties، تكامل مع SDV (Software-Defined Vehicle).</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════ SECTION 2 ═══════════════════════════════ -->
-<div class="section" id="s2">
-  <div class="section-header">
-    <div class="section-icon c2">🧱</div>
-    <div>
-      <div class="section-title"><span class="tag tag-orange">Architecture</span> معمارية النظام الكاملة</div>
-      <div style="color:var(--text3); font-size:13px;">ازاي كل طبقة بتتكلم مع التانية</div>
-    </div>
-  </div>
-
-  <div class="arch-diagram">
-    <div class="layer-label">🟦 Android Applications Layer</div>
-    <div class="arch-layer">
-      <div class="arch-box app">CarSettings</div>
-      <div class="arch-box app">Maps/Nav</div>
-      <div class="arch-box app">Media App</div>
-      <div class="arch-box app">Cluster App</div>
-      <div class="arch-box app">OEM App</div>
-    </div>
-    <div class="arch-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M6 14l6 6 6-6" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/></svg></div>
-    <div class="layer-label">🟨 Android Framework</div>
-    <div class="arch-layer">
-      <div class="arch-box app" style="background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.4);color:var(--accent5);">CarPropertyManager</div>
-      <div class="arch-box app" style="background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.4);color:var(--accent5);">CarHvacManager</div>
-      <div class="arch-box app" style="background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.4);color:var(--accent5);">CarSensorManager</div>
-    </div>
-    <div class="arch-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M6 14l6 6 6-6" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/></svg></div>
-    <div class="layer-label">🟪 Car Service (System Server)</div>
-    <div class="arch-layer">
-      <div class="arch-box kern">CarPropertyService</div>
-      <div class="arch-box kern">CarPowerService</div>
-    </div>
-    <div class="arch-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M6 14l6 6 6-6" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round"/></svg></div>
-    <div class="layer-label">⭐ VHAL (Vehicle Hardware Abstraction Layer)</div>
-    <div class="arch-layer">
-      <div class="arch-box vhal">VHAL Interface<br><span style="font-size:11px;font-weight:400;opacity:0.7">(AIDL / HIDL)</span></div>
-    </div>
-    <div class="arch-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M6 14l6 6 6-6" stroke="#ff6b35" stroke-width="2" stroke-linecap="round"/></svg></div>
-    <div class="layer-label">🟩 HAL Implementation (OEM Specific)</div>
-    <div class="arch-layer">
-      <div class="arch-box hal">Default HAL</div>
-      <div class="arch-box hal">CAN Bus HAL</div>
-      <div class="arch-box hal">OEM Custom HAL</div>
-    </div>
-    <div class="arch-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M6 14l6 6 6-6" stroke="#10b981" stroke-width="2" stroke-linecap="round"/></svg></div>
-    <div class="layer-label">⚙️ Vehicle Hardware</div>
-    <div class="arch-layer">
-      <div class="arch-box hw">CAN Bus</div>
-      <div class="arch-box hw">ECUs</div>
-      <div class="arch-box hw">LIN Bus</div>
-      <div class="arch-box hw">Sensors</div>
-      <div class="arch-box hw">Actuators</div>
-    </div>
-  </div>
-
-  <div class="grid3">
-    <div class="card">
-      <div class="card-title"><span class="dot dot-blue"></span>CarPropertyManager</div>
-      <p>الـ API الرئيسي اللي الـ Apps بتستخدمه. بيديك getProperty() وsetProperty() وregisterCallback(). ده اللي الـ developer بيتعامل معاه في معظم الوقت.</p>
-    </div>
-    <div class="card purple">
-      <div class="card-title"><span class="dot dot-purple"></span>Car Service</div>
-      <p>System service بيشتغل كـ root. بيترجم الـ requests من الـ Apps لـ VHAL calls، وبيتحكم في الـ Permissions والـ Access Control.</p>
-    </div>
-    <div class="card orange">
-      <div class="card-title"><span class="dot dot-orange"></span>HAL Implementation</div>
-      <p>ده اللي OEM بيكتبه. بياخد الـ VHAL property requests ويترجمها لـ CAN messages أو أي Vehicle Protocol تاني.</p>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span class="dot dot-blue"></span>IPC Communication — ازاي الطبقات بتتكلم</div>
-    <div class="flow">
-      <div class="flow-step"><div class="step-icon">📱</div><div class="step-label">App</div><div class="step-sub">CarPropertyManager</div></div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step"><div class="step-icon">🔗</div><div class="step-label">Binder IPC</div><div class="step-sub">inter-process</div></div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step"><div class="step-icon">⚙️</div><div class="step-label">Car Service</div><div class="step-sub">System Server</div></div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step"><div class="step-icon">🛡️</div><div class="step-label">VHAL</div><div class="step-sub">AIDL Interface</div></div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step"><div class="step-icon">🚗</div><div class="step-label">Vehicle</div><div class="step-sub">CAN/LIN/Eth</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════ SECTION 3 ═══════════════════════════════ -->
-<div class="section" id="s3">
-  <div class="section-header">
-    <div class="section-icon c3">🔑</div>
-    <div>
-      <div class="section-title"><span class="tag tag-purple">Properties</span> كل حاجة عن Vehicle Properties</div>
-      <div style="color:var(--text3); font-size:13px;">القلب النابض للـ VHAL</div>
-    </div>
-  </div>
-
-  <div class="card purple">
-    <div class="card-title"><span class="dot dot-purple"></span>الـ Property ده إيه؟</div>
-    <p>كل حاجة في السيارة ممكن نعبر عنها بـ <strong style="color:#a78bfa">Property</strong> — ليها ID فريد، نوع بيانات، صلاحيات (Read/Write/OnChange)، وقيمة. التفكير في VHAL هو "كل sensor/actuator/state = property واحدة".</p>
-  </div>
-
-  <!-- Property Structure -->
-  <div class="card">
-    <div class="card-title"><span class="dot dot-blue"></span>تركيب الـ Property ID</div>
-    <div class="code-wrap">
-      <span class="code-label">Property ID Structure</span>
-      <pre><span class="cmt">// Property ID = 32-bit integer مقسم كالتالي:</span>
-<span class="cmt">// [31:28] = Property Type  [27:16] = Property Group  [15:0] = Property Index</span>
-
-<span class="kw">int</span> <span class="prop">HVAC_TEMPERATURE_SET</span> = <span class="num">0x12600504</span>;
-<span class="cmt">// 0x1  = FLOAT type</span>
-<span class="cmt">// 0x26 = HVAC group</span>
-<span class="cmt">// 0x0504 = property index</span>
-
-<span class="kw">int</span> <span class="prop">VEHICLE_SPEED</span>       = <span class="num">0x11600207</span>;
-<span class="kw">int</span> <span class="prop">GEAR_SELECTION</span>      = <span class="num">0x11400400</span>;
-<span class="kw">int</span> <span class="prop">FUEL_LEVEL</span>          = <span class="num">0x11600307</span>;</pre>
-    </div>
-  </div>
-
-  <!-- Property Types -->
-  <div class="card">
-    <div class="card-title"><span class="dot dot-blue"></span>أنواع البيانات (VehiclePropertyType)</div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>النوع</th><th>القيمة</th><th>الاستخدام</th><th>مثال</th></tr></thead>
-        <tbody>
-          <tr><td><span class="badge int32">INT32</span></td><td><code>0x00400000</code></td><td>أرقام صحيحة</td><td>Gear, Door state</td></tr>
-          <tr><td><span class="badge float">FLOAT</span></td><td><code>0x00600000</code></td><td>أرقام عشرية</td><td>Speed, Temperature</td></tr>
-          <tr><td><span class="badge bool">INT32_VEC</span></td><td><code>0x00410000</code></td><td>مصفوفة أرقام</td><td>Window positions</td></tr>
-          <tr><td><span class="badge float">FLOAT_VEC</span></td><td><code>0x00610000</code></td><td>مصفوفة عشرية</td><td>Multiple sensors</td></tr>
-          <tr><td><span class="badge bool">BOOLEAN</span></td><td><code>0x00200000</code></td><td>صح/غلط</td><td>Seatbelt, Door open</td></tr>
-          <tr><td><span class="badge str-t">STRING</span></td><td><code>0x00100000</code></td><td>نصوص</td><td>Vin number</td></tr>
-          <tr><td><span class="badge bytes">BYTES</span></td><td><code>0x00700000</code></td><td>بيانات خام</td><td>OBD data</td></tr>
-          <tr><td><span class="badge mixed">MIXED</span></td><td><code>0x00e00000</code></td><td>متعدد</td><td>Complex properties</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Change Mode -->
-  <div class="card purple">
-    <div class="card-title"><span class="dot dot-purple"></span>Change Mode — متى بيتحدث الـ Property؟</div>
-    <div class="grid3">
-      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;">
-        <div style="font-size:20px;margin-bottom:8px;">📌</div>
-        <div style="font-weight:700;color:var(--accent1);margin-bottom:6px;">STATIC</div>
-        <div style="font-size:12px;color:var(--text3);">بيتحدد مرة واحدة وما بيتغيرش. زي VIN number أو معلومات الهارد وير.</div>
-      </div>
-      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;">
-        <div style="font-size:20px;margin-bottom:8px;">🔔</div>
-        <div style="font-weight:700;color:var(--accent4);margin-bottom:6px;">ON_CHANGE</div>
-        <div style="font-size:12px;color:var(--text3);">بيبعت notification بس لما القيمة تتغير. زي Door open/close أو Gear change.</div>
-      </div>
-      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;">
-        <div style="font-size:20px;margin-bottom:8px;">⏱️</div>
-        <div style="font-weight:700;color:var(--accent5);margin-bottom:6px;">CONTINUOUS</div>
-        <div style="font-size:12px;color:var(--text3);">بيبعت بـ rate ثابتة (Hz). زي Vehicle speed أو Engine RPM. بيستهلك موارد أكتر.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Access Mode -->
-  <div class="card orange">
-    <div class="card-title"><span class="dot dot-orange"></span>Access Mode — صلاحيات القراءة والكتابة</div>
-    <div class="grid3">
-      <div style="background:var(--bg3);border:1px solid rgba(16,185,129,0.3);border-radius:10px;padding:16px;">
-        <div style="font-weight:700;color:var(--accent4);margin-bottom:6px;">READ</div>
-        <div style="font-size:12px;color:var(--text3);">قراءة بس — زي Vehicle Speed، Fuel Level، Engine RPM. الـ app مش قادر يغير.</div>
-      </div>
-      <div style="background:var(--bg3);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:16px;">
-        <div style="font-weight:700;color:var(--accent6);margin-bottom:6px;">WRITE</div>
-        <div style="font-size:12px;color:var(--text3);">كتابة بس — نادر جداً. بيبعت command للـ hardware من غير ما تقرأ الحالة.</div>
-      </div>
-      <div style="background:var(--bg3);border:1px solid rgba(0,212,255,0.3);border-radius:10px;padding:16px;">
-        <div style="font-weight:700;color:var(--accent1);margin-bottom:6px;">READ_WRITE</div>
-        <div style="font-size:12px;color:var(--text3);">قراءة وكتابة — زي HVAC Temperature، Seat position. الأكتر شيوعاً.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Area IDs -->
-  <div class="card">
-    <div class="card-title"><span class="dot dot-blue"></span>Area Types — نطاق الـ Property</div>
-    <p style="margin-bottom:14px;">كل property ليها <strong style="color:var(--accent1)">AreaType</strong> بيحدد هي لـ "أنهي منطقة" في السيارة.</p>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>النوع</th><th>المعنى</th><th>مثال</th></tr></thead>
-        <tbody>
-          <tr><td><code style="color:var(--accent1)">GLOBAL</code></td><td>للسيارة كلها</td><td>Vehicle speed, Gear</td></tr>
-          <tr><td><code style="color:var(--accent4)">WINDOW</code></td><td>للنوافذ</td><td>Window position (ROW1_LEFT, etc.)</td></tr>
-          <tr><td><code style="color:var(--accent5)">DOOR</code></td><td>للأبواب</td><td>Door lock state</td></tr>
-          <tr><td><code style="color:var(--accent2)">SEAT</code></td><td>للمقاعد</td><td>Seat position, heat</td></tr>
-          <tr><td><code style="color:#a78bfa">MIRROR</code></td><td>للمرايا</td><td>Mirror position</td></tr>
-          <tr><td><code style="color:var(--accent6)">WHEEL</code></td><td>للعجلات</td><td>Tire pressure</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="code-wrap" style="margin-top:16px;">
-      <span class="code-label">Area IDs للمقاعد</span>
-      <pre><span class="cmt">// بيتحدد بـ bitflags قابلة للدمج:</span>
-<span class="type">VehicleAreaSeat</span>.<span class="prop">ROW_1_LEFT</span>   = <span class="num">0x0001</span>  <span class="cmt">// مقعد السائق</span>
-<span class="type">VehicleAreaSeat</span>.<span class="prop">ROW_1_CENTER</span> = <span class="num">0x0002</span>  <span class="cmt">// وسط الأمام</span>
-<span class="type">VehicleAreaSeat</span>.<span class="prop">ROW_1_RIGHT</span>  = <span class="num">0x0004</span>  <span class="cmt">// المقعد المجاور</span>
-<span class="type">VehicleAreaSeat</span>.<span class="prop">ROW_2_LEFT</span>   = <span class="num">0x0010</span>  <span class="cmt">// خلفي يسار</span>
-<span class="type">VehicleAreaSeat</span>.<span class="prop">ROW_2_CENTER</span> = <span class="num">0x0020</span>  <span class="cmt">// خلفي وسط</span>
-<span class="type">VehicleAreaSeat</span>.<span class="prop">ROW_2_RIGHT</span>  = <span class="num">0x0040</span>  <span class="cmt">// خلفي يمين</span></pre>
-    </div>
-  </div>
-
-  <!-- Key Properties List -->
-  <div class="card">
-    <div class="card-title"><span class="dot dot-blue"></span>أهم الـ Properties اللي لازم تحفظها</div>
-
-    <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;">🚗 Properties الحركة والقيادة</div>
-    <div class="prop-card">
-      <div class="prop-id">0x11600207</div>
-      <div class="prop-info"><div class="pname">VEHICLE_SPEED</div><div class="pdesc">سرعة السيارة بالـ m/s</div><div class="prop-badges"><span class="badge ro">READ ONLY</span><span class="badge cont">CONTINUOUS</span><span class="badge float">FLOAT</span></div></div>
-    </div>
-    <div class="prop-card">
-      <div class="prop-id">0x11400400</div>
-      <div class="prop-info"><div class="pname">GEAR_SELECTION</div><div class="pdesc">الجير المختار من السائق (P/R/N/D…)</div><div class="prop-badges"><span class="badge rw">READ_WRITE</span><span class="badge on-ch">ON_CHANGE</span><span class="badge int32">INT32</span></div></div>
-    </div>
-    <div class="prop-card">
-      <div class="prop-id">0x11600305</div>
-      <div class="prop-info"><div class="pname">ENGINE_RPM</div><div class="pdesc">دورات المحرك في الدقيقة</div><div class="prop-badges"><span class="badge ro">READ ONLY</span><span class="badge cont">CONTINUOUS</span><span class="badge float">FLOAT</span></div></div>
-    </div>
-    <div class="prop-card">
-      <div class="prop-id">0x11600307</div>
-      <div class="prop-info"><div class="pname">FUEL_LEVEL</div><div class="pdesc">مستوى الوقود بالـ milliliters</div><div class="prop-badges"><span class="badge ro">READ ONLY</span><span class="badge cont">CONTINUOUS</span><span class="badge float">FLOAT</span></div></div>
-    </div>
-    <div class="prop-card">
-      <div class="prop-id">0x11600308</div>
-      <div class="prop-info"><div class="pname">FUEL_DOOR_OPEN</div><div class="pdesc">باب الوقود مفتوح أو لا</div><div class="prop-badges"><span class="badge ro">READ ONLY</span><span class="badge on-ch">ON_CHANGE</span><span class="badge bool">BOOLEAN</span></div></div>
-    </div>
-
-    <div style="font-size:12px;font-weight:700;color:var(--text3);margin:16px 0 10px;text-transform:uppercase;letter-spacing:1px;">🌡️ HVAC Properties</div>
-    <div class="prop-card">
-      <div class="prop-id">0x12600504</div>
-      <div class="prop-info"><div class="pname">HVAC_TEMPERATURE_SET</div><div class="pdesc">الحرارة المطلوبة (بالمقعد)</div><div class="prop-badges"><span class="badge rw">READ_WRITE</span><span class="badge on-ch">ON_CHANGE</span><span class="badge float">FLOAT</span></div></div>
-    </div>
-    <div class="prop-card">
-      <div class="prop-id">0x12400501</div>
-      <div class="prop-info"><div class="pname">HVAC_POWER_ON</div><div class="pdesc">التكييف شغال/مطفي</div><div class="prop-badges"><span class="badge rw">READ_WRITE</span><span class="badge on-ch">ON_CHANGE</span><span class="badge bool">BOOLEAN</span></div></div>
-    </div>
-    <div class="prop-card">
-      <div class="prop-id">0x12600507</div>
-      <div class="prop-info"><div class="pname">HVAC_ACTUAL_FAN_SPEED_RPM</div><div class="pdesc">سرعة الفان الفعلية</div><div class="prop-badges"><span class="badge ro">READ ONLY</span><span class="badge cont">CONTINUOUS</span><span class="badge float">FLOAT</span></div></div>
-    </div>
-
-    <div style="font-size:12px;font-weight:700;color:var(--text3);margin:16px 0 10px;text-transform:uppercase;letter-spacing:1px;">🚪 Door & Window Properties</div>
-    <div class="prop-card">
-      <div class="prop-id">0x16200B01</div>
-      <div class="prop-info"><div class="pname">DOOR_LOCK</div><div class="pdesc">قفل الباب (true=مقفول)</div><div class="prop-badges"><span class="badge rw">READ_WRITE</span><span class="badge on-ch">ON_CHANGE</span><span class="badge bool">BOOLEAN</span></div></div>
-    </div>
-    <div class="prop-card">
-      <div class="prop-id">0x16200B02</div>
-      <div class="prop-info"><div class="pname">DOOR_MOVE</div><div class="pdesc">تحريك الباب (للسيارات بالأبواب الأوتوماتيك)</div><div class="prop-badges"><span class="badge rw">READ_WRITE</span><span class="badge on-ch">ON_CHANGE</span><span class="badge int32">INT32</span></div></div>
-    </div>
-    <div class="prop-card">
-      <div class="prop-id">0x13400A01</div>
-      <div class="prop-info"><div class="pname">WINDOW_POS</div><div class="pdesc">موضع الشباك (0=مغلق تماماً)</div><div class="prop-badges"><span class="badge rw">READ_WRITE</span><span class="badge on-ch">ON_CHANGE</span><span class="badge int32">INT32</span></div></div>
-    </div>
-
-    <div style="font-size:12px;font-weight:700;color:var(--text3);margin:16px 0 10px;text-transform:uppercase;letter-spacing:1px;">🔋 EV Properties</div>
-    <div class="prop-card">
-      <div class="prop-id">0x11600309</div>
-      <div class="prop-info"><div class="pname">EV_BATTERY_LEVEL</div><div class="pdesc">مستوى شحن البطارية (Wh)</div><div class="prop-badges"><span class="badge ro">READ ONLY</span><span class="badge cont">CONTINUOUS</span><span class="badge float">FLOAT</span></div></div>
-    </div>
-    <div class="prop-card">
-      <div class="prop-id">0x1140030A</div>
-      <div class="prop-info"><div class="pname">EV_CHARGE_PORT_OPEN</div><div class="pdesc">فتحة الشحن مفتوحة أو لا</div><div class="prop-badges"><span class="badge rw">READ_WRITE</span><span class="badge on-ch">ON_CHANGE</span><span class="badge bool">BOOLEAN</span></div></div>
-    </div>
-    <div class="prop-card">
-      <div class="prop-id">0x1160030B</div>
-      <div class="prop-info"><div class="pname">EV_BATTERY_INSTANTANEOUS_CHARGE_RATE</div><div class="pdesc">معدل الشحن اللحظي (mW)</div><div class="prop-badges"><span class="badge ro">READ ONLY</span><span class="badge cont">CONTINUOUS</span><span class="badge float">FLOAT</span></div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════ SECTION 4 ═══════════════════════════════ -->
-<div class="section" id="s4">
-  <div class="section-header">
-    <div class="section-icon c4">⚡</div>
-    <div>
-      <div class="section-title"><span class="tag tag-green">HAL Interface</span> التعامل مع VHAL برمجياً</div>
-      <div style="color:var(--text3); font-size:13px;">كود حقيقي + أمثلة كاملة</div>
-    </div>
-  </div>
-
-  <!-- GET PROPERTY -->
-  <div class="card green">
-    <div class="card-title"><span class="dot dot-green"></span>قراءة Property (getProperty)</div>
-    <div class="code-wrap">
-      <span class="code-label">Java / Kotlin</span>
-      <pre><span class="kw">import</span> android.car.hardware.CarPropertyValue;
-<span class="kw">import</span> android.car.hardware.property.CarPropertyManager;
-<span class="kw">import</span> android.car.VehiclePropertyIds;
-
-<span class="cmt">// 1. الحصول على CarPropertyManager</span>
-<span class="type">Car</span> car = <span class="type">Car</span>.<span class="fn">createCar</span>(context);
-<span class="type">CarPropertyManager</span> carPropMgr =
-    (<span class="type">CarPropertyManager</span>) car.<span class="fn">getCarManager</span>(<span class="type">Car</span>.<span class="prop">PROPERTY_SERVICE</span>);
-
-<span class="cmt">// 2. قراءة Vehicle Speed</span>
-<span class="type">CarPropertyValue</span>&lt;<span class="type">Float</span>&gt; speedProp = carPropMgr.<span class="fn">getProperty</span>(
-    <span class="type">Float</span>.<span class="kw">class</span>,
-    <span class="type">VehiclePropertyIds</span>.<span class="prop">PERF_VEHICLE_SPEED</span>,  <span class="cmt">// Property ID</span>
-    <span class="num">0</span>                                           <span class="cmt">// areaId = GLOBAL</span>
-);
-
-<span class="kw">float</span> speedMs = speedProp.<span class="fn">getValue</span>();  <span class="cmt">// m/s</span>
-<span class="kw">float</span> speedKmh = speedMs * <span class="num">3.6f</span>;      <span class="cmt">// تحويل لـ km/h</span>
-
-<span class="cmt">// 3. قراءة HVAC Temperature لمقعد السائق</span>
-<span class="kw">int</span> driverSeat = <span class="type">VehicleAreaSeat</span>.<span class="prop">ROW_1_LEFT</span>;
-<span class="type">CarPropertyValue</span>&lt;<span class="type">Float</span>&gt; tempProp = carPropMgr.<span class="fn">getProperty</span>(
-    <span class="type">Float</span>.<span class="kw">class</span>,
-    <span class="type">VehiclePropertyIds</span>.<span class="prop">HVAC_TEMPERATURE_SET</span>,
-    driverSeat
-);
-<span class="type">Log</span>.<span class="fn">d</span>(<span class="str">"VHAL"</span>, <span class="str">"Temp = "</span> + tempProp.<span class="fn">getValue</span>());</pre>
-    </div>
-  </div>
-
-  <!-- SET PROPERTY -->
-  <div class="card orange">
-    <div class="card-title"><span class="dot dot-orange"></span>كتابة Property (setProperty)</div>
-    <div class="code-wrap">
-      <span class="code-label">Java / Kotlin</span>
-      <pre><span class="cmt">// ضبط درجة الحرارة على 22°C للسائق</span>
-<span class="kw">boolean</span> success = carPropMgr.<span class="fn">setProperty</span>(
-    <span class="type">Float</span>.<span class="kw">class</span>,
-    <span class="type">VehiclePropertyIds</span>.<span class="prop">HVAC_TEMPERATURE_SET</span>,
-    <span class="type">VehicleAreaSeat</span>.<span class="prop">ROW_1_LEFT</span>,       <span class="cmt">// areaId</span>
-    <span class="num">22.0f</span>                               <span class="cmt">// القيمة الجديدة</span>
-);
-
-<span class="cmt">// قفل كل الأبواب</span>
-<span class="kw">int</span>[] doorAreas = {
-    <span class="type">VehicleAreaDoor</span>.<span class="prop">ROW_1_LEFT</span>,
-    <span class="type">VehicleAreaDoor</span>.<span class="prop">ROW_1_RIGHT</span>,
-    <span class="type">VehicleAreaDoor</span>.<span class="prop">ROW_2_LEFT</span>,
-    <span class="type">VehicleAreaDoor</span>.<span class="prop">ROW_2_RIGHT</span>
-};
-
-<span class="kw">for</span> (<span class="kw">int</span> areaId : doorAreas) {
-    carPropMgr.<span class="fn">setBooleanProperty</span>(
-        <span class="type">VehiclePropertyIds</span>.<span class="prop">DOOR_LOCK</span>,
-        areaId,
-        <span class="kw">true</span>  <span class="cmt">// true = مقفول</span>
-    );
-}</pre>
-    </div>
-  </div>
-
-  <!-- SUBSCRIPTION -->
-  <div class="card purple">
-    <div class="card-title"><span class="dot dot-purple"></span>الاشتراك في التغييرات (registerCallback)</div>
-    <div class="code-wrap">
-      <span class="code-label">Java / Kotlin — Subscription</span>
-      <pre><span class="cmt">// الـ Callback اللي بيتفعل لما القيمة تتغير</span>
-<span class="type">CarPropertyManager</span>.<span class="type">CarPropertyEventCallback</span> speedCallback =
-    <span class="kw">new</span> <span class="type">CarPropertyManager</span>.<span class="type">CarPropertyEventCallback</span>() {
-        <span class="kw">@Override</span>
-        <span class="kw">public void</span> <span class="fn">onChangeEvent</span>(<span class="type">CarPropertyValue</span> value) {
-            <span class="kw">float</span> speed = (<span class="type">Float</span>) value.<span class="fn">getValue</span>();
-            <span class="cmt">// بيتفعل كل ما السرعة تتغير</span>
-            <span class="fn">updateSpeedometer</span>(speed * <span class="num">3.6f</span>);
-        }
-        <span class="kw">@Override</span>
-        <span class="kw">public void</span> <span class="fn">onErrorEvent</span>(<span class="kw">int</span> propId, <span class="kw">int</span> areaId) {
-            <span class="type">Log</span>.<span class="fn">e</span>(<span class="str">"VHAL"</span>, <span class="str">"Error on property: "</span> + propId);
-        }
-    };
-
-<span class="cmt">// اشتراك بـ rate معينة (Hz)</span>
-carPropMgr.<span class="fn">registerCallback</span>(
-    speedCallback,
-    <span class="type">VehiclePropertyIds</span>.<span class="prop">PERF_VEHICLE_SPEED</span>,
-    <span class="num">10.0f</span>  <span class="cmt">// 10 Hz = 10 updates per second</span>
-);
-
-<span class="cmt">// لا تنسى: إلغاء الاشتراك لما مش محتاجه</span>
-<span class="cmt">// carPropMgr.unregisterCallback(speedCallback);</span></pre>
-    </div>
-  </div>
-
-  <!-- HAL IMPLEMENTATION -->
-  <div class="card">
-    <div class="card-title"><span class="dot dot-blue"></span>جانب الـ HAL Implementation (OEM Side)</div>
-    <div class="code-wrap">
-      <span class="code-label">C++ — DefaultVehicleHal.cpp</span>
-      <pre><span class="cmt">// AIDL Interface — ده اللي بيكتبه OEM</span>
-<span class="kw">class</span> <span class="type">DefaultVehicleHal</span> : <span class="kw">public</span> <span class="type">BnVehicle</span> {
-<span class="kw">public</span>:
-    <span class="cmt">// الـ App طلب قراءة property</span>
-    <span class="type">ndk</span>::<span class="type">ScopedAStatus</span> <span class="fn">getValues</span>(
-        <span class="kw">const</span> <span class="type">std</span>::<span class="type">vector</span>&lt;<span class="type">VehiclePropValueRequest</span>&gt;&amp; requests,
-        <span class="type">GetValueResults</span>* results) {
-
-        <span class="kw">for</span> (<span class="kw">auto</span>&amp; req : requests) {
-            <span class="kw">if</span> (req.prop.prop == <span class="type">toInt</span>(<span class="type">VehicleProperty</span>::<span class="prop">PERF_VEHICLE_SPEED</span>)) {
-                <span class="cmt">// إقرأ من CAN Bus أو Sensor</span>
-                <span class="kw">float</span> speed = <span class="fn">readCanBusSpeed</span>();
-                results-&gt;<span class="fn">push_back</span>({.<span class="prop">value</span> = speed, .<span class="prop">status</span> = <span class="type">StatusCode</span>::<span class="prop">OK</span>});
-            }
-        }
-        <span class="kw">return</span> <span class="type">ndk</span>::<span class="type">ScopedAStatus</span>::<span class="fn">ok</span>();
-    }
-
-    <span class="cmt">// الـ App طلب كتابة property</span>
-    <span class="type">ndk</span>::<span class="type">ScopedAStatus</span> <span class="fn">setValues</span>(
-        <span class="kw">const</span> <span class="type">std</span>::<span class="type">vector</span>&lt;<span class="type">VehiclePropValue</span>&gt;&amp; values) {
-
-        <span class="kw">for</span> (<span class="kw">auto</span>&amp; val : values) {
-            <span class="kw">if</span> (val.<span class="prop">prop</span> == <span class="type">toInt</span>(<span class="type">VehicleProperty</span>::<span class="prop">HVAC_TEMPERATURE_SET</span>)) {
-                <span class="kw">float</span> temp = val.<span class="prop">value</span>.<span class="prop">floatValues</span>[<span class="num">0</span>];
-                <span class="cmt">// أرسل للـ HVAC ECU عبر CAN Bus</span>
-                <span class="fn">sendCanMessage</span>(<span class="prop">HVAC_TEMP_CMD</span>, temp);
-            }
-        }
-        <span class="kw">return</span> <span class="type">ndk</span>::<span class="type">ScopedAStatus</span>::<span class="fn">ok</span>();
-    }
-};</pre>
-    </div>
-  </div>
-
-  <!-- PROPERTY CONFIG -->
-  <div class="card">
-    <div class="card-title"><span class="dot dot-blue"></span>تعريف Property جديدة (Vehicle Property Config)</div>
-    <div class="code-wrap">
-      <span class="code-label">C++ — Property Configuration</span>
-      <pre><span class="type">VehiclePropConfig</span> mySpeedConfig = {
-    .<span class="prop">prop</span>         = <span class="type">toInt</span>(<span class="type">VehicleProperty</span>::<span class="prop">PERF_VEHICLE_SPEED</span>),
-    .<span class="prop">access</span>       = <span class="type">VehiclePropertyAccess</span>::<span class="prop">READ</span>,
-    .<span class="prop">changeMode</span>   = <span class="type">VehiclePropertyChangeMode</span>::<span class="prop">CONTINUOUS</span>,
-    .<span class="prop">areaConfigs</span>  = {{
-        .<span class="prop">areaId</span>    = <span class="num">0</span>,              <span class="cmt">// GLOBAL</span>
-        .<span class="prop">minFloatValue</span> = <span class="num">0.0f</span>,      <span class="cmt">// 0 m/s</span>
-        .<span class="prop">maxFloatValue</span> = <span class="num">100.0f</span>,    <span class="cmt">// 360 km/h max</span>
-    }},
-    .<span class="prop">minSampleRate</span> = <span class="num">1.0f</span>,  <span class="cmt">// 1 Hz minimum</span>
-    .<span class="prop">maxSampleRate</span> = <span class="num">100.0f</span>, <span class="cmt">// 100 Hz maximum</span>
-};</pre>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════ SECTION 5 ═══════════════════════════════ -->
-<div class="section" id="s5">
-  <div class="section-header">
-    <div class="section-icon c5">🔄</div>
-    <div>
-      <div class="section-title"><span class="tag tag-yellow">Data Flow</span> رحلة البيانات من السيارة للـ App</div>
-      <div style="color:var(--text3); font-size:13px;">خطوة بخطوة مع الكود</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span class="dot dot-yellow"></span>Scenario 1: App يقرأ السرعة (Pull)</div>
-    <div class="flow" style="flex-direction:column; gap:10px;">
-      <div style="display:flex;align-items:center;gap:10px;width:100%;flex-wrap:wrap;justify-content:center;">
-        <div class="flow-step" style="min-width:160px;"><div class="step-icon">📱</div><div class="step-label">App calls getProperty()</div><div class="step-sub">CarPropertyManager</div></div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step"><div class="step-icon">🔗</div><div class="step-label">Binder RPC</div><div class="step-sub">IPC call</div></div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step"><div class="step-icon">⚙️</div><div class="step-label">CarPropertyService</div><div class="step-sub">Permission check</div></div>
-      </div>
-      <div style="color:var(--accent1);font-size:20px;text-align:center;">↓</div>
-      <div style="display:flex;align-items:center;gap:10px;width:100%;flex-wrap:wrap;justify-content:center;">
-        <div class="flow-step"><div class="step-icon">🏘️</div><div class="step-label">VHAL getValues()</div><div class="step-sub">AIDL call</div></div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step"><div class="step-icon">🔌</div><div class="step-label">HAL Impl</div><div class="step-sub">Read from CAN</div></div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step"><div class="step-icon">🚗</div><div class="step-label">CAN Bus</div><div class="step-sub">ECU data</div></div>
-      </div>
-      <div style="color:var(--accent4);font-size:20px;text-align:center;">↑ return value</div>
-    </div>
-  </div>
-
-  <div class="card purple">
-    <div class="card-title"><span class="dot dot-purple"></span>Scenario 2: السيارة تبعت event للـ App (Push / Callback)</div>
-    <div class="flow" style="flex-direction:column; gap:10px;">
-      <div style="display:flex;align-items:center;gap:10px;width:100%;flex-wrap:wrap;justify-content:center;">
-        <div class="flow-step"><div class="step-icon">🚗</div><div class="step-label">CAN frame received</div><div class="step-sub">Door opened</div></div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step"><div class="step-icon">🔌</div><div class="step-label">HAL parses CAN</div><div class="step-sub">Creates VehiclePropValue</div></div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step"><div class="step-icon">📡</div><div class="step-label">onPropertyEvent()</div><div class="step-sub">VHAL callback</div></div>
-      </div>
-      <div style="color:var(--accent4);font-size:20px;text-align:center;">↓</div>
-      <div style="display:flex;align-items:center;gap:10px;width:100%;flex-wrap:wrap;justify-content:center;">
-        <div class="flow-step"><div class="step-icon">⚙️</div><div class="step-label">CarPropertyService</div><div class="step-sub">Dispatches to listeners</div></div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step"><div class="step-icon">🔗</div><div class="step-label">Binder callback</div><div class="step-sub">to registered apps</div></div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step" style="border-color:rgba(0,212,255,0.4);"><div class="step-icon">📱</div><div class="step-label">onChangeEvent()</div><div class="step-sub">App callback fires!</div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- STATUS CODES -->
-  <div class="card">
-    <div class="card-title"><span class="dot dot-blue"></span>Property Status Codes</div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Status</th><th>المعنى</th><th>متى بيحصل</th></tr></thead>
-        <tbody>
-          <tr><td><span class="badge rw">AVAILABLE</span></td><td>البيانات متاحة وصحيحة</td><td>الحالة الطبيعية المطلوبة</td></tr>
-          <tr><td><span class="badge ro">UNAVAILABLE</span></td><td>البيانات مش متاحة حالياً</td><td>الـ sensor مش شغال أو معدوم</td></tr>
-          <tr><td><span class="badge wo">ERROR</span></td><td>في خطأ في البيانات</td><td>communication error مع الـ ECU</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="alert warn" style="margin-top:16px;">
-      <span class="alert-icon">⚠️</span>
-      <div class="alert-body">
-        <div class="alert-title">تنبيه مهم جداً</div>
-        <p>لازم دايماً تتحقق من الـ Status قبل ما تستخدم القيمة. لو UNAVAILABLE وأنت عاملت القيمة كأنها صح، ممكن تحصل مشاكل خطيرة في السيارة!</p>
-      </div>
-    </div>
-    <div class="code-wrap" style="margin-top:16px;">
-      <span class="code-label">Status Check Example</span>
-      <pre><span class="type">CarPropertyValue</span>&lt;<span class="type">Float</span>&gt; prop = carPropMgr.<span class="fn">getProperty</span>(...);
-
-<span class="kw">if</span> (prop.<span class="fn">getStatus</span>() == <span class="type">CarPropertyValue</span>.<span class="prop">STATUS_AVAILABLE</span>) {
-    <span class="kw">float</span> speed = prop.<span class="fn">getValue</span>();
-    <span class="fn">updateUI</span>(speed);
-} <span class="kw">else if</span> (prop.<span class="fn">getStatus</span>() == <span class="type">CarPropertyValue</span>.<span class="prop">STATUS_UNAVAILABLE</span>) {
-    <span class="fn">showError</span>(<span class="str">"Sensor not available"</span>);
-} <span class="kw">else</span> {
-    <span class="fn">logError</span>(<span class="str">"Property error detected"</span>);
-}</pre>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════ SECTION 6 ═══════════════════════════════ -->
-<div class="section" id="s6">
-  <div class="section-header">
-    <div class="section-icon c6">🚗</div>
-    <div>
-      <div class="section-title"><span class="tag tag-red">أنواع المسائل</span> المسائل الشائعة وطريقة حلها</div>
-      <div style="color:var(--text3); font-size:13px;">أكتر الأسئلة اللي بتيجي في الـ Interviews والـ Projects</div>
-    </div>
-  </div>
-
-  <div class="exam-card">
-    <div class="exam-num">مسألة نوع ١</div>
-    <div class="exam-q">🏎️ عايز تعمل Speedometer App يعرض سرعة السيارة في real-time</div>
-    <div class="exam-hint">
-      <div class="hint-title">🧭 طريقة التفكير والحل</div>
-      <ul class="exam-steps">
-        <li>حدد الـ Property المطلوبة: <code style="color:var(--accent1)">PERF_VEHICLE_SPEED</code> (FLOAT, READ, CONTINUOUS)</li>
-        <li>لازم تستخدم <strong>Subscription</strong> (registerCallback) مش polling — عشان real-time</li>
-        <li>حدد الـ rate المناسبة: للـ speedometer عادةً <strong>10-20 Hz</strong> كافي</li>
-        <li>تحقق من الـ Status قبل عرض القيمة</li>
-        <li>حوّل من m/s لـ km/h بضرب في 3.6</li>
-        <li>عند onDestroy أو onStop: unregisterCallback عشان ما تتعملش memory leak</li>
-      </ul>
-    </div>
-    <div class="code-wrap" style="margin-top:14px;">
-      <span class="code-label">Speedometer Implementation</span>
-      <pre><span class="kw">public class</span> <span class="type">SpeedometerActivity</span> <span class="kw">extends</span> <span class="type">CarAppActivity</span> {
-    <span class="kw">private</span> <span class="type">CarPropertyManager</span> mCarPropMgr;
-    <span class="kw">private</span> <span class="type">CarPropertyManager</span>.<span class="type">CarPropertyEventCallback</span> mCb;
-
-    <span class="kw">@Override</span>
-    <span class="kw">protected void</span> <span class="fn">onCreate</span>(<span class="type">Bundle</span> savedInstanceState) {
-        mCb = <span class="kw">new</span> <span class="type">CarPropertyManager</span>.<span class="type">CarPropertyEventCallback</span>() {
-            <span class="kw">@Override</span>
-            <span class="kw">public void</span> <span class="fn">onChangeEvent</span>(<span class="type">CarPropertyValue</span> value) {
-                <span class="kw">if</span> (value.<span class="fn">getStatus</span>() != <span class="type">STATUS_AVAILABLE</span>) <span class="kw">return</span>;
-                <span class="kw">float</span> kmh = (<span class="type">Float</span>) value.<span class="fn">getValue</span>() * <span class="num">3.6f</span>;
-                <span class="fn">runOnUiThread</span>(() -&gt; mSpeedText.<span class="fn">setText</span>(
-                    <span class="type">String</span>.<span class="fn">format</span>(<span class="str">"%.0f km/h"</span>, kmh)));
-            }
-            <span class="kw">@Override</span>
-            <span class="kw">public void</span> <span class="fn">onErrorEvent</span>(<span class="kw">int</span> propId, <span class="kw">int</span> areaId) { }
-        };
-
-        mCarPropMgr.<span class="fn">registerCallback</span>(
-            mCb, <span class="type">VehiclePropertyIds</span>.<span class="prop">PERF_VEHICLE_SPEED</span>, <span class="num">10f</span>);
-    }
-
-    <span class="kw">@Override</span>
-    <span class="kw">protected void</span> <span class="fn">onDestroy</span>() {
-        mCarPropMgr.<span class="fn">unregisterCallback</span>(mCb); <span class="cmt">// مهم جداً!</span>
-        <span class="kw">super</span>.<span class="fn">onDestroy</span>();
-    }
-}</pre>
-    </div>
-  </div>
-
-  <div class="exam-card">
-    <div class="exam-num">مسألة نوع ٢</div>
-    <div class="exam-q">🌡️ عايز تعمل HVAC Controller — يقرأ الحرارة الحالية ويسمح للمستخدم يغيرها</div>
-    <div class="exam-hint">
-      <div class="hint-title">🧭 طريقة التفكير والحل</div>
-      <ul class="exam-steps">
-        <li>Property: <code style="color:var(--accent1)">HVAC_TEMPERATURE_SET</code> — READ_WRITE, ON_CHANGE, FLOAT, per-seat area</li>
-        <li>للقراءة: استخدم getProperty() مع الـ areaId المناسب (مقعد السائق = ROW_1_LEFT)</li>
-        <li>للاشتراك في التغييرات: registerCallback لمعرفة لو حد غيّر من مكان تاني</li>
-        <li>لضبط قيمة جديدة: setProperty() — تأكد إن القيمة في النطاق (عادةً 16-32°C)</li>
-        <li>تعامل مع الـ Permissions: <code style="color:var(--accent5)">android.car.permission.CONTROL_CAR_CLIMATE</code></li>
-      </ul>
-    </div>
-    <div class="alert warn" style="margin-top:14px;">
-      <span class="alert-icon">⚠️</span>
-      <div class="alert-body">
-        <div class="alert-title">علامة مهمة في HVAC</div>
-        <p>لو شفت الـ property بـ SEAT area وما حددتش الـ areaId الصح، ممكن تغير حرارة مقعد غلط أو تجيلك exception. دايماً حدد السيت المطلوب.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="exam-card">
-    <div class="exam-num">مسألة نوع ٣</div>
-    <div class="exam-q">🚪 مسألة قفل وفتح الأبواب — عايز تعمل "Lock All Doors" button</div>
-    <div class="exam-hint">
-      <div class="hint-title">🧭 طريقة التفكير والحل</div>
-      <ul class="exam-steps">
-        <li>Property: <code style="color:var(--accent1)">DOOR_LOCK</code> — BOOLEAN, READ_WRITE, ON_CHANGE, per-door area</li>
-        <li>الـ areaIds: ROW_1_LEFT, ROW_1_RIGHT, ROW_2_LEFT, ROW_2_RIGHT (وممكن ROW_3_*)</li>
-        <li>احتاج تعرف عدد الأبواب أولاً: استخدم <code>getAreaIds(DOOR_LOCK)</code></li>
-        <li>Loop على كل areaId واعمل setBooleanProperty(DOOR_LOCK, areaId, true)</li>
-        <li>Permission مطلوب: <code style="color:var(--accent5)">android.car.permission.CONTROL_CAR_DOORS</code></li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="exam-card">
-    <div class="exam-num">مسألة نوع ٤</div>
-    <div class="exam-q">🔋 مسألة EV — عايز تعرض معلومات البطارية: مستوى الشحن، وقت الشحن المتبقي، هل متوصل بشاحن</div>
-    <div class="exam-hint">
-      <div class="hint-title">🧭 Properties اللي محتاجها</div>
-      <ul class="exam-steps">
-        <li><code style="color:var(--accent1)">EV_BATTERY_LEVEL</code> — FLOAT, مستوى الشحن بالـ Wh</li>
-        <li><code style="color:var(--accent1)">EV_BATTERY_CAPACITY</code> — FLOAT, السعة الكلية بالـ Wh (Static)</li>
-        <li><code style="color:var(--accent1)">EV_CHARGE_PORT_CONNECTED</code> — BOOLEAN, هل الشاحن متوصل</li>
-        <li><code style="color:var(--accent1)">EV_BATTERY_INSTANTANEOUS_CHARGE_RATE</code> — FLOAT, معدل الشحن (mW)</li>
-        <li>النسبة المئوية = (BATTERY_LEVEL / BATTERY_CAPACITY) × 100</li>
-        <li>وقت الشحن = (CAPACITY - LEVEL) / CHARGE_RATE</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="exam-card">
-    <div class="exam-num">مسألة نوع ٥</div>
-    <div class="exam-q">🛠️ مسألة Custom Property — عايز تضيف property جديدة مش موجودة في VHAL الـ Standard</div>
-    <div class="exam-hint">
-      <div class="hint-title">🧭 خطوات إضافة Custom Property</div>
-      <ul class="exam-steps">
-        <li>حدد الـ Property ID: لازم يبدأ بـ <code style="color:var(--accent2)">0x21xxxxxx</code> (Vendor range)</li>
-        <li>عرّف الـ Property في الـ HAL implementation (C++): بحدد النوع، الـ Access Mode، الـ Change Mode</li>
-        <li>أضف الـ Property لـ VehiclePropertyStore</li>
-        <li>في Android side: استخدم <code>CarPropertyManager.getProperty()</code> بنفس الـ ID</li>
-        <li>أضف الـ Permission المناسب في AndroidManifest</li>
-        <li>اعمل VHAL test للـ property الجديدة</li>
-      </ul>
-    </div>
-    <div class="alert danger" style="margin-top:14px;">
-      <span class="alert-icon">🚫</span>
-      <div class="alert-body">
-        <div class="alert-title">انتبه!</div>
-        <p>الـ Vendor properties مش portable — لو نقلت الـ App لسيارة تانية بـ OEM تاني، الـ property مش موجودة. دايماً استخدم Standard properties لو ممكن.</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════ SECTION 7 ═══════════════════════════════ -->
-<div class="section" id="s7">
-  <div class="section-header">
-    <div class="section-icon c1">🎯</div>
-    <div>
-      <div class="section-title"><span class="tag tag-blue">العلامات</span> ازاي تعرف المسألة دي VHAL وازاي تحلها</div>
-      <div style="color:var(--text3); font-size:13px;">الـ Red Flags والـ Green Flags في كل مسألة</div>
-    </div>
-  </div>
-
-  <div class="alert success">
-    <span class="alert-icon">✅</span>
-    <div class="alert-body">
-      <div class="alert-title">الـ Keywords اللي بتعرفك إن المسألة عن VHAL</div>
-      <p>أي كلمة من دول في السؤال = فكر في VHAL فوراً: <strong style="color:var(--accent4)">سرعة السيارة، تكييف، أبواب، نوافذ، وقود، بطارية EV، مقاعد، مرايا، Android Automotive، AAOS، CarPropertyManager، In-Vehicle، IVI، ECU، CAN Bus</strong></p>
-    </div>
-  </div>
-
-  <div class="grid2">
-    <div class="sign-card">
-      <div class="sign-emoji">⚡</div>
-      <div class="sign-body">
-        <div class="sign-title">علامة: بيانات بتتغير باستمرار (مثل سرعة)</div>
-        <p>لو البيانات بتتغير بـ rate عالية (speed, RPM, battery current…)</p>
-        <div class="sign-solve">→ استخدم CONTINUOUS + registerCallback بـ Hz مناسب (5-20 Hz)</div>
-      </div>
-    </div>
-    <div class="sign-card">
-      <div class="sign-emoji">🔔</div>
-      <div class="sign-body">
-        <div class="sign-title">علامة: حدث معين (مثل فتح باب)</div>
-        <p>لو المسألة عن "لما يحصل حاجة معينة" — event-based</p>
-        <div class="sign-solve">→ استخدم ON_CHANGE + registerCallback بدون Hz</div>
-      </div>
-    </div>
-    <div class="sign-card">
-      <div class="sign-emoji">📌</div>
-      <div class="sign-body">
-        <div class="sign-title">علامة: بيانات ثابتة (VIN, capacity)</div>
-        <p>لو البيانات بتتحدد لمرة واحدة بس في حياة السيارة</p>
-        <div class="sign-solve">→ استخدم STATIC + getProperty() بدون subscription</div>
-      </div>
-    </div>
-    <div class="sign-card">
-      <div class="sign-emoji">🗺️</div>
-      <div class="sign-body">
-        <div class="sign-title">علامة: Property لمنطقة معينة</div>
-        <p>لو المسألة بتقول "للسائق" أو "للباب الأمامي" أو "للشباك الخلفي"</p>
-        <div class="sign-solve">→ ده area-based property — لازم تحدد الـ areaId المناسب</div>
-      </div>
-    </div>
-    <div class="sign-card">
-      <div class="sign-emoji">🔐</div>
-      <div class="sign-body">
-        <div class="sign-title">علامة: Access Denied أو SecurityException</div>
-        <p>الـ app بيرفع exception لما بيحاول يقرأ property</p>
-        <div class="sign-solve">→ Permission مش مضافة في Manifest. أضف الـ car.permission المناسبة.</div>
-      </div>
-    </div>
-    <div class="sign-card">
-      <div class="sign-emoji">📡</div>
-      <div class="sign-body">
-        <div class="sign-title">علامة: القيمة دايماً UNAVAILABLE</div>
-        <p>الـ property موجودة في الكود بس القيمة دايماً unavailable</p>
-        <div class="sign-solve">→ مشكلة في الـ HAL implementation أو الـ sensor/ECU مش شغال أو الـ areaId غلط</div>
-      </div>
-    </div>
-    <div class="sign-card">
-      <div class="sign-emoji">💾</div>
-      <div class="sign-body">
-        <div class="sign-title">علامة: Memory Leak في الـ App</div>
-        <p>الـ app بطيء بعد فترة أو بيستهلك RAM كتير</p>
-        <div class="sign-solve">→ ناسي unregisterCallback() في onDestroy/onStop</div>
-      </div>
-    </div>
-    <div class="sign-card">
-      <div class="sign-emoji">🎯</div>
-      <div class="sign-body">
-        <div class="sign-title">علامة: القيمة المتبعتة غلط أو قديمة</div>
-        <p>الـ callback بيتفعل بس القيمة مش صح</p>
-        <div class="sign-solve">→ تحقق من الـ Timestamp في CarPropertyValue — ممكن القيمة stale. تأكد من getTimestamp()</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PERMISSIONS TABLE -->
-  <div class="card">
-    <div class="card-title"><span class="dot dot-blue"></span>الـ Permissions اللي لازم تعرفها</div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Permission</th><th>تتيح</th></tr></thead>
-        <tbody>
-          <tr><td><code style="color:var(--accent1)">android.car.permission.CAR_SPEED</code></td><td>قراءة VEHICLE_SPEED</td></tr>
-          <tr><td><code style="color:var(--accent1)">android.car.permission.CAR_ENERGY</code></td><td>قراءة Fuel Level, EV Battery</td></tr>
-          <tr><td><code style="color:var(--accent1)">android.car.permission.CONTROL_CAR_CLIMATE</code></td><td>قراءة/كتابة HVAC</td></tr>
-          <tr><td><code style="color:var(--accent1)">android.car.permission.CONTROL_CAR_DOORS</code></td><td>قفل/فتح الأبواب</td></tr>
-          <tr><td><code style="color:var(--accent1)">android.car.permission.CONTROL_CAR_WINDOWS</code></td><td>تحريك النوافذ</td></tr>
-          <tr><td><code style="color:var(--accent1)">android.car.permission.CONTROL_CAR_SEATS</code></td><td>تعديل المقاعد</td></tr>
-          <tr><td><code style="color:var(--accent1)">android.car.permission.CAR_INFO</code></td><td>معلومات السيارة (VIN, etc.)</td></tr>
-          <tr><td><code style="color:var(--accent1)">android.car.permission.CAR_POWERTRAIN</code></td><td>Gear, Engine RPM</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- DEBUGGING -->
-  <div class="card orange">
-    <div class="card-title"><span class="dot dot-orange"></span>Debugging Tools — ازاي تتحقق من الـ VHAL</div>
-    <div class="code-wrap">
-      <span class="code-label">ADB Commands</span>
-      <pre><span class="cmt"># عرض كل الـ Properties المتاحة</span>
-adb shell dumpsys car_service --hal
-
-<span class="cmt"># قراءة قيمة property معينة</span>
-adb shell cmd car_service inject-vhal-event \
-    0x11600207 <span class="num">0</span>  <span class="cmt"># VEHICLE_SPEED, areaId=0</span>
-
-<span class="cmt"># محاكاة تغيير السرعة (للتطوير)</span>
-adb shell cmd car_service inject-vhal-event \
-    0x11600207 <span class="num">13.89</span>  <span class="cmt"># 50 km/h = 13.89 m/s</span>
-
-<span class="cmt"># محاكاة فتح باب</span>
-adb shell cmd car_service inject-vhal-event \
-    0x11400B00 <span class="num">0x00000001</span>  <span class="cmt"># DOOR_OPEN = true</span>
-
-<span class="cmt"># عرض logcat للـ VHAL</span>
-adb logcat -s CarPropertyManager:V DefaultVehicleHal:V</pre>
-    </div>
-    <div class="alert info" style="margin-top:16px;">
-      <span class="alert-icon">💡</span>
-      <div class="alert-body">
-        <div class="alert-title">VHAL Emulator</div>
-        <p>لو بتشتغل على Emulator (AVD)، الـ VHAL بيشتغل بـ FakeVehicleHal اللي بيسمح بـ inject events من command line. في الـ real hardware بيكون حالة مختلفة.</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════ SECTION 8 ═══════════════════════════════ -->
-<div class="section" id="s8">
-  <div class="section-header">
-    <div class="section-icon c3">📝</div>
-    <div>
-      <div class="section-title"><span class="tag tag-purple">اختبار</span> اختبر معلوماتك</div>
-      <div style="color:var(--text3); font-size:13px;">أسئلة مصغرة لتثبيت المعلومات</div>
-    </div>
-  </div>
-
-  <div class="quiz-section">
-    <div class="quiz-q">السؤال ١: أي Change Mode تستخدم لعرض سرعة السيارة في real-time?</div>
-    <div class="quiz-options">
-      <div class="quiz-opt" onclick="checkQuiz(this,'wrong','q1')"><div class="opt-letter">A</div> STATIC</div>
-      <div class="quiz-opt" onclick="checkQuiz(this,'wrong','q1')"><div class="opt-letter">B</div> ON_CHANGE</div>
-      <div class="quiz-opt" onclick="checkQuiz(this,'correct','q1')"><div class="opt-letter">C</div> CONTINUOUS</div>
-      <div class="quiz-opt" onclick="checkQuiz(this,'wrong','q1')"><div class="opt-letter">D</div> PERIODIC</div>
-    </div>
-    <div class="quiz-feedback good" id="q1-good">✅ صح! CONTINUOUS هو الأنسب للبيانات اللي بتتغير باستمرار زي السرعة. بيبعت updates بـ rate ثابتة (Hz).</div>
-    <div class="quiz-feedback bad" id="q1-bad">❌ غلط. CONTINUOUS هو الصح — لأن السرعة بتتغير باستمرار وحتاج updates بـ rate ثابتة.</div>
-    <button class="quiz-reset" onclick="resetQuiz('q1')">🔄 إعادة السؤال</button>
-  </div>
-
-  <div class="quiz-section">
-    <div class="quiz-q">السؤال ٢: أنهي Property تستخدم لقفل كل أبواب السيارة؟</div>
-    <div class="quiz-options">
-      <div class="quiz-opt" onclick="checkQuiz(this,'wrong','q2')"><div class="opt-letter">A</div> DOOR_OPEN</div>
-      <div class="quiz-opt" onclick="checkQuiz(this,'correct','q2')"><div class="opt-letter">B</div> DOOR_LOCK</div>
-      <div class="quiz-opt" onclick="checkQuiz(this,'wrong','q2')"><div class="opt-letter">C</div> DOOR_CLOSE</div>
-      <div class="quiz-opt" onclick="checkQuiz(this,'wrong','q2')"><div class="opt-letter">D</div> DOOR_STATE</div>
-    </div>
-    <div class="quiz-feedback good" id="q2-good">✅ صح! DOOR_LOCK هو الـ property الصح. بيكون BOOLEAN وبتحتاج تعمل setProperty لكل areaId (باب).</div>
-    <div class="quiz-feedback bad" id="q2-bad">❌ غلط. الصح هو DOOR_LOCK — BOOLEAN property بتتحكم في قفل وفتح الأبواب.</div>
-    <button class="quiz-reset" onclick="resetQuiz('q2')">🔄 إعادة السؤال</button>
-  </div>
-
-  <div class="quiz-section">
-    <div class="quiz-q">السؤال ٣: لو الـ App بتديك SecurityException لما بتحاول تقرأ Vehicle Speed، الحل الأول إيه؟</div>
-    <div class="quiz-options">
-      <div class="quiz-opt" onclick="checkQuiz(this,'wrong','q3')"><div class="opt-letter">A</div> غيّر الـ Property ID</div>
-      <div class="quiz-opt" onclick="checkQuiz(this,'correct','q3')"><div class="opt-letter">B</div> أضف Permission في AndroidManifest</div>
-      <div class="quiz-opt" onclick="checkQuiz(this,'wrong','q3')"><div class="opt-letter">C</div> استخدم root access</div>
-      <div class="quiz-opt" onclick="checkQuiz(this,'wrong','q3')"><div class="opt-letter">D</div> غيّر الـ areaId</div>
-    </div>
-    <div class="quiz-feedback good" id="q3-good">✅ صح! SecurityException في VHAL بيعني Permission مفيش. أضف <code>android.car.permission.CAR_SPEED</code> في الـ Manifest.</div>
-    <div class="quiz-feedback bad" id="q3-bad">❌ غلط. أول حاجة تعملها لما تلاقي SecurityException هي تراجع الـ Permissions في AndroidManifest.</div>
-    <button class="quiz-reset" onclick="resetQuiz('q3')">🔄 إعادة السؤال</button>
-  </div>
-
-  <div class="quiz-section">
-    <div class="quiz-q">السؤال ٤: الـ Vendor Properties (Custom Properties) لازم ID تاعها يبدأ بـ إيه؟</div>
-    <div class="quiz-options">
-      <div class="quiz-opt" onclick="checkQuiz(this,'wrong','q4')"><div class="opt-letter">A</div> 0x10......</div>
-      <div class="quiz-opt" onclick="checkQuiz(this,'wrong','q4')"><div class="opt-letter">B</div> 0x11......</div>
-      <div class="quiz-opt" onclick="checkQuiz(this,'correct','q4')"><div class="opt-letter">C</div> 0x21......</div>
-      <div class="quiz-opt" onclick="checkQuiz(this,'wrong','q4')"><div class="opt-letter">D</div> 0xFF......</div>
-    </div>
-    <div class="quiz-feedback good" id="q4-good">✅ صح! الـ Vendor range في VHAL بيبدأ بـ 0x21. ده بيميز الـ Custom properties عن الـ Standard ones.</div>
-    <div class="quiz-feedback bad" id="q4-bad">❌ غلط. الـ Vendor Properties لازم تبدأ بـ 0x21 عشان تكون في الـ Vendor range وما تتعارضش مع الـ Standard properties.</div>
-    <button class="quiz-reset" onclick="resetQuiz('q4')">🔄 إعادة السؤال</button>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════ EXTRA TIPS ═══════════════════════════════ -->
-<div class="section">
-  <div class="section-header">
-    <div class="section-icon c4">💎</div>
-    <div>
-      <div class="section-title"><span class="tag tag-green">Pro Tips</span> نصائح من الخبرة</div>
-    </div>
-  </div>
-
-  <div class="grid2">
-    <div class="card green">
-      <div class="card-title"><span class="dot dot-green"></span>✅ افعل دايماً</div>
-      <ul style="list-style:none;padding:0;">
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);">✔️ تحقق من Status قبل استخدام أي قيمة</li>
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);">✔️ Unregister الـ callbacks في onDestroy</li>
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);">✔️ استخدم Coroutines أو LiveData مع الـ callbacks</li>
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);">✔️ اختبر على Emulator أولاً بـ inject-vhal-event</li>
-        <li style="padding:6px 0;font-size:13px;color:var(--text2);">✔️ راجع الـ Permissions في Manifest قبل كل test</li>
-      </ul>
-    </div>
-    <div class="card red">
-      <div class="card-title"><span class="dot dot-red"></span>🚫 لا تعمل أبداً</div>
-      <ul style="list-style:none;padding:0;">
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);">✖️ لا تستخدم Polling (تكرار getProperty بدون callback)</li>
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);">✖️ لا تستخدم قيمة UNAVAILABLE كأنها صحيحة</li>
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);">✖️ لا تطلب Rate عالية جداً (100Hz+ للـ UI = overhead)</li>
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);">✖️ لا تكتب لـ READ-ONLY properties</li>
-        <li style="padding:6px 0;font-size:13px;color:var(--text2);">✖️ لا تعمل blocking call على Main Thread</li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-</div><!-- end wrapper -->
-
-<!-- FOOTER -->
-<footer class="footer">
-  <div class="logo">VHAL <span>Masterclass</span></div>
-  <p>الدليل الشامل للـ Vehicle Hardware Abstraction Layer في Android Automotive</p>
-  <p style="margin-top:8px;">من الصفر للاحتراف · A to Z · كل حاجة محتاجها في مكان واحد</p>
-</footer>
-
-<script>
-// ── Intersection Observer for section animations
-const sections = document.querySelectorAll('.section');
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); }});
-}, { threshold: 0.08 });
-sections.forEach(s => observer.observe(s));
-
-// ── Stagger arch boxes
-document.querySelectorAll('.arch-box').forEach((b,i) => {
-  b.style.animationDelay = (i * 0.07) + 's';
-});
-
-// ── Quiz logic
-function checkQuiz(el, result, qid) {
-  const container = el.closest('.quiz-section');
-  container.querySelectorAll('.quiz-opt').forEach(o => {
-    o.style.pointerEvents = 'none';
-    o.style.opacity = '0.7';
-  });
-  el.style.opacity = '1';
-  if(result === 'correct') {
-    el.classList.add('correct');
-    container.querySelector('#' + qid + '-good').classList.add('show');
-  } else {
-    el.classList.add('wrong');
-    container.querySelector('#' + qid + '-bad').classList.add('show');
-    // highlight correct
-    container.querySelectorAll('.quiz-opt').forEach(o => {
-      if(o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'")) {
-        o.classList.add('correct');
-      }
-    });
-  }
-}
-
-function resetQuiz(qid) {
-  const btn = document.querySelector(`[onclick="resetQuiz('${qid}')"]`);
-  const container = btn.closest('.quiz-section');
-  container.querySelectorAll('.quiz-opt').forEach(o => {
-    o.style.pointerEvents = '';
-    o.style.opacity = '';
-    o.classList.remove('correct','wrong');
-  });
-  container.querySelectorAll('.quiz-feedback').forEach(f => f.classList.remove('show'));
-}
-
-// ── Smooth scroll for nav
-document.querySelectorAll('.nav-btn').forEach(btn => {
-  btn.addEventListener('click', e => {
-    const target = document.querySelector(btn.getAttribute('href'));
-    if(target) { e.preventDefault(); target.scrollIntoView({behavior:'smooth', block:'start'}); }
-  });
-});
-
-// ── Animated counter for hero stats
-const counters = document.querySelectorAll('.stat-box .num');
-const counterObserver = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if(e.isIntersecting) {
-      const el = e.target;
-      const target = parseInt(el.textContent);
-      if(isNaN(target)) return;
-      let current = 0;
-      const step = target / 30;
-      const timer = setInterval(() => {
-        current += step;
-        if(current >= target) { el.textContent = target + '+'; clearInterval(timer); }
-        else { el.textContent = Math.floor(current); }
-      }, 40);
-      counterObserver.unobserve(el);
-    }
-  });
-}, {threshold: 0.5});
-counters.forEach(c => counterObserver.observe(c));
-</script>
-</body>
-</html>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VHAL — المرجع التقني الشامل لمحترفي AAOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Fira+Code:wght@400;600&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080c14;
+  --bg2: #0d1526;
+  --bg3: #111d33;
+  --panel: #0f1e36;
+  --border: #1e3a5f;
+  --accent1: #00d4ff;
+  --accent2: #ff6b35;
+  --accent3: #7c3aed;
+  --accent4: #10b981;
+  --accent5: #f59e0b;
+  --accent6: #ef4444;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --glow1: rgba(0,212,255,0.15);
+  --glow2: rgba(255,107,53,0.15);
+  --glow3: rgba(124,58,237,0.15);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ── ANIMATED BACKGROUND ── */
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+.bg-orb {
+  position: fixed; border-radius: 50%; filter: blur(120px);
+  pointer-events: none; z-index: 0; animation: orbFloat 8s ease-in-out infinite;
+}
+.bg-orb.o1 { width:500px; height:500px; background:rgba(0,212,255,0.06); top:-100px; right:-100px; }
+.bg-orb.o2 { width:400px; height:400px; background:rgba(124,58,237,0.06); bottom:10%; left:-100px; animation-delay:-3s; }
+.bg-orb.o3 { width:300px; height:300px; background:rgba(255,107,53,0.05); top:50%; left:50%; animation-delay:-5s; }
+
+@keyframes orbFloat {
+  0%,100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-30px) scale(1.05); }
+}
+
+/* ── WRAPPER ── */
+.wrapper { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  justify-content: center; align-items: center; text-align: center;
+  padding: 60px 20px;
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3);
+  padding: 6px 18px; border-radius: 100px; font-size: 13px;
+  color: var(--accent1); margin-bottom: 28px; letter-spacing: 2px;
+  animation: fadeDown 0.8s ease both;
+}
+.hero-badge span { width:6px; height:6px; background:var(--accent1); border-radius:50%; animation: blink 1.2s ease-in-out infinite; }
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+@keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes slideRight { from{opacity:0;transform:translateX(-40px)} to{opacity:1;transform:translateX(0)} }
+@keyframes slideLeft { from{opacity:0;transform:translateX(40px)} to{opacity:1;transform:translateX(0)} }
+@keyframes scaleIn { from{opacity:0;transform:scale(0.8)} to{opacity:1;transform:scale(1)} }
+@keyframes shimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
+@keyframes pulse-border { 0%,100%{box-shadow:0 0 0 0 rgba(0,212,255,0.4)} 50%{box-shadow:0 0 0 8px rgba(0,212,255,0)} }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+@keyframes spin-slow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes data-flow { 0%{stroke-dashoffset:200} 100%{stroke-dashoffset:0} }
+@keyframes reveal { from{width:0} to{width:100%} }
+
+.hero-title {
+  font-size: clamp(42px, 8vw, 88px);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 12px;
+  animation: fadeUp 0.9s 0.2s ease both;
+}
+.hero-title .grad {
+  background: linear-gradient(135deg, var(--accent1) 0%, #4fc3f7 40%, var(--accent3) 80%, var(--accent2) 100%);
+  background-size: 300% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+
+.hero-sub {
+  font-size: clamp(16px, 3vw, 22px); color: var(--text2);
+  margin-bottom: 20px; animation: fadeUp 0.9s 0.35s ease both;
+}
+
+.hero-desc {
+  max-width: 640px; color: var(--text3); font-size: 15px;
+  margin-bottom: 48px; animation: fadeUp 0.9s 0.5s ease both;
+}
+
+.hero-stats {
+  display: flex; gap: 32px; flex-wrap: wrap; justify-content: center;
+  animation: fadeUp 0.9s 0.65s ease both;
+}
+.stat-box {
+  text-align: center;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  padding: 16px 28px; border-radius: 12px; backdrop-filter: blur(10px);
+  transition: all 0.3s;
+}
+.stat-box:hover { border-color: var(--accent1); background: var(--glow1); transform: translateY(-4px); }
+.stat-box .num { font-size: 28px; font-weight: 900; color: var(--accent1); }
+.stat-box .lbl { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+.scroll-hint {
+  position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  color: var(--text3); font-size: 12px; animation: fadeIn 2s 1.5s ease both;
+}
+.scroll-arrow { width: 24px; height: 24px; border-right: 2px solid var(--text3); border-bottom: 2px solid var(--text3); transform: rotate(45deg); animation: float 1.5s ease-in-out infinite; }
+
+/* ── NAV ── */
+.sticky-nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(8,12,20,0.85); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+  margin-bottom: 60px;
+}
+.nav-btn {
+  padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+  border: 1px solid transparent; cursor: pointer; transition: all 0.2s;
+  background: transparent; color: var(--text2); font-family: 'Cairo', sans-serif;
+  text-decoration: none; display: inline-block;
+}
+.nav-btn:hover { border-color: var(--accent1); color: var(--accent1); background: var(--glow1); }
+
+/* ── SECTION ── */
+.section { margin-bottom: 80px; opacity: 0; transform: translateY(30px); transition: all 0.7s ease; }
+.section.visible { opacity: 1; transform: translateY(0); }
+
+.section-header {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 32px;
+}
+.section-icon {
+  width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center;
+  justify-content: center; font-size: 24px; flex-shrink: 0;
+  animation: float 3s ease-in-out infinite;
+}
+.section-icon.c1 { background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(0,212,255,0.05)); border: 1px solid rgba(0,212,255,0.3); }
+.section-icon.c2 { background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.05)); border: 1px solid rgba(255,107,53,0.3); }
+.section-icon.c3 { background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(124,58,237,0.05)); border: 1px solid rgba(124,58,237,0.3); }
+.section-icon.c4 { background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05)); border: 1px solid rgba(16,185,129,0.3); }
+.section-icon.c5 { background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(245,158,11,0.05)); border: 1px solid rgba(245,158,11,0.3); }
+.section-icon.c6 { background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.05)); border: 1px solid rgba(239,68,68,0.3); }
+
+.section-title { font-size: 26px; font-weight: 800; }
+.section-title .tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-right: 8px; vertical-align: middle; }
+.tag-blue { background: rgba(0,212,255,0.15); color: var(--accent1); border: 1px solid rgba(0,212,255,0.3); }
+.tag-orange { background: rgba(255,107,53,0.15); color: var(--accent2); border: 1px solid rgba(255,107,53,0.3); }
+.tag-purple { background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+.tag-green { background: rgba(16,185,129,0.15); color: var(--accent4); border: 1px solid rgba(16,185,129,0.3); }
+.tag-yellow { background: rgba(245,158,11,0.15); color: var(--accent5); border: 1px solid rgba(245,158,11,0.3); }
+.tag-red { background: rgba(239,68,68,0.15); color: var(--accent6); border: 1px solid rgba(239,68,68,0.3); }
+
+/* ── CARD ── */
+.card {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+  padding: 24px 28px; margin-bottom: 20px;
+  transition: all 0.3s; position: relative; overflow: hidden;
+}
+.card::before {
+  content: ''; position: absolute; inset: 0; border-radius: 16px; opacity: 0;
+  background: linear-gradient(135deg, var(--glow1), transparent);
+  transition: opacity 0.3s;
+}
+.card:hover::before { opacity: 1; }
+.card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,212,255,0.08); }
+
+.card.orange:hover { border-color: rgba(255,107,53,0.3); box-shadow: 0 12px 40px rgba(255,107,53,0.08); }
+.card.orange::before { background: linear-gradient(135deg, var(--glow2), transparent); }
+.card.purple:hover { border-color: rgba(124,58,237,0.3); box-shadow: 0 12px 40px rgba(124,58,237,0.08); }
+.card.purple::before { background: linear-gradient(135deg, var(--glow3), transparent); }
+.card.green:hover { border-color: rgba(16,185,129,0.3); }
+.card.yellow:hover { border-color: rgba(245,158,11,0.3); }
+.card.red:hover { border-color: rgba(239,68,68,0.3); }
+
+.card-title { font-size: 17px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+.card-title .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-blue { background: var(--accent1); box-shadow: 0 0 8px var(--accent1); }
+.dot-orange { background: var(--accent2); box-shadow: 0 0 8px var(--accent2); }
+.dot-purple { background: #a78bfa; box-shadow: 0 0 8px #a78bfa; }
+.dot-green { background: var(--accent4); box-shadow: 0 0 8px var(--accent4); }
+.dot-yellow { background: var(--accent5); box-shadow: 0 0 8px var(--accent5); }
+.dot-red { background: var(--accent6); box-shadow: 0 0 8px var(--accent6); }
+
+.card p { color: var(--text2); font-size: 14px; line-height: 1.9; }
+
+/* ── GRID ── */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+@media(max-width:768px) { .grid2,.grid3 { grid-template-columns:1fr; } }
+
+/* ── CODE BLOCK ── */
+.code-wrap { position: relative; margin: 16px 0; }
+.code-label {
+  position: absolute; top: 10px; right: 14px; font-size: 11px; font-family: 'Fira Code', monospace;
+  color: var(--text3); background: var(--bg); padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border);
+}
+pre {
+  background: #060a10; border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px 18px; overflow-x: auto; font-family: 'Fira Code', monospace;
+  font-size: 13px; line-height: 1.8; color: #e2e8f0;
+  direction: ltr !important; text-align: left !important;
+}
+.kw { color: #c792ea; }
+.fn { color: #82aaff; }
+.str { color: #c3e88d; }
+.num { color: #f78c6c; }
+.cmt { color: #546e7a; font-style: italic; }
+.type { color: #ffcb6b; }
+.op { color: #89ddff; }
+.prop { color: #80cbc4; }
+
+/* ── ARCHITECTURE DIAGRAM ── */
+.arch-diagram {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 20px;
+  padding: 32px; margin-bottom: 24px; overflow: hidden;
+}
+.arch-layer {
+  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  margin-bottom: 12px; position: relative;
+}
+.arch-box {
+  padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 700;
+  text-align: center; min-width: 120px; transition: all 0.3s; cursor: pointer;
+  animation: scaleIn 0.5s ease both;
+}
+.arch-box:hover { transform: scale(1.05); filter: brightness(1.2); }
+.arch-box.app { background: rgba(0,212,255,0.15); border: 1px solid rgba(0,212,255,0.4); color: var(--accent1); }
+.arch-box.vhal { background: rgba(124,58,237,0.2); border: 2px solid rgba(124,58,237,0.6); color: #a78bfa; font-size: 15px; min-width: 200px; }
+.arch-box.hal { background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.4); color: var(--accent2); }
+.arch-box.hw { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4); color: var(--accent4); }
+.arch-box.kern { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.4); color: var(--accent5); }
+
+.arch-arrow {
+  display: flex; justify-content: center; margin: 4px 0;
+}
+.arch-arrow svg { animation: float 2s ease-in-out infinite; }
+
+.layer-label {
+  text-align: center; font-size: 11px; color: var(--text3); margin-bottom: 6px;
+  letter-spacing: 1px; text-transform: uppercase;
+}
+
+/* ── PROPERTY CARD ── */
+.prop-card {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 16px; margin-bottom: 10px; display: flex; gap: 14px; align-items: flex-start;
+  transition: all 0.2s;
+}
+.prop-card:hover { border-color: rgba(0,212,255,0.3); background: var(--panel); }
+.prop-id {
+  font-family: 'Fira Code', monospace; font-size: 11px; color: var(--accent1);
+  background: rgba(0,212,255,0.08); padding: 3px 8px; border-radius: 6px; white-space: nowrap;
+  flex-shrink: 0; border: 1px solid rgba(0,212,255,0.2);
+}
+.prop-info .pname { font-size: 13px; font-weight: 700; color: var(--text); }
+.prop-info .pdesc { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.prop-badges { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.badge {
+  font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+  letter-spacing: 0.5px; text-transform: uppercase;
+}
+.badge.rw { background: rgba(16,185,129,0.15); color: var(--accent4); border: 1px solid rgba(16,185,129,0.3); }
+.badge.ro { background: rgba(245,158,11,0.15); color: var(--accent5); border: 1px solid rgba(245,158,11,0.3); }
+.badge.wo { background: rgba(239,68,68,0.15); color: var(--accent6); border: 1px solid rgba(239,68,68,0.3); }
+.badge.cont { background: rgba(0,212,255,0.1); color: var(--accent1); border: 1px solid rgba(0,212,255,0.2); }
+.badge.on-ch { background: rgba(124,58,237,0.1); color: #a78bfa; border: 1px solid rgba(124,58,237,0.2); }
+.badge.int32 { background: rgba(255,107,53,0.1); color: var(--accent2); border: 1px solid rgba(255,107,53,0.2); }
+.badge.float { background: rgba(16,185,129,0.1); color: var(--accent4); border: 1px solid rgba(16,185,129,0.2); }
+.badge.bool { background: rgba(245,158,11,0.1); color: var(--accent5); border: 1px solid rgba(245,158,11,0.2); }
+.badge.str-t { background: rgba(124,58,237,0.1); color: #c4b5fd; border: 1px solid rgba(124,58,237,0.2); }
+.badge.bytes { background: rgba(239,68,68,0.1); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
+.badge.mixed { background: rgba(100,116,139,0.1); color: #94a3b8; border: 1px solid rgba(100,116,139,0.2); }
+
+/* ── ALERT BOXES ── */
+.alert {
+  border-radius: 12px; padding: 16px 20px; margin: 16px 0; display: flex; gap: 14px; align-items: flex-start;
+  border-right: 4px solid;
+}
+.alert-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+.alert-body .alert-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.alert-body p { font-size: 13px; line-height: 1.7; color: var(--text2); }
+.alert.info { background: rgba(0,212,255,0.07); border-color: var(--accent1); }
+.alert.info .alert-title { color: var(--accent1); }
+.alert.warn { background: rgba(245,158,11,0.07); border-color: var(--accent5); }
+.alert.warn .alert-title { color: var(--accent5); }
+.alert.danger { background: rgba(239,68,68,0.07); border-color: var(--accent6); }
+.alert.danger .alert-title { color: var(--accent6); }
+.alert.success { background: rgba(16,185,129,0.07); border-color: var(--accent4); }
+.alert.success .alert-title { color: var(--accent4); }
+
+/* ── EXAM SECTION ── */
+.exam-card {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+  padding: 24px; margin-bottom: 20px; position: relative;
+}
+.exam-num {
+  position: absolute; top: -14px; right: 24px;
+  background: linear-gradient(135deg, var(--accent3), var(--accent1));
+  color: #fff; font-size: 12px; font-weight: 800; padding: 4px 16px;
+  border-radius: 20px; letter-spacing: 1px;
+}
+.exam-q { font-size: 15px; font-weight: 700; margin-bottom: 14px; color: var(--text); }
+.exam-hint {
+  background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.2);
+  border-radius: 10px; padding: 14px 16px; font-size: 13px; color: var(--text2);
+}
+.exam-hint .hint-title { font-size: 12px; font-weight: 700; color: var(--accent1); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+.exam-steps { list-style: none; }
+.exam-steps li {
+  padding: 6px 0; font-size: 13px; color: var(--text2);
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.exam-steps li::before { content: '→'; color: var(--accent1); font-weight: 700; flex-shrink: 0; }
+
+/* ── SIGNS SECTION ── */
+.sign-card {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+  padding: 20px; margin-bottom: 14px; display: flex; gap: 16px; align-items: flex-start;
+}
+.sign-emoji { font-size: 28px; }
+.sign-body .sign-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: var(--accent5); }
+.sign-body p { font-size: 13px; color: var(--text2); line-height: 1.7; }
+.sign-body .sign-solve { font-size: 12px; color: var(--accent4); margin-top: 8px; font-weight: 600; }
+
+/* ── TABLE ── */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { background: rgba(0,212,255,0.1); color: var(--accent1); padding: 12px 16px; text-align: right; font-weight: 700; border-bottom: 1px solid var(--border); }
+td { padding: 11px 16px; border-bottom: 1px solid rgba(30,58,95,0.5); color: var(--text2); }
+tr:hover td { background: rgba(0,212,255,0.03); }
+.table-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin: 16px 0; }
+
+/* ── FLOW DIAGRAM ── */
+.flow {
+  display: flex; align-items: center; gap: 0; flex-wrap: wrap;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+  padding: 24px; margin: 16px 0; justify-content: center;
+}
+.flow-step {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 16px; min-width: 110px; text-align: center;
+  transition: all 0.3s; cursor: default;
+}
+.flow-step:hover { border-color: var(--accent1); background: var(--glow1); transform: scale(1.05); }
+.flow-step .step-icon { font-size: 22px; }
+.flow-step .step-label { font-size: 11px; font-weight: 700; color: var(--text2); }
+.flow-step .step-sub { font-size: 10px; color: var(--text3); }
+.flow-arrow { color: var(--accent1); font-size: 20px; margin: 0 6px; flex-shrink: 0; animation: float 2s ease-in-out infinite; }
+
+/* ── PROGRESS / TIMELINE ── */
+.timeline { position: relative; padding-right: 24px; }
+.timeline::before {
+  content: ''; position: absolute; right: 11px; top: 0; bottom: 0;
+  width: 2px; background: linear-gradient(to bottom, var(--accent1), var(--accent3), var(--accent2));
+}
+.tl-item { position: relative; margin-bottom: 28px; }
+.tl-dot {
+  position: absolute; right: -14px; top: 6px;
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid var(--bg); animation: pulse-border 2s ease-in-out infinite;
+}
+.tl-dot.d1 { background: var(--accent1); box-shadow: 0 0 8px var(--accent1); }
+.tl-dot.d2 { background: #4fc3f7; box-shadow: 0 0 8px #4fc3f7; }
+.tl-dot.d3 { background: #a78bfa; box-shadow: 0 0 8px #a78bfa; }
+.tl-dot.d4 { background: var(--accent2); box-shadow: 0 0 8px var(--accent2); }
+.tl-dot.d5 { background: var(--accent4); box-shadow: 0 0 8px var(--accent4); }
+.tl-content { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; }
+.tl-content h4 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.tl-content p { font-size: 13px; color: var(--text2); }
+
+/* ── FOOTER ── */
+.footer {
+  text-align: center; padding: 48px 24px; color: var(--text3); font-size: 13px;
+  border-top: 1px solid var(--border); margin-top: 40px;
+}
+.footer .logo { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+.footer .logo span { background: linear-gradient(135deg, var(--accent1), var(--accent3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+/* ── INTERACTIVE QUIZ ── */
+.quiz-section { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 28px; margin-bottom: 20px; }
+.quiz-q { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+.quiz-options { display: flex; flex-direction: column; gap: 10px; }
+.quiz-opt {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 16px; cursor: pointer; font-size: 13px; transition: all 0.2s;
+  display: flex; gap: 12px; align-items: center;
+}
+.quiz-opt:hover { border-color: var(--accent1); background: var(--glow1); }
+.quiz-opt.correct { border-color: var(--accent4); background: rgba(16,185,129,0.1); }
+.quiz-opt.wrong { border-color: var(--accent6); background: rgba(239,68,68,0.1); }
+.quiz-opt .opt-letter { width: 24px; height: 24px; border-radius: 6px; background: var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0; }
+.quiz-feedback { margin-top: 14px; padding: 12px 16px; border-radius: 10px; font-size: 13px; display: none; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.good { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: var(--accent4); }
+.quiz-feedback.bad { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: var(--accent6); }
+.quiz-reset { margin-top: 12px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: var(--accent1); padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: 'Cairo',sans-serif; transition: all 0.2s; }
+.quiz-reset:hover { background: rgba(0,212,255,0.2); }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-orb o1"></div>
+<div class="bg-orb o2"></div>
+<div class="bg-orb o3"></div>
+
+<!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
+<div style="position:relative; z-index:1;">
+<div class="hero wrapper" style="max-width:100%; padding: 60px 40px; position:relative;">
+  <div class="hero-badge"><span></span> AUTOMOTIVE ANDROID · VHAL REFERENCE</div>
+  <h1 class="hero-title"><span class="grad">VHAL</span><br><span style="font-size:0.45em; color:var(--text2); -webkit-text-fill-color:var(--text2);">Vehicle Hardware Abstraction Layer</span></h1>
+  <p class="hero-sub">المرجع التقني الشامل من المفاهيم حتى التنفيذ</p>
+  <p class="hero-desc">كل ما تحتاجه لإتقان الـ VHAL — من البنية الهندسية، معمارية الخصائص (Properties)، تنفيذ الـ HAL Interfaces، وصولاً لسيناريوهات التطبيق العملي وأدوات التشخيص المتقدمة.</p>
+  <div class="hero-stats">
+    <div class="stat-box"><div class="num">8</div><div class="lbl">أقسام مرجعية</div></div>
+    <div class="stat-box"><div class="num">50+</div><div class="lbl">خاصية تقنية</div></div>
+    <div class="stat-box"><div class="num">A→Z</div><div class="lbl">دليل هندسي كامل</div></div>
+    <div class="stat-box"><div class="num">🚀</div><div class="lbl">سيناريوهات إنتاجية</div></div>
+  </div>
+  <div class="scroll-hint">
+    <span>استكشف المرجع</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</div>
+</div>
+
+<!-- NAV -->
+<nav class="sticky-nav">
+  <a class="nav-btn" href="#s1">🔍 ما هو VHAL</a>
+  <a class="nav-btn" href="#s2">🧱 المعمارية</a>
+  <a class="nav-btn" href="#s3">🔑 Properties</a>
+  <a class="nav-btn" href="#s4">⚡ HAL Interface</a>
+  <a class="nav-btn" href="#s5">🔄 Data Flow</a>
+  <a class="nav-btn" href="#s6">🛠️ سيناريوهات تطبيقية</a>
+  <a class="nav-btn" href="#s7">🛡️ الأمن والأداء</a>
+  <a class="nav-btn" href="#s8">📡 التشخيص والـ ADB</a>
+</nav>
+
+<div class="wrapper">
+
+<!-- ═══════════════════════════════ SECTION 1 ═══════════════════════════════ -->
+<div class="section" id="s1">
+  <div class="section-header">
+    <div class="section-icon c1">🏗️</div>
+    <div>
+      <div class="section-title"><span class="tag tag-blue">الأساسيات</span> ما هو VHAL؟</div>
+      <div style="color:var(--text3); font-size:13px;">Vehicle Hardware Abstraction Layer — الطبقة اللي بتربط Android بالسيارة</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-blue"></span>التعريف التقني</div>
+    <p>VHAL هو طبقة تجريد برمجية في <strong style="color:var(--accent1)">Android Automotive OS (AAOS)</strong> — تعمل كوسيط (Proxy) بين الـ Android Framework من جهة، والشبكة الداخلية للسيارة (Vehicle Network) من جهة أخرى. تهدف لتوحيد الوصول لبيانات السيارة بغض النظر عن نوع الهاردوير.</p>
+    <div class="alert info" style="margin-top:16px;">
+      <span class="alert-icon">💡</span>
+      <div class="alert-body">
+        <div class="alert-title">الفلسفة الهندسية</div>
+        <p>بدلاً من التعامل المباشر مع بروتوكولات معقدة مثل CAN أو LIN، يوفر الـ VHAL واجهة موحدة تعتمد على مفهوم الـ Properties، مما يسهل تطوير تطبيقات السيارات بشكل مستقل عن الموردين (OEMs).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card orange">
+      <div class="card-title"><span class="dot dot-orange"></span>لماذا التجريد (Abstraction)؟</div>
+      <p>يسمح الـ VHAL لشركة Google بتطوير نظام AAOS موحد، بينما يقوم كل مصنع سيارات (OEM) بكتابة الـ HAL Implementation الخاص به ليتوافق مع أجهزته، مما يحافظ على استقرار النظام العلوي.</p>
+    </div>
+    <div class="card purple">
+      <div class="card-title"><span class="dot dot-purple"></span>نطاق التشغيل</div>
+      <p>يعمل الـ VHAL كجزء من الـ Android System، ويتصل عبر طبقة الـ Kernel بمتحكمات الشبكة (Controller Area Network) لاستقاء البيانات من الحساسات أو إصدار أوامر للمشغلات (Actuators).</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-blue"></span>التطور التاريخي للواجهات</div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot d1"></div>
+        <div class="tl-content">
+          <h4 style="color:var(--accent1)">HIDL Era (Android 8 - 12)</h4>
+          <p>استخدام واجهة Hardware Interface Definition Language للربط بين العمليات (IPC).</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot d3"></div>
+        <div class="tl-content">
+          <h4 style="color:#a78bfa">AIDL Era (Android 13+)</h4>
+          <p>التحول الكامل لـ Android Interface Definition Language لتوحيد المعايير وتحسين الأداء وسهولة التطوير.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ SECTION 2 ═══════════════════════════════ -->
+<div class="section" id="s2">
+  <div class="section-header">
+    <div class="section-icon c2">🧱</div>
+    <div>
+      <div class="section-title"><span class="tag tag-orange">Architecture</span> معمارية النظام</div>
+      <div style="color:var(--text3); font-size:13px;">الهيكل الهندسي لتدفق البيانات</div>
+    </div>
+  </div>
+
+  <div class="arch-diagram">
+    <div class="layer-label">🟦 Android Applications Layer</div>
+    <div class="arch-layer">
+      <div class="arch-box app">CarSettings</div>
+      <div class="arch-box app">Maps/Nav</div>
+      <div class="arch-box app">Media App</div>
+      <div class="arch-box app">Cluster App</div>
+      <div class="arch-box app">OEM App</div>
+    </div>
+    <div class="arch-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M6 14l6 6 6-6" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/></svg></div>
+    <div class="layer-label">🟨 Android Framework</div>
+    <div class="arch-layer">
+      <div class="arch-box app" style="background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.4);color:var(--accent5);">CarPropertyManager</div>
+      <div class="arch-box app" style="background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.4);color:var(--accent5);">CarHvacManager</div>
+      <div class="arch-box app" style="background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.4);color:var(--accent5);">CarSensorManager</div>
+    </div>
+    <div class="arch-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M6 14l6 6 6-6" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/></svg></div>
+    <div class="layer-label">🟪 Car Service (System Server)</div>
+    <div class="arch-layer">
+      <div class="arch-box kern">CarPropertyService</div>
+      <div class="arch-box kern">CarPowerService</div>
+    </div>
+    <div class="arch-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M6 14l6 6 6-6" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+    <div class="layer-label">⭐ VHAL (Vehicle Hardware Abstraction Layer)</div>
+    <div class="arch-layer">
+      <div class="arch-box vhal">VHAL Interface<br><span style="font-size:11px;font-weight:400;opacity:0.7">(AIDL / HIDL)</span></div>
+    </div>
+    <div class="arch-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M6 14l6 6 6-6" stroke="#ff6b35" stroke-width="2" stroke-linecap="round"/></svg></div>
+    <div class="layer-label">🟩 HAL Implementation (OEM Specific)</div>
+    <div class="arch-layer">
+      <div class="arch-box hal">Default HAL</div>
+      <div class="arch-box hal">CAN Bus HAL</div>
+      <div class="arch-box hal">OEM Custom HAL</div>
+    </div>
+    <div class="arch-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M6 14l6 6 6-6" stroke="#10b981" stroke-width="2" stroke-linecap="round"/></svg></div>
+    <div class="layer-label">⚙️ Vehicle Hardware</div>
+    <div class="arch-layer">
+      <div class="arch-box hw">CAN Bus</div>
+      <div class="arch-box hw">ECUs</div>
+      <div class="arch-box hw">LIN Bus</div>
+      <div class="arch-box hw">Sensors</div>
+      <div class="arch-box hw">Actuators</div>
+    </div>
+  </div>
+
+  <div class="grid3">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>CarPropertyManager</div>
+      <p>البوابة البرمجية للمطورين. يوفر دوال القراءة والكتابة والاشتراك في الأحداث، ويتواجد داخل عملية التطبيق.</p>
+    </div>
+    <div class="card purple">
+      <div class="card-title"><span class="dot dot-purple"></span>Car Service</div>
+      <p>الخدمة المركزية في النظام التي تدير الوصول، تتحقق من الصلاحيات، وتضمن مزامنة الطلبات بين التطبيقات المختلفة والـ VHAL.</p>
+    </div>
+    <div class="card orange">
+      <div class="card-title"><span class="dot dot-orange"></span>HAL Implementation</div>
+      <p>المكون المسؤول عن التحدث الفعلي مع الهاردوير. يقوم بتحويل طلبات VHAL إلى رسائل بروتوكولية (مثل CAN Frames).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ SECTION 3 ═══════════════════════════════ -->
+<div class="section" id="s3">
+  <div class="section-header">
+    <div class="section-icon c3">🔑</div>
+    <div>
+      <div class="section-title"><span class="tag tag-purple">Properties</span> هيكلية الخصائص التقنية</div>
+      <div style="color:var(--text3); font-size:13px;">البيانات كذرات برمجية</div>
+    </div>
+  </div>
+
+  <div class="card purple">
+    <div class="card-title"><span class="dot dot-purple"></span>مفهوم الـ Property</div>
+    <p>كل معلومة في السيارة (سرعة، درجة حرارة، حالة قفل) تُعتبر <strong style="color:#a78bfa">Vehicle Property</strong>. يتم تعريفها بمعرف فريد (ID) يحمل معلومات عن نوع البيانات والمجموعة والمنطقة.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-blue"></span>تشريح المعرف (Property ID Structure)</div>
+    <div class="code-wrap">
+      <span class="code-label">Property ID Mapping</span>
+      <pre><span class="cmt">// المعرف هو 32-bit مقسم لـ 3 أجزاء رئيسية:</span>
+<span class="cmt">// [31:28] = النوع  | [27:16] = المجموعة | [15:0] = الرقم التسلسلي</span>
+
+<span class="kw">int</span> <span class="prop">PERF_VEHICLE_SPEED</span> = <span class="num">0x11600207</span>;
+<span class="cmt">// 0x1  -> FLOAT (نوع البيانات)</span>
+<span class="cmt">// 0x16 -> PERF GROUP (مجموعة الأداء)</span>
+<span class="cmt">// 0x0207 -> SPEED INDEX (المعرف الخاص بالسرعة)</span></pre>
+    </div>
+  </div>
+
+  <div class="grid3">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>STATIC Mode</div>
+      <p>قيم لا تتغير أبداً مثل سعة خزان الوقود القصوى أو رقم الـ VIN. تُقرأ مرة واحدة فقط.</p>
+    </div>
+    <div class="card purple">
+      <div class="card-title"><span class="dot dot-purple"></span>ON_CHANGE Mode</div>
+      <p>يتم إرسال إشعار فقط عند تغير القيمة. مثالي لحالات الأبواب، الجير، أو أزرار التحكم.</p>
+    </div>
+    <div class="card orange">
+      <div class="card-title"><span class="dot dot-orange"></span>CONTINUOUS Mode</div>
+      <p>يتم تحديث البيانات بشكل مستمر بمعدل تردد (Hz) محدد. ضروري للسرعة وضغط المحرك.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-blue"></span>نطاق المناطق (Area IDs)</div>
+    <p>تسمح المناطق بتخصيص الخاصية لجزء معين من السيارة (مثل تكييف المقعد الخلفي يسار).</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Area Type</th><th>الوصف</th><th>مثال</th></tr></thead>
+        <tbody>
+          <tr><td><code>GLOBAL</code></td><td>على مستوى السيارة كاملة</td><td>السرعة، الوقود</td></tr>
+          <tr><td><code>SEAT</code></td><td>مرتبط بمقعد معين</td><td>تسخين المقاعد</td></tr>
+          <tr><td><code>WINDOW</code></td><td>مرتبط بنافذة معينة</td><td>وضعية النافذة</td></tr>
+          <tr><td><code>DOOR</code></td><td>مرتبط بباب معين</td><td>قفل الأبواب</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ SECTION 4 ═══════════════════════════════ -->
+<div class="section" id="s4">
+  <div class="section-header">
+    <div class="section-icon c4">⚡</div>
+    <div>
+      <div class="section-title"><span class="tag tag-green">HAL Interface</span> تنفيذ الواجهات البرمجية</div>
+      <div style="color:var(--text3); font-size:13px;">تفاعل الكود مع النظام</div>
+    </div>
+  </div>
+
+  <div class="card green">
+    <div class="card-title"><span class="dot dot-green"></span>القراءة (Pull Model)</div>
+    <div class="code-wrap">
+      <pre><span class="cmt">// استخدام CarPropertyManager للحصول على السرعة</span>
+<span class="type">CarPropertyValue</span>&lt;<span class="type">Float</span>&gt; speed = carPropMgr.<span class="fn">getProperty</span>(
+    <span class="type">Float</span>.<span class="kw">class</span>,
+    <span class="type">VehiclePropertyIds</span>.<span class="prop">PERF_VEHICLE_SPEED</span>,
+    <span class="num">0</span> <span class="cmt">// Global Area</span>
+);
+<span class="kw">float</span> currentSpeed = speed.<span class="fn">getValue</span>();</pre>
+    </div>
+  </div>
+
+  <div class="card orange">
+    <div class="card-title"><span class="dot dot-orange"></span>الكتابة (Push Model)</div>
+    <div class="code-wrap">
+      <pre><span class="cmt">// ضبط درجة الحرارة لمقعد السائق</span>
+carPropMgr.<span class="fn">setProperty</span>(
+    <span class="type">Float</span>.<span class="kw">class</span>,
+    <span class="type">VehiclePropertyIds</span>.<span class="prop">HVAC_TEMPERATURE_SET</span>,
+    <span class="type">VehicleAreaSeat</span>.<span class="prop">ROW_1_LEFT</span>,
+    <span class="num">22.5f</span>
+);</pre>
+    </div>
+  </div>
+
+  <div class="card purple">
+    <div class="card-title"><span class="dot dot-purple"></span>الاشتراك (Subscription Model)</div>
+    <p>أفضل وسيلة للحصول على بيانات محدثة دون استهلاك موارد المعالج في عمليات Polling غير ضرورية.</p>
+    <div class="code-wrap">
+      <pre><span class="cmt">// التسجيل لاستقبال تحديثات السرعة بمعدل 10Hz</span>
+carPropMgr.<span class="fn">registerCallback</span>(
+    <span class="kw">new</span> <span class="type">CarPropertyEventCallback</span>() {
+        <span class="kw">@Override</span>
+        <span class="kw">public void</span> <span class="fn">onChangeEvent</span>(<span class="type">CarPropertyValue</span> value) {
+            <span class="cmt">// معالجة البيانات الجديدة</span>
+        }
+    },
+    <span class="type">VehiclePropertyIds</span>.<span class="prop">PERF_VEHICLE_SPEED</span>,
+    <span class="num">10.0f</span> <span class="cmt">// Hz</span>
+);</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ SECTION 5 ═══════════════════════════════ -->
+<div class="section" id="s5">
+  <div class="section-header">
+    <div class="section-icon c5">🔄</div>
+    <div>
+      <div class="section-title"><span class="tag tag-yellow">Data Flow</span> دورة حياة البيانات</div>
+      <div style="color:var(--text3); font-size:13px;">من المستشعر إلى شاشة المستخدم</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-yellow"></span>مسار حدث (Property Event)</div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot d1"></div>
+        <div class="tl-content">
+          <h4>ECU Trigger</h4>
+          <p>تغيير في حالة الحساس الفيزيائي في السيارة يولد إشارة على شبكة الـ CAN.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot d2"></div>
+        <div class="tl-content">
+          <h4>HAL Implementation</h4>
+          <p>يقوم كود الـ OEM بالتقاط الإشارة وترجمتها لـ <code>VehiclePropValue</code> وإرسالها عبر AIDL.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot d3"></div>
+        <div class="tl-content">
+          <h4>VHAL Service</h4>
+          <p>يستلم الحدث ويقوم بتوجيهه لخدمة <code>CarPropertyService</code> في نظام الـ Framework.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot d5"></div>
+        <div class="tl-content">
+          <h4>App Callback</h4>
+          <p>يصل الإشعار لكل تطبيق مشترك في هذه الخاصية عبر الـ Binder IPC لتحديث واجهة المستخدم.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ SECTION 6 ═══════════════════════════════ -->
+<div class="section" id="s6">
+  <div class="section-header">
+    <div class="section-icon c6">🛠️</div>
+    <div>
+      <div class="section-title"><span class="tag tag-red">التطبيق</span> سيناريوهات تنفيذية متقدمة</div>
+      <div style="color:var(--text3); font-size:13px;">كيفية بناء ميزات حقيقية باستخدام VHAL</div>
+    </div>
+  </div>
+
+  <div class="exam-card">
+    <div class="exam-num">السيناريو ١</div>
+    <div class="exam-q">🏎️ تنفيذ عداد السرعة (Real-time Speedometer)</div>
+    <div class="exam-hint">
+      <div class="hint-title">🧭 المبادئ الأساسية للتنفيذ</div>
+      <ul class="exam-steps">
+        <li>استخدام الـ Property: <code style="color:var(--accent1)">PERF_VEHICLE_SPEED</code></li>
+        <li>الترميز البرمجي: الاشتراك (Subscription) هو الخيار الأمثل وليس الـ Polling.</li>
+        <li>ضبط معدل التحديث: معدل <strong>10-20 Hz</strong> يوفر سلاسة كافية للعين البشرية دون تحميل النظام.</li>
+        <li>معالجة البيانات: التحقق من الحالة (Status) وتحويل الوحدة من m/s إلى km/h (بالضرب في 3.6).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="exam-card">
+    <div class="exam-num">السيناريو ٢</div>
+    <div class="exam-q">🌡️ نظام التحكم في المناخ (HVAC Bi-directional Control)</div>
+    <div class="exam-hint">
+      <div class="hint-title">🧭 المبادئ الأساسية للتنفيذ</div>
+      <ul class="exam-steps">
+        <li>استخدام الـ Property: <code style="color:var(--accent1)">HVAC_TEMPERATURE_SET</code></li>
+        <li>تحديد النطاق (Area): استخدام الـ AreaId الصحيح (مثل مقعد السائق: ROW_1_LEFT).</li>
+        <li>التحكم الثنائي: استخدام <code>getProperty</code> للقراءة و <code>setProperty</code> للكتابة.</li>
+        <li>الأذونات: يتطلب إذن <code>android.car.permission.CONTROL_CAR_CLIMATE</code>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="exam-card">
+    <div class="exam-num">السيناريو ٣</div>
+    <div class="exam-q">🚪 التحكم المركزي في الأبواب (Central Locking Logic)</div>
+    <div class="exam-hint">
+      <div class="hint-title">🧭 المبادئ الأساسية للتنفيذ</div>
+      <ul class="exam-steps">
+        <li>استخدام الـ Property: <code style="color:var(--accent1)">DOOR_LOCK</code></li>
+        <li>التعامل مع المناطق المتعددة: استخدام <code>getAreaIds()</code> لتحديد كافة الأبواب المدعومة في السيارة.</li>
+        <li>التنفيذ التسلسلي: إرسال أوامر <code>setBooleanProperty</code> لكل باب بشكل منفصل.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="exam-card">
+    <div class="exam-num">السيناريو ٤</div>
+    <div class="exam-q">🔋 إدارة الطاقة في السيارات الكهربائية (EV Power Management)</div>
+    <div class="exam-hint">
+      <div class="hint-title">🧭 المبادئ الأساسية للتنفيذ</div>
+      <ul class="exam-steps">
+        <li>حساب النسب المئوية: استخدام <code>EV_BATTERY_LEVEL</code> مقسوماً على <code>EV_BATTERY_CAPACITY</code>.</li>
+        <li>مراقبة الشحن: استخدام <code>EV_CHARGE_PORT_CONNECTED</code> و <code>EV_BATTERY_INSTANTANEOUS_CHARGE_RATE</code>.</li>
+        <li>أفضل ممارسة: عرض البيانات كـ On-change لتجنب استهلاك البطارية عند عدم وجود تغيير.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="exam-card">
+    <div class="exam-num">السيناريو ٥</div>
+    <div class="exam-q">🔌 إضافة خصائص مخصصة (Custom Vendor Properties)</div>
+    <div class="exam-hint">
+      <div class="hint-title">🧭 خطوات التوسعة والاستمرارية</div>
+      <ul class="exam-steps">
+        <li>تحديد المعرف: استخدام نطاق الـ Vendor (0x21xxxxxx).</li>
+        <li>التعريف في الـ HAL: إضافة الإعدادات (Config) في كود الـ C++ (AIDL Interface).</li>
+        <li>الربط مع الـ Framework: الوصول للخاصية بنفس الـ ID من خلال الـ Java/Kotlin layer.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ SECTION 7 ═══════════════════════════════ -->
+<div class="section" id="s7">
+  <div class="section-header">
+    <div class="section-icon c1">🛡️</div>
+    <div>
+      <div class="section-title"><span class="tag tag-blue">الأداء</span> الأمن وتحسين استهلاك الموارد</div>
+      <div style="color:var(--text3); font-size:13px;">بناء نظام VHAL مستقر وآمن</div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card green">
+      <div class="card-title"><span class="dot dot-green"></span>إدارة الأذونات (Permissions)</div>
+      <p>يستخدم AAOS نظام أذونات صارم لحماية بيانات السيارة. لا يمكن للتطبيقات الوصول للـ VHAL دون تعريف الأذونات المناسبة في <code>AndroidManifest.xml</code>.</p>
+    </div>
+    <div class="card orange">
+      <div class="card-title"><span class="dot dot-orange"></span>كفاءة الـ Sampling Rate</div>
+      <p>طلب ترددات عالية جداً (مثلاً 100Hz+) لبيانات غير حرجة يؤدي لاختناق الـ Binder IPC واستهلاك البطارية. دايماً اختر أقل تردد يحقق تجربة مستخدم جيدة.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-blue"></span>أفضل الممارسات البرمجية</div>
+    <ul class="exam-steps" style="padding: 20px;">
+      <li style="margin-bottom:10px;"><strong>تحقق من الحالة (Status Check):</strong> لا تقم بمعالجة أي قيمة إذا كانت الحالة <code>UNAVAILABLE</code> أو <code>ERROR</code>.</li>
+      <li style="margin-bottom:10px;"><strong>إلغاء الاشتراك (Lifecycle):</strong> تأكد دايماً من استدعاء <code>unregisterCallback</code> عند إغلاق التطبيق أو الـ Activity لمنع تسريب الذاكرة (Memory Leaks).</li>
+      <li style="margin-bottom:10px;"><strong>التعامل مع التأخير (Latency):</strong> تذكر أن أوامر الـ VHAL قد تستغرق وقتاً للوصول للـ ECU الفعلي؛ صمم واجهتك لتكون responsive حتى في حالة التأخير.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ SECTION 8 ═══════════════════════════════ -->
+<div class="section" id="s8">
+  <div class="section-header">
+    <div class="section-icon c3">📡</div>
+    <div>
+      <div class="section-title"><span class="tag tag-purple">التشخيص</span> أدوات ADB والتشخيص المتقدم</div>
+      <div style="color:var(--text3); font-size:13px;">استكشاف الأخطاء ومحاكاة البيانات</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-blue"></span>أهم أوامر الـ ADB للمطورين</div>
+    <div class="code-wrap">
+      <span class="code-label">Terminal / Shell</span>
+      <pre><span class="cmt"># عرض الحالة الحالية لكل الـ Properties في الـ VHAL</span>
+adb shell dumpsys car_service --hal
+
+<span class="cmt"># محاكاة (Inject) قيمة جديدة لخاصية معينة (اختبار UI)</span>
+adb shell cmd car_service inject-vhal-event <span class="num">0x11600207</span> <span class="num">25.5</span>
+
+<span class="cmt"># عرض الـ Logs الخاصة بالتواصل مع الـ VHAL</span>
+adb logcat -s CarPropertyManager:V DefaultVehicleHal:V</pre>
+    </div>
+  </div>
+
+  <div class="alert info">
+    <span class="alert-icon">💡</span>
+    <div class="alert-body">
+      <div class="alert-title">استخدام الـ Kitchen Sink</div>
+      <p>تطبيق Kitchen Sink المتوفر في AOSP هو أداة لا غنى عنها لاختبار تكامل الـ VHAL مع النظام بشكل مرئي قبل البدء في كتابة كود تطبيقك الخاص.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ EXTRA TIPS ═══════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon c4">💎</div>
+    <div>
+      <div class="section-title"><span class="tag tag-green">Pro Tips</span> نصائح هندسية</div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card green">
+      <div class="card-title"><span class="dot dot-green"></span>✅ افعل دايماً</div>
+      <ul style="list-style:none;padding:0;">
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);">✔️ استخدم الـ Standard Properties كلما أمكن للـ Portability.</li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);">✔️ تعامل مع البيانات في Thread خلفي لتجنب تجميد الـ UI.</li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);">✔️ اختبر حالات الحواف (Edge Cases) مثل فصل البطارية أو فقدان الإشارة.</li>
+      </ul>
+    </div>
+    <div class="card red">
+      <div class="card-title"><span class="dot dot-red"></span>🚫 لا تعمل أبداً</div>
+      <ul style="list-style:none;padding:0;">
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);">✖️ لا تقم بعمل Polling (getProperty) داخل Loops سريعة.</li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);">✖️ لا تفترض أن الـ VHAL دايماً متاح (Handling Nulls).</li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);">✖️ لا تستخدم الـ VHAL لتخزين بيانات التطبيق الخاصة (للسيارة فقط).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div><!-- end wrapper -->
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="logo">VHAL <span>Reference</span></div>
+  <p>المرجع التقني المتكامل لمهندسي الأنظمة المدمجة في السيارات</p>
+  <p style="margin-top:8px;">تم الإعداد ليكون دليلاً شاملاً للمعايير الهندسية في AAOS</p>
+</footer>
+
+<script>
+// ── Intersection Observer for section animations
+const sections = document.querySelectorAll('.section');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); }});
+}, { threshold: 0.08 });
+sections.forEach(s => observer.observe(s));
+
+// ── Stagger arch boxes
+document.querySelectorAll('.arch-box').forEach((b,i) => {
+  b.style.animationDelay = (i * 0.07) + 's';
+});
+
+// ── Smooth scroll for nav
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    const target = document.querySelector(btn.getAttribute('href'));
+    if(target) { e.preventDefault(); target.scrollIntoView({behavior:'smooth', block:'start'}); }
+  });
+});
+
+// ── Animated counter for hero stats
+const counters = document.querySelectorAll('.stat-box .num');
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting) {
+      const el = e.target;
+      const text = el.textContent;
+      const target = parseInt(text);
+      if(isNaN(target)) return;
+      let current = 0;
+      const duration = 1500;
+      const startTime = performance.now();
+      
+      function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        current = Math.floor(progress * target);
+        el.textContent = current + (text.includes('+') ? '+' : '');
+        if (progress < 1) requestAnimationFrame(update);
+        else el.textContent = text;
+      }
+      requestAnimationFrame(update);
+      counterObserver.unobserve(el);
+    }
+  });
+}, {threshold: 0.5});
+counters.forEach(c => counterObserver.observe(c));
+</script>
+</body>
+</html>
