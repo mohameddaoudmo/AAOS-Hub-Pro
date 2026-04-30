@@ -1,0 +1,2138 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OTA Updates & A/B Partitions — ?????? ??????</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #060810;
+  --bg2:       #080c18;
+  --bg3:       #0c1220;
+  --surface:   #0e1628;
+  --surface2:  #121e38;
+  --border:    #1a2a50;
+  --border2:   #243660;
+
+  --lime:      #b8ff3a;
+  --lime-dim:  #8acc20;
+  --teal:      #00ffc8;
+  --teal-dim:  #00c99d;
+  --orange:    #ff8c42;
+  --orange-dim:#d4682a;
+  --red:       #ff4d6d;
+  --blue:      #3a9eff;
+  --violet:    #9b6dff;
+
+  --text:      #dce8ff;
+  --muted:     #7a93c4;
+  --dim:       #3d5480;
+
+  --code-bg:   #050810;
+  --font-body: 'Tajawal', sans-serif;
+  --font-code: 'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.85;
+  font-size: 16px;
+  overflow-x: hidden;
+}
+
+/* -- SCANLINE OVERLAY -- */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.04) 2px,
+    rgba(0,0,0,0.04) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ---------------------------------------
+   HERO
+--------------------------------------- */
+.hero {
+  position: relative;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 40px 60px;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 100% 80% at 50% -10%, rgba(184,255,58,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 10%  90%, rgba(0,255,200,0.05) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 50% at 90%  80%, rgba(255,77,109,0.05) 0%, transparent 50%);
+}
+
+/* Grid dots */
+.hero-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(184,255,58,0.15) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+}
+
+.hero-tag {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(184,255,58,0.08);
+  border: 1px solid rgba(184,255,58,0.3);
+  color: var(--lime);
+  padding: 6px 18px;
+  border-radius: 4px;
+  font-size: 11px;
+  letter-spacing: 3px;
+  font-weight: 700;
+  margin-bottom: 28px;
+  font-family: var(--font-code);
+}
+
+.hero-tag::before { content: '?'; font-size: 8px; }
+
+.hero h1 {
+  position: relative;
+  font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.h1-top {
+  display: block;
+  color: var(--lime);
+  text-shadow: 0 0 40px rgba(184,255,58,0.4);
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+.h1-sub {
+  display: block;
+  color: var(--text);
+  font-size: 0.55em;
+  font-weight: 400;
+  margin-top: 8px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+@keyframes glowPulse {
+  0%,100% { text-shadow: 0 0 30px rgba(184,255,58,0.3); }
+  50%      { text-shadow: 0 0 60px rgba(184,255,58,0.6), 0 0 100px rgba(184,255,58,0.2); }
+}
+
+.hero-desc {
+  position: relative;
+  color: var(--muted);
+  font-size: 1.05rem;
+  max-width: 680px;
+  margin: 16px auto 40px;
+}
+
+.hero-pills {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 40px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid;
+  transition: transform 0.2s;
+}
+.pill:hover { transform: translateY(-2px); }
+.pill-lime   { background: rgba(184,255,58,0.08); border-color: rgba(184,255,58,0.3); color: var(--lime); }
+.pill-teal   { background: rgba(0,255,200,0.08); border-color: rgba(0,255,200,0.3); color: var(--teal); }
+.pill-orange { background: rgba(255,140,66,0.08); border-color: rgba(255,140,66,0.3); color: var(--orange); }
+.pill-red    { background: rgba(255,77,109,0.08); border-color: rgba(255,77,109,0.3); color: var(--red); }
+.pill-blue   { background: rgba(58,158,255,0.08); border-color: rgba(58,158,255,0.3); color: var(--blue); }
+.pill-violet { background: rgba(155,109,255,0.08); border-color: rgba(155,109,255,0.3); color: var(--violet); }
+
+/* ---------------------------------------
+   NAV
+--------------------------------------- */
+.topnav {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: rgba(6,8,16,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+}
+
+.topnav-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 12px 0;
+  scrollbar-width: none;
+}
+.topnav-inner::-webkit-scrollbar { display: none; }
+
+.nav-logo {
+  font-family: var(--font-code);
+  font-size: 12px;
+  color: var(--lime);
+  white-space: nowrap;
+  padding-left: 0;
+  margin-left: 0;
+  margin-left: auto;
+  order: 99;
+}
+
+.topnav a {
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 4px;
+  white-space: nowrap;
+  transition: all 0.18s;
+  font-family: var(--font-code);
+  letter-spacing: 0.5px;
+}
+.topnav a:hover {
+  color: var(--lime);
+  background: rgba(184,255,58,0.07);
+}
+
+/* ---------------------------------------
+   LAYOUT
+--------------------------------------- */
+.wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 70px 40px;
+}
+
+section.chapter { margin-bottom: 90px; }
+
+/* -- Chapter Header -- */
+.ch-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 42px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ch-num {
+  font-family: var(--font-code);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  padding: 12px 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cn-lime   { background: rgba(184,255,58,0.08);  color: var(--lime);   border: 1px solid rgba(184,255,58,0.25); }
+.cn-teal   { background: rgba(0,255,200,0.08);   color: var(--teal);   border: 1px solid rgba(0,255,200,0.25); }
+.cn-orange { background: rgba(255,140,66,0.08);  color: var(--orange); border: 1px solid rgba(255,140,66,0.25); }
+.cn-red    { background: rgba(255,77,109,0.08);  color: var(--red);    border: 1px solid rgba(255,77,109,0.25); }
+.cn-blue   { background: rgba(58,158,255,0.08);  color: var(--blue);   border: 1px solid rgba(58,158,255,0.25); }
+.cn-violet { background: rgba(155,109,255,0.08); color: var(--violet); border: 1px solid rgba(155,109,255,0.25); }
+.cn-teal2  { background: rgba(0,201,157,0.08);   color: var(--teal-dim); border: 1px solid rgba(0,201,157,0.25); }
+
+.ch-title { font-size: 2rem; font-weight: 800; color: var(--text); }
+.ch-title small {
+  display: block;
+  font-family: var(--font-code);
+  font-size: 0.42em;
+  font-weight: 400;
+  color: var(--dim);
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
+
+/* -- Prose -- */
+p { color: var(--muted); margin-bottom: 18px; line-height: 1.9; }
+h3 { font-size: 1.25rem; font-weight: 700; color: var(--text); margin: 32px 0 14px; }
+h4 { font-size: 1.05rem; font-weight: 600; color: var(--lime); margin: 22px 0 10px; font-family: var(--font-code); }
+strong { color: var(--text); }
+code {
+  background: rgba(184,255,58,0.08);
+  color: var(--lime);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-code);
+  font-size: 0.87em;
+}
+
+/* ---------------------------------------
+   CARDS
+--------------------------------------- */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 18px; margin: 24px 0; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin: 24px 0; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.25s, transform 0.25s;
+}
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+}
+.cl::after { background: var(--lime); box-shadow: 0 0 12px var(--lime); }
+.ct::after { background: var(--teal); box-shadow: 0 0 12px var(--teal); }
+.co::after { background: var(--orange); box-shadow: 0 0 12px var(--orange); }
+.cr::after { background: var(--red); box-shadow: 0 0 12px var(--red); }
+.cb::after { background: var(--blue); box-shadow: 0 0 12px var(--blue); }
+.cv::after { background: var(--violet); box-shadow: 0 0 12px var(--violet); }
+
+.card-ico { font-size: 1.8rem; margin-bottom: 12px; }
+.card-title { font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+.card-body { font-size: 0.9rem; color: var(--muted); }
+
+/* ---------------------------------------
+   CODE BLOCKS
+--------------------------------------- */
+.code-wrap {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 22px 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.code-wrap::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--lime), transparent 60%);
+}
+
+.code-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  background: rgba(255,255,255,0.025);
+  border-bottom: 1px solid var(--border);
+}
+
+.code-file {
+  font-family: var(--font-code);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+}
+
+.dots { display: flex; gap: 6px; }
+.d { width: 10px; height: 10px; border-radius: 50%; }
+.d-r { background: #ff5f57; }
+.d-y { background: #febc2e; }
+.d-g { background: #28c840; }
+
+pre {
+  padding: 22px 24px;
+  overflow-x: auto;
+  font-family: var(--font-code);
+  font-size: 13px;
+  line-height: 1.75;
+  color: #b8cce8;
+}
+
+/* Syntax tokens */
+.ck { color: #b8ff3a; }   /* key / keyword */
+.cs { color: #88ffcc; }   /* string */
+.cc { color: #3d5a7a; font-style:italic; } /* comment */
+.cn2{ color: #ffb347; }   /* number */
+.cp { color: #ff8c42; }   /* param/special */
+.ct2{ color: #ff6b6b; }   /* type */
+.cf { color: #7dd3fc; }   /* function */
+.cm { color: #e0aaff; }   /* method call */
+
+/* ---------------------------------------
+   CALLOUTS
+--------------------------------------- */
+.callout {
+  display: flex;
+  gap: 16px;
+  padding: 18px 22px;
+  border-radius: 8px;
+  margin: 24px 0;
+}
+.callout-ico { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+.callout-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 4px; }
+.callout p { font-size: 0.89rem; margin: 0; }
+
+.cal-lime   { background: rgba(184,255,58,0.06); border: 1px solid rgba(184,255,58,0.2); }
+.cal-lime .callout-title   { color: var(--lime); }
+.cal-teal   { background: rgba(0,255,200,0.06); border: 1px solid rgba(0,255,200,0.2); }
+.cal-teal .callout-title   { color: var(--teal); }
+.cal-orange { background: rgba(255,140,66,0.06); border: 1px solid rgba(255,140,66,0.2); }
+.cal-orange .callout-title { color: var(--orange); }
+.cal-red    { background: rgba(255,77,109,0.06); border: 1px solid rgba(255,77,109,0.2); }
+.cal-red .callout-title    { color: var(--red); }
+
+/* ---------------------------------------
+   PARTITION DIAGRAM
+--------------------------------------- */
+.partition-diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  margin: 28px 0;
+  overflow-x: auto;
+}
+
+.pd-label {
+  font-family: var(--font-code);
+  font-size: 11px;
+  color: var(--dim);
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+
+.pd-row {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 10px;
+  align-items: stretch;
+  min-width: 600px;
+}
+
+.pd-cell {
+  border-radius: 6px;
+  padding: 14px 12px;
+  text-align: center;
+  font-size: 12px;
+  font-family: var(--font-code);
+  font-weight: 600;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  position: relative;
+  transition: transform 0.2s;
+  cursor: default;
+}
+.pd-cell:hover { transform: scaleY(1.04); }
+
+.pd-size {
+  font-size: 10px;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+/* Partition colors */
+.pc-boot  { background: rgba(184,255,58,0.12); border: 1px solid rgba(184,255,58,0.35); color: var(--lime); flex: 1; }
+.pc-sys   { background: rgba(0,255,200,0.12); border: 1px solid rgba(0,255,200,0.35); color: var(--teal); flex: 4; }
+.pc-vnd   { background: rgba(155,109,255,0.12); border: 1px solid rgba(155,109,255,0.35); color: var(--violet); flex: 3; }
+.pc-data  { background: rgba(58,158,255,0.12); border: 1px solid rgba(58,158,255,0.35); color: var(--blue); flex: 5; }
+.pc-misc  { background: rgba(255,140,66,0.12); border: 1px solid rgba(255,140,66,0.35); color: var(--orange); flex: 1; }
+.pc-meta  { background: rgba(255,77,109,0.12); border: 1px solid rgba(255,77,109,0.35); color: var(--red); flex: 1; }
+.pc-a     { background: rgba(184,255,58,0.08); border: 2px solid rgba(184,255,58,0.5); color: var(--lime); }
+.pc-b     { background: rgba(0,255,200,0.08); border: 2px solid rgba(0,255,200,0.4); color: var(--teal); }
+
+.active-badge {
+  position: absolute;
+  top: -8px;
+  right: -4px;
+  background: var(--lime);
+  color: #000;
+  font-size: 8px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 1px;
+}
+
+.pd-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.leg-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.leg-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ---------------------------------------
+   OTA FLOW DIAGRAM
+--------------------------------------- */
+.flow-diagram {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 28px 0;
+}
+
+.flow-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.flow-node {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 18px 16px;
+  text-align: center;
+  position: relative;
+  transition: background 0.2s;
+}
+.flow-node:hover { background: var(--surface2); }
+
+.fn-ico  { font-size: 1.6rem; margin-bottom: 8px; }
+.fn-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.fn-sub   { font-size: 11px; color: var(--muted); font-family: var(--font-code); }
+
+.flow-arrow-h {
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lime);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.flow-arrow-v {
+  text-align: center;
+  color: var(--lime);
+  font-size: 1rem;
+  padding: 6px;
+}
+
+/* ---------------------------------------
+   TIMELINE
+--------------------------------------- */
+.timeline {
+  position: relative;
+  margin: 28px 0;
+  padding-right: 24px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--lime), var(--teal), var(--orange));
+}
+
+.tl-item {
+  position: relative;
+  padding: 0 30px 32px 0;
+}
+
+.tl-item::before {
+  content: '';
+  position: absolute;
+  right: -5px;
+  top: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--bg);
+}
+
+.tl-lime::before   { background: var(--lime); box-shadow: 0 0 8px var(--lime); }
+.tl-teal::before   { background: var(--teal); box-shadow: 0 0 8px var(--teal); }
+.tl-orange::before { background: var(--orange); box-shadow: 0 0 8px var(--orange); }
+.tl-red::before    { background: var(--red); box-shadow: 0 0 8px var(--red); }
+.tl-blue::before   { background: var(--blue); box-shadow: 0 0 8px var(--blue); }
+.tl-violet::before { background: var(--violet); box-shadow: 0 0 8px var(--violet); }
+
+.tl-tag {
+  font-family: var(--font-code);
+  font-size: 10px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.tl-lime .tl-tag   { color: var(--lime); }
+.tl-teal .tl-tag   { color: var(--teal); }
+.tl-orange .tl-tag { color: var(--orange); }
+.tl-red .tl-tag    { color: var(--red); }
+.tl-blue .tl-tag   { color: var(--blue); }
+.tl-violet .tl-tag { color: var(--violet); }
+
+.tl-title { font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.tl-body  { font-size: 0.9rem; color: var(--muted); }
+
+/* ---------------------------------------
+   TABLE
+--------------------------------------- */
+.tbl-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin: 24px 0;
+}
+
+table { width: 100%; border-collapse: collapse; }
+
+thead tr { background: rgba(184,255,58,0.05); }
+
+th {
+  padding: 14px 20px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--lime);
+  letter-spacing: 1.5px;
+  font-family: var(--font-code);
+  border-bottom: 1px solid var(--border);
+}
+
+td {
+  padding: 13px 20px;
+  font-size: 13.5px;
+  color: var(--muted);
+  border-bottom: 1px solid rgba(26,42,80,0.5);
+  vertical-align: top;
+}
+
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(184,255,58,0.02); }
+
+/* ---------------------------------------
+   BADGE
+--------------------------------------- */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-code);
+  letter-spacing: 0.5px;
+}
+.bl  { background: rgba(184,255,58,0.1); color: var(--lime); }
+.bt  { background: rgba(0,255,200,0.1); color: var(--teal); }
+.bo  { background: rgba(255,140,66,0.1); color: var(--orange); }
+.br  { background: rgba(255,77,109,0.1); color: var(--red); }
+.bb  { background: rgba(58,158,255,0.1); color: var(--blue); }
+.bv  { background: rgba(155,109,255,0.1); color: var(--violet); }
+
+/* ---------------------------------------
+   FEATURE LIST
+--------------------------------------- */
+.feat-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+.feat-list li {
+  display: flex;
+  gap: 10px;
+  font-size: 0.92rem;
+  color: var(--muted);
+  align-items: flex-start;
+}
+.feat-list li::before {
+  content: '›';
+  color: var(--lime);
+  font-size: 1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ---------------------------------------
+   STATE MACHINE
+--------------------------------------- */
+.state-machine {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 28px;
+  margin: 24px 0;
+}
+
+.sm-states {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+
+.sm-state {
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-family: var(--font-code);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  min-width: 140px;
+}
+
+.ss-idle    { background: rgba(184,255,58,0.1); border: 1px solid rgba(184,255,58,0.3); color: var(--lime); }
+.ss-check   { background: rgba(58,158,255,0.1); border: 1px solid rgba(58,158,255,0.3); color: var(--blue); }
+.ss-dl      { background: rgba(155,109,255,0.1); border: 1px solid rgba(155,109,255,0.3); color: var(--violet); }
+.ss-verify  { background: rgba(0,255,200,0.1); border: 1px solid rgba(0,255,200,0.3); color: var(--teal); }
+.ss-apply   { background: rgba(255,140,66,0.1); border: 1px solid rgba(255,140,66,0.3); color: var(--orange); }
+.ss-reboot  { background: rgba(255,77,109,0.1); border: 1px solid rgba(255,77,109,0.3); color: var(--red); }
+.ss-fin     { background: rgba(184,255,58,0.15); border: 2px solid var(--lime); color: var(--lime); }
+
+.sm-arrow {
+  color: var(--dim);
+  font-size: 1rem;
+}
+
+/* ---------------------------------------
+   DIFF BLOCK
+--------------------------------------- */
+.diff-wrap {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 20px 0;
+}
+
+.diff-hdr {
+  padding: 10px 18px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-code);
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.diff-hdr span { color: var(--lime); }
+
+.diff-line {
+  padding: 3px 18px;
+  font-family: var(--font-code);
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.dl-add { background: rgba(184,255,58,0.06); color: #b8ff3a; }
+.dl-del { background: rgba(255,77,109,0.06); color: #ff4d6d; }
+.dl-ctx { color: var(--dim); }
+
+/* ---------------------------------------
+   FOOTER
+--------------------------------------- */
+footer {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  text-align: center;
+  padding: 40px;
+}
+
+footer p {
+  font-family: var(--font-code);
+  font-size: 12px;
+  color: var(--dim);
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+footer span { color: var(--lime); }
+
+/* ---------------------------------------
+   SCROLLBAR
+--------------------------------------- */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--lime); }
+
+/* ---------------------------------------
+   RESPONSIVE
+--------------------------------------- */
+@media (max-width: 768px) {
+  .hero, .wrap { padding: 50px 20px 40px; }
+  .topnav { padding: 0 20px; }
+  .ch-title { font-size: 1.5rem; }
+  .sm-states { flex-direction: column; align-items: stretch; }
+  .sm-state { min-width: auto; }
+}
+</style>
+<link rel="stylesheet" href="../styles/theme.css">
+<script>var s=localStorage.getItem('aaos_theme')||'dark';document.documentElement.setAttribute('data-theme',s);</script></head>
+<body>
+
+<!-- ---------- HERO ---------- -->
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-dots"></div>
+
+  <div class="hero-tag">ANDROID INTERNALS · SYSTEM UPDATE</div>
+
+  <h1>
+    <span class="h1-top">OTA Updates & A/B Partitions</span>
+    <span class="h1-sub">?????? ?????? ?? ???????? ???????? ????? ?????? Update Engine</span>
+  </h1>
+
+  <p class="hero-desc">??? ????? ????????? ???? ?????? ?? ????? ??? A/B ?A-only? ??? ???? OTA server ?????? ?? ????? ???.</p>
+
+  <div class="hero-pills">
+    <div class="pill pill-lime">?? Update Engine</div>
+    <div class="pill pill-teal">?? A/B Partitions</div>
+    <div class="pill pill-orange">?? OTA Packages</div>
+    <div class="pill pill-red">?? Verified Boot</div>
+    <div class="pill pill-blue">? Seamless Updates</div>
+    <div class="pill pill-violet">??? Rollback Protection</div>
+  </div>
+</header>
+
+<!-- ---------- NAV ---------- -->
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a href="#s1">????????</a>
+    <a href="#s2">A/B Partitions</a>
+    <a href="#s3">Update Engine</a>
+    <a href="#s4">OTA Packages</a>
+    <a href="#s5">Verified Boot</a>
+    <a href="#s6">OTA Server</a>
+    <a href="#s7">Rollback</a>
+    <a href="#s8">Advanced</a>
+    <div class="nav-logo">OTA_GUIDE.v3</div>
+  </div>
+</nav>
+
+<!-- ---------- CONTENT ---------- -->
+<main class="wrap">
+
+  <!-- --- CHAPTER 1: FUNDAMENTALS --- -->
+  <section class="chapter" id="s1">
+    <div class="ch-head">
+      <div class="ch-num cn-lime">01 // INTRO</div>
+      <div>
+        <div class="ch-title">
+          ?? ?? OTA Updates?
+          <small>// Over-The-Air Update Fundamentals</small>
+        </div>
+      </div>
+    </div>
+
+    <p>
+      <strong>OTA (Over-The-Air)</strong> ?? ???? ????? ???? ????????? ??? ???????? ???????? ???? ?? ????? ???? ???????? ?? ????? ??? ??????. ?? ??? ?? ???? "Check for Update" ??? ?? ??????? ????? — ?? ??????? ?????? ????? ?????? ?? ????? ??????.
+    </p>
+
+    <div class="grid3">
+      <div class="card cl">
+        <div class="card-ico">??</div>
+        <div class="card-title">Full OTA</div>
+        <div class="card-body">???? ????? ????? ??? ?? ??? partitions ???????. ????? ???? (500MB–3GB) ????? ????? ?? ?? ?????.</div>
+      </div>
+      <div class="card ct">
+        <div class="card-ico">??</div>
+        <div class="card-title">Incremental OTA</div>
+        <div class="card-body">??? ??? diff (?????) ??? ??????? ?????? ???????. ????? ???? (20–200MB)? ???? ????? ?? data.</div>
+      </div>
+      <div class="card co">
+        <div class="card-ico">?</div>
+        <div class="card-title">Streaming OTA</div>
+        <div class="card-body">????? ??????? ????? ??????? ???? (Pixel 3+). ?? ???? ?????? ????? ??????.</div>
+      </div>
+    </div>
+
+    <h3>???? ???? ??????? ??? ?????</h3>
+    <div class="timeline">
+      <div class="tl-item tl-lime">
+        <div class="tl-tag">ANDROID 1.0 — 2008</div>
+        <div class="tl-title">Recovery-based OTA</div>
+        <div class="tl-body">??????? ????? ??????? ?????? ?????? ?? Recovery? ???? ?????? ??? ??? system partition? ?? ?????? ??? ?????. ???????: ?? ??? = brick!</div>
+      </div>
+      <div class="tl-item tl-teal">
+        <div class="tl-tag">ANDROID 7.0 (NOUGAT) — 2016</div>
+        <div class="tl-title">A/B Seamless Updates</div>
+        <div class="tl-body">???? ??????. ?????? ???? ?????? ?? ??? partitions. ??????? ???? ?????? ?? ??? background ??? ?????? ??? ??????. ????? ???? ???? ???.</div>
+      </div>
+      <div class="tl-item tl-orange">
+        <div class="tl-tag">ANDROID 8.0 (OREO) — 2017</div>
+        <div class="tl-title">Project Treble</div>
+        <div class="tl-body">??? ??? vendor partition ?? ??? system. ????????? ?????? ????? ??? ?????? ???????.</div>
+      </div>
+      <div class="tl-item tl-red">
+        <div class="tl-tag">ANDROID 10 — 2019</div>
+        <div class="tl-title">Dynamic Partitions</div>
+        <div class="tl-body">??? system, vendor, product ???? partitions ????????? ????? ??????? ?????. ????? ???? ?? ????? ???????.</div>
+      </div>
+      <div class="tl-item tl-blue">
+        <div class="tl-tag">ANDROID 11 — 2020</div>
+        <div class="tl-title">Virtual A/B</div>
+        <div class="tl-body">A/B ???? ?????? ???????! ?????? snapshots ????? ??? ?????? ???????. ???? ?? ??? ????.</div>
+      </div>
+      <div class="tl-item tl-violet">
+        <div class="tl-tag">ANDROID 12+ — 2021</div>
+        <div class="tl-title">Compression + Updatable APEX</div>
+        <div class="tl-body">??? ??? snapshots ?????? ????? + ????? ?????? ??? system ???? ????? ??? APEX modules.</div>
+      </div>
+    </div>
+
+    <div class="callout cal-lime">
+      <div class="callout-ico">??</div>
+      <div>
+        <div class="callout-title">??? OTA ???? ?????</div>
+        <p>??????? ??????? Android ?? ??????. ??? OTA ?? ??????? ??????? ?????? ??????? ?????? ?????? ??????? ??? ???? ????. ????? ????? ???? = ?????? ????? ????? ?????.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- --- CHAPTER 2: A/B PARTITIONS --- -->
+  <section class="chapter" id="s2">
+    <div class="ch-head">
+      <div class="ch-num cn-teal">02 // A/B</div>
+      <div>
+        <div class="ch-title">
+          A/B Partition System
+          <small>// Seamless Updates Architecture</small>
+        </div>
+      </div>
+    </div>
+
+    <p>??? A/B partition system ?? ??? ????? ?? Android internals ?? ??????? ???????. ?????? ????? ??????: ?????? ???? <strong>??????</strong> ?? ?? ??? critical partitions — ???? <code>_a</code> ????? <code>_b</code>. ?????? ????? ???? ???????? "?????".</p>
+
+    <h3>???? ??? Storage — A/B ????? A-only</h3>
+
+    <div class="partition-diagram">
+      <div class="pd-label">// TRADITIONAL A-ONLY LAYOUT</div>
+      <div class="pd-row">
+        <div class="pd-cell pc-boot" style="flex:1">bootloader<div class="pd-size">~16MB</div></div>
+        <div class="pd-cell pc-boot" style="flex:1">boot<div class="pd-size">~64MB</div></div>
+        <div class="pd-cell pc-sys" style="flex:5">system<div class="pd-size">~2GB</div></div>
+        <div class="pd-cell pc-vnd" style="flex:3">vendor<div class="pd-size">~1GB</div></div>
+        <div class="pd-cell pc-misc" style="flex:1">recovery<div class="pd-size">~32MB</div></div>
+        <div class="pd-cell pc-data" style="flex:6">userdata<div class="pd-size">~56GB</div></div>
+      </div>
+      <div class="pd-label" style="margin-top:20px;">// A/B SEAMLESS LAYOUT</div>
+      <div class="pd-row">
+        <div class="pd-cell pc-boot" style="flex:1">bootloader<div class="pd-size">~16MB</div></div>
+        <div class="pd-cell pc-a" style="flex:1.5">boot_a <div class="active-badge">ACTIVE</div><div class="pd-size">~64MB</div></div>
+        <div class="pd-cell pc-b" style="flex:1.5">boot_b<div class="pd-size">~64MB</div></div>
+        <div class="pd-cell pc-a" style="flex:3">system_a<div class="pd-size">~2GB</div></div>
+        <div class="pd-cell pc-b" style="flex:3">system_b<div class="pd-size">~2GB</div></div>
+        <div class="pd-cell pc-meta" style="flex:0.8">misc<div class="pd-size">~4MB</div></div>
+        <div class="pd-cell pc-data" style="flex:5">userdata<div class="pd-size">~50GB</div></div>
+      </div>
+      <div class="pd-legend">
+        <div class="leg-item"><div class="leg-dot" style="background:rgba(184,255,58,0.5)"></div>Slot A (Active)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:rgba(0,255,200,0.5)"></div>Slot B (Inactive/Update Target)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:rgba(58,158,255,0.5)"></div>Shared (????? ??? ??? slots)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:rgba(255,77,109,0.5)"></div>Metadata Partition</div>
+      </div>
+    </div>
+
+    <h3>??? Partitions ???? ??????? ?? A/B</h3>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Partition</th>
+            <th>A/B?</th>
+            <th>?????</th>
+            <th>????? ????????</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>boot</code></td>
+            <td><span class="badge bl">???</span></td>
+            <td>Kernel + initramfs. ??? ?? ????? ??? ??? bootloader</td>
+            <td>32–128 MB</td>
+          </tr>
+          <tr>
+            <td><code>system</code></td>
+            <td><span class="badge bl">???</span></td>
+            <td>Android framework, apps ??????, ?????? Java</td>
+            <td>1–4 GB</td>
+          </tr>
+          <tr>
+            <td><code>vendor</code></td>
+            <td><span class="badge bl">???</span></td>
+            <td>Drivers, HALs, firmware ???????</td>
+            <td>500MB–2GB</td>
+          </tr>
+          <tr>
+            <td><code>product</code></td>
+            <td><span class="badge bl">???</span></td>
+            <td>Apps ?????? ??? OEM (Google, Samsung, etc.)</td>
+            <td>100MB–2GB</td>
+          </tr>
+          <tr>
+            <td><code>dtbo</code></td>
+            <td><span class="badge bl">???</span></td>
+            <td>Device Tree Blob Overlay ??? hardware</td>
+            <td>~8 MB</td>
+          </tr>
+          <tr>
+            <td><code>userdata</code></td>
+            <td><span class="badge br">??</span></td>
+            <td>?????? ???????? — ?? ???? ????? ?? OTA</td>
+            <td>???? ??? storage</td>
+          </tr>
+          <tr>
+            <td><code>misc</code></td>
+            <td><span class="badge br">??</span></td>
+            <td>????? ??? bootloader ?OS (update status)</td>
+            <td>~4 MB</td>
+          </tr>
+          <tr>
+            <td><code>metadata</code></td>
+            <td><span class="badge br">??</span></td>
+            <td>??????? ??? Dynamic Partitions ?slot info</td>
+            <td>~16 MB</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>??? ???? ??? Slot ??????</h3>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">adb shell — Slot Detection Commands</div>
+      </div>
+      <pre><span class="cc"># ????? ??? slot ??????</span>
+<span class="cf">adb shell</span> getprop ro.boot.slot_suffix
+<span class="cc"># Output: _a  ??  _b</span>
+
+<span class="cc"># ??????? ????? ?? ??? slots</span>
+<span class="cf">adb shell</span> bootctl get-current-slot
+<span class="cc"># Output: 0 (???? _a) ?? 1 (???? _b)</span>
+
+<span class="cc"># ???? ?? slot</span>
+<span class="cf">adb shell</span> bootctl get-slot-info 0
+<span class="cc"># Slot 0: bootable=yes, successful=yes, tries_remaining=7</span>
+
+<span class="cf">adb shell</span> bootctl get-slot-info 1
+<span class="cc"># Slot 1: bootable=yes, successful=no, tries_remaining=0</span>
+
+<span class="cc"># ????? switch ??? slot ?????? (??????? ???)</span>
+<span class="cf">adb shell</span> bootctl set-active-boot-slot 1</pre>
+    </div>
+
+    <h3>Virtual A/B — ????? ?????? (Android 11+)</h3>
+
+    <p>??????? ??????? ?? A/B ?????????: ?????? ???????. ???? 64GB ????? 8GB ?????? ??? slot ??????!</p>
+
+    <div class="grid2">
+      <div class="card cl">
+        <div class="card-ico">??</div>
+        <div class="card-title">Traditional A/B Problem</div>
+        <ul class="feat-list">
+          <li>?????? ??????? ?? system + vendor + boot</li>
+          <li>????? ?????? 4–8GB ????? ?????</li>
+          <li>??????? ?????? ??? ?? ???? ?????</li>
+        </ul>
+      </div>
+      <div class="card ct">
+        <div class="card-ico">?</div>
+        <div class="card-title">Virtual A/B Solution</div>
+        <ul class="feat-list">
+          <li>slot ???? ????? + snapshots ????? ?? userdata</li>
+          <li>??? snapshots ????? ??? ??????? ??????</li>
+          <li>????? 4–8GB ?? ??????? ????????</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">Virtual A/B — ??? ???? dm-snapshot</div>
+      </div>
+      <pre><span class="cc">-----------------------------------------------------------</span>
+<span class="cc">             VIRTUAL A/B — UPDATE FLOW</span>
+<span class="cc">-----------------------------------------------------------</span>
+
+<span class="cc">1. ??? ??????? — ??? system partition ???? ??????:</span>
+   <span class="cs">[system partition] --read--? Android OS</span>
+
+<span class="cc">2. ????? ??????? — ??? ????? snapshot ?? userdata:</span>
+   <span class="cs">[system partition]  --read--? Android OS (????? ????)</span>
+   <span class="cs">[system_b snapshot] ?--write-- update_engine (????? ?? ???????)</span>
+   <span class="cs">   +- stored in: /data/gsi/</span>
+
+<span class="cc">3. ??? ??????? — ??? snapshot ???? ?????? ??????:</span>
+   <span class="ck">device mapper</span> ???? [system partition] + [snapshot]
+   
+   <span class="cs">[snapshot merged] --read--? Android OS ?????? ?</span>
+   
+<span class="cc">4. ??? ??????? ?????? — merge ?????:</span>
+   <span class="cs">[system partition] ? merged snapshot data</span>
+   <span class="cs">[snapshot deleted] — ???? ??????? ?</span></pre>
+    </div>
+  </section>
+
+  <!-- --- CHAPTER 3: UPDATE ENGINE --- -->
+  <section class="chapter" id="s3">
+    <div class="ch-head">
+      <div class="ch-num cn-orange">03 // ENGINE</div>
+      <div>
+        <div class="ch-title">
+          Update Engine
+          <small>// update_engine daemon — ????? ??????</small>
+        </div>
+      </div>
+    </div>
+
+    <p>
+      <code>update_engine</code> ?? ??? daemon ??????? ?? ?? ???: ????? ??????? ?????? ?? ???????? ????? ??? delta? ?????? ??? slots. ??? ?? C++ ?????? ?? system service ??? Android 7.
+    </p>
+
+    <h3>?????? Update Engine ????????</h3>
+
+    <div class="grid2">
+      <div class="card cl">
+        <div class="card-ico">??</div>
+        <div class="card-title">UpdateAttempter</div>
+        <div class="card-body">??????? ???????. ???? state machine ?????? ?? "idle" ?? "updated". ?????? ?? ?? ???????? ??????.</div>
+      </div>
+      <div class="card ct">
+        <div class="card-ico">??</div>
+        <div class="card-title">HttpFetcher</div>
+        <div class="card-body">????? ?????? ??? HTTP/HTTPS ?? ??? resume? range requests? ????? ?? ??? bandwidth.</div>
+      </div>
+      <div class="card co">
+        <div class="card-ico">??</div>
+        <div class="card-title">PayloadVerifier</div>
+        <div class="card-body">?????? ?? ????? ?????? ?????? RSA ????? ?? ??? system. ?? ????? = ?? ?????.</div>
+      </div>
+      <div class="card cr">
+        <div class="card-ico">??</div>
+        <div class="card-title">DeltaPerformer</div>
+        <div class="card-body">????? ?????? ??? patch ??? ????? ??? blocks. ???? COPY, ZERO, REPLACE, BSDIFF, PUFFDIFF.</div>
+      </div>
+      <div class="card cb">
+        <div class="card-ico">??</div>
+        <div class="card-title">BootControlInterface</div>
+        <div class="card-body">?????? ?? ??? slots ??? HAL. ???? ??? active slot? ????? ?? bootable/unbootable flags.</div>
+      </div>
+      <div class="card cv">
+        <div class="card-ico">??</div>
+        <div class="card-title">PrefsInterface</div>
+        <div class="card-body">????? ???? ??????? ??? ??? disk. ?? ?????? ????? ????? ???????? ???? ?? ??? ??????.</div>
+      </div>
+    </div>
+
+    <h3>State Machine — ???? ???? ???????</h3>
+
+    <div class="state-machine">
+      <div class="sm-states">
+        <div class="sm-state ss-idle">??<br>IDLE<br><small style="font-size:10px;opacity:0.7">??????</small></div>
+        <div class="sm-arrow">?</div>
+        <div class="sm-state ss-check">??<br>CHECKING_FOR_UPDATE<br><small style="font-size:10px;opacity:0.7">??? ???????</small></div>
+        <div class="sm-arrow">?</div>
+        <div class="sm-state ss-dl">??<br>DOWNLOADING<br><small style="font-size:10px;opacity:0.7">????? ??????</small></div>
+        <div class="sm-arrow">?</div>
+        <div class="sm-state ss-verify">?<br>VERIFYING<br><small style="font-size:10px;opacity:0.7">??? ??? hash</small></div>
+        <div class="sm-arrow">?</div>
+        <div class="sm-state ss-apply">??<br>FINALIZING<br><small style="font-size:10px;opacity:0.7">????? ??? delta</small></div>
+        <div class="sm-arrow">?</div>
+        <div class="sm-state ss-reboot">??<br>NEED_REBOOT<br><small style="font-size:10px;opacity:0.7">???? ???????</small></div>
+        <div class="sm-arrow">?</div>
+        <div class="sm-state ss-fin">??<br>UPDATED_NEED_REBOOT<br><small style="font-size:10px;opacity:0.7">????? ?</small></div>
+      </div>
+    </div>
+
+    <h3>update_engine — AIDL Interface</h3>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">system/update_engine/binder_bindings/android/os/IUpdateEngine.aidl</div>
+      </div>
+      <pre><span class="cc">// AIDL interface — ??? ?????? Android Settings ?? update_engine</span>
+<span class="ck">interface</span> <span class="ct2">IUpdateEngine</span> {
+  <span class="cc">// ??? ??????? — ????? URL ?????? ??????</span>
+  <span class="ck">void</span> <span class="cf">applyPayload</span>(
+    <span class="ck">in</span> <span class="ct2">String</span> url,
+    <span class="ck">in</span> <span class="ct2">long</span>   payloadOffset,
+    <span class="ck">in</span> <span class="ct2">long</span>   payloadSize,
+    <span class="ck">in</span> <span class="ct2">String</span>[] headerKeyValuePairs
+  );
+
+  <span class="cc">// ????? ??????? ??????</span>
+  <span class="ck">void</span> <span class="cf">cancel</span>();
+
+  <span class="cc">// ??????? ?? ????? ??????</span>
+  <span class="ck">void</span> <span class="cf">rollback</span>();
+
+  <span class="cc">// ??? callback ??????? ??????</span>
+  <span class="ck">void</span> <span class="cf">bind</span>(<span class="ck">in</span> <span class="ct2">IUpdateEngineCallback</span> callback);
+  <span class="ck">void</span> <span class="cf">unbind</span>(<span class="ck">in</span> <span class="ct2">IUpdateEngineCallback</span> callback);
+
+  <span class="cc">// ????? payload ?? local storage</span>
+  <span class="ck">void</span> <span class="cf">applyPayloadFd</span>(
+    <span class="ck">in</span> <span class="ct2">ParcelFileDescriptor</span> pfd,
+    <span class="ck">in</span> <span class="ct2">long</span> payloadOffset,
+    <span class="ck">in</span> <span class="ct2">long</span> payloadSize,
+    <span class="ck">in</span> <span class="ct2">String</span>[] headerKeyValuePairs
+  );
+}</pre>
+    </div>
+
+    <h3>??????? Update Engine ?? ????? Android (Kotlin)</h3>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">SystemUpdateManager.kt — ????? OTA ?? ??? App</div>
+      </div>
+      <pre><span class="ck">import</span> android.os.UpdateEngine
+<span class="ck">import</span> android.os.UpdateEngineCallback
+
+<span class="ck">class</span> <span class="ct2">SystemUpdateManager</span>(
+  <span class="ck">private val</span> context: Context
+) {
+  <span class="ck">private val</span> updateEngine = <span class="cm">UpdateEngine</span>()
+
+  <span class="cc">// Callback ??????? ???????</span>
+  <span class="ck">private val</span> callback = <span class="ck">object</span> : <span class="ct2">UpdateEngineCallback</span>() {
+
+    <span class="ck">override fun</span> <span class="cf">onStatusUpdate</span>(status: <span class="ct2">Int</span>, percent: <span class="ct2">Float</span>) {
+      <span class="ck">val</span> statusName = <span class="ck">when</span>(status) {
+        UpdateEngine.UpdateStatusConstants.<span class="cp">IDLE</span>                    -> <span class="cs">"?? ?? ????????"</span>
+        UpdateEngine.UpdateStatusConstants.<span class="cp">CHECKING_FOR_UPDATE</span>    -> <span class="cs">"?? ??? ?????????"</span>
+        UpdateEngine.UpdateStatusConstants.<span class="cp">UPDATE_AVAILABLE</span>       -> <span class="cs">"?? ????? ????"</span>
+        UpdateEngine.UpdateStatusConstants.<span class="cp">DOWNLOADING</span>            -> <span class="cs">"?? ???? ??????? ${(percent*100).toInt()}%"</span>
+        UpdateEngine.UpdateStatusConstants.<span class="cp">VERIFYING</span>              -> <span class="cs">"? ??? ???????"</span>
+        UpdateEngine.UpdateStatusConstants.<span class="cp">FINALIZING</span>             -> <span class="cs">"?? ????? ??????? ${(percent*100).toInt()}%"</span>
+        UpdateEngine.UpdateStatusConstants.<span class="cp">UPDATED_NEED_REBOOT</span>    -> <span class="cs">"?? ????! ??? ???????"</span>
+        UpdateEngine.UpdateStatusConstants.<span class="cp">ERROR</span>                  -> <span class="cs">"? ???"</span>
+        <span class="ck">else</span> -> <span class="cs">"unknown: $status"</span>
+      }
+      <span class="cm">Log</span>.d(<span class="cs">"OTA"</span>, statusName)
+    }
+
+    <span class="ck">override fun</span> <span class="cf">onPayloadApplicationComplete</span>(errorCode: <span class="ct2">Int</span>) {
+      <span class="ck">if</span> (errorCode == UpdateEngine.ErrorCodeConstants.<span class="cp">SUCCESS</span>) {
+        <span class="cm">promptUserToReboot</span>()
+      } <span class="ck">else</span> {
+        <span class="cm">handleError</span>(errorCode)
+      }
+    }
+  }
+
+  <span class="cc">// ????? ????? ?? URL</span>
+  <span class="ck">fun</span> <span class="cf">applyUpdate</span>(
+    otaUrl: <span class="ct2">String</span>,
+    payloadOffset: <span class="ct2">Long</span>,
+    payloadSize: <span class="ct2">Long</span>,
+    headerProperties: <span class="ct2">List</span>&lt;<span class="ct2">String</span>&gt;
+  ) {
+    updateEngine.<span class="cf">bind</span>(callback)
+    updateEngine.<span class="cf">applyPayload</span>(
+      otaUrl,
+      payloadOffset,
+      payloadSize,
+      headerProperties.<span class="cf">toTypedArray</span>()
+    )
+  }
+  
+  <span class="cc">// Rollback ?? ??? ?????</span>
+  <span class="ck">fun</span> <span class="cf">rollback</span>() {
+    updateEngine.<span class="cf">rollback</span>()
+  }
+}</pre>
+    </div>
+
+    <div class="callout cal-orange">
+      <div class="callout-ico">??</div>
+      <div>
+        <div class="callout-title">??????? ??????</div>
+        <p>????? OTA ????? <code>android.permission.REBOOT</code> ?<code>android.permission.UPDATE_DEVICE_STATS</code> ??? ???? system app ??????? ?? <code>/system/priv-app/</code>. ??????? ????? ?? ?????? ??????? Update Engine ??????.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- --- CHAPTER 4: OTA PACKAGES --- -->
+  <section class="chapter" id="s4">
+    <div class="ch-head">
+      <div class="ch-num cn-red">04 // PACKAGES</div>
+      <div>
+        <div class="ch-title">
+          OTA Package Format
+          <small>// payload.bin, metadata, signatures</small>
+        </div>
+      </div>
+    </div>
+
+    <p>?? OTA package ?? ??? ZIP ????? ??? ???? ????? ????. ??? update_engine ??????? ??????? ??? ??? partitions. ????? ???? ?? ???? ????.</p>
+
+    <h3>???? ??? OTA ZIP Package</h3>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">ota_package.zip — Internal Structure</div>
+      </div>
+      <pre><span class="cs">ota_package.zip</span>
++-- <span class="ck">META-INF/</span>
+¦   +-- <span class="ct2">com/android/metadata</span>          <span class="cc"># ?????? ?????? (from/to build)</span>
+¦   +-- <span class="ct2">com/android/metadata.pb</span>       <span class="cc"># ??? ???????? ?? Protobuf</span>
+¦   +-- <span class="ct2">com/android/otacert</span>           <span class="cc"># ????? ???????</span>
+¦
++-- <span class="ck">payload.bin</span>                        <span class="cc"># ? ????? — ?? ?????? ???????</span>
+¦   +-- DeltaArchiveManifest (protobuf)
+¦   ¦   +-- block_size: 4096
+¦   ¦   +-- minor_version: 2
+¦   ¦   +-- partitions: [...]           <span class="cc"># ????? ?? ??? partitions</span>
+¦   ¦       +-- partition_name: "system"
+¦   ¦       +-- new_partition_info: {size, hash}
+¦   ¦       +-- operations: [...]       <span class="cc"># ?????? ??? patch</span>
+¦   +-- partition data (raw blocks)
+¦
++-- <span class="ck">payload_properties.txt</span>             <span class="cc"># Hashes ???? ??? payload</span>
+¦   +-- FILE_HASH=base64(sha256)
+¦   +-- FILE_SIZE=1234567890
+¦   +-- METADATA_HASH=base64(sha256)
+¦   +-- METADATA_SIZE=123456
+¦
++-- <span class="ck">care_map.pb</span>                        <span class="cc"># ????? ??? blocks ??????</span></pre>
+    </div>
+
+    <h3>?????? ??? Delta (Operations)</h3>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Operation Type</th>
+            <th>?????</th>
+            <th>??? ???????</th>
+            <th>???????</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>SOURCE_COPY</code></td>
+            <td>??? blocks ?? ??? partition ?????? ??????</td>
+            <td>Blocks ?? ?????</td>
+            <td><span class="badge bl">????? — ???? ??????</span></td>
+          </tr>
+          <tr>
+            <td><code>REPLACE</code></td>
+            <td>??????? blocks ?????? ???? ??????</td>
+            <td>Blocks ????? ?????</td>
+            <td><span class="badge br">Full size</span></td>
+          </tr>
+          <tr>
+            <td><code>REPLACE_BZ</code></td>
+            <td>??????? ??? ??? bzip2</td>
+            <td>?????? ????? ?????</td>
+            <td><span class="badge bt">?????</span></td>
+          </tr>
+          <tr>
+            <td><code>REPLACE_XZ</code></td>
+            <td>??????? ??? ??? xz (???? ?? bzip2)</td>
+            <td>?????? ???????</td>
+            <td><span class="badge bl">???</span></td>
+          </tr>
+          <tr>
+            <td><code>PUFFDIFF</code></td>
+            <td>???? delta ?????? zlib ????????</td>
+            <td>APKs, JARs ????? system</td>
+            <td><span class="badge bl">????? ??? APKs</span></td>
+          </tr>
+          <tr>
+            <td><code>BSDIFF</code></td>
+            <td>Binary diff ?????????</td>
+            <td>Executables, shared libs</td>
+            <td><span class="badge bt">??? ??? binaries</span></td>
+          </tr>
+          <tr>
+            <td><code>ZERO</code></td>
+            <td>??? blocks ????????</td>
+            <td>??? ??????</td>
+            <td><span class="badge bl">????</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>????? OTA Package ?? AOSP Tools</h3>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">build/tools — OTA Generation</div>
+      </div>
+      <pre><span class="cc"># ===== Full OTA Package =====</span>
+<span class="cf">ota_from_target_files</span> \
+  --verbose \
+  --package_key ./certs/releasekey \
+  target_files.zip \
+  full_ota.zip
+
+<span class="cc"># ===== Incremental OTA (Delta) =====</span>
+<span class="cf">ota_from_target_files</span> \
+  --verbose \
+  --package_key ./certs/releasekey \
+  <span class="ck">--incremental_from</span> old_target_files.zip \
+  <span class="ck">--payload_signer</span> ./sign_payload.sh \
+  new_target_files.zip \
+  incremental_ota.zip
+
+<span class="cc"># ===== ??? ????? ??? OTA Package =====</span>
+<span class="cf">unzip</span> -l ota_package.zip
+
+<span class="cc"># ????? ??? metadata</span>
+<span class="cf">unzip</span> -p ota_package.zip META-INF/com/android/metadata
+
+<span class="cc"># ===== Payload Extractor (????? ????????) =====</span>
+<span class="cf">payload-dumper-go</span> payload.bin --out ./extracted_partitions/
+
+<span class="cc"># ?? ?? Python</span>
+<span class="cf">python3</span> payload_dumper.py payload.bin \
+  <span class="ck">--output_dir</span> ./partitions/ \
+  <span class="ck">--partitions</span> system,vendor,boot</pre>
+    </div>
+
+    <h3>payload_properties.txt — ??????? ?????</h3>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">payload_properties.txt — ???? ?????</div>
+      </div>
+      <pre><span class="ck">FILE_HASH</span>=<span class="cs">ozGgyQEcnkI5ZaX+Wufu/YFmgbMrqvMd9XtX/hkO9C0=</span>
+<span class="ck">FILE_SIZE</span>=<span class="cn2">1471748294</span>
+<span class="ck">METADATA_HASH</span>=<span class="cs">3sWM9XYQK2LmQIHhFXhXWoF5aaKkVpByBFVLQFPqJbg=</span>
+<span class="ck">METADATA_SIZE</span>=<span class="cn2">37385</span></pre>
+    </div>
+
+    <div class="callout cal-teal">
+      <div class="callout-ico">??</div>
+      <div>
+        <div class="callout-title">??? ??????? properties ??????</div>
+        <p>??? update_engine ???????? ?? headers ?? ??? HTTP request. ??????? ?? <code>applyPayload()</code> ???? ????? ?? ????? ????? ??? ?? ???? ???????.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- --- CHAPTER 5: VERIFIED BOOT --- -->
+  <section class="chapter" id="s5">
+    <div class="ch-head">
+      <div class="ch-num cn-red">05 // SECURITY</div>
+      <div>
+        <div class="ch-title">
+          Verified Boot & dm-verity
+          <small>// Chain of Trust ?? ??? Bootloader ??? OS</small>
+        </div>
+      </div>
+    </div>
+
+    <p>??? OTA ???? ???? = ?????. Verified Boot ?? ???? ?????? ?? ?? ????? ????? ??? ???????. ?????? ????? ??? ?? ??? ???? ????? ??????.</p>
+
+    <h3>Chain of Trust — ????? ?????</h3>
+
+    <div class="partition-diagram">
+      <div class="pd-label">// VERIFIED BOOT CHAIN</div>
+      <div style="display:flex; flex-direction:column; gap:0; min-width:500px;">
+        <div style="padding:16px 20px; background:rgba(184,255,58,0.1); border:1px solid rgba(184,255,58,0.3); border-radius:8px 8px 0 0; margin-bottom:2px;">
+          <div style="color:var(--lime); font-family:var(--font-code); font-size:13px; font-weight:700;">?? ROM BOOTLOADER (BL1)</div>
+          <div style="color:var(--muted); font-size:12px; margin-top:4px;">??????? ?? ??? hardware. ?? ???? ??????. ???? ??????? ????? ??????.</div>
+        </div>
+        <div style="text-align:center; color:var(--lime); padding:4px; font-size:11px;">? ??????? ??????</div>
+        <div style="padding:16px 20px; background:rgba(0,255,200,0.08); border:1px solid rgba(0,255,200,0.3); border-radius:4px; margin-bottom:2px;">
+          <div style="color:var(--teal); font-family:var(--font-code); font-size:13px; font-weight:700;">? ABL / BOOTLOADER (BL2)</div>
+          <div style="color:var(--muted); font-size:12px; margin-top:4px;">????? ?? ????? ??? boot partition. ????? ?? ??? slot ?????.</div>
+        </div>
+        <div style="text-align:center; color:var(--lime); padding:4px; font-size:11px;">? ??????? ??????</div>
+        <div style="padding:16px 20px; background:rgba(155,109,255,0.08); border:1px solid rgba(155,109,255,0.3); border-radius:4px; margin-bottom:2px;">
+          <div style="color:var(--violet); font-family:var(--font-code); font-size:13px; font-weight:700;">?? KERNEL + INITRAMFS (boot.img)</div>
+          <div style="color:var(--muted); font-size:12px; margin-top:4px;">????? dm-verity ?????? ??? system partition. ?????? AVB metadata.</div>
+        </div>
+        <div style="text-align:center; color:var(--lime); padding:4px; font-size:11px;">? ?????? dm-verity</div>
+        <div style="padding:16px 20px; background:rgba(58,158,255,0.08); border:1px solid rgba(58,158,255,0.3); border-radius:4px; margin-bottom:2px;">
+          <div style="color:var(--blue); font-family:var(--font-code); font-size:13px; font-weight:700;">?? SYSTEM + VENDOR PARTITIONS</div>
+          <div style="color:var(--muted); font-size:12px; margin-top:4px;">?? block ????? ??? ??? ??????? ??? Merkle tree. ????? ?? byte = ??? ???????.</div>
+        </div>
+        <div style="text-align:center; color:var(--lime); padding:4px; font-size:11px;">? ?????</div>
+        <div style="padding:16px 20px; background:rgba(255,140,66,0.08); border:1px solid rgba(255,140,66,0.3); border-radius:8px 8px 0 0;">
+          <div style="color:var(--orange); font-family:var(--font-code); font-size:13px; font-weight:700;">?? ANDROID FRAMEWORK</div>
+          <div style="color:var(--muted); font-size:12px; margin-top:4px;">????? 100% ??? ?? ????? ??? ??????.</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>dm-verity — ?????? ??????</h3>
+
+    <p>dm-verity ?? Linux kernel module ??????? <strong>Merkle tree</strong> ?????? ?? ?? block ?? ??? partition ??? ???????. ?? ????? ?? ?? ???? = error.</p>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">dm-verity Merkle Tree — ??? ????</div>
+      </div>
+      <pre><span class="cc">            ROOT HASH (??????? ?? vbmeta.img)</span>
+                       ¦
+              +-----------------+
+            H(L1a)           H(L1b)
+           +-----+           +-----+
+        H(L2a) H(L2b)     H(L2c) H(L2d)
+          ¦      ¦           ¦      ¦
+       [B0-B3][B4-B7]   [B8-B11][B12-B15]   <span class="cc">? data blocks (4KB each)</span>
+
+<span class="cc">  ??? ????? ?? block:</span>
+  <span class="cs">Block 5 ?????</span> ? H(L2b) ????? ? H(L1a) ????? ? ROOT HASH ?????
+  ? <span class="ct2">dm-verity ???? ???????</span> ? <span class="cp">I/O error</span> ? Android ????? ???????? ??</pre>
+    </div>
+
+    <h3>AVB (Android Verified Boot 2.0)</h3>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">avbtool — ????? ??? partitions</div>
+      </div>
+      <pre><span class="cc"># ????? AVB footer ?? partition</span>
+<span class="cf">avbtool</span> add_hashtree_footer \
+  <span class="ck">--image</span> system.img \
+  <span class="ck">--partition_name</span> system \
+  <span class="ck">--key</span> ./keys/testkey_rsa4096.pem \
+  <span class="ck">--algorithm</span> SHA256_RSA4096
+
+<span class="cc"># ????? vbmeta ??????</span>
+<span class="cf">avbtool</span> make_vbmeta_image \
+  <span class="ck">--output</span> vbmeta.img \
+  <span class="ck">--key</span> ./keys/testkey_rsa4096.pem \
+  <span class="ck">--algorithm</span> SHA256_RSA4096 \
+  <span class="ck">--include_descriptors_from_image</span> boot.img \
+  <span class="ck">--include_descriptors_from_image</span> system.img \
+  <span class="ck">--include_descriptors_from_image</span> vendor.img
+
+<span class="cc"># ??? ??? vbmeta</span>
+<span class="cf">avbtool</span> info_image <span class="ck">--image</span> vbmeta.img</pre>
+    </div>
+
+    <div class="callout cal-red">
+      <div class="callout-ico">??</div>
+      <div>
+        <div class="callout-title">????? OTA ? ????? AVB</div>
+        <p>?? ??????? ???????: ????? <strong>OTA</strong> ?????? ??? payload.bin (????? ??? update_engine)? ?????? <strong>AVB</strong> ?????? ??? partitions ????? (????? ??? bootloader). ??????? ???????.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- --- CHAPTER 6: OTA SERVER --- -->
+  <section class="chapter" id="s6">
+    <div class="ch-head">
+      <div class="ch-num cn-blue">06 // SERVER</div>
+      <div>
+        <div class="ch-title">
+          ???? OTA Update Server
+          <small>// ?? ??? Architecture ??? Implementation</small>
+        </div>
+      </div>
+    </div>
+
+    <p>??? OTA server ?? ???? file server. ????? ???? ??? rollout? ????? ?? ?? ???? ??? ??????? ????? ?????? ??? status.</p>
+
+    <h3>Architecture ??? OTA Server</h3>
+
+    <div class="flow-diagram">
+      <div class="flow-row">
+        <div class="flow-node" style="border-radius:10px 10px 0 0; border-color:rgba(184,255,58,0.3); background:rgba(184,255,58,0.05);">
+          <div class="fn-ico">??</div>
+          <div class="fn-title">Android Device</div>
+          <div class="fn-sub">check_interval: 24h</div>
+        </div>
+        <div class="flow-arrow-h">?</div>
+        <div class="flow-node" style="border-color:rgba(58,158,255,0.3); background:rgba(58,158,255,0.05);">
+          <div class="fn-ico">??</div>
+          <div class="fn-title">Update Check API</div>
+          <div class="fn-sub">POST /check-update</div>
+        </div>
+        <div class="flow-arrow-h">?</div>
+        <div class="flow-node" style="border-color:rgba(155,109,255,0.3); background:rgba(155,109,255,0.05);">
+          <div class="fn-ico">??</div>
+          <div class="fn-title">Targeting Engine</div>
+          <div class="fn-sub">rollout %, cohorts</div>
+        </div>
+        <div class="flow-arrow-h">?</div>
+        <div class="flow-node" style="border-color:rgba(0,255,200,0.3); background:rgba(0,255,200,0.05);">
+          <div class="fn-ico">??</div>
+          <div class="fn-title">Package Store</div>
+          <div class="fn-sub">CDN + GCS/S3</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Update Check API — Request/Response</h3>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">POST /api/v1/check-update — Request Body (JSON)</div>
+      </div>
+      <pre>{
+  <span class="ck">"device_id"</span>:       <span class="cs">"a1b2c3d4e5f6..."</span>,
+  <span class="ck">"device_model"</span>:    <span class="cs">"Pixel_8_Pro"</span>,
+  <span class="ck">"current_build"</span>:   <span class="cs">"UD1A.231105.004"</span>,
+  <span class="ck">"android_version"</span>: <span class="cs">"14"</span>,
+  <span class="ck">"security_patch"</span>:  <span class="cs">"2024-01-05"</span>,
+  <span class="ck">"hardware_id"</span>:     <span class="cs">"oriole"</span>,
+  <span class="ck">"channel"</span>:         <span class="cs">"stable"</span>,
+  <span class="ck">"timezone"</span>:        <span class="cs">"Africa/Cairo"</span>,
+  <span class="ck">"battery_level"</span>:   <span class="cn2">78</span>,
+  <span class="ck">"is_charging"</span>:     <span class="cn2">true</span>,
+  <span class="ck">"wifi_connected"</span>:  <span class="cn2">true</span>
+}</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">POST /api/v1/check-update — Response (????? ????)</div>
+      </div>
+      <pre>{
+  <span class="ck">"status"</span>:       <span class="cs">"UPDATE_AVAILABLE"</span>,
+  <span class="ck">"update"</span>: {
+    <span class="ck">"build_id"</span>:     <span class="cs">"UP1A.240305.019"</span>,
+    <span class="ck">"version"</span>:      <span class="cs">"14.0.0"</span>,
+    <span class="ck">"security_patch"</span>: <span class="cs">"2024-03-05"</span>,
+    <span class="ck">"type"</span>:         <span class="cs">"INCREMENTAL"</span>,
+    <span class="ck">"url"</span>:          <span class="cs">"https://cdn.ota.example.com/packages/incremental_abc123.zip"</span>,
+    <span class="ck">"payload_url"</span>:  <span class="cs">"https://cdn.ota.example.com/payloads/payload_abc123.bin"</span>,
+    <span class="ck">"size_bytes"</span>:   <span class="cn2">87654321</span>,
+    <span class="ck">"payload_offset"</span>: <span class="cn2">1234</span>,
+    <span class="ck">"payload_size"</span>: <span class="cn2">87600000</span>,
+    <span class="ck">"metadata_signature_rsa"</span>: <span class="cs">"base64encoded..."</span>,
+    <span class="ck">"properties"</span>: [
+      <span class="cs">"FILE_HASH=ozGgyQEcnkI5ZaX+Wufu/YFmgbMrqvMd9XtX/hkO9C0="</span>,
+      <span class="cs">"FILE_SIZE=87654321"</span>,
+      <span class="cs">"METADATA_HASH=3sWM9XYQK2LmQIHhFXhXWoF5aaKkVpByBFVLQFPqJbg="</span>,
+      <span class="cs">"METADATA_SIZE=37385"</span>
+    ],
+    <span class="ck">"release_notes"</span>: {
+      <span class="cs">"ar"</span>: <span class="cs">"??????? ?????? ???????? ????? ???? ???? 2024"</span>,
+      <span class="cs">"en"</span>: <span class="cs">"March 2024 security patches and performance improvements"</span>
+    },
+    <span class="ck">"rollout_percentage"</span>: <span class="cn2">10</span>,
+    <span class="ck">"mandatory"</span>: <span class="cn2">false</span>,
+    <span class="ck">"deadline_days"</span>: <span class="cn2">30</span>
+  }
+}</pre>
+    </div>
+
+    <h3>OTA Server ?? Node.js/Express — Implementation</h3>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">ota-server/src/update-controller.ts</div>
+      </div>
+      <pre><span class="ck">import</span> { Request, Response } <span class="ck">from</span> <span class="cs">'express'</span>
+<span class="ck">import</span> { UpdateService } <span class="ck">from</span> <span class="cs">'./update-service'</span>
+<span class="ck">import</span> { DeviceService } <span class="ck">from</span> <span class="cs">'./device-service'</span>
+
+<span class="ck">export class</span> <span class="ct2">UpdateController</span> {
+  <span class="ck">constructor</span>(
+    <span class="ck">private</span> updateService: <span class="ct2">UpdateService</span>,
+    <span class="ck">private</span> deviceService: <span class="ct2">DeviceService</span>
+  ) {}
+
+  <span class="cf">checkUpdate</span> = <span class="ck">async</span> (req: <span class="ct2">Request</span>, res: <span class="ct2">Response</span>) => {
+    <span class="ck">const</span> {
+      device_id, device_model, current_build,
+      channel, battery_level, is_charging, wifi_connected
+    } = req.body
+
+    <span class="cc">// 1. ???? ??? check-in</span>
+    <span class="ck">await</span> <span class="ck">this</span>.deviceService.<span class="cf">recordCheckIn</span>(device_id, {
+      build: current_build,
+      timestamp: <span class="ck">new</span> <span class="ct2">Date</span>()
+    })
+
+    <span class="cc">// 2. ???? ?? ????? ???? ??? model ???? channel</span>
+    <span class="ck">const</span> latestUpdate = <span class="ck">await</span> <span class="ck">this</span>.updateService.<span class="cf">getLatestUpdate</span>({
+      model: device_model,
+      currentBuild: current_build,
+      channel
+    })
+
+    <span class="ck">if</span> (!latestUpdate) {
+      <span class="ck">return</span> res.<span class="cf">json</span>({ status: <span class="cs">'NO_UPDATE'</span> })
+    }
+
+    <span class="cc">// 3. ???? ?? ??? rollout percentage</span>
+    <span class="ck">const</span> isEligible = <span class="ck">await</span> <span class="ck">this</span>.updateService.<span class="cf">isDeviceEligible</span>(
+      device_id,
+      latestUpdate.rollout_percentage
+    )
+
+    <span class="ck">if</span> (!isEligible) {
+      <span class="ck">return</span> res.<span class="cf">json</span>({ status: <span class="cs">'NO_UPDATE'</span> })
+    }
+
+    <span class="cc">// 4. ??? ???? ??????? (?????? + WiFi)</span>
+    <span class="ck">if</span> (!latestUpdate.mandatory) {
+      <span class="ck">if</span> (battery_level < <span class="cn2">30</span> && !is_charging) {
+        <span class="ck">return</span> res.<span class="cf">json</span>({
+          status: <span class="cs">'DEFERRED'</span>,
+          reason: <span class="cs">'LOW_BATTERY'</span>,
+          retry_after_minutes: <span class="cn2">60</span>
+        })
+      }
+    }
+
+    <span class="cc">// 5. ???? ???????</span>
+    <span class="ck">const</span> signedUrl = <span class="ck">await</span> <span class="ck">this</span>.updateService.<span class="cf">generateSignedUrl</span>(
+      latestUpdate.payload_path,
+      <span class="cn2">3600</span> <span class="cc">// ???? ???? ?????</span>
+    )
+
+    res.<span class="cf">json</span>({
+      status: <span class="cs">'UPDATE_AVAILABLE'</span>,
+      update: {
+        ...latestUpdate,
+        url: signedUrl
+      }
+    })
+  }
+}</pre>
+    </div>
+
+    <h3>Staged Rollout — ??? ?????? ???</h3>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">staged-rollout-strategy.ts</div>
+      </div>
+      <pre><span class="cc">/**
+ * Staged Rollout Strategy
+ * 1% ? 5% ? 10% ? 25% ? 50% ? 100%
+ * ?? ????? ?????? 24-48 ????
+ */</span>
+
+<span class="ck">const</span> ROLLOUT_STAGES = [
+  { percentage: <span class="cn2">1</span>,   duration_hours: <span class="cn2">24</span>,  cohort: <span class="cs">'internal'</span>   },
+  { percentage: <span class="cn2">5</span>,   duration_hours: <span class="cn2">24</span>,  cohort: <span class="cs">'beta'</span>       },
+  { percentage: <span class="cn2">10</span>,  duration_hours: <span class="cn2">48</span>,  cohort: <span class="cs">'early_access'</span>},
+  { percentage: <span class="cn2">25</span>,  duration_hours: <span class="cn2">48</span>,  cohort: <span class="cs">'general'</span>    },
+  { percentage: <span class="cn2">50</span>,  duration_hours: <span class="cn2">24</span>,  cohort: <span class="cs">'general'</span>    },
+  { percentage: <span class="cn2">100</span>, duration_hours: <span class="cn2">0</span>,   cohort: <span class="cs">'all'</span>        }
+]
+
+<span class="ck">function</span> <span class="cf">isDeviceEligible</span>(
+  deviceId: <span class="ct2">string</span>,
+  rolloutPercentage: <span class="ct2">number</span>
+): <span class="ct2">boolean</span> {
+  <span class="cc">// Hash deterministic: ??? ?????? ?????? ??? ???????</span>
+  <span class="ck">const</span> hash = <span class="cf">murmurhash3</span>(deviceId) % <span class="cn2">100</span>
+  <span class="ck">return</span> hash < rolloutPercentage
+}
+
+<span class="cc">// ????: ???? ?? hash=7 ???? ??? ??????? ?? ??? 10%
+// ???? ?? hash=55 ????? ??? ??? 50% stage</span></pre>
+    </div>
+  </section>
+
+  <!-- --- CHAPTER 7: ROLLBACK --- -->
+  <section class="chapter" id="s7">
+    <div class="ch-head">
+      <div class="ch-num cn-violet">07 // SAFETY</div>
+      <div>
+        <div class="ch-title">
+          Rollback Protection
+          <small>// Anti-Rollback & Recovery Mechanisms</small>
+        </div>
+      </div>
+    </div>
+
+    <p>???? ???? ?? ??? ???????? ?? ?? ??? ??????? ?????? ?? ????? ?????? Android ???? ????? ?????? ?? ???????.</p>
+
+    <h3>Automatic Rollback — ??? Boot Attempts Counter</h3>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">Boot Attempts Counter — ??? ????</div>
+      </div>
+      <pre><span class="cc">----------------------------------------------------------
+         AUTOMATIC ROLLBACK FLOW
+----------------------------------------------------------</span>
+
+<span class="cc"># ??? ????? ??????? ??? slot B:</span>
+slot_b.tries_remaining = <span class="cn2">7</span>
+slot_b.successful      = <span class="cs">false</span>
+slot_b.bootable        = <span class="cs">true</span>
+
+<span class="cc"># ??? ????? — ????? ????? ?? slot B:</span>
+slot_b.tries_remaining = <span class="cn2">6</span>
+<span class="cf">? ?? Android ????? ?MarkSuccessful() ??????:</span>
+    slot_b.successful      = <span class="cs">true</span>   ? ?? ??????? ?????
+
+<span class="cf">? ?? Android ?? ?????? (Boot loop):</span>
+    tries_remaining-- ??? ?? ??????
+    ??? ??? 0: slot_b.bootable = <span class="cs">false</span>
+    ??? bootloader ???? ?? slot_a ???????? ??
+
+<span class="cc"># ????? ?? bootloader (pseudocode):</span>
+<span class="ck">function</span> <span class="cf">selectBootSlot</span>() {
+  <span class="ck">for</span> (slot of [current, other]) {
+    <span class="ck">if</span> (slot.bootable && slot.tries > <span class="cn2">0</span>) {
+      slot.tries--
+      <span class="ck">return</span> slot
+    }
+  }
+  <span class="ck">return</span> recoveryMode()
+}</pre>
+    </div>
+
+    <h3>MarkSuccessful — ??? ??????? ?? ??? Boot</h3>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">UpdateVerifier.java — ????? ???? ???????</div>
+      </div>
+      <pre><span class="cc">// UpdateVerifier ????? ?? ??? background ??? ???????</span>
+<span class="cc">// ????? ??: DM-verity? system integrity? essential services</span>
+
+<span class="ck">public class</span> <span class="ct2">UpdateVerifier</span> <span class="ck">extends</span> <span class="ct2">IntentService</span> {
+
+  <span class="ck">private void</span> <span class="cf">verifyUpdateAndMarkSuccessful</span>() {
+    <span class="cc">// 1. ???? ?? dm-verity status</span>
+    <span class="ck">if</span> (!<span class="cf">isDmVerityClean</span>()) {
+      <span class="cm">Log</span>.<span class="cf">e</span>(TAG, <span class="cs">"dm-verity corruption detected!"</span>)
+      <span class="cf">triggerRollback</span>()
+      <span class="ck">return</span>
+    }
+
+    <span class="cc">// 2. ???? ?? ??? essential system processes</span>
+    <span class="ck">if</span> (!<span class="cf">areEssentialServicesRunning</span>()) {
+      <span class="cf">triggerRollback</span>()
+      <span class="ck">return</span>
+    }
+
+    <span class="cc">// 3. ? ?? ??? ???? — ???? ??????</span>
+    <span class="ct2">UpdateEngine</span> updateEngine = <span class="ck">new</span> <span class="ct2">UpdateEngine</span>()
+    <span class="cc">// ??? ?????? bootctl mark-boot-successful ??? ??????</span>
+    updateEngine.<span class="cf">resetStatus</span>()
+    
+    <span class="cm">Log</span>.<span class="cf">i</span>(TAG, <span class="cs">"Update verified successfully! Slot marked as successful."</span>)
+  }
+}</pre>
+    </div>
+
+    <h3>Anti-Rollback — ??? ??????? ???????? ?????</h3>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">AVB Anti-Rollback Index — ??????? ?? ???????</div>
+      </div>
+      <pre><span class="cc">-------------------------------------------------------
+  ANTI-ROLLBACK PROTECTION
+-------------------------------------------------------</span>
+
+<span class="cc"># ?? image ??? ROLLBACK_INDEX ??????? ??:</span>
+<span class="cc"># 1. ??? vbmeta.img (???? ???????)</span>
+<span class="cc"># 2. ??? hardware eFuses (??? ???? ???????!)</span>
+
+<span class="cc"># ???? ?? vbmeta:</span>
+<span class="ck">Rollback Index</span>: <span class="cn2">5</span>
+<span class="ck">Rollback Index Location</span>: <span class="cn2">0</span>
+
+<span class="cc"># ?? ????? ????? image ???? ??? ?? 5:</span>
+<span class="cs">avbtool: ERROR: Rollback index 3 < stored rollback index 5</span>
+<span class="cs">Bootloader: REJECTED - Anti-rollback protection triggered!</span>
+<span class="cs">Device will NOT boot this image.</span>
+
+<span class="cc"># ??? ???? ??? rollback index (??? ????):</span>
+<span class="cf">avbtool</span> add_hashtree_footer \
+  <span class="ck">--image</span> system.img \
+  <span class="ck">--rollback_index</span> <span class="cn2">6</span> \  <span class="cc"># ????? ?????? ???</span>
+  <span class="ck">--key</span> ./keys/releasekey.pem</pre>
+    </div>
+
+    <div class="callout cal-red">
+      <div class="callout-ico">??</div>
+      <div>
+        <div class="callout-title">Anti-Rollback ?? ????</div>
+        <p>????? ????? ??? rollback index ?? ??? eFuses? ?? ???? ????? ????? ????? ????. ??? ????? ????? ???? ????? "downgrade" ???? ?????? ????? ????? ????????.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- --- CHAPTER 8: ADVANCED --- -->
+  <section class="chapter" id="s8">
+    <div class="ch-head">
+      <div class="ch-num cn-teal2">08 // ADVANCED</div>
+      <div>
+        <div class="ch-title">
+          ?????? ??????
+          <small>// Streaming OTA, APEX, Recovery Mode</small>
+        </div>
+      </div>
+    </div>
+
+    <h3>Streaming OTA — ????? ???? ????? ????</h3>
+
+    <p>???? ????? ?? Pixel 3+ ?Android 9+: ??? update_engine ???? ????? ??? blocks ????? ?? ???? ??????? ??????. ????? HTTP Range Requests ?? ??? server.</p>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">Streaming OTA — ????? ?? applyPayload</div>
+      </div>
+      <pre><span class="cc">// Non-streaming: ????? ???? ????? ?? ???????</span>
+updateEngine.<span class="cf">applyPayload</span>(
+  <span class="cs">"file:///data/ota_update/payload.bin"</span>, <span class="cc">// local file</span>
+  <span class="cn2">0L</span>, <span class="cn2">0L</span>,
+  properties
+)
+
+<span class="cc">// Streaming: ??????? ?? URL ??????</span>
+<span class="cc">// update_engine ???? ranges ?? HTTP Range header</span>
+updateEngine.<span class="cf">applyPayload</span>(
+  <span class="cs">"https://cdn.ota.example.com/payload.bin"</span>, <span class="cc">// remote URL</span>
+  payloadOffset,  <span class="cc">// offset ???? ??? ZIP</span>
+  payloadSize,    <span class="cc">// ??? ??? payload.bin</span>
+  arrayOf(
+    <span class="cs">"FILE_HASH=$fileHash"</span>,
+    <span class="cs">"FILE_SIZE=$fileSize"</span>,
+    <span class="cs">"METADATA_HASH=$metaHash"</span>,
+    <span class="cs">"METADATA_SIZE=$metaSize"</span>
+  )
+)
+
+<span class="cc">// ??? server ??? ?? ????:
+// GET /payload.bin HTTP/1.1
+// Range: bytes=0-4095          ? block ?????
+// Range: bytes=4096-8191       ? block ??????
+// ... ???? blocks ???????? ???? ??????</span></pre>
+    </div>
+
+    <h3>APEX — ????? ?????? ?????? ???? ?????</h3>
+
+    <p>Android APEX (Android Pony EXpress) ?? ???? ????? ?????? ??? system ???????. ??? APK ??? framework.</p>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">APEX Modules — ?????? ????? ???????</div>
+      </div>
+      <pre><span class="cc">// APEX modules ???????? (Android 10+)</span>
+/apex/
++-- <span class="ck">com.android.conscrypt</span>           <span class="cc"># TLS/SSL library</span>
++-- <span class="ck">com.android.media</span>               <span class="cc"># Media codecs</span>
++-- <span class="ck">com.android.neuralnetworks</span>      <span class="cc"># AI/ML runtime</span>
++-- <span class="ck">com.android.resolv</span>              <span class="cc"># DNS resolver</span>
++-- <span class="ck">com.android.runtime</span>             <span class="cc"># ART runtime (Kotlin/Java VM)</span>
++-- <span class="ck">com.android.tzdata</span>              <span class="cc"># Timezone database</span>
++-- <span class="ck">com.android.wifi</span>                <span class="cc"># WiFi stack</span>
+
+<span class="cc">// Google ????? ??? ???????? ??? Google Play Store
+// ?????? — ???? ?????? OEM ?? ????? ??????!</span>
+
+<span class="cc">// ????: ???? ?? TLS ? Google ???? com.android.conscrypt
+// ???????? ??? ????? Android 10+ ?? ?????</span>
+
+<span class="cf">adb shell</span> pm list packages --apex-only
+<span class="cc"># package:com.android.adbd</span>
+<span class="cc"># package:com.android.art</span>
+<span class="cc"># package:com.android.btservices</span>
+<span class="cc"># ...</span></pre>
+    </div>
+
+    <h3>Recovery Mode — ??? ?? ????</h3>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">Recovery Commands — ?? BCB (Bootloader Control Block)</div>
+      </div>
+      <pre><span class="cc"># ??? misc partition ?????? BCB structure</span>
+<span class="cc"># ??? bootloader ??????? ?????? ?? ?????</span>
+
+<span class="ck">struct</span> <span class="ct2">bootloader_message</span> {
+  <span class="cc">// command ????? ?? Android ?? Recovery</span>
+  <span class="ck">char</span> command[<span class="cn2">32</span>];   <span class="cc">// "boot-recovery", "bootonce-bootloader"</span>
+  <span class="ck">char</span> status[<span class="cn2">32</span>];    <span class="cc"># ????? ??? ?????</span>
+  <span class="ck">char</span> recovery[<span class="cn2">1024</span>]; <span class="cc">// arguments ??? Recovery</span>
+  <span class="ck">char</span> stage[<span class="cn2">32</span>];     <span class="cc">// "1/3", "2/3" ?? multi-stage</span>
+}
+
+<span class="cc"># ????: ????? ??????? ??? Recovery ?? Android</span>
+<span class="cf">adb shell</span> reboot recovery
+
+<span class="cc"># ????? command ???? ??? BCB:</span>
+<span class="cf">adb shell</span> <span class="cs">"echo 'boot-recovery' > /dev/block/by-name/misc"</span>
+
+<span class="cc"># ?? Recovery — ????? sideload:</span>
+<span class="cf">adb sideload</span> ota_package.zip
+
+<span class="cc"># ?????? ?? recovery.log:</span>
+<span class="cf">adb shell</span> cat /cache/recovery/last_log</pre>
+    </div>
+
+    <h3>Debugging OTA — ????? ????? ????????</h3>
+
+    <div class="code-wrap">
+      <div class="code-hdr">
+        <div class="dots"><div class="d d-r"></div><div class="d d-y"></div><div class="d d-g"></div></div>
+        <div class="code-file">OTA Debugging Commands — ??????? ???????</div>
+      </div>
+      <pre><span class="cc">--------------------------------------------
+  OTA DEBUGGING TOOLKIT
+--------------------------------------------</span>
+
+<span class="cc"># 1. ??? update_engine logs ?? real-time</span>
+<span class="cf">adb logcat</span> -s update_engine
+
+<span class="cc"># 2. ??? ??? log ??????</span>
+<span class="cf">adb shell</span> cat /data/misc/update_engine_log/update_engine.<span class="cn2">0</span>
+
+<span class="cc"># 3. ??? update_engine_client ?? testing</span>
+<span class="cf">adb shell</span> update_engine_client \
+  <span class="ck">--update</span> \
+  <span class="ck">--payload=</span><span class="cs">"file:///data/local/tmp/payload.bin"</span> \
+  <span class="ck">--update_check_count=1</span>
+
+<span class="cc"># 4. ???? ??? update engine</span>
+<span class="cf">adb shell</span> update_engine_client <span class="ck">--show_update_engine_status</span>
+
+<span class="cc"># 5. ??????? ??? slots ???????</span>
+<span class="cf">adb shell</span> bootctl get-number-slots
+<span class="cf">adb shell</span> bootctl get-current-slot
+<span class="cf">adb shell</span> bootctl get-slot-info <span class="cn2">0</span>
+<span class="cf">adb shell</span> bootctl get-slot-info <span class="cn2">1</span>
+
+<span class="cc"># 6. dm-verity status</span>
+<span class="cf">adb shell</span> cat /sys/block/dm-<span class="cn2">0</span>/dm/verity
+
+<span class="cc"># 7. ??? AVB state</span>
+<span class="cf">adb shell</span> avbctl get-verified-boot-state
+<span class="cf">adb shell</span> avbctl get-rollback-index <span class="ck">--location=0</span>
+
+<span class="cc"># 8. ????? payload metadata</span>
+<span class="cf">delta_generator</span> \
+  <span class="ck">--in_file=</span>payload.bin \
+  <span class="ck">--action=</span>print_partition_sizes</pre>
+    </div>
+
+    <h3>OTA Best Practices — ?????? ???????</h3>
+
+    <div class="grid2">
+      <div class="card cl">
+        <div class="card-ico">?</div>
+        <div class="card-title">???? ??????</div>
+        <ul class="feat-list">
+          <li>?????? ???? ??? payload ?? RSA-4096</li>
+          <li>?????? staged rollout: 1% ? 100%</li>
+          <li>???? crash rates ??? ?? ?????</li>
+          <li>???? target_files ??? build ?? incremental updates</li>
+          <li>?????? HTTPS ??? ?? payload URLs</li>
+          <li>??? expiry ??? signed URLs (max 1 ????)</li>
+        </ul>
+      </div>
+      <div class="card cr">
+        <div class="card-ico">??</div>
+        <div class="card-title">???? ??????</div>
+        <ul class="feat-list">
+          <li>?? ????? rollback index ??? ??? ?????? 100%</li>
+          <li>?? ????? 100% ???? ????? ???? soak testing</li>
+          <li>?? ??????? dm-verity errors ?? logs</li>
+          <li>?? ?????? ??? userdata ?? ??? OTA scripts</li>
+          <li>?? ????? ????? care_map ??? incremental updates</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout cal-lime">
+      <div class="callout-ico">??</div>
+      <div>
+        <div class="callout-title">??? Golden Rule ?? OTA</div>
+        <p>???? ????? ???? OTA ???????: <strong>??????? ?????? ??? ?? ???? ???? ?????? ?? ??????? ??????</strong>. ???? ??????: ?? ?????? ???? ????? ??????? ?????? ?? ??? ?? ???? ?? ?????? ??? ??? system ?? ready ??? production.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ---------- FOOTER ---------- -->
+<footer>
+  <p>? <span>OTA Updates & A/B Partitions</span> — ?????? ?????? · ?? ?????? ?????? Claude AI</p>
+</footer>
+
+<div class="aaos-theme-bar">
+  <button class="aaos-fab theme-toggle-btn" onclick="aaosToggleTheme()" title="????? ?????">??</button>
+  <a class="aaos-fab" href="../index.html" title="????????">??</a>
+</div>
+<script src="../scripts/theme.js"></script></body>
+</html>
+

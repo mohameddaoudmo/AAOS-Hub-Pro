@@ -1,0 +1,201 @@
+/* ══════════════════════════════════════
+   AAOS Hub Pro — Universal Light/Dark CSS
+   يُضاف إلى كل صفحة دليل لدعم Light Mode
+══════════════════════════════════════ */
+
+/* ── Theme Variables ── */
+:root {
+    /* Default Dark Theme Values (Match guides) */
+    --theme-bg: #070c18;
+    --theme-bg2: #0d1526;
+    --theme-card: #111b2e;
+    --theme-border: rgba(255,255,255,0.07);
+    --theme-text: #f0f4ff;
+    --theme-text2: #8899bb;
+    --theme-primary: #6366f1;
+    --theme-accent: #10b981;
+}
+
+/* ── LIGHT MODE OVERRIDES ── */
+[data-theme="light"] {
+    /* Generic Theme Vars */
+    --theme-bg: #f5f6ff;
+    --theme-bg2: #ffffff;
+    --theme-card: #eef0fb;
+    --theme-border: rgba(0,0,0,0.08);
+    --theme-text: #1a1f3c;
+    --theme-text2: #4a5280;
+    --theme-primary: #4f46e5;
+    --theme-accent: #059669;
+
+    /* Override common variables found in guide internal CSS */
+    --bg: #f5f6ff !important;
+    --bg2: #ffffff !important;
+    --ink: #1a1f3c !important;
+    --ink2: #334155 !important;
+    --muted: #64748b !important;
+    --rule: rgba(0, 0, 0, 0.1) !important;
+    --card: #ffffff !important;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ── Universal Theme Toggle Button (FAB) ── */
+.aaos-theme-bar {
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.aaos-fab {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.1);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    background: rgba(15,23,42,0.9);
+    backdrop-filter: blur(10px);
+    text-decoration: none;
+    color: #fff !important;
+}
+
+.aaos-fab:hover {
+    transform: scale(1.12);
+    box-shadow: 0 6px 30px rgba(0,0,0,0.4);
+}
+
+[data-theme="light"] .aaos-fab {
+    background: rgba(255,255,255,0.9);
+    border-color: rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    color: #1a1f3c !important;
+}
+
+/* ── Element Specific Overrides ── */
+[data-theme="light"] body {
+    background-color: var(--bg) !important;
+    color: var(--ink) !important;
+}
+
+/* Remove or flip dark texture overlays if they exist */
+[data-theme="light"] body::after, 
+[data-theme="light"] .hero::before {
+    opacity: 0.05 !important;
+    filter: invert(1);
+}
+
+[data-theme="light"] .hero {
+    background: #eef2ff !important;
+    color: #1e1b4b !important;
+    border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+}
+
+[data-theme="light"] .hero h1 { color: #1e1b4b !important; }
+[data-theme="light"] .hero-sub { color: #4338ca !important; }
+
+[data-theme="light"] .toc {
+    background: #ffffff !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
+}
+
+[data-theme="light"] .toc a { color: #312e81 !important; }
+[data-theme="light"] .toc a:hover { color: #4f46e5 !important; }
+
+[data-theme="light"] .tbl th {
+    background: #f1f5f9 !important;
+    color: #4f46e5 !important;
+    border-bottom: 2px solid rgba(0,0,0,0.05) !important;
+}
+
+[data-theme="light"] .tbl td {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+}
+
+[data-theme="light"] .tbl tr:nth-child(even) td {
+    background: #f8fafc !important;
+}
+
+[data-theme="light"] code {
+    background: #f1f5f9 !important;
+    color: #4338ca !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* Keep code blocks dark but adjust their containers */
+[data-theme="light"] .code, 
+[data-theme="light"] pre {
+    background: #0f172a !important;
+    color: #f1f5f9 !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+}
+/* Code Blocks Force LTR */
+pre, code {
+    direction: ltr !important;
+    text-align: left !important;
+    unicode-bidi: plaintext !important;
+    font-family: 'Fira Code', 'Consolas', monospace !important;
+}
+
+pre span {
+    direction: ltr !important;
+    display: inline-block; /* Helps with some RTL edge cases */
+}
+
+[data-theme="light"] h1, 
+[data-theme="light"] h2, 
+[data-theme="light"] h3, 
+[data-theme="light"] h4 {
+    color: #1e1b4b !important;
+}
+
+[data-theme="light"] p, 
+[data-theme="light"] li {
+    color: #334155 !important;
+}
+
+/* Fix specific guide components */
+[data-theme="light"] .ac, 
+[data-theme="light"] .card, 
+[data-theme="light"] .stat-cell,
+[data-theme="light"] .box,
+[data-theme="light"] .item,
+[data-theme="light"] .section-card,
+[data-theme="light"] .info-box {
+    background: #ffffff !important;
+    color: #334155 !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+}
+
+[data-theme="light"] .stats,
+[data-theme="light"] .grid-box {
+    background: rgba(0,0,0,0.05) !important;
+}
+
+/* Fix text colors for titles inside components */
+[data-theme="light"] .card-title,
+[data-theme="light"] .ac-title,
+[data-theme="light"] .box-title {
+    color: #1e1b4b !important;
+}
+
+/* Sidebar in guides if any */
+[data-theme="light"] .side-nav,
+[data-theme="light"] .navigation {
+    background: #f1f5f9 !important;
+    border-color: rgba(0,0,0,0.1) !important;
+}
+
+/* Flash Prevention */
+html:not([data-theme]) body { visibility: hidden; }
+

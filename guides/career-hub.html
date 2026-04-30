@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Germany Tech Career Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a0f;
+  --surface:#111118;
+  --surface2:#18181f;
+  --border:#ffffff12;
+  --border2:#ffffff20;
+  --text:#f0f0f0;
+  --muted:#888;
+  --faint:#444;
+  --android:#34c759;
+  --ios:#007aff;
+  --pos:#ff9500;
+  --dsa:#af52de;
+  --accent:#e8ff47;
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* noise texture overlay */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4}
+
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px 80px}
+
+/* header */
+header{padding:60px 0 48px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.header-left h1{font-family:'Syne',sans-serif;font-size:clamp(28px,5vw,52px);font-weight:800;letter-spacing:-1.5px;line-height:1.05}
+.header-left h1 span{color:var(--accent)}
+.header-left p{margin-top:10px;color:var(--muted);font-size:15px;font-family:'DM Mono',monospace;letter-spacing:.02em}
+.progress-summary{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px 20px;min-width:180px;text-align:center}
+.progress-summary .big{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--accent);line-height:1}
+.progress-summary .label{font-size:12px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace}
+
+/* track cards grid */
+.tracks{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:48px}
+.track{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;cursor:pointer;transition:border-color .2s,transform .15s;position:relative;overflow:hidden}
+.track::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:20px 20px 0 0}
+.track.android::before{background:var(--android)}
+.track.ios::before{background:var(--ios)}
+.track.pos::before{background:var(--pos)}
+.track.dsa::before{background:var(--dsa)}
+.track:hover{transform:translateY(-2px);border-color:var(--border2)}
+.track.active{border-color:var(--border2)}
+.track-icon{font-size:28px;margin-bottom:12px}
+.track-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:4px}
+.track-sub{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:16px}
+.track-bar-wrap{background:var(--surface2);border-radius:4px;height:4px;margin-bottom:10px}
+.track-bar{height:4px;border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.track.android .track-bar{background:var(--android)}
+.track.ios .track-bar{background:var(--ios)}
+.track.pos .track-bar{background:var(--pos)}
+.track.dsa .track-bar{background:var(--dsa)}
+.track-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace}
+
+/* detail panel */
+.detail{display:none;animation:fadeUp .25s ease}
+.detail.visible{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.detail-header{display:flex;align-items:center;gap:16px;margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.detail-header h2{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-0.5px}
+.back-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:8px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;transition:color .15s,border-color .15s}
+.back-btn:hover{color:var(--text);border-color:var(--border2)}
+
+/* phases */
+.phases{display:flex;flex-direction:column;gap:12px}
+.phase{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.phase-head{display:flex;align-items:center;gap:14px;padding:18px 20px;cursor:pointer;transition:background .15s}
+.phase-head:hover{background:var(--surface2)}
+.phase-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);min-width:60px}
+.phase-title-wrap{flex:1}
+.phase-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:600}
+.phase-months{font-size:12px;color:var(--muted);margin-top:1px}
+.phase-chevron{font-size:12px;color:var(--faint);transition:transform .2s}
+.phase.open .phase-chevron{transform:rotate(180deg)}
+.phase-done{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--faint);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .2s;font-size:10px}
+.phase-done.checked{background:var(--accent);border-color:var(--accent);color:#000}
+
+.phase-body{display:none;padding:0 20px 20px}
+.phase.open .phase-body{display:block}
+
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-bottom:16px}
+.skill-chip{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 12px}
+.skill-chip .name{font-size:13px;font-weight:500;color:var(--text);display:block;margin-bottom:3px}
+.skill-chip .desc{font-size:11px;color:var(--muted);line-height:1.4}
+
+.refs-label{font-size:11px;font-family:'DM Mono',monospace;color:var(--faint);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
+.refs{display:flex;flex-wrap:wrap;gap:6px}
+.refs a{font-size:11px;padding:4px 10px;border-radius:8px;border:1px solid var(--border);color:#7ab8ff;text-decoration:none;transition:border-color .15s,background .15s}
+.refs a:hover{border-color:var(--border2);background:var(--surface2)}
+
+/* project + tips sections */
+.section-label{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;margin:36px 0 14px;letter-spacing:-.3px}
+.section-label span{color:var(--accent)}
+
+.proj-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.proj-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
+.proj-card .star{color:var(--accent);font-size:12px;font-family:'DM Mono',monospace;margin-bottom:8px;display:block}
+.proj-card h4{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:6px}
+.proj-card p{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:10px}
+
+.tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.tip{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.tip .tip-icon{font-size:18px;margin-bottom:8px}
+.tip h4{font-size:13px;font-weight:500;margin-bottom:4px;font-family:'Syne',sans-serif}
+.tip p{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* germany box */
+.germany-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-top:12px}
+.germany-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:12px}
+.g-item{background:var(--surface2);border-radius:10px;padding:12px 14px}
+.g-item h4{font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px}
+.g-item p{font-size:11px;color:var(--muted);line-height:1.5}
+
+/* tab nav inside detail */
+.sub-tabs{display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap}
+.sub-tab{font-size:12px;padding:6px 14px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.sub-tab.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:500}
+
+/* overview home */
+.overview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:40px}
+.ov-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px}
+.ov-card h4{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:6px}
+.ov-card p{font-size:12px;color:var(--muted);line-height:1.5}
+
+.timeline-hint{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:40px}
+.tl-item{text-align:center}
+.tl-item .mo{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
+.tl-item .ev{font-size:13px;font-weight:500;margin-top:2px}
+.tl-arrow{color:var(--faint);font-size:18px}
+
+@media(max-width:600px){
+  header{padding:40px 0 32px}
+  .tracks{grid-template-columns:1fr 1fr}
+}
+</style>
+<link rel="stylesheet" href="../styles/theme.css">
+<script>var s=localStorage.getItem('aaos_theme')||'dark';document.documentElement.setAttribute('data-theme',s);</script></head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="header-left">
+    <h1>Germany Tech<br><span>Career Hub</span></h1>
+    <p>// android automotive · ios · pos · problem solving</p>
+  </div>
+  <div class="progress-summary">
+    <div class="big" id="total-pct">0%</div>
+    <div class="label">overall progress</div>
+  </div>
+</header>
+
+<!-- home view -->
+<div id="home-view">
+
+  <div class="tracks" id="track-cards">
+
+    <div class="track android" onclick="openTrack('android')">
+      <div class="track-icon">??</div>
+      <div class="track-title">Android Automotive</div>
+      <div class="track-sub">AAOS · CarService · VHAL · OEM targets in Germany</div>
+      <div class="track-bar-wrap"><div class="track-bar" id="bar-android" style="width:0%"></div></div>
+      <div class="track-meta"><span id="prog-android">0 / 6 phases</span><span>12–18 mo</span></div>
+    </div>
+
+    <div class="track ios" onclick="openTrack('ios')">
+      <div class="track-icon">??</div>
+      <div class="track-title">iOS Engineer</div>
+      <div class="track-sub">Swift · SwiftUI · UIKit · Berlin & Munich companies</div>
+      <div class="track-bar-wrap"><div class="track-bar" id="bar-ios" style="width:0%"></div></div>
+      <div class="track-meta"><span id="prog-ios">0 / 6 phases</span><span>14–18 mo</span></div>
+    </div>
+
+    <div class="track pos" onclick="openTrack('pos')">
+      <div class="track-icon">??</div>
+      <div class="track-title">POS Android</div>
+      <div class="track-sub">Payments · EMV · NFC · Stripe · Adyen · SumUp</div>
+      <div class="track-bar-wrap"><div class="track-bar" id="bar-pos" style="width:0%"></div></div>
+      <div class="track-meta"><span id="prog-pos">0 / 5 phases</span><span>15–20 mo</span></div>
+    </div>
+
+    <div class="track dsa" onclick="openTrack('dsa')">
+      <div class="track-icon">??</div>
+      <div class="track-title">Problem Solving</div>
+      <div class="track-sub">DSA · Algorithms · System Design · German interviews</div>
+      <div class="track-bar-wrap"><div class="track-bar" id="bar-dsa" style="width:0%"></div></div>
+      <div class="track-meta"><span id="prog-dsa">0 / 6 phases</span><span>12–16 mo</span></div>
+    </div>
+
+  </div>
+
+  <div class="timeline-hint">
+    <div class="tl-item"><div class="mo">NOW</div><div class="ev">Start DSA + current track</div></div>
+    <div class="tl-arrow">?</div>
+    <div class="tl-item"><div class="mo">Mo 3</div><div class="ev">First portfolio project</div></div>
+    <div class="tl-arrow">?</div>
+    <div class="tl-item"><div class="mo">Mo 9</div><div class="ev">Mock interviews begin</div></div>
+    <div class="tl-arrow">?</div>
+    <div class="tl-item"><div class="mo">Mo 12</div><div class="ev">Apply to German companies</div></div>
+    <div class="tl-arrow">?</div>
+    <div class="tl-item"><div class="mo">Mo 15–18</div><div class="ev">EU Blue Card + relocate</div></div>
+  </div>
+
+  <p class="section-label">Why <span>Germany</span> is the right target</p>
+  <div class="overview-grid">
+    <div class="ov-card"><h4>Strong iOS & Android market</h4><p>Berlin, Munich & Hamburg have hundreds of product companies — N26, Zalando, SumUp, BMW, Siemens — all actively hiring mobile engineers.</p></div>
+    <div class="ov-card"><h4>EU Blue Card for IT</h4><p>IT is a recognised shortage occupation — the salary threshold is lower (˜ €43,800/yr). Egyptian CS degrees are usually recognised without extra exams.</p></div>
+    <div class="ov-card"><h4>Less competition than US</h4><p>German tech hiring is less saturated than US FAANG. Good problem solving + clean code + domain specialisation can beat pure LeetCode grinders.</p></div>
+    <div class="ov-card"><h4>Mittelstand entry point</h4><p>Thousands of mid-sized German software companies hire with a take-home project, not 5 rounds of hard LeetCode. Great first step before targeting big names.</p></div>
+  </div>
+
+</div>
+
+<!-- detail views -->
+<div id="detail-view" style="display:none">
+  <div class="detail-header">
+    <button class="back-btn" onclick="closeTrack()">? Back</button>
+    <h2 id="detail-title"></h2>
+  </div>
+  <div class="sub-tabs" id="sub-tabs"></div>
+  <div id="detail-content"></div>
+</div>
+
+</div>
+
+<script>
+const state = JSON.parse(localStorage.getItem('hub-state') || '{}');
+
+const data = {
+android: {
+  title: '?? Android Automotive',
+  tabs: ['Phases','Projects','Germany tips'],
+  total: 6,
+  phases: [
+    {name:'AAOS foundations', months:'Months 1–3',
+     skills:[
+       {name:'AAOS architecture',desc:'CarService, CarPropertyManager, HAL layer overview'},
+       {name:'Car UI Library',desc:'CarUiLib, templates, driving-mode restrictions'},
+       {name:'VHAL concepts',desc:'Vehicle Hardware Abstraction Layer basics'},
+       {name:'Android media/audio',desc:'MediaSession in vehicle context'},
+     ],
+     refs:[
+       {label:'AAOS official docs',url:'https://source.android.com/docs/automotive'},
+       {label:'Android for Cars dev guide',url:'https://developer.android.com/training/cars'},
+       {label:'Car API reference',url:'https://developer.android.com/reference/android/car/Car'},
+       {label:'Car samples GitHub',url:'https://github.com/android/car-samples'},
+     ]},
+    {name:'AOSP & deep architecture', months:'Months 3–7',
+     skills:[
+       {name:'AOSP build system',desc:'Soong, Makefile, flashing custom builds'},
+       {name:'IPC / Binder / AIDL',desc:'Cross-process communication in car apps'},
+       {name:'Kotlin Coroutines',desc:'Advanced concurrency, Flow in services'},
+       {name:'Safety & ASPICE',desc:'ISO 26262, functional safety basics'},
+       {name:'Connectivity',desc:'Bluetooth, Wi-Fi, Android Auto projection'},
+       {name:'OTA & updates',desc:'Update engine, A/B partitions'},
+     ],
+     refs:[
+       {label:'AOSP build guide',url:'https://source.android.com/docs/setup/build/building'},
+       {label:'AIDL guide',url:'https://developer.android.com/guide/components/aidl'},
+       {label:'ISO 26262 overview',url:'https://www.iso.org/standard/68383.html'},
+       {label:'Udacity AAOS course',url:'https://www.udacity.com/course/android-automotive-development--nd032'},
+     ]},
+    {name:'Portfolio & German language', months:'Months 7–12',
+     skills:[
+       {name:'German (A2–B1)',desc:'BMW, VW, Bosch teams prefer basic German'},
+       {name:'CI/CD for Android',desc:'GitHub Actions, fastlane, emulator testing'},
+       {name:'CAN bus basics',desc:'How car ECUs communicate data to VHAL'},
+       {name:'Compose for Automotive',desc:'New OEM preference for in-vehicle UI'},
+     ],
+     refs:[
+       {label:'Compose for Automotive',url:'https://developer.android.com/jetpack/compose/automotive'},
+       {label:'Goethe Institut German',url:'https://www.goethe.de'},
+       {label:'Vector CAN bus intro',url:'https://www.vector.com/int/en/know-how/technologies/can/'},
+     ]},
+    {name:'Target OEM employers', months:'Months 12–14',
+     skills:[
+       {name:'BMW Group',desc:'Munich — AAOS infotainment lead'},
+       {name:'CARIAD (VW)',desc:'Wolfsburg/Berlin — VW software company'},
+       {name:'Mercedes-Benz',desc:'Stuttgart — MBUX Android platform'},
+       {name:'Continental / Bosch',desc:'Tier-1 suppliers across many German cities'},
+       {name:'Elektrobit (EB)',desc:'Erlangen — AAOS specialist vendor'},
+     ],
+     refs:[
+       {label:'CARIAD careers',url:'https://www.cariad.technology/global/en/jobs.html'},
+       {label:'BMW careers',url:'https://www.bmw.com/en/footer/metanavigation/jobs-and-career.html'},
+       {label:'Bosch careers',url:'https://www.bosch.com/careers/'},
+       {label:'Elektrobit careers',url:'https://www.elektrobit.com/career/'},
+     ]},
+    {name:'EU Blue Card application', months:'Months 14–16',
+     skills:[
+       {name:'Make it in Germany',desc:'Official portal for skilled worker visa info'},
+       {name:'Degree recognition',desc:'anabin.kmk.org — verify Egyptian CS degree'},
+       {name:'EU Blue Card',desc:'Job offer = €43,800/yr — IT shortage occupation'},
+       {name:'German embassy Cairo',desc:'Submit visa application here'},
+     ],
+     refs:[
+       {label:'Make it in Germany',url:'https://www.make-it-in-germany.com'},
+       {label:'anabin degree check',url:'https://anabin.kmk.org'},
+       {label:'EU Blue Card guide',url:'https://www.make-it-in-germany.com/en/visa-residence/types/eu-blue-card'},
+     ]},
+    {name:'Relocation & onboarding', months:'Months 16–18',
+     skills:[
+       {name:'XING profile',desc:'German LinkedIn — must-have for German job market'},
+       {name:'City selection',desc:'Munich (automotive hub) vs Berlin (startup scene)'},
+       {name:'Housing & taxes',desc:'SCHUFA credit, Anmeldung registration, Steuerklasse'},
+       {name:'Health insurance',desc:'TK, DAK, AOK — mandatory in Germany'},
+     ],
+     refs:[
+       {label:'XING Germany',url:'https://www.xing.com'},
+       {label:'How to Germany',url:'https://www.howtogermany.com'},
+       {label:'Toytown Germany (expats)',url:'https://www.toytownger many.com'},
+       {label:'StepStone Germany',url:'https://www.stepstone.de'},
+     ]},
+  ],
+  projects:[
+    {star:true,title:'AAOS Dashboard companion app',desc:'A cluster/head-unit app using CarPropertyManager to read real-time vehicle properties (speed, fuel, TPMS, HVAC) and display them with Compose for Automotive UI. Run on AAOS AVD in Android Studio. Demonstrates CarService APIs, VHAL data, and driving-mode UI restrictions.',refs:[{label:'AAOS AVD setup',url:'https://developer.android.com/studio/run/managing-avds'},{label:'CarPropertyManager',url:'https://developer.android.com/reference/android/car/hardware/CarPropertyManager'}]},
+    {title:'Android Auto navigation overlay',desc:'An Android Auto app using Car App Library showing POI search + turn-by-turn navigation templates. Tests your understanding of restricted template system, Sessions/Screens lifecycle, and safe-driving UI guidelines.',refs:[{label:'Car App Library',url:'https://developer.android.com/training/cars/apps'},{label:'Sample code',url:'https://github.com/android/car-samples/tree/main/car_app_library'}]},
+    {title:'CAN bus simulator + VHAL bridge',desc:'Use a Raspberry Pi or virtual CAN (SocketCAN) to simulate CAN messages, then write a VHAL reference implementation bridging data to AAOS properties. Advanced — extremely impressive to German Tier-1 employers.',refs:[{label:'VHAL reference',url:'https://source.android.com/docs/automotive/vhal'},{label:'python-can',url:'https://python-can.readthedocs.io'}]},
+  ],
+  germany:[
+    {icon:'??',title:'Top city: Munich',body:'Automotive capital of Germany. BMW, MAN, Continental, Bosch R&D all here. Higher cost of living but highest automotive engineering salaries.'},
+    {icon:'??',title:'Salary range',body:'Mid (3–5 yrs): €55–70k gross. Senior (5–8 yrs): €70–90k gross. Net ˜ 60% of gross after taxes.'},
+    {icon:'????',title:'Language tip',body:'Blue Card needs no German, but automotive teams (BMW, Bosch) heavily prefer B1. Start Goethe A1 now — 6 months gets you to A2.'},
+    {icon:'??',title:'Interview style',body:'German OEMs do take-home projects + technical discussion. Less LeetCode grinding, more architecture and domain knowledge.'},
+  ]
+},
+
+ios: {
+  title: '?? iOS Engineer',
+  tabs: ['Phases','Swift deep dive','Projects','Germany tips'],
+  total: 6,
+  phases: [
+    {name:'Swift language mastery', months:'Months 1–3',
+     skills:[
+       {name:'Swift fundamentals',desc:'Optionals, closures, enums with associated values, generics'},
+       {name:'Value vs reference types',desc:'Struct vs class, copy-on-write, mutability'},
+       {name:'Protocols & POP',desc:'Protocol-oriented programming — Apple core philosophy'},
+       {name:'ARC & memory',desc:'Strong/weak/unowned, retain cycles — critical interview topic'},
+       {name:'Swift concurrency',desc:'async/await, actors, Task, structured concurrency'},
+       {name:'Error handling',desc:'throws/try/catch, Result type, custom Error types'},
+     ],
+     refs:[
+       {label:'Swift official book',url:'https://docs.swift.org/swift-book/documentation/the-swift-programming-language/'},
+       {label:'Hacking with Swift',url:'https://www.hackingwithswift.com/read'},
+       {label:'Swift.org getting started',url:'https://www.swift.org/getting-started/'},
+       {label:'Point-Free (advanced)',url:'https://www.pointfree.co'},
+     ]},
+    {name:'UIKit + SwiftUI', months:'Months 3–5',
+     skills:[
+       {name:'UIKit core',desc:'UIViewController lifecycle, UITableView, UICollectionView'},
+       {name:'Auto Layout',desc:'Programmatic constraints, StackView, intrinsic content size'},
+       {name:'SwiftUI',desc:'View, State, Binding, ObservableObject, NavigationStack'},
+       {name:'UIKit + SwiftUI interop',desc:'UIHostingController, UIViewRepresentable'},
+       {name:'Navigation patterns',desc:'UINavigationController, modal presentation, deep linking'},
+       {name:'Animations',desc:'UIView.animate, Core Animation, SwiftUI animations'},
+     ],
+     refs:[
+       {label:'UIKit documentation',url:'https://developer.apple.com/documentation/uikit'},
+       {label:'SwiftUI documentation',url:'https://developer.apple.com/documentation/swiftui'},
+       {label:'100 Days of SwiftUI',url:'https://www.hackingwithswift.com/100/swiftui'},
+       {label:'100 Days of Swift (UIKit)',url:'https://www.hackingwithswift.com/100'},
+       {label:'Use Your Loaf (Auto Layout)',url:'https://useyourloaf.com'},
+     ]},
+    {name:'Architecture & platform depth', months:'Months 5–9',
+     skills:[
+       {name:'Architecture patterns',desc:'MVC, MVVM, MVP, VIPER, TCA — know trade-offs'},
+       {name:'Combine framework',desc:'Publishers, subscribers, operators — reactive in Apple ecosystem'},
+       {name:'Networking',desc:'URLSession, Codable, REST, async/await networking'},
+       {name:'Core Data',desc:'NSManagedObject, migrations, relationships'},
+       {name:'Dependency injection',desc:'Constructor injection, Swinject, testing with DI'},
+       {name:'Unit & UI testing',desc:'XCTest, XCUITest, mocking with protocols'},
+     ],
+     refs:[
+       {label:'Combine framework docs',url:'https://developer.apple.com/documentation/combine'},
+       {label:'Core Data docs',url:'https://developer.apple.com/documentation/coredata'},
+       {label:'TCA GitHub',url:'https://github.com/pointfreeco/swift-composable-architecture'},
+       {label:'Swinject DI',url:'https://github.com/Swinject/Swinject'},
+       {label:'SwiftData docs',url:'https://developer.apple.com/documentation/swiftdata'},
+     ]},
+    {name:'Advanced iOS frameworks', months:'Months 9–12',
+     skills:[
+       {name:'Performance profiling',desc:'Instruments (Time Profiler, Allocations, Leaks)'},
+       {name:'Push notifications',desc:'APNs, UserNotifications, rich notifications'},
+       {name:'Security & Keychain',desc:'Keychain Services API, Data Protection, ATS'},
+       {name:'WidgetKit',desc:'Home screen widgets, App Clips, Share extensions'},
+       {name:'CI/CD for iOS',desc:'Fastlane, Xcode Cloud, GitHub Actions, TestFlight'},
+       {name:'Core Location & Maps',desc:'CLLocationManager, MapKit, geofencing'},
+     ],
+     refs:[
+       {label:'UserNotifications docs',url:'https://developer.apple.com/documentation/usernotifications'},
+       {label:'WidgetKit docs',url:'https://developer.apple.com/documentation/widgetkit'},
+       {label:'Fastlane docs',url:'https://docs.fastlane.tools'},
+       {label:'Instruments guide',url:'https://developer.apple.com/instruments/'},
+     ]},
+    {name:'Interview prep — iOS specific', months:'Months 12–15',
+     skills:[
+       {name:'iOS interview Q&A',desc:'ARC, MVVM vs VIPER, Combine vs async/await, Core Data'},
+       {name:'Swift DSA',desc:'LeetCode in Swift — practice language idioms under pressure'},
+       {name:'Take-home prep',desc:'Clean SwiftUI app with networking, tests, MVVM'},
+       {name:'WWDC review',desc:'Follow Apple updates — German engineers expect this'},
+     ],
+     refs:[
+       {label:'HWS interview questions',url:'https://www.hackingwithswift.com/interview-questions'},
+       {label:'iOS Interview Guide',url:'https://iosinterviewguide.com'},
+       {label:'WWDC sessions',url:'https://developer.apple.com/wwdc/'},
+       {label:'LeetCode in Swift',url:'https://leetcode.com/problemset/?languageTags=swift'},
+       {label:'Swift Algorithm Club',url:'https://github.com/raywenderlich/swift-algorithm-club'},
+     ]},
+    {name:'Emerging tech & open source', months:'Months 15–18',
+     skills:[
+       {name:'Vision / Core ML',desc:'On-device ML, image recognition, object detection'},
+       {name:'visionOS / RealityKit',desc:'Apple Vision Pro — growing in Munich & Berlin'},
+       {name:'Vapor (Swift server)',desc:'Full-stack Swift — impressive to German backend teams'},
+       {name:'Accessibility (a11y)',desc:'VoiceOver, Dynamic Type — German legal obligation'},
+     ],
+     refs:[
+       {label:'Vision framework',url:'https://developer.apple.com/documentation/vision'},
+       {label:'Core ML',url:'https://developer.apple.com/documentation/coreml'},
+       {label:'Vapor',url:'https://vapor.codes'},
+       {label:'Apple accessibility',url:'https://developer.apple.com/accessibility/'},
+     ]},
+  ],
+  swift:[
+    {title:'Memory management & ARC',desc:'Know how Automatic Reference Counting works, when to use weak vs unowned, and how to find retain cycles in Instruments. Most common German iOS interview topic.',refs:[{label:'Swift book — ARC',url:'https://docs.swift.org/swift-book/documentation/the-swift-programming-language/automaticreferencecounting/'},{label:'Capture lists explained',url:'https://www.hackingwithswift.com/articles/179/capture-lists-in-swift-whats-the-difference-between-weak-strong-and-unowned-references'}]},
+    {title:'Protocols & protocol-oriented programming',desc:'Protocol extensions, default implementations, associated types, conditional conformance. "Value semantics + protocols" is Apple\'s design foundation.',refs:[{label:'WWDC 2015: POP',url:'https://developer.apple.com/videos/play/wwdc2015/408/'},{label:'Swift by Sundell — protocols',url:'https://www.swiftbysundell.com/articles/protocol-oriented-programming/'}]},
+    {title:'Swift concurrency — async/await & actors',desc:'Modern replacement for GCD. Know Task, async/await, actor isolation, MainActor, and structured concurrency. "How do actors prevent data races?" is a senior-level question.',refs:[{label:'WWDC 2021: Meet async/await',url:'https://developer.apple.com/videos/play/wwdc2021/10132/'},{label:'Swift by Sundell — actors',url:'https://www.swiftbysundell.com/articles/swift-actors/'}]},
+    {title:'Combine vs async/await',desc:'Combine is in many German codebases. Know Publishers, Subscribers, operators. Know when structured concurrency replaces Combine and when Combine is still better.',refs:[{label:'Combine official docs',url:'https://developer.apple.com/documentation/combine'},{label:'Combine vs async/await',url:'https://www.avanderlee.com/swift/combine-vs-async-await/'}]},
+    {title:'Generics & opaque types',desc:'Generic functions, constraints, opaque types (some View), existential types (any Protocol). Difference between opaque and existential = senior-level Swift question.',refs:[{label:'Swift book — generics',url:'https://docs.swift.org/swift-book/documentation/the-swift-programming-language/generics/'},{label:'WWDC 2022: Embrace generics',url:'https://developer.apple.com/videos/play/wwdc2022/110352/'}]},
+  ],
+  projects:[
+    {star:true,title:'News reader app (SwiftUI + MVVM)',desc:'Full news app: SwiftUI list with pagination, async/await networking, Core Data offline caching, push notifications, WidgetKit home screen widget, full unit test coverage, modular Swift packages per feature.',refs:[{label:'NewsAPI (free)',url:'https://newsapi.org'},{label:'WidgetKit docs',url:'https://developer.apple.com/documentation/widgetkit'}]},
+    {title:'Offline-first task manager',desc:'To-do app working fully offline, syncing via CloudKit when connected, resolving conflicts. Uses SwiftData, MVVM, XCTest + XCUITest. Demonstrates offline-first patterns German fintech companies care about.',refs:[{label:'CloudKit docs',url:'https://developer.apple.com/documentation/cloudkit'},{label:'SwiftData docs',url:'https://developer.apple.com/documentation/swiftdata'}]},
+    {title:'Core ML image classifier',desc:'App using Vision + Core ML to classify images on-device. Real-time camera feed with AVFoundation, clean SwiftUI results interface. Apple framework depth — rare in most candidates.',refs:[{label:'Core ML',url:'https://developer.apple.com/documentation/coreml'},{label:'Apple ML models',url:'https://developer.apple.com/machine-learning/models/'}]},
+  ],
+  germany:[
+    {icon:'???',title:'Top cities for iOS',body:'Berlin (N26, Zalando, Delivery Hero) and Munich (BMW, Siemens, enterprise). Berlin = English-first startups. Munich = corporate but higher automotive pay.'},
+    {icon:'??',title:'Salary range',body:'Mid (3–5 yrs): €55–70k gross. Senior: €70–95k gross. Net ˜ 58–62% of gross depending on tax class.'},
+    {icon:'??',title:'UIKit still matters',body:'Most German companies have large UIKit codebases. Learn both UIKit and SwiftUI — German corporates test UIKit depth heavily.'},
+    {icon:'??',title:'Take-home projects',body:'Very common in Germany. 3–7 day assignment. Clean code, README, unit tests, and architecture explanation are all expected.'},
+  ]
+},
+
+pos: {
+  title: '?? POS Android',
+  tabs: ['Phases','Projects','Ecosystem','Germany tips'],
+  total: 5,
+  phases: [
+    {name:'POS domain & payment flows', months:'Months 1–3',
+     skills:[
+       {name:'POS architecture',desc:'Terminals, PAX, Ingenico, Verifone hardware + Android POS'},
+       {name:'EMV standard',desc:'How chip cards work — ICC, APDU commands, kernels'},
+       {name:'Payment flows',desc:'Auth, capture, void, refund — card present vs not present'},
+       {name:'NFC & contactless',desc:'Android NFC APIs, HCE, ISO 14443'},
+     ],
+     refs:[
+       {label:'EMVCo official specs',url:'https://www.emvco.com/emv-technologies/contact/'},
+       {label:'Android NFC guide',url:'https://developer.android.com/guide/topics/connectivity/nfc'},
+       {label:'Android HCE guide',url:'https://developer.android.com/guide/topics/connectivity/nfc/hce'},
+       {label:'PCI DSS docs',url:'https://www.pcisecuritystandards.org/document_library/'},
+     ]},
+    {name:'Hardware & peripheral integration', months:'Months 3–6',
+     skills:[
+       {name:'USB & serial comms',desc:'UsbManager, USB-HID, RS-232 over USB adapters'},
+       {name:'ESC/POS printing',desc:'Thermal receipt printer command protocol'},
+       {name:'Barcode scanning',desc:'Zebra DataWedge, Honeywell SDK, ML Kit barcode'},
+       {name:'Sunmi / PAX SDK',desc:'Android POS device-specific SDKs'},
+       {name:'Bluetooth peripherals',desc:'Classic BT SPP profile for receipt printers'},
+     ],
+     refs:[
+       {label:'Android USB Host',url:'https://developer.android.com/guide/topics/connectivity/usb/host'},
+       {label:'Sunmi developer docs',url:'https://developers.sunmi.com/docs/en-US/xegk5or2p4frboi/'},
+       {label:'PAX PAXSTORE SDK',url:'https://docs.paxstore.us/doc/en/d/index.html'},
+       {label:'ESC/POS Android lib',url:'https://github.com/DantSu/ESCPOS-ThermalPrinter-Android'},
+       {label:'Zebra DataWedge',url:'https://techdocs.zebra.com/datawedge/'},
+     ]},
+    {name:'Payment SDK integration', months:'Months 6–10',
+     skills:[
+       {name:'Stripe Terminal SDK',desc:'Most common in startups — readers, discovery, payments'},
+       {name:'Adyen Terminal API',desc:'Enterprise-grade, widely used in Germany & Europe'},
+       {name:'SumUp Android SDK',desc:'Popular EU/Germany mPOS — good for German job market'},
+       {name:'SoftPOS / Tap on Phone',desc:'Android phone as terminal, Visa/MC requirements'},
+       {name:'ISO 8583',desc:'Financial transaction message standard — most acquirers'},
+     ],
+     refs:[
+       {label:'Stripe Terminal Android',url:'https://docs.stripe.com/terminal/android'},
+       {label:'Adyen Terminal API',url:'https://docs.adyen.com/point-of-sale/terminal-api/'},
+       {label:'SumUp Android SDK',url:'https://developer.sumup.com/terminal-sdk/android/'},
+       {label:'Visa Tap to Phone',url:'https://developer.visa.com/capabilities/tap-to-phone'},
+     ]},
+    {name:'Security & offline architecture', months:'Months 10–14',
+     skills:[
+       {name:'PCI DSS & P2PE',desc:'Scope reduction, cardholder data environment rules'},
+       {name:'Android Keystore',desc:'Key generation, TEE, StrongBox for secure key storage'},
+       {name:'DUKPT key management',desc:'Derived unique key per transaction — payments standard'},
+       {name:'Offline transaction queue',desc:'Room DB queue, sync-on-reconnect, conflict resolution'},
+       {name:'Root detection',desc:'Play Integrity API, RootBeer library'},
+       {name:'Certificate pinning',desc:'OkHttp CertificatePinner, TrustKit Android'},
+     ],
+     refs:[
+       {label:'PCI SSC library',url:'https://www.pcisecuritystandards.org/document_library/'},
+       {label:'Android Keystore',url:'https://developer.android.com/privacy-and-security/keystore'},
+       {label:'Play Integrity API',url:'https://developer.android.com/google/play/integrity'},
+       {label:'RootBeer GitHub',url:'https://github.com/scottyab/rootbeer'},
+       {label:'OkHttp cert pinning',url:'https://square.github.io/okhttp/4.x/okhttp/okhttp3/-certificate-pinner/'},
+     ]},
+    {name:'Advanced POS + job hunt', months:'Months 14–20',
+     skills:[
+       {name:'Kiosk / device owner mode',desc:'Android Enterprise, Device Policy Controller, lock-task mode'},
+       {name:'MDM integration',desc:'VMware Workspace ONE, Zebra OEMConfig, remote deploy'},
+       {name:'Multi-lane POS',desc:'Customer-facing display, split-screen POS architecture'},
+       {name:'Real-time reporting',desc:'WebSocket for live sales dashboard, Firestore sync'},
+       {name:'CI/CD for POS devices',desc:'GitHub Actions + Firebase App Distribution'},
+     ],
+     refs:[
+       {label:'Android Enterprise guide',url:'https://developer.android.com/work/guide'},
+       {label:'Device Policy Controller',url:'https://developer.android.com/work/dpc/build-dpc'},
+       {label:'Firebase App Distribution',url:'https://firebase.google.com/docs/app-distribution/android'},
+       {label:'OEMConfig / managed config',url:'https://developer.android.com/work/managed-configurations'},
+     ]},
+  ],
+  projects:[
+    {star:true,title:'Full Android POS app (Stripe Terminal)',desc:'Complete card-present POS: product catalog, cart, tax engine, Stripe Terminal SDK for card reading, ESC/POS BT receipt printing, offline transaction queue with Room DB sync. Jetpack Compose UI, MVVM + Clean Architecture, Hilt DI.',refs:[{label:'Stripe Terminal quickstart',url:'https://docs.stripe.com/terminal/android/integration'},{label:'ESC/POS library',url:'https://github.com/DantSu/ESCPOS-ThermalPrinter-Android'},{label:'Room DB',url:'https://developer.android.com/training/data-storage/room'}]},
+    {title:'SoftPOS / Tap on Phone prototype',desc:'Use Android HCE + NFC to accept contactless card taps on a regular Android phone. Simulates EMV transaction flow. Demonstrates deep contactless payment standards knowledge — rare skill, immediate attention.',refs:[{label:'HCE developer guide',url:'https://developer.android.com/guide/topics/connectivity/nfc/hce'},{label:'EMVCo contactless spec',url:'https://www.emvco.com/emv-technologies/contactless/'}]},
+    {title:'Android kiosk order system',desc:'Self-service kiosk using lock-task mode, Device Policy Controller, and a customer-facing display. QR code loyalty cards. Kitchen display WebSocket bridge. Shows Android Enterprise skills.',refs:[{label:'Lock-task mode',url:'https://developer.android.com/work/dpc/lock-task-mode'},{label:'DevicePolicyManager API',url:'https://developer.android.com/reference/android/app/admin/DevicePolicyManager'}]},
+  ],
+  ecosystem:[
+    {icon:'???',title:'Sunmi (T2s, V2s)',body:'Popular in Middle East & EU. Android-based, custom SDK for printer + scanner. Good first hardware to learn on.'},
+    {icon:'??',title:'PAX Technology',body:'Enterprise POS hardware. PAXSTORE marketplace. Strong in Germany — Bosch and Siemens use PAX terminals.'},
+    {icon:'??',title:'Adyen (Amsterdam/Munich)',body:'Dominant in Europe. Terminal API + Android SDK. Best German employer target for POS engineers.'},
+    {icon:'????',title:'SumUp (Berlin)',body:'Android-first POS startup. Huge EU presence. Most active hiring for Android POS in Germany right now.'},
+  ],
+  germany:[
+    {icon:'??',title:'Top target: SumUp Berlin',body:'Android-first, POS-native, actively hiring, no German language requirement. Best entry point for Egyptian POS engineers targeting Germany.'},
+    {icon:'??',title:'Salary range',body:'Mid (3–5 yrs): €55–68k gross. Senior: €70–90k gross. SumUp, Adyen, Worldline all at this level.'},
+    {icon:'??',title:'PCI knowledge differentiates',body:'Most candidates know Android but not PCI DSS or DUKPT. If you can speak to P2PE and key management, you get shortlisted immediately.'},
+    {icon:'????',title:'Egypt first strategy',body:'Get Paymob or Fawry experience first — real POS hardware, real EMV. Then apply to Germany with production POS on your CV.'},
+  ]
+},
+
+dsa: {
+  title: '?? Problem Solving',
+  tabs: ['Phases','14 Patterns','Practice plan','Germany tips'],
+  total: 6,
+  phases: [
+    {name:'Core data structures', months:'Months 1–2',
+     skills:[
+       {name:'Arrays & strings',desc:'Two pointers, sliding window, prefix sums'},
+       {name:'Linked lists',desc:'Singly, doubly, cycle detection, reversal'},
+       {name:'Stacks & queues',desc:'Monotonic stack, deque, priority queue'},
+       {name:'Hash maps & sets',desc:'Collision, chaining, frequency counting'},
+       {name:'Big-O analysis',desc:'Time & space complexity — expected in every interview'},
+     ],
+     refs:[
+       {label:'NeetCode roadmap',url:'https://neetcode.io/roadmap'},
+       {label:'VisuAlgo (animations)',url:'https://visualgo.net/en'},
+       {label:'Big-O cheat sheet',url:'https://www.bigocheatsheet.com'},
+       {label:'AlgoExpert',url:'https://www.algoexpert.io'},
+     ]},
+    {name:'Trees & sorting', months:'Months 2–4',
+     skills:[
+       {name:'Binary trees',desc:'DFS (pre/in/post-order), BFS, height, diameter'},
+       {name:'Binary search trees',desc:'Insert, delete, validate BST, kth smallest'},
+       {name:'Heaps / priority queues',desc:'Min-heap, max-heap, heap sort, top-K problems'},
+       {name:'Sorting algorithms',desc:'Merge sort, quick sort, counting sort — know complexity'},
+       {name:'Binary search',desc:'On sorted arrays, on answer space, rotated arrays'},
+       {name:'Tries',desc:'Prefix trees, autocomplete — common in EU companies'},
+     ],
+     refs:[
+       {label:'LeetCode binary tree',url:'https://leetcode.com/tag/binary-tree/'},
+       {label:'LeetCode binary search',url:'https://leetcode.com/tag/binary-search/'},
+       {label:'GfG heap guide',url:'https://www.geeksforgeeks.org/heap-data-structure/'},
+       {label:'Sorting algorithms (YouTube)',url:'https://www.youtube.com/watch?v=RBSGKlAvoiM'},
+     ]},
+    {name:'Graphs & dynamic programming', months:'Months 4–7',
+     skills:[
+       {name:'Graph BFS & DFS',desc:'Shortest path, connected components, cycle detection'},
+       {name:'Dijkstra algorithm',desc:'Weighted shortest path — very common in system design'},
+       {name:'Topological sort',desc:'Kahn\'s algorithm, course schedule type problems'},
+       {name:'Union-Find (DSU)',desc:'Connected components, cycle detection, Kruskal\'s MST'},
+       {name:'DP — 1D & 2D',desc:'Fibonacci, coin change, knapsack, LCS, LIS'},
+       {name:'DP on strings',desc:'Edit distance, palindromes, regex matching'},
+     ],
+     refs:[
+       {label:'LeetCode DP tag',url:'https://leetcode.com/tag/dynamic-programming/'},
+       {label:'LeetCode graph tag',url:'https://leetcode.com/tag/graph/'},
+       {label:'CP-algorithms Dijkstra',url:'https://cp-algorithms.com/graph/dijkstra.html'},
+       {label:'DP for beginners (YouTube)',url:'https://www.youtube.com/watch?v=oBt53YbR9Kk'},
+       {label:'NeetCode advanced course',url:'https://neetcode.io/courses/advanced-algorithms/0'},
+     ]},
+    {name:'Advanced patterns + system design', months:'Months 7–9',
+     skills:[
+       {name:'Backtracking',desc:'Subsets, permutations, N-queens, sudoku solver'},
+       {name:'Greedy algorithms',desc:'Interval scheduling, jump game, gas station'},
+       {name:'Bit manipulation',desc:'XOR tricks, counting bits, single number problems'},
+       {name:'System design basics',desc:'Load balancer, DB sharding, caching, CAP theorem'},
+       {name:'OOP design patterns',desc:'Factory, Observer, Strategy — common in German interviews'},
+     ],
+     refs:[
+       {label:'LeetCode backtracking',url:'https://leetcode.com/tag/backtracking/'},
+       {label:'System Design Primer',url:'https://github.com/donnemartin/system-design-primer'},
+       {label:'Grokking System Design',url:'https://www.educative.io/courses/grokking-the-system-design-interview'},
+       {label:'Refactoring Guru (patterns)',url:'https://refactoring.guru/design-patterns'},
+     ]},
+    {name:'Interview simulation', months:'Months 9–13',
+     skills:[
+       {name:'Timed mock interviews',desc:'45-min sessions — think out loud, write clean code'},
+       {name:'Take-home assignments',desc:'Common in Germany — clean architecture matters'},
+       {name:'STAR method behavioral',desc:'Conflict resolution, ownership — SAP, Zalando ask this'},
+       {name:'German interview culture',desc:'Narrate your thinking — silence is penalised more than in US'},
+     ],
+     refs:[
+       {label:'interviewing.io (mock)',url:'https://interviewing.io'},
+       {label:'Pramp (free mock)',url:'https://www.pramp.com'},
+       {label:'Tech Interview Handbook',url:'https://www.techinterviewhandbook.org'},
+       {label:'NeetCode YouTube',url:'https://www.youtube.com/c/NeetCode'},
+     ]},
+    {name:'Competitive programming & open source', months:'Months 13–16',
+     skills:[
+       {name:'Codeforces Div.2–3',desc:'Shows rigour that impresses German engineers'},
+       {name:'String algorithms',desc:'KMP, Z-algorithm, Rabin-Karp pattern matching'},
+       {name:'Math & number theory',desc:'GCD, modular arithmetic, sieve of Eratosthenes'},
+       {name:'Open source contribution',desc:'GitHub activity — German companies verify this'},
+     ],
+     refs:[
+       {label:'Codeforces',url:'https://codeforces.com'},
+       {label:'AtCoder',url:'https://atcoder.jp'},
+       {label:'CP-algorithms KMP',url:'https://cp-algorithms.com/string/kmp.html'},
+       {label:'Project Euler',url:'https://projecteuler.net'},
+     ]},
+  ],
+  patterns:[
+    {title:'Two pointers',desc:'Used when: sorted arrays, palindrome check, container with water. Signal: pair of elements, O(n) needed. Problems: valid palindrome, 3Sum, trapping rain water.',refs:[{label:'LeetCode two pointers',url:'https://leetcode.com/tag/two-pointers/'}]},
+    {title:'Sliding window',desc:'Used when: contiguous subarray, "maximum in a window". Problems: longest substring without repeating chars, minimum window substring.',refs:[{label:'LeetCode sliding window',url:'https://leetcode.com/tag/sliding-window/'}]},
+    {title:'Fast & slow pointers',desc:'Used when: linked list cycle, middle of linked list, duplicate number. Always O(1) space. Floyd\'s cycle detection.',refs:[{label:'Linked list cycle',url:'https://leetcode.com/problems/linked-list-cycle/'}]},
+    {title:'Binary search on answer',desc:'Used when: "find minimum/maximum feasible value". Search on answer space, not arrays. Problems: koko eating bananas, capacity to ship packages.',refs:[{label:'LeetCode binary search',url:'https://leetcode.com/tag/binary-search/'},{label:'NeetCode binary search on answer',url:'https://neetcode.io/courses/advanced-algorithms/13'}]},
+    {title:'Merge intervals',desc:'Used when: scheduling, overlapping ranges, calendar problems. Sort by start time first. Very common in European fintech/SaaS.',refs:[{label:'LeetCode intervals',url:'https://leetcode.com/tag/intervals/'}]},
+    {title:'Tree DFS & BFS',desc:'DFS: recursion or stack. BFS: queue, level-order. Know: max depth, path sum, LCA, serialize/deserialize.',refs:[{label:'LeetCode tree',url:'https://leetcode.com/tag/tree/'}]},
+    {title:'Graph BFS / DFS',desc:'Used when: grid problems, connected components, shortest path (unweighted). Problems: number of islands, clone graph, word ladder.',refs:[{label:'LeetCode graph',url:'https://leetcode.com/tag/graph/'},{label:'CP-algorithms BFS',url:'https://cp-algorithms.com/graph/bfs.html'}]},
+    {title:'Dynamic programming',desc:'Used when: "how many ways", "maximum/minimum cost", overlapping subproblems. Always: brute force ? memoization ? tabulation.',refs:[{label:'LeetCode DP',url:'https://leetcode.com/tag/dynamic-programming/'}]},
+    {title:'Monotonic stack',desc:'Used when: "next greater element", "largest rectangle in histogram". O(n) with strict pattern. Problems: daily temperatures, largest rectangle.',refs:[{label:'LeetCode monotonic stack',url:'https://leetcode.com/tag/monotonic-stack/'}]},
+    {title:'Backtracking',desc:'Used when: all combinations/permutations, constraint satisfaction. Template: choose ? recurse ? unchoose. Problems: subsets, permutations, word search.',refs:[{label:'LeetCode backtracking',url:'https://leetcode.com/tag/backtracking/'}]},
+    {title:'Top-K / heap pattern',desc:'Used when: "K largest/smallest", "K most frequent", "merge K sorted". Always think heap first.',refs:[{label:'LeetCode heap',url:'https://leetcode.com/tag/heap-priority-queue/'}]},
+    {title:'Union-Find (DSU)',desc:'Used when: grouping, connected components, detecting cycles. Know path compression + union by rank.',refs:[{label:'CP-algorithms DSU',url:'https://cp-algorithms.com/data_structures/disjoint_set_union.html'}]},
+    {title:'Trie (prefix tree)',desc:'Used when: word search, autocomplete, prefix matching. Build from scratch. Common in EU product companies.',refs:[{label:'LeetCode trie',url:'https://leetcode.com/tag/trie/'}]},
+    {title:'Topological sort',desc:'Used when: dependencies, task scheduling, build order. Know Kahn\'s (BFS) and DFS approach. Problems: course schedule, alien dictionary.',refs:[{label:'LeetCode topological sort',url:'https://leetcode.com/tag/topological-sort/'}]},
+  ],
+  practice:[
+    {title:'NeetCode 150',desc:'The single best curated list. Covers all patterns. Do this first, in order.',refs:[{label:'NeetCode 150 practice',url:'https://neetcode.io/practice'}]},
+    {title:'Grind 75',desc:'Shorter list, highest ROI problems. Use for interview crunch time.',refs:[{label:'Grind 75',url:'https://www.techinterviewhandbook.org/grind75'}]},
+    {title:'Blind 75',desc:'Classic list — most German companies use problems from this set.',refs:[{label:'Blind 75 on LeetCode',url:'https://leetcode.com/list/xi4ci4ig/'}]},
+    {title:'Mock interviews',desc:'Pramp (free) or interviewing.io. Full 45-min timed sessions, narrate out loud. Do at least 2 per week in final prep month.',refs:[{label:'Pramp',url:'https://www.pramp.com'},{label:'interviewing.io',url:'https://interviewing.io'}]},
+    {title:'Cracking the Coding Interview',desc:'Still the most complete book. Chapters 1–11 cover everything needed for German mid-level roles.',refs:[{label:'CTCI official site',url:'https://www.crackingthecodinginterview.com'}]},
+    {title:'Designing Data-Intensive Applications',desc:'Best system design book. German senior interviews expect this level of knowledge.',refs:[{label:'DDIA (O\'Reilly)',url:'https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/'}]},
+  ],
+  germany:[
+    {icon:'??',title:'Actual LeetCode bar',body:'Junior: Easy problems. Mid: Medium consistently. Senior: Medium-Hard + system design. Mittelstand SMEs: mostly take-home projects, minimal LeetCode.'},
+    {icon:'???',title:'Take-home projects dominate',body:'Most German companies give a 3–7 day task. Clean code, SOLID principles, README, and architecture discussion matter as much as a working solution.'},
+    {icon:'???',title:'Narrate your thinking',body:'Germans value structured thinking. Say "I recognise this as a sliding window problem because..." — silence during coding is penalised more than in US interviews.'},
+    {icon:'??',title:'Clean Code = cultural value',body:'Robert Martin\'s Clean Code is taken seriously in Germany. Read it before any take-home assignment. Readable, maintainable code over clever code.'},
+  ]
+}
+};
+
+function renderPhases(track, phases) {
+  return phases.map((p,i) => {
+    const key = `${track}-phase-${i}`;
+    const checked = state[key] || false;
+    const open = state[`${key}-open`] || false;
+    return `<div class="phase${open?' open':''}" id="ph-${track}-${i}">
+      <div class="phase-head" onclick="togglePhase('${track}',${i})">
+        <span class="phase-num">Phase ${i+1}</span>
+        <div class="phase-title-wrap">
+          <div class="phase-name">${p.name}</div>
+          <div class="phase-months">${p.months}</div>
+        </div>
+        <div class="phase-done${checked?' checked':''}" onclick="event.stopPropagation();toggleDone('${track}',${i})">${checked?'?':''}</div>
+        <span class="phase-chevron">?</span>
+      </div>
+      <div class="phase-body">
+        <div class="skills-grid">
+          ${p.skills.map(s=>`<div class="skill-chip"><span class="name">${s.name}</span><span class="desc">${s.desc}</span></div>`).join('')}
+        </div>
+        <div class="refs-label">References</div>
+        <div class="refs">${p.refs.map(r=>`<a href="${r.url}" target="_blank">${r.label}</a>`).join('')}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderProjects(projs) {
+  return `<p class="section-label">Portfolio <span>projects</span></p>
+  <div class="proj-cards">${projs.map(p=>`
+    <div class="proj-card">
+      ${p.star?'<span class="star">? RECOMMENDED</span>':''}
+      <h4>${p.title}</h4>
+      <p>${p.desc}</p>
+      <div class="refs">${p.refs.map(r=>`<a href="${r.url}" target="_blank">${r.label}</a>`).join('')}</div>
+    </div>`).join('')}
+  </div>`;
+}
+
+function renderGermany(tips) {
+  return `<p class="section-label">Germany <span>tips</span></p>
+  <div class="germany-box">
+    <div class="germany-grid">${tips.map(t=>`
+      <div class="g-item">
+        <h4>${t.icon} ${t.title}</h4>
+        <p>${t.body}</p>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderItems(items) {
+  return `<div class="phases">${items.map((p,i)=>`
+    <div class="phase" id="extra-${i}">
+      <div class="phase-head" onclick="toggleExtra(${i})">
+        <span class="phase-num">#${i+1}</span>
+        <div class="phase-title-wrap"><div class="phase-name">${p.title}</div></div>
+        <span class="phase-chevron">?</span>
+      </div>
+      <div class="phase-body">
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px">${p.desc}</p>
+        <div class="refs">${p.refs.map(r=>`<a href="${r.url}" target="_blank">${r.label}</a>`).join('')}</div>
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
+
+let currentTrack = null;
+let currentSubTab = 0;
+
+function openTrack(key) {
+  currentTrack = key;
+  currentSubTab = 0;
+  const d = data[key];
+  document.getElementById('home-view').style.display = 'none';
+  document.getElementById('detail-view').style.display = 'block';
+  document.getElementById('detail-title').textContent = d.title;
+  const tabs = document.getElementById('sub-tabs');
+  tabs.innerHTML = d.tabs.map((t,i)=>`<button class="sub-tab${i===0?' active':''}" onclick="switchSubTab(${i},this)">${t}</button>`).join('');
+  renderSubTab(key, 0);
+}
+
+function switchSubTab(i, btn) {
+  currentSubTab = i;
+  document.querySelectorAll('.sub-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSubTab(currentTrack, i);
+}
+
+function renderSubTab(key, i) {
+  const d = data[key];
+  const tab = d.tabs[i];
+  const c = document.getElementById('detail-content');
+  if (tab === 'Phases') {
+    c.innerHTML = `<div class="phases">${renderPhases(key, d.phases)}</div>`;
+  } else if (tab === 'Projects') {
+    c.innerHTML = renderProjects(d.projects || []);
+  } else if (tab === 'Germany tips') {
+    c.innerHTML = renderGermany(d.germany || []);
+  } else if (tab === 'Swift deep dive') {
+    c.innerHTML = `<p class="section-label">Swift <span>interview topics</span></p>${renderItems(d.swift||[])}`;
+  } else if (tab === '14 Patterns') {
+    c.innerHTML = `<p class="section-label">The 14 <span>patterns</span></p>${renderItems(d.patterns||[])}`;
+  } else if (tab === 'Practice plan') {
+    c.innerHTML = `<p class="section-label">Practice <span>resources</span></p>${renderItems(d.practice||[])}`;
+  } else if (tab === 'Ecosystem') {
+    c.innerHTML = `<p class="section-label">POS <span>ecosystem</span></p><div class="tips">${(d.ecosystem||[]).map(t=>`<div class="tip"><div class="tip-icon">${t.icon}</div><h4>${t.title}</h4><p>${t.body}</p></div>`).join('')}</div>`;
+  }
+}
+
+function togglePhase(track, i) {
+  const key = `${track}-phase-${i}-open`;
+  state[key] = !state[key];
+  save();
+  const el = document.getElementById(`ph-${track}-${i}`);
+  el.classList.toggle('open', state[key]);
+}
+
+function toggleExtra(i) {
+  const el = document.getElementById(`extra-${i}`);
+  el.classList.toggle('open');
+}
+
+function toggleDone(track, i) {
+  const key = `${track}-phase-${i}`;
+  state[key] = !state[key];
+  save();
+  updateProgress();
+  renderSubTab(track, currentSubTab);
+}
+
+function closeTrack() {
+  document.getElementById('home-view').style.display = 'block';
+  document.getElementById('detail-view').style.display = 'none';
+  currentTrack = null;
+}
+
+function save() {
+  localStorage.setItem('hub-state', JSON.stringify(state));
+}
+
+function updateProgress() {
+  const tracks = ['android','ios','pos','dsa'];
+  let totalDone = 0, totalAll = 0;
+  tracks.forEach(t => {
+    const total = data[t].total;
+    let done = 0;
+    for (let i=0;i<total;i++) { if (state[`${t}-phase-${i}`]) done++; }
+    const pct = total ? Math.round(done/total*100) : 0;
+    const barEl = document.getElementById(`bar-${t}`);
+    const progEl = document.getElementById(`prog-${t}`);
+    if (barEl) barEl.style.width = pct + '%';
+    if (progEl) progEl.textContent = `${done} / ${total} phases`;
+    totalDone += done; totalAll += total;
+  });
+  const overall = totalAll ? Math.round(totalDone/totalAll*100) : 0;
+  document.getElementById('total-pct').textContent = overall + '%';
+}
+
+updateProgress();
+</script>
+<div class="aaos-theme-bar">
+  <button class="aaos-fab theme-toggle-btn" onclick="aaosToggleTheme()" title="????? ?????">??</button>
+  <a class="aaos-fab" href="../index.html" title="????????">??</a>
+</div>
+<script src="../scripts/theme.js"></script></body>
+</html>
+
