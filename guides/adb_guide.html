@@ -467,7 +467,7 @@ td code{
 /* ═══════════════════════════════════════
    GRID
 ═══════════════════════════════════════ */
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.g2{display:grid;grid-template-columns:1fr;gap:16px;}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
 @media(max-width:768px){.g2,.g3{grid-template-columns:1fr;}}
 
@@ -812,7 +812,7 @@ footer{
     </div>
   </div>
 
-  <div class="g2">
+  <div style="display:flex;flex-direction:column;gap:16px;">
     <div>
       <div class="card">
         <div class="card-title"><span class="dot dot-b"></span>🪟 Windows</div>
