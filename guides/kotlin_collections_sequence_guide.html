@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collections & Sequences في Kotlin — دليل المطوّر</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0E13;
+    --bg-soft:#0D1218;
+    --surface:#131A22;
+    --surface-2:#19222C;
+    --border:#22303D;
+    --text:#E9F1F7;
+    --text-muted:#8CA0B3;
+    --amber:#FFB454;
+    --amber-dim:#B87F2E;
+    --azure:#5DC2FF;
+    --lime:#B8E552;
+    --coral:#FF7A7A;
+    --violet:#B79CFF;
+    --grad-hero: radial-gradient(circle at 18% 15%, rgba(255,180,84,0.14), transparent 45%),
+                 radial-gradient(circle at 85% 12%, rgba(93,194,255,0.16), transparent 42%),
+                 radial-gradient(circle at 55% 95%, rgba(184,229,82,0.08), transparent 45%);
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{ background:var(--bg); color:var(--text); font-family:'Tajawal', sans-serif; line-height:1.85; overflow-x:hidden; }
+  h1,h2,h3,.display{ font-family:'Cairo', sans-serif; }
+  code, pre, .mono{ font-family:'JetBrains Mono', monospace; }
+  ::selection{ background:var(--amber); color:#1A1200; }
+  a{ color:var(--amber); }
+
+  /* ===== NAV ===== */
+  .nav{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 6vw;
+    background:rgba(10,14,19,0.75);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-brand{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:1.05rem; }
+  .nav-dot{ width:10px; height:10px; border-radius:3px; background:var(--amber); box-shadow:0 0 14px var(--amber); }
+  .nav-links{ display:flex; gap:24px; font-size:.9rem; color:var(--text-muted); }
+  .nav-links a{ color:var(--text-muted); text-decoration:none; transition:color .2s; }
+  .nav-links a:hover{ color:var(--amber); }
+  @media(max-width:900px){ .nav-links{ display:none; } }
+
+  /* ===== HERO ===== */
+  .hero{ position:relative; padding:9vh 6vw 10vh; background:var(--grad-hero), var(--bg); border-bottom:1px solid var(--border); overflow:hidden; }
+  .hero-grid{ display:grid; grid-template-columns:1.15fr .85fr; gap:60px; align-items:center; }
+  @media(max-width:900px){ .hero-grid{ grid-template-columns:1fr; } }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'JetBrains Mono', monospace; font-size:.78rem; letter-spacing:.06em;
+    color:var(--amber); background:rgba(255,180,84,0.08);
+    border:1px solid rgba(255,180,84,0.3);
+    padding:6px 14px; border-radius:100px; margin-bottom:22px;
+  }
+  .hero h1{ font-size:clamp(2.2rem, 4.6vw, 3.5rem); font-weight:900; line-height:1.28; margin-bottom:20px; }
+  .hero h1 span{ color:var(--amber); }
+  .hero p{ font-size:1.1rem; color:var(--text-muted); max-width:54ch; margin-bottom:32px; }
+  .hero-actions{ display:flex; gap:14px; flex-wrap:wrap; }
+  .btn{
+    font-family:'Cairo',sans-serif; font-weight:700; font-size:.95rem;
+    padding:13px 26px; border-radius:10px; cursor:pointer; border:none;
+    text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-primary{ background:var(--amber); color:#1A1200; box-shadow:0 8px 24px rgba(255,180,84,0.25); }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 12px 30px rgba(255,180,84,0.35); }
+  .btn-ghost{ background:transparent; color:var(--text); border:1px solid var(--border); }
+  .btn-ghost:hover{ border-color:var(--amber); color:var(--amber); }
+
+  /* signature: pipeline visual — eager pour vs lazy conveyor */
+  .pipeline{ position:relative; height:380px; display:flex; flex-direction:column; justify-content:center; gap:26px; }
+  .lane{
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    padding:18px 20px; position:relative; overflow:hidden;
+  }
+  .lane-label{ font-family:'JetBrains Mono'; font-size:.72rem; color:var(--text-muted); margin-bottom:12px; display:flex; justify-content:space-between; }
+  .lane-label b{ color:var(--text); font-weight:600; }
+  .beads{ display:flex; gap:8px; }
+  .bead{ width:26px; height:26px; border-radius:7px; background:var(--surface-2); border:1px solid var(--border); flex:none; }
+  .lane.eager .bead{ animation:fillAll .1s ease forwards; background:var(--azure); opacity:.85; }
+  .lane.lazy .bead{ opacity:.25; }
+  .lane.lazy .bead.active{ background:var(--lime); opacity:1; animation:pulseBead 1.6s infinite; }
+  @keyframes pulseBead{ 0%,100%{ box-shadow:0 0 0 rgba(184,229,82,0); } 50%{ box-shadow:0 0 16px rgba(184,229,82,0.6); } }
+
+  /* ===== SECTIONS ===== */
+  section{ padding:9vh 6vw; max-width:1180px; margin:0 auto; }
+  .section-head{ margin-bottom:44px; max-width:66ch; }
+  .section-tag{ font-family:'JetBrains Mono'; font-size:.78rem; color:var(--azure); letter-spacing:.05em; margin-bottom:10px; display:block; }
+  h2{ font-size:clamp(1.6rem,3vw,2.3rem); font-weight:800; margin-bottom:14px; }
+  .section-head p{ color:var(--text-muted); font-size:1.05rem; }
+
+  /* type cards */
+  .type-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  @media(max-width:820px){ .type-grid{ grid-template-columns:1fr; } }
+  .type-card{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:26px; border-top:3px solid var(--azure); }
+  .type-card.set{ border-top-color:var(--lime); }
+  .type-card.map{ border-top-color:var(--violet); }
+  .type-card h3{ font-size:1.1rem; margin-bottom:10px; font-family:'JetBrains Mono'; }
+  .type-card p{ color:var(--text-muted); font-size:.92rem; margin-bottom:14px; }
+  .type-card .tags{ display:flex; gap:8px; flex-wrap:wrap; }
+  .pill{ font-family:'JetBrains Mono'; font-size:.72rem; padding:4px 10px; border-radius:100px; background:var(--surface-2); color:var(--text-muted); border:1px solid var(--border); }
+
+  /* code window */
+  .code-window{ background:#0C1015; border:1px solid var(--border); border-radius:14px; overflow:hidden; margin:22px 0; box-shadow:0 20px 45px rgba(0,0,0,0.35); }
+  .code-header{ display:flex; align-items:center; justify-content:space-between; padding:12px 18px; background:var(--surface); border-bottom:1px solid var(--border); }
+  .dots{ display:flex; gap:7px; }
+  .dots span{ width:11px; height:11px; border-radius:50%; }
+  .dots span:nth-child(1){ background:#FF5F57; }
+  .dots span:nth-child(2){ background:#FEBC2E; }
+  .dots span:nth-child(3){ background:#28C840; }
+  .code-filename{ font-family:'JetBrains Mono'; font-size:.78rem; color:var(--text-muted); }
+  .code-window pre{ direction:ltr; text-align:left; padding:20px 22px; overflow-x:auto; font-size:.86rem; line-height:1.7; color:#D8E4EE; }
+  .code-window code{ direction:ltr; }
+  .tok-kw{ color:var(--violet); }
+  .tok-str{ color:var(--amber); }
+  .tok-type{ color:var(--azure); }
+  .tok-cmt{ color:#5C7185; font-style:italic; }
+  .tok-fn{ color:var(--lime); }
+
+  /* operations grid */
+  .ops-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+  @media(max-width:800px){ .ops-grid{ grid-template-columns:1fr; } }
+  .op-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px 22px; }
+  .op-card .op-name{ font-family:'JetBrains Mono'; color:var(--azure); font-weight:700; font-size:.95rem; margin-bottom:6px; }
+  .op-card p{ color:var(--text-muted); font-size:.88rem; margin-bottom:12px; }
+  .op-card pre{ direction:ltr; text-align:left; font-size:.8rem; background:#0C1015; padding:12px 14px; border-radius:8px; overflow-x:auto; border:1px solid var(--border); }
+
+  /* vs comparison */
+  .vs-wrap{ display:grid; grid-template-columns:1fr auto 1fr; gap:20px; align-items:center; margin-top:10px; }
+  @media(max-width:800px){ .vs-wrap{ grid-template-columns:1fr; } }
+  .vs-card{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px; }
+  .vs-card.collection{ border-top:3px solid var(--azure); }
+  .vs-card.sequence{ border-top:3px solid var(--lime); }
+  .vs-card h3{ font-size:1.15rem; margin-bottom:14px; display:flex; align-items:center; gap:10px; }
+  .vs-card ul{ list-style:none; }
+  .vs-card li{ color:var(--text-muted); padding:9px 0; border-bottom:1px dashed var(--border); font-size:.92rem; }
+  .vs-card li:last-child{ border-bottom:none; }
+  .vs-divider{ font-family:'JetBrains Mono'; color:var(--text-muted); font-weight:700; text-align:center; font-size:.85rem; }
+
+  /* table */
+  .styled-table{ width:100%; border-collapse:collapse; margin-top:20px; }
+  .styled-table th, .styled-table td{ padding:14px 16px; text-align:right; border-bottom:1px solid var(--border); font-size:.93rem; }
+  .styled-table th{ font-family:'Cairo'; color:var(--amber); font-size:.85rem; letter-spacing:.03em; border-bottom:2px solid var(--amber-dim); }
+  .styled-table td{ color:var(--text-muted); }
+  .styled-table tr:hover td{ color:var(--text); background:rgba(255,255,255,0.02); }
+  .table-wrap{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:8px 20px; overflow-x:auto; }
+  code.inline{ background:var(--surface-2); border:1px solid var(--border); padding:2px 8px; border-radius:6px; font-size:.85em; color:var(--lime); direction:ltr; display:inline-block; }
+
+  /* steps (sequence performance walkthrough) */
+  .steps{ display:flex; flex-direction:column; gap:14px; margin-top:10px; }
+  .step{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:26px 28px; }
+  .step-top{ display:flex; align-items:center; gap:14px; margin-bottom:6px; }
+  .step-index{ font-family:'JetBrains Mono'; font-weight:700; color:var(--amber); background:rgba(255,180,84,0.08); border:1px solid rgba(255,180,84,0.3); width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex:none; }
+  .step h3{ font-size:1.1rem; }
+  .step-desc{ color:var(--text-muted); margin-bottom:4px; font-size:.94rem; }
+
+  /* tips grid */
+  .tips{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:18px; margin-top:10px; }
+  .tip{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px; transition:border-color .2s, transform .2s; }
+  .tip:hover{ border-color:var(--amber); transform:translateY(-3px); }
+  .tip .icon{ width:40px; height:40px; border-radius:10px; margin-bottom:16px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; background:rgba(93,194,255,0.12); color:var(--azure); }
+  .tip h4{ font-size:1rem; margin-bottom:8px; }
+  .tip p{ font-size:.88rem; color:var(--text-muted); }
+
+  footer{ border-top:1px solid var(--border); padding:40px 6vw; text-align:center; color:var(--text-muted); font-size:.88rem; }
+  footer .nav-brand{ justify-content:center; margin-bottom:10px; }
+
+  .glow-divider{ height:1px; width:100%; background:linear-gradient(90deg, transparent, var(--border), transparent); margin:0; }
+
+  ::-webkit-scrollbar{ width:10px; height:10px; }
+  ::-webkit-scrollbar-track{ background:var(--bg); }
+  ::-webkit-scrollbar-thumb{ background:var(--border); border-radius:10px; }
+  ::-webkit-scrollbar-thumb:hover{ background:var(--amber-dim); }
+
+  :focus-visible{ outline:2px solid var(--amber); outline-offset:3px; }
+
+  @media (prefers-reduced-motion: reduce){ .lane .bead{ animation:none; } }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand"><span class="nav-dot"></span> Kotlin Collections & Sequences</div>
+  <div class="nav-links">
+    <a href="#types">الأنواع</a>
+    <a href="#operations">العمليات</a>
+    <a href="#sequence">الـ Sequence</a>
+    <a href="#compare">المقارنة</a>
+    <a href="#android">في أندرويد</a>
+    <a href="#tips">نصائح</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-grid">
+    <div>
+      <span class="eyebrow">🧩 Kotlin Standard Library</span>
+      <h1>Collections و <span>Sequence</span> في Kotlin بعمق</h1>
+      <p>دليل شامل لكل حاجة عن الـ Collections (List, Set, Map) وعمليات التحويل والفلترة، والفرق الجوهري بين Collection و Sequence وإمتى تستخدم كل واحدة في تطبيقات أندرويد.</p>
+      <div class="hero-actions">
+        <a href="#sequence" class="btn btn-primary">شوف الفرق الحقيقي ←</a>
+        <a href="#operations" class="btn btn-ghost">كل العمليات</a>
+      </div>
+    </div>
+    <div class="pipeline">
+      <div class="lane eager">
+        <div class="lane-label"><b>Collection</b> — تنفيذ فوري (Eager) على كل عنصر في كل خطوة</div>
+        <div class="beads"><div class="bead"></div><div class="bead"></div><div class="bead"></div><div class="bead"></div><div class="bead"></div><div class="bead"></div></div>
+      </div>
+      <div class="lane lazy">
+        <div class="lane-label"><b>Sequence</b> — تنفيذ كسول (Lazy) عنصر بعنصر عند الحاجة</div>
+        <div class="beads">
+          <div class="bead active"></div><div class="bead"></div><div class="bead"></div><div class="bead"></div><div class="bead"></div><div class="bead"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="glow-divider"></div>
+
+<section id="types">
+  <div class="section-head">
+    <span class="section-tag">01 · الأساسيات</span>
+    <h2>أنواع الـ Collections في Kotlin</h2>
+    <p>كل الـ Collections في Kotlin مبنية على تفرقة واضحة بين النسخ اللي ممكن تتعدّل (Mutable) والنسخ اللي للقراءة بس (Read-only) — الفرق مش في الـ Class نفسه، لكن في الـ Interface اللي بتتعامل بيه.</p>
+  </div>
+
+  <div class="type-grid">
+    <div class="type-card">
+      <h3>List</h3>
+      <p>عناصر مرتّبة، وممكن يتكرر نفس العنصر أكتر من مرة. الترتيب مهم والوصول بيكون بالـ Index.</p>
+      <div class="tags"><span class="pill">listOf()</span><span class="pill">mutableListOf()</span><span class="pill">ArrayList</span></div>
+    </div>
+    <div class="type-card set">
+      <h3>Set</h3>
+      <p>عناصر فريدة (بدون تكرار). مفيد لما تحتاج تتأكد إن كل عنصر موجود مرة واحدة بس.</p>
+      <div class="tags"><span class="pill">setOf()</span><span class="pill">mutableSetOf()</span><span class="pill">HashSet</span></div>
+    </div>
+    <div class="type-card map">
+      <h3>Map</h3>
+      <p>مجموعة من أزواج مفتاح-قيمة (Key-Value). كل مفتاح فريد وبيشاور لقيمة واحدة.</p>
+      <div class="tags"><span class="pill">mapOf()</span><span class="pill">mutableMapOf()</span><span class="pill">HashMap</span></div>
+    </div>
+  </div>
+
+  <div class="code-window">
+    <div class="code-header"><div class="dots"><span></span><span></span><span></span></div><span class="code-filename">Collections.kt</span></div>
+    <pre><code><span class="tok-cmt">// Read-only — للقراءة فقط، مش هتقدر تضيف أو تحذف</span>
+<span class="tok-kw">val</span> names: List&lt;String&gt; = listOf(<span class="tok-str">"أحمد"</span>, <span class="tok-str">"سارة"</span>, <span class="tok-str">"محمد"</span>)
+
+<span class="tok-cmt">// Mutable — قابلة للتعديل</span>
+<span class="tok-kw">val</span> cart: MutableList&lt;String&gt; = mutableListOf(<span class="tok-str">"قلم"</span>, <span class="tok-str">"دفتر"</span>)
+cart.<span class="tok-fn">add</span>(<span class="tok-str">"مسطرة"</span>)
+
+<span class="tok-cmt">// Set — بدون تكرار</span>
+<span class="tok-kw">val</span> uniqueIds: Set&lt;Int&gt; = setOf(<span class="tok-str">1</span>, <span class="tok-str">2</span>, <span class="tok-str">2</span>, <span class="tok-str">3</span>) <span class="tok-cmt">// النتيجة: {1, 2, 3}</span>
+
+<span class="tok-cmt">// Map — مفتاح وقيمة</span>
+<span class="tok-kw">val</span> userAges: Map&lt;String, Int&gt; = mapOf(<span class="tok-str">"أحمد"</span> <span class="tok-kw">to</span> <span class="tok-str">25</span>, <span class="tok-str">"سارة"</span> <span class="tok-kw">to</span> <span class="tok-str">30</span>)</code></pre>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<section id="operations">
+  <div class="section-head">
+    <span class="section-tag">02 · عمليات التحويل</span>
+    <h2>أهم العمليات على الـ Collections</h2>
+    <p>Kotlin بتوفّر مكتبة ضخمة من الـ Extension Functions اللي بتخليك تتعامل مع البيانات بأسلوب وظيفي (Functional) وبكود أقصر بكتير.</p>
+  </div>
+
+  <div class="ops-grid">
+    <div class="op-card">
+      <div class="op-name">map()</div>
+      <p>بتحوّل كل عنصر لشكل جديد.</p>
+      <pre><code>val names = users.map { it.name }</code></pre>
+    </div>
+    <div class="op-card">
+      <div class="op-name">filter()</div>
+      <p>بترجع بس العناصر اللي بتحقق شرط معيّن.</p>
+      <pre><code>val adults = users.filter { it.age >= 18 }</code></pre>
+    </div>
+    <div class="op-card">
+      <div class="op-name">sortedBy()</div>
+      <p>بترتب العناصر حسب خاصية معينة.</p>
+      <pre><code>val sorted = users.sortedBy { it.name }</code></pre>
+    </div>
+    <div class="op-card">
+      <div class="op-name">groupBy()</div>
+      <p>بتقسّم العناصر لمجموعات على أساس مفتاح.</p>
+      <pre><code>val byCity = users.groupBy { it.city }</code></pre>
+    </div>
+    <div class="op-card">
+      <div class="op-name">reduce() / fold()</div>
+      <p>بتجمع كل العناصر لقيمة واحدة نهائية.</p>
+      <pre><code>val total = cart.fold(0) { acc, item -> acc + item.price }</code></pre>
+    </div>
+    <div class="op-card">
+      <div class="op-name">find() / firstOrNull()</div>
+      <p>بترجع أول عنصر يحقق الشرط أو null.</p>
+      <pre><code>val admin = users.find { it.role == "admin" }</code></pre>
+    </div>
+    <div class="op-card">
+      <div class="op-name">any() / all() / none()</div>
+      <p>بترجع Boolean حسب تحقق الشرط على العناصر.</p>
+      <pre><code>val hasAdmin = users.any { it.role == "admin" }</code></pre>
+    </div>
+    <div class="op-card">
+      <div class="op-name">flatMap()</div>
+      <p>بتحوّل كل عنصر لقائمة، وبعدين تدمجهم في قائمة واحدة.</p>
+      <pre><code>val allTags = posts.flatMap { it.tags }</code></pre>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<section id="sequence">
+  <div class="section-head">
+    <span class="section-tag">03 · التنفيذ الكسول</span>
+    <h2>إيه هي الـ Sequence وليه بتفرق؟</h2>
+    <p>الفرق الجوهري بين Collection و Sequence مش في العمليات المتاحة، لكن في <b>إمتى وإزاي</b> بتتنفذ العمليات دي على البيانات.</p>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-top"><div class="step-index">1</div><h3>Collection = تنفيذ فوري (Eager)</h3></div>
+      <p class="step-desc">كل عملية زي map أو filter بتتنفذ على <b>كل الـ List</b> فورًا وبترجع List جديدة كاملة، قبل ما تنتقل للعملية التالية.</p>
+      <div class="code-window">
+        <div class="code-header"><div class="dots"><span></span><span></span><span></span></div><span class="code-filename">Eager.kt</span></div>
+        <pre><code><span class="tok-kw">val</span> result = numbers
+    .<span class="tok-fn">map</span> { it * <span class="tok-str">2</span> }       <span class="tok-cmt">// بتعمل List كامل هنا</span>
+    .<span class="tok-fn">filter</span> { it > <span class="tok-str">10</span> }   <span class="tok-cmt">// وبعدين List تاني كامل هنا</span>
+    .<span class="tok-fn">first</span>()             <span class="tok-cmt">// حتى لو محتاج عنصر واحد بس!</span></code></pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-top"><div class="step-index">2</div><h3>Sequence = تنفيذ كسول (Lazy)</h3></div>
+      <p class="step-desc">كل عنصر بيمر بكل العمليات <b>واحد واحد</b> بدل ما تتعمل List وسيطة في كل خطوة. التنفيذ الفعلي بيحصل بس لما تستدعي عملية "طرفية" زي toList() أو first().</p>
+      <div class="code-window">
+        <div class="code-header"><div class="dots"><span></span><span></span><span></span></div><span class="code-filename">Lazy.kt</span></div>
+        <pre><code><span class="tok-kw">val</span> result = numbers
+    .<span class="tok-fn">asSequence</span>()
+    .<span class="tok-fn">map</span> { it * <span class="tok-str">2</span> }
+    .<span class="tok-fn">filter</span> { it > <span class="tok-str">10</span> }
+    .<span class="tok-fn">first</span>()   <span class="tok-cmt">// بتوقف فورًا أول ما تلاقي نتيجة، من غير ما تكمل باقي القائمة</span></code></pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-top"><div class="step-index">3</div><h3>الفرق في الأداء عمليًا</h3></div>
+      <p class="step-desc">لو عندك قائمة فيها مليون عنصر وعايز بس أول عنصر يحقق شرط بعد عمليتين، الـ Collection هتعالج المليون عنصر مرتين كاملين، بينما الـ Sequence ممكن توقف بعد أول عنصر بس.</p>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<section id="compare">
+  <div class="section-head">
+    <span class="section-tag">04 · مقارنة مباشرة</span>
+    <h2>Collection ضد Sequence</h2>
+    <p>مفيش واحد "أفضل" مطلقًا — الاختيار بيعتمد على حجم البيانات وعدد العمليات المتسلسلة.</p>
+  </div>
+
+  <div class="vs-wrap">
+    <div class="vs-card collection">
+      <h3>📦 Collection</h3>
+      <ul>
+        <li>تنفيذ فوري (Eager) — كل خطوة بتعمل List وسيطة</li>
+        <li>مناسبة للقوائم الصغيرة والمتوسطة</li>
+        <li>أبسط في القراءة والتتبع أثناء الـ Debug</li>
+        <li>أسرع مع عدد عمليات قليل (1-2 عملية)</li>
+      </ul>
+    </div>
+    <div class="vs-divider">VS</div>
+    <div class="vs-card sequence">
+      <h3>🌊 Sequence</h3>
+      <ul>
+        <li>تنفيذ كسول (Lazy) — عنصر بعنصر عند الطلب</li>
+        <li>مثالية للقوائم الكبيرة أو سلسلة عمليات طويلة</li>
+        <li>بتوفّر ذاكرة لأنها مش بتعمل Lists وسيطة</li>
+        <li>أسرع مع أي عدد عمليات + بيانات كبيرة</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="styled-table">
+      <thead><tr><th>المعيار</th><th>Collection</th><th>Sequence</th></tr></thead>
+      <tbody>
+        <tr><td>طريقة التنفيذ</td><td>فوري (Eager)</td><td>كسول (Lazy)</td></tr>
+        <tr><td>القوائم الوسيطة</td><td>بتتعمل في كل خطوة</td><td>مفيش، معالجة مباشرة</td></tr>
+        <tr><td>الأنسب لـ</td><td>بيانات صغيرة / عملية أو اتنين</td><td>بيانات كبيرة / سلسلة عمليات طويلة</td></tr>
+        <tr><td>الإنشاء</td><td><code class="inline">listOf()</code></td><td><code class="inline">list.asSequence()</code></td></tr>
+        <tr><td>وقت التنفيذ الفعلي</td><td>مع كل عملية Intermediate</td><td>بس عند عملية Terminal مثل toList()</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<section id="android">
+  <div class="section-head">
+    <span class="section-tag">05 · تطبيق عملي</span>
+    <h2>استخدامها في تطبيق أندرويد</h2>
+    <p>مثال شائع: عندك قائمة منتجات جاية من API، وعايز تفلترها وتحولها لموديل UI، وتاخد أول 20 منتج بس متاحين في المخزون.</p>
+  </div>
+
+  <div class="code-window">
+    <div class="code-header"><div class="dots"><span></span><span></span><span></span></div><span class="code-filename">ProductMapper.kt</span></div>
+    <pre><code><span class="tok-kw">fun</span> <span class="tok-fn">mapToUiProducts</span>(rawProducts: List&lt;ProductDto&gt;): List&lt;ProductUiModel&gt; {
+    <span class="tok-kw">return</span> rawProducts
+        .<span class="tok-fn">asSequence</span>()                                  <span class="tok-cmt">// نبدأ التنفيذ الكسول</span>
+        .<span class="tok-fn">filter</span> { it.stock > <span class="tok-str">0</span> }                     <span class="tok-cmt">// بس المتاح في المخزون</span>
+        .<span class="tok-fn">map</span> { it.<span class="tok-fn">toUiModel</span>() }                     <span class="tok-cmt">// تحويل من DTO لموديل UI</span>
+        .<span class="tok-fn">sortedByDescending</span> { it.rating }             <span class="tok-cmt">// الأعلى تقييمًا الأول</span>
+        .<span class="tok-fn">take</span>(<span class="tok-str">20</span>)                                    <span class="tok-cmt">// أول 20 منتج بس</span>
+        .<span class="tok-fn">toList</span>()                                     <span class="tok-cmt">// عملية Terminal — هنا بيتنفذ كل حاجة فعليًا</span>
+}</code></pre>
+  </div>
+
+  <p style="color:var(--text-muted); margin-top:18px; max-width:70ch;">في المثال ده، لو عندك آلاف المنتجات جايين من الـ API، استخدام <code class="inline">asSequence()</code> بيمنع إنشاء List وسيطة بعد كل خطوة (filter, map, sortedBy)، وده بيقلل استهلاك الذاكرة بشكل ملحوظ خصوصًا في شاشات فيها Scroll مستمر.</p>
+</section>
+
+<div class="glow-divider"></div>
+
+<section id="tips">
+  <div class="section-head">
+    <span class="section-tag">06 · أفضل الممارسات</span>
+    <h2>إمتى تستخدم كل واحدة؟</h2>
+  </div>
+
+  <div class="tips">
+    <div class="tip">
+      <div class="icon">📋</div>
+      <h4>قائمة صغيرة + عملية واحدة</h4>
+      <p>استخدم Collection العادية — الفرق في الأداء مش هيكون محسوس، والكود أبسط.</p>
+    </div>
+    <div class="tip">
+      <div class="icon">🧮</div>
+      <h4>بيانات كبيرة + عمليات متسلسلة</h4>
+      <p>استخدم Sequence لتقليل الـ Lists الوسيطة وتوفير الذاكرة والمعالجة.</p>
+    </div>
+    <div class="tip">
+      <div class="icon">🎯</div>
+      <h4>محتاج أول نتيجة بس</h4>
+      <p>Sequence مع first() أو find() بتوقف فورًا من غير ما تكمل باقي القائمة.</p>
+    </div>
+    <div class="tip">
+      <div class="icon">🧵</div>
+      <h4>مصادر بيانات لا نهائية</h4>
+      <p>استخدم <code class="inline">generateSequence()</code> لإنشاء تسلسلات كسولة غير محدودة.</p>
+    </div>
+    <div class="tip">
+      <div class="icon">⚠️</div>
+      <h4>لا تستخدم Sequence لكل حاجة</h4>
+      <p>مع القوائم الصغيرة، الـ overhead بتاع إنشاء الـ Sequence نفسه ممكن يخليها أبطأ.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="nav-brand"><span class="nav-dot"></span> Kotlin Collections & Sequences</div>
+  <p>دليل مرجعي لاستخدام Collections و Sequences في مشاريع أندرويد باستخدام Kotlin.</p>
+</footer>
+
+</body>
+</html>

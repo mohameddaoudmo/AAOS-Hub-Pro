@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KMP & CMP — دليل المقابلات الشامل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --bg: #0A0912;
+  --bg-elevated: #120F1E;
+  --surface: #171325;
+  --surface-2: #1D1830;
+  --border: rgba(148, 130, 255, 0.14);
+  --border-strong: rgba(148, 130, 255, 0.28);
+  --text: #EDEAF7;
+  --text-muted: #9C96B8;
+  --text-dim: #6D6785;
+  --purple: #9B7FFF;
+  --purple-deep: #7F52FF;
+  --orange: #FF8A5C;
+  --orange-deep: #FF6B35;
+  --green: #5FE3A3;
+  --code-bg: #0D0B16;
+  --font-body: 'IBM Plex Sans Arabic', 'Segoe UI', sans-serif;
+  --font-display: 'Space Grotesk', 'IBM Plex Sans Arabic', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius: 14px;
+}
+
+*{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+body{
+  margin:0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.9;
+  min-height: 100vh;
+}
+
+.bg-noise{
+  position: fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(60vw 40vw at 85% -10%, rgba(127,82,255,0.16), transparent 60%),
+    radial-gradient(50vw 35vw at -10% 20%, rgba(255,107,53,0.10), transparent 60%),
+    radial-gradient(40vw 30vw at 50% 100%, rgba(95,227,163,0.06), transparent 60%);
+}
+
+/* ===== Sidebar ===== */
+.sidebar{
+  position: fixed; inset-inline-end:0; top:0; bottom:0;
+  width: 300px;
+  background: var(--bg-elevated);
+  border-inline-start: 1px solid var(--border);
+  display:flex; flex-direction:column;
+  z-index: 40;
+  transition: transform .3s ease;
+}
+.sidebar-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 22px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.brand{ display:flex; align-items:center; gap:10px; }
+.brand-text{ display:flex; flex-direction:column; }
+.brand-title{ font-family: var(--font-display); font-weight:700; font-size:15px; letter-spacing:.02em; }
+.brand-sub{ font-family: var(--font-mono); font-size:10px; color: var(--text-dim); direction:ltr; }
+.sidebar-close{ display:none; background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer; }
+
+.sidebar-progress{ padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.progress-label{ display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); font-family: var(--font-mono); margin-bottom:8px; }
+.progress-track{ height:5px; background: var(--surface-2); border-radius:4px; overflow:hidden; }
+.progress-fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--purple-deep), var(--orange-deep)); transition: width .4s ease; }
+
+.tree-nav{ flex:1; overflow-y:auto; padding: 10px 10px 10px; }
+.tree-root{ font-family: var(--font-mono); font-size:11px; color: var(--text-dim); padding: 8px 10px 4px; }
+.tree-list{ list-style:none; margin:0; padding-inline-start: 14px; border-inline-start: 1px dashed var(--border); }
+.tree-item{ margin: 2px 0; }
+.tree-link{
+  display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
+  padding: 9px 10px; border-radius: 10px;
+  text-decoration:none; color: var(--text-muted);
+  font-size: 13px; transition: background .15s ease, color .15s ease;
+}
+.tree-link:hover{ background: var(--surface); color: var(--text); }
+.tree-link.active{ background: var(--surface-2); color: var(--text); box-shadow: inset 3px 0 0 var(--purple-deep); }
+.tree-bracket{ font-family: var(--font-mono); font-size:10px; color: var(--purple); }
+.tree-path{ font-family: var(--font-mono); font-size:11px; color: var(--text-dim); direction:ltr; }
+.tree-title{ font-weight:500; }
+
+.sidebar-foot{
+  padding: 14px 20px; border-top: 1px solid var(--border);
+  font-size:11px; color: var(--text-dim); display:flex; align-items:center; gap:8px;
+}
+.foot-dot{ width:6px; height:6px; border-radius:50%; background: var(--green); box-shadow:0 0 8px var(--green); }
+
+.sidebar-toggle{
+  display:none; position: fixed; inset-inline-end:16px; top:16px; z-index:50;
+  width:42px; height:42px; border-radius:12px; background: var(--surface); border:1px solid var(--border);
+  flex-direction:column; align-items:center; justify-content:center; gap:4px; cursor:pointer;
+}
+.sidebar-toggle span{ width:18px; height:2px; background: var(--text); border-radius:2px; }
+
+/* ===== Main / Hero ===== */
+.main{ margin-inline-end: 300px; position:relative; z-index:1; }
+
+.hero{
+  padding: 64px 56px 40px;
+  display:flex; align-items:center; justify-content:space-between; gap:40px;
+  flex-wrap:wrap;
+  border-bottom: 1px solid var(--border);
+}
+.hero-inner{ max-width: 640px; }
+.hero-eyebrow{
+  font-family: var(--font-mono); font-size:13px; color: var(--text-dim);
+  margin-bottom:18px; direction:ltr; text-align:left;
+}
+.eyebrow-highlight{ color: var(--green); }
+.hero-title{
+  font-family: var(--font-display); font-size: clamp(28px, 4vw, 42px);
+  line-height:1.35; font-weight:700; margin: 0 0 18px;
+}
+.hero-gradient{
+  background: linear-gradient(90deg, var(--purple), #C9B8FF);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.hero-gradient-alt{
+  background: linear-gradient(90deg, var(--orange), #FFC08A);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.hero-desc{ color: var(--text-muted); font-size:15.5px; max-width: 560px; margin-bottom: 28px; }
+.hero-stats{ display:flex; gap:14px; flex-wrap:wrap; }
+.stat-card{
+  background: var(--surface); border:1px solid var(--border); border-radius: var(--radius);
+  padding: 14px 20px; display:flex; flex-direction:column; gap:4px; min-width:100px;
+}
+.stat-num{ font-family: var(--font-display); font-weight:700; font-size:22px; color: var(--purple); }
+.stat-label{ font-size:11.5px; color: var(--text-muted); }
+
+/* Hero visual: source-set tree diagram (signature element) */
+.hero-visual{ flex-shrink:0; }
+.platform-stack{ display:flex; flex-direction:column; align-items:center; gap:0; }
+.platform-chip{
+  border:1px solid var(--border-strong); border-radius:12px; padding:12px 18px;
+  background: var(--surface); display:flex; flex-direction:column; align-items:center; gap:3px;
+  font-family: var(--font-mono); min-width: 150px;
+}
+.chip-common{ background: linear-gradient(135deg, rgba(127,82,255,.22), rgba(255,107,53,.14)); border-color: var(--border-strong); }
+.chip-common .chip-label{ color: var(--text); }
+.chip-label{ font-size:12.5px; font-weight:600; direction:ltr; }
+.chip-sub{ font-size:9.5px; color: var(--text-dim); direction:ltr; }
+.platform-branches{ display:flex; gap:10px; margin-top:26px; position:relative; }
+.platform-branches::before{
+  content:""; position:absolute; top:-26px; left:50%; transform:translateX(-50%);
+  width:1px; height:26px; background: var(--border-strong);
+}
+.chip-android{ border-top: 2px solid var(--green); }
+.chip-ios{ border-top: 2px solid var(--purple); }
+.chip-desktop{ border-top: 2px solid var(--orange); }
+
+/* ===== Content / Categories ===== */
+.content{ padding: 20px 56px 40px; max-width: 900px; }
+.category-section{ padding: 56px 0 20px; border-bottom: 1px solid var(--border); scroll-margin-top: 30px; }
+.category-section:last-of-type{ border-bottom:none; }
+.category-header{ margin-bottom: 28px; }
+.category-kicker{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.kicker-index{ font-family: var(--font-mono); color: var(--orange); font-size:13px; }
+.kicker-path{ font-family: var(--font-mono); color: var(--text-dim); font-size:13px; }
+.category-title{ font-family: var(--font-display); font-size: 26px; font-weight:700; margin: 0 0 8px; }
+.category-subtitle{ color: var(--text-muted); font-size:14.5px; margin:0 0 12px; }
+.category-meta{
+  display:inline-block; font-family: var(--font-mono); font-size:11px; color: var(--purple);
+  border:1px solid var(--border-strong); padding: 4px 10px; border-radius: 20px;
+}
+
+.qa-list{ display:flex; flex-direction:column; gap:12px; }
+.qa-card{
+  background: var(--surface); border:1px solid var(--border); border-radius: var(--radius);
+  overflow:hidden; transition: border-color .2s ease;
+}
+.qa-card:hover{ border-color: var(--border-strong); }
+.qa-toggle{
+  width:100%; display:flex; align-items:center; gap:14px; text-align: start;
+  background:none; border:none; color: var(--text); cursor:pointer;
+  padding: 18px 20px; font-family: var(--font-body); font-size: 15.5px; font-weight:600;
+}
+.qa-num{
+  font-family: var(--font-mono); font-size:11px; color: var(--bg);
+  background: linear-gradient(135deg, var(--purple), var(--orange));
+  width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.qa-question{ flex:1; }
+.qa-chevron{
+  width:9px; height:9px; border-inline-end:2px solid var(--text-dim); border-bottom:2px solid var(--text-dim);
+  transform: rotate(45deg); transition: transform .25s ease; flex-shrink:0;
+}
+.qa-toggle[aria-expanded="true"] .qa-chevron{ transform: rotate(225deg); }
+
+.qa-answer{
+  max-height:0; overflow:hidden; transition: max-height .35s ease;
+  padding: 0 20px;
+}
+.qa-answer p{ color: var(--text-muted); font-size: 15px; line-height:2; margin: 0 0 14px; padding-top: 2px; }
+.qa-card.open .qa-answer{ padding-bottom: 20px; }
+
+.code-block{
+  background: var(--code-bg); border:1px solid var(--border); border-radius: 10px;
+  padding: 16px 18px; overflow-x:auto; margin: 0 0 4px;
+}
+.code-block code{
+  font-family: var(--font-mono); font-size: 12.5px; color: #C9C3E8; line-height:1.7; white-space:pre;
+}
+
+.doc-footer{ margin-top: 40px; padding: 24px 0 60px; color: var(--text-dim); font-size: 13px; text-align:center; }
+
+/* ===== Responsive ===== */
+@media (max-width: 980px){
+  .main{ margin-inline-end:0; }
+  .sidebar{ transform: translateX(100%); box-shadow: -20px 0 60px rgba(0,0,0,.5); }
+  [dir="rtl"] .sidebar{ transform: translateX(100%); }
+  .sidebar.open{ transform: translateX(0); }
+  .sidebar-toggle{ display:flex; }
+  .sidebar-close{ display:block; }
+  .hero{ padding: 90px 24px 32px; }
+  .content{ padding: 20px 24px 40px; }
+  .hero-visual{ display:none; }
+}
+@media (max-width: 560px){
+  .hero-title{ font-size: 24px; }
+  .qa-toggle{ padding: 14px 16px; font-size:14px; }
+  .qa-answer{ padding: 0 16px; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="bg-noise" aria-hidden="true"></div>
+
+<!-- ===== Sidebar : Gradle source-set tree ===== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-head">
+    <div class="brand">
+      <span class="brand-mark">
+        <svg viewBox="0 0 40 40" width="30" height="30" aria-hidden="true">
+          <defs>
+            <linearGradient id="kgrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#B39CFF"/>
+              <stop offset="0.5" stop-color="#7F52FF"/>
+              <stop offset="1" stop-color="#FF6B35"/>
+            </linearGradient>
+          </defs>
+          <path d="M4 4H36L20 20L36 36H4L20 20Z" fill="url(#kgrad)"/>
+        </svg>
+      </span>
+      <div class="brand-text">
+        <span class="brand-title">KMP / CMP</span>
+        <span class="brand-sub">Interview Source Tree</span>
+      </div>
+    </div>
+    <button class="sidebar-close" id="sidebarClose" aria-label="إغلاق القائمة">✕</button>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="progress-label">
+      <span>التقدّم</span>
+      <span id="progressCount">0 / 44</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <nav class="tree-nav">
+    <div class="tree-root">root/</div>
+    <ul class="tree-list">
+      
+        <li class="tree-item">
+          <a href="#commonMain" class="tree-link" data-cat="commonMain">
+            <span class="tree-bracket">01</span>
+            <span class="tree-path">src/commonMain/</span>
+            <span class="tree-title">أساسيات Kotlin Multiplatform</span>
+          </a>
+        </li>
+
+        <li class="tree-item">
+          <a href="#buildSystem" class="tree-link" data-cat="buildSystem">
+            <span class="tree-bracket">02</span>
+            <span class="tree-path">src/buildSystem/</span>
+            <span class="tree-title">Gradle وبنية المشروع</span>
+          </a>
+        </li>
+
+        <li class="tree-item">
+          <a href="#expectActual" class="tree-link" data-cat="expectActual">
+            <span class="tree-bracket">03</span>
+            <span class="tree-path">src/expectActual/</span>
+            <span class="tree-title">آلية expect / actual</span>
+          </a>
+        </li>
+
+        <li class="tree-item">
+          <a href="#concurrency" class="tree-link" data-cat="concurrency">
+            <span class="tree-bracket">04</span>
+            <span class="tree-path">src/concurrency/</span>
+            <span class="tree-title">Coroutines والـ Concurrency</span>
+          </a>
+        </li>
+
+        <li class="tree-item">
+          <a href="#cmpUi" class="tree-link" data-cat="cmpUi">
+            <span class="tree-bracket">05</span>
+            <span class="tree-path">src/cmpUi/</span>
+            <span class="tree-title">Compose Multiplatform (UI)</span>
+          </a>
+        </li>
+
+        <li class="tree-item">
+          <a href="#networkingData" class="tree-link" data-cat="networkingData">
+            <span class="tree-bracket">06</span>
+            <span class="tree-path">src/networkingData/</span>
+            <span class="tree-title">Networking و Data Layer</span>
+          </a>
+        </li>
+
+        <li class="tree-item">
+          <a href="#architecture" class="tree-link" data-cat="architecture">
+            <span class="tree-bracket">07</span>
+            <span class="tree-path">src/architecture/</span>
+            <span class="tree-title">Architecture و DI</span>
+          </a>
+        </li>
+
+        <li class="tree-item">
+          <a href="#iosInterop" class="tree-link" data-cat="iosInterop">
+            <span class="tree-bracket">08</span>
+            <span class="tree-path">src/iosInterop/</span>
+            <span class="tree-title">Kotlin/Native و iOS Interop</span>
+          </a>
+        </li>
+
+        <li class="tree-item">
+          <a href="#testing" class="tree-link" data-cat="testing">
+            <span class="tree-bracket">09</span>
+            <span class="tree-path">src/testing/</span>
+            <span class="tree-title">Testing في KMP</span>
+          </a>
+        </li>
+
+        <li class="tree-item">
+          <a href="#advancedComparisons" class="tree-link" data-cat="advancedComparisons">
+            <span class="tree-bracket">10</span>
+            <span class="tree-path">src/advancedComparisons/</span>
+            <span class="tree-title">أسئلة متقدمة ومقارنات</span>
+          </a>
+        </li>
+    </ul>
+  </nav>
+
+  <div class="sidebar-foot">
+    <span class="foot-dot"></span>
+    <span>10 source sets · 44 سؤال</span>
+  </div>
+</aside>
+
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="فتح القائمة">
+  <span></span><span></span><span></span>
+</button>
+
+<!-- ===== Main ===== -->
+<div class="main">
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow" dir="ltr">expect fun <span class="eyebrow-highlight">interviewReady</span>(): Boolean</div>
+      <h1 class="hero-title">
+        دليلك الكامل لمقابلات
+        <span class="hero-gradient">Kotlin Multiplatform</span>
+        و <span class="hero-gradient hero-gradient-alt">Compose Multiplatform</span>
+      </h1>
+      <p class="hero-desc">
+        44 سؤال حقيقي بمستوى Senior، متقسّمين زي شجرة source sets في مشروع Gradle —
+        من أساسيات expect/actual لغاية Kotlin/Native memory model وSwift interop.
+        الشرح عربي، والمصطلحات التقنية زي ما هي بالإنجليزي عشان تتعامل معاها في أي مقابلة فعلية.
+      </p>
+      <div class="hero-stats">
+        <div class="stat-card">
+          <span class="stat-num">10</span>
+          <span class="stat-label">Source Sets</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">44</span>
+          <span class="stat-label">سؤال وجواب</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">Senior</span>
+          <span class="stat-label">المستوى</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="platform-stack">
+        <div class="platform-chip chip-common">
+          <span class="chip-label">commonMain</span>
+          <span class="chip-sub">shared business logic</span>
+        </div>
+        <div class="platform-branches">
+          <div class="platform-chip chip-android">
+            <span class="chip-label">androidMain</span>
+            <span class="chip-sub">Jetpack Compose</span>
+          </div>
+          <div class="platform-chip chip-ios">
+            <span class="chip-label">iosMain</span>
+            <span class="chip-sub">SwiftUI · Kotlin/Native</span>
+          </div>
+          <div class="platform-chip chip-desktop">
+            <span class="chip-label">desktopMain</span>
+            <span class="chip-sub">JVM</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    
+    <section class="category-section" id="commonMain" data-cat="commonMain">
+      <header class="category-header">
+        <div class="category-kicker">
+          <span class="kicker-index">01</span>
+          <span class="kicker-path" dir="ltr">src/commonMain/</span>
+        </div>
+        <h2 class="category-title">أساسيات Kotlin Multiplatform</h2>
+        <p class="category-subtitle">المفهوم الأساسي، لماذا KMP، والفرق عن الحلول التانية</p>
+        <div class="category-meta">5 أسئلة</div>
+      </header>
+      <div class="qa-list">
+        
+      <article class="qa-card" id="commonMain-1">
+        <button class="qa-toggle" aria-expanded="false" data-target="commonMain-1">
+          <span class="qa-num">01</span>
+          <span class="qa-question">إيه هو Kotlin Multiplatform (KMP) بالظبط، وإزاي بيختلف عن حلول الـ Cross-Platform التانية زي Flutter أو React Native؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>KMP مش framework بيرسم UI، هو بالأساس امتداد لـ compiler الـ Kotlin بيسمحلك تكتب الـ business logic (زي networking، caching، validation، domain models) مرة واحدة في source set اسمه commonMain، وبعدين الكود ده يترجم (compile) لكل platform بشكل native: JVM bytecode للـ Android، LLVM/native binary للـ iOS عن طريق Kotlin/Native، وJS/Wasm للويب. الفرق الجوهري عن Flutter إنك مش بتشغل VM أو rendering engine إضافي (زي Skia engine اللي بيرسم كل حاجة من الصفر في Flutter) فوق الـ native platform؛ الـ UI في KMP التقليدي بيفضل native 100% (SwiftUI على iOS و Jetpack Compose على Android)، يعني تجربة المستخدم والأداء والـ accessibility بيبقوا native حقيقي. React Native بيستخدم Bridge (أو JSI في الإصدارات الجديدة) للتواصل بين JS والـ native، أما KMP فمفيش bridge أصلاً لأن الكود بيتحول native فعلي وقت الـ compilation، فمفيش overhead في الـ runtime marshalling.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="commonMain-2">
+        <button class="qa-toggle" aria-expanded="false" data-target="commonMain-2">
+          <span class="qa-num">02</span>
+          <span class="qa-question">إيه الفرق بين KMP و CMP (Compose Multiplatform)؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>KMP هي الـ umbrella الأشمل: مشاركة أي كود Kotlin (منطق، data layer، networking...) بين المنصات مع سيبان الـ UI native لكل platform. CMP هي مكتبة UI declarative مبنية فوق نفس الـ Compose compiler و runtime اللي بيستخدمه Jetpack Compose، لكن بتوسّع الرسم (rendering) عن طريق Skia بحيث تشتغل على iOS وDesktop (JVM) وWeb (Wasm/JS) مش بس Android. يعني CMP بيسمحلك كمان تشارك الـ UI layer نفسه مش بس الـ logic. الاختيار العملي: لو عايز أقصى درجة native feel وaccessibility مطابقة 100% للمنصة، تسيب الـ UI native وتستخدم KMP للـ logic بس (زي إستراتيجية JetBrains نفسها في IntelliJ/Android Studio قبل ما يتحولوا لـ Compose في بعض الأجزاء). لو عايز سرعة تطوير وconsistency بصرية بين المنصات وuser base متقارب، CMP هي الخيار.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="commonMain-3">
+        <button class="qa-toggle" aria-expanded="false" data-target="commonMain-3">
+          <span class="qa-num">03</span>
+          <span class="qa-question">إيه هي الـ Source Sets في KMP، وإزاي بتتنظم؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>الـ Source Set هو مجلد كود مربوط بـ target معين أو مجموعة targets بيتشارك فيهم نفس الكود. الأساسي هو commonMain اللي فيه الكود المشترك، ومقابله commonTest للاختبارات المشتركة. تحت كل target فيه source set مخصص زي androidMain وiosMain وdesktopMain وwasmJsMain، وده اللي بتحط فيه الـ platform-specific implementations. لو عندك مجموعة targets قريبة من بعض زي iosX64 وiosArm64 وiosSimulatorArm64، بتقدر تعمل intermediate source set زي iosMain يبقى parent ليهم عشان تتفادى تكرار كود الـ actual الخاص بـ iOS في كل target لوحده. الـ hierarchy ده بيتحدد في build.gradle.kts عن طريق kotlin { sourceSets { ... } } وبيدعم الـ Default Hierarchy Template اللي JetBrains وفروه عشان يبسط الإعداد اليدوي.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="commonMain-4">
+        <button class="qa-toggle" aria-expanded="false" data-target="commonMain-4">
+          <span class="qa-num">04</span>
+          <span class="qa-question">إيه المشاكل العملية اللي بتقابلك لما تقرر تحول مشروع Android موجود لـ KMP؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>أول تحدي هو فصل الـ business logic عن أي حاجة Android-specific زي Context أو Android SDK APIs، وده بيتطلب إعادة هيكلة الـ layers لو الكود مكتوب أصلاً بطريقة متشابكة. تاني حاجة هي الـ dependencies: مكتبات كتير في عالم Android (زي Retrofit أو Room بشكلها التقليدي) مش KMP-ready، فمحتاج تستبدلها بـ multiplatform alternatives زي Ktor بدل Retrofit وSQLDelight أو Room KMP (بقت متاحة تجريبياً) بدل Room التقليدي. كمان فيه تعقيد في الـ build configuration، خصوصاً لو المشروع بيستخدم Gradle plugins قديمة أو build logic معقدة. وأخيراً، لو الهدف يوصل لـ iOS، لازم فريق يكون عنده خبرة Swift/Xcode كافية للـ integration، وده تحدي تنظيمي مش تقني بس.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="commonMain-5">
+        <button class="qa-toggle" aria-expanded="false" data-target="commonMain-5">
+          <span class="qa-num">05</span>
+          <span class="qa-question">إزاي بتشرح مفهوم الـ 'write once, run natively' لحد مش تقني في مقابلة سلوكية؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>بقول إن الفكرة زي ما تكتب وصفة أكل بلغة عالمية، وكل مطبخ (Android أو iOS) عنده أدواته الخاصة بيحضر بيها نفس الوصفة بطريقته الأمثل - النتيجة طبق يليق بذوق أهل البلد ده، مش نسخة معلبة واحدة اتوزعت على الكل. الفايدة التجارية إن الفريق بيكتب الـ business rules والـ validation والـ networking مرة واحدة، فبيقلل الأخطاء الناتجة عن اختلاف التنفيذ بين الفريقين (Android bug مش موجود في iOS والعكس)، وبيسرّع وقت الوصول للسوق، مع الحفاظ على إحساس الأداء والتصميم الأصلي لكل منصة.</p>
+          
+        </div>
+      </article>
+      </div>
+    </section>
+
+    <section class="category-section" id="buildSystem" data-cat="buildSystem">
+      <header class="category-header">
+        <div class="category-kicker">
+          <span class="kicker-index">02</span>
+          <span class="kicker-path" dir="ltr">src/buildSystem/</span>
+        </div>
+        <h2 class="category-title">Gradle وبنية المشروع</h2>
+        <p class="category-subtitle">إعداد المشروع، الـ targets، والـ Kotlin/Native toolchain</p>
+        <div class="category-meta">5 أسئلة</div>
+      </header>
+      <div class="qa-list">
+        
+      <article class="qa-card" id="buildSystem-1">
+        <button class="qa-toggle" aria-expanded="false" data-target="buildSystem-1">
+          <span class="qa-num">01</span>
+          <span class="qa-question">إزاي بيتم تعريف الـ targets في ملف build.gradle.kts لمشروع KMP؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>بتستخدم الـ kotlin block وجواه بتعرّف كل target عايز تدعمه، مثلاً androidTarget() لدعم Android، وiosX64() / iosArm64() / iosSimulatorArm64() لدعم أجهزة وsimulators iOS المختلفة (أو ببساطة iosMain hierarchy)، وjvm('desktop') لدعم Desktop، وwasmJs { browser() } لدعم الويب عبر WebAssembly. كل target بيتربط تلقائياً بـ source set مخصوص ليه. الميزة إن نفس الملف بيتحكم في كل حاجة: dependencies، compiler options، وحتى framework configuration للـ iOS زي اسم الـ XCFramework الناتج وهل هو static ولا dynamic.</p>
+          <pre class="code-block" dir="ltr"><code>kotlin {
+    androidTarget()
+    jvm("desktop")
+    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach {
+        it.binaries.framework {
+            baseName = "shared"
+            isStatic = true
+        }
+    }
+}</code></pre>
+        </div>
+      </article>
+
+      <article class="qa-card" id="buildSystem-2">
+        <button class="qa-toggle" aria-expanded="false" data-target="buildSystem-2">
+          <span class="qa-num">02</span>
+          <span class="qa-question">إيه الفرق بين expect/actual والـ Dependency Injection كطريقة لحقن الـ platform-specific behavior؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>expect/actual آلية على مستوى الـ compiler: بتعرّف 'توقيع' (signature) في commonMain بكلمة expect، وكل platform بيوفر التنفيذ الفعلي بكلمة actual، والـ compiler هو اللي بيربط بينهم وقت البناء لكل target، يعني مفيش أي runtime overhead والربط بيحصل statically. أما الـ DI (زي Koin) فهو حل runtime: بتعرّف interface عادي في commonMain، وكل platform module بيسجل الـ implementation بتاعه في الـ container، والـ resolution بيحصل وقت التشغيل. عملياً، expect/actual أنسب للحاجات البسيطة والمباشرة زي الحصول على اسم المنصة أو platform-specific utility function، أما الـ DI أنسب للـ dependencies المعقدة اللي محتاجة lifecycle management أو lazy initialization أو scoping.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="buildSystem-3">
+        <button class="qa-toggle" aria-expanded="false" data-target="buildSystem-3">
+          <span class="qa-num">03</span>
+          <span class="qa-question">إيه هو الـ Kotlin/Native memory model الجديد، وليه كان فيه مشكلة قبل كده؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>قبل Kotlin 1.7.20 كان فيه الـ 'strict/old memory model' اللي كان بيفرض قيود صارمة على مشاركة الـ objects بين الـ threads؛ أي object اتعمله freeze() كان بيبقى immutable تماماً وأي محاولة تعديل عليه من thread تاني كانت بترمي InvalidMutabilityException، وده كان بيخلي التعامل مع الـ coroutines والـ concurrency معقد جداً وغير بديهي بالنسبة لمطور جاي من عالم JVM. الـ 'New Memory Model' (بقى default من Kotlin 1.9.20) قرّب السلوك من الـ JVM: مفيش freezing إجباري، وبتقدر تشارك الـ objects بين threads بحرية أكبر مع الاعتماد على نفس آليات الـ synchronization المعتادة، وده خلى مكتبات زي kotlinx.coroutines تشتغل على iOS بسلوك متوقع أقرب لسلوكها على Android.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="buildSystem-4">
+        <button class="qa-toggle" aria-expanded="false" data-target="buildSystem-4">
+          <span class="qa-num">04</span>
+          <span class="qa-question">إيه هو CocoaPods مقابل Swift Package Manager (SPM) في سياق تصدير مكتبة KMP لـ iOS؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>لما بتبني مكتبة KMP وتصدرها كـ framework لاستخدامها في مشروع iOS، عندك طريقتين للتوزيع. الأولى CocoaPods: بتستخدم الـ Kotlin CocoaPods Gradle plugin اللي بيولّد podspec تلقائي، وده مناسب لو الفريق أصلاً شغال بـ CocoaPods كـ dependency manager. الثانية SPM، اللي بقى الاتجاه الرسمي الحديث من Apple وبقى JetBrains بيدعمه بشكل رسمي عن طريق بناء XCFramework وربطه كـ binary target في Package.swift. عملياً، SPM بقى الخيار المفضل في المشاريع الجديدة لأنه مدمج في Xcode من غير أدوات خارجية، وأسرع في الـ resolution، وأقرب لتوجه Apple المستقبلي، لكن الفرق التقنية القديمة أو اللي عندها dependencies تانية بـ CocoaPods ممكن تفضل مستمرة عليه لتفادي الخلط بين نظامين.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="buildSystem-5">
+        <button class="qa-toggle" aria-expanded="false" data-target="buildSystem-5">
+          <span class="qa-num">05</span>
+          <span class="qa-question">إيه هو الـ 'commonizer' في Kotlin/Native ولية محتاجينه؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>الـ commonizer أداة بتشتغل خلف الكواليس وقت الـ build عشان توحّد الـ platform libraries (زي POSIX أو Foundation APIs بتاعة iOS) اللي مختلفة شكلياً بين iosX64 وiosArm64 وiosSimulatorArm64 رغم إنها بتمثل نفس الـ API منطقياً. بدل ما تكتب expect/actual يدوي لكل حاجة، الـ commonizer بيولّد 'commonized' API موحدة تقدر تستخدمها مباشرة من جوه intermediate source set زي iosMain، وده اللي بيخلي كتابة كود مشترك بين أجهزة iOS المختلفة أسهل بكتير من غير ما تكرر نفس الـ actual تلاتة مرات.</p>
+          
+        </div>
+      </article>
+      </div>
+    </section>
+
+    <section class="category-section" id="expectActual" data-cat="expectActual">
+      <header class="category-header">
+        <div class="category-kicker">
+          <span class="kicker-index">03</span>
+          <span class="kicker-path" dir="ltr">src/expectActual/</span>
+        </div>
+        <h2 class="category-title">آلية expect / actual</h2>
+        <p class="category-subtitle">أساس الربط بين الكود المشترك والكود الخاص بكل منصة</p>
+        <div class="category-meta">3 أسئلة</div>
+      </header>
+      <div class="qa-list">
+        
+      <article class="qa-card" id="expectActual-1">
+        <button class="qa-toggle" aria-expanded="false" data-target="expectActual-1">
+          <span class="qa-num">01</span>
+          <span class="qa-question">اشرح آلية expect/actual بمثال عملي كامل.</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>بتعرّف في commonMain 'توقيع' من غير تنفيذ باستخدام expect، وده ممكن يكون function أو class أو property أو حتى annotation. وبعدين في كل platform source set، لازم توفر actual implementation مطابق تماماً للتوقيع (نفس الاسم، نفس الـ parameters، نفس النوع الراجع)، وإلا الـ compiler هيرفض البناء. الـ compiler بيتأكد وقت البناء إن كل expect ليه actual مقابل في كل target مفعّل، فمفيش احتمال تنسى تنفيذ منصة وتكتشف الغلط في الـ runtime زي ما ممكن يحصل مع الـ reflection-based solutions.</p>
+          <pre class="code-block" dir="ltr"><code>// commonMain
+expect fun getPlatformName(): String
+
+expect class SecureStorage {
+    fun save(key: String, value: String)
+    fun read(key: String): String?
+}
+
+// androidMain
+actual fun getPlatformName(): String = "Android"
+
+actual class SecureStorage(private val context: Context) {
+    private val prefs = EncryptedSharedPreferences.create(...)
+    actual fun save(key: String, value: String) { prefs.edit().putString(key, value).apply() }
+    actual fun read(key: String): String? = prefs.getString(key, null)
+}
+
+// iosMain
+actual class SecureStorage {
+    actual fun save(key: String, value: String) {
+        KeychainWrapper.set(value, forKey = key)
+    }
+    actual fun read(key: String): String? = KeychainWrapper.stringForKey(key)
+}</code></pre>
+        </div>
+      </article>
+
+      <article class="qa-card" id="expectActual-2">
+        <button class="qa-toggle" aria-expanded="false" data-target="expectActual-2">
+          <span class="qa-num">02</span>
+          <span class="qa-question">ليه JetBrains بتنصح تقلل استخدام expect/actual قد الإمكان وتفضّل interfaces عادية؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>لأن expect/actual بتربط الكود المشترك بشكل مباشر (tight coupling) بكل target وقت الـ compile time، وده بيصعّب اختبار الكود بمعزل عن المنصة، وبيصعّب إضافة target جديد لاحقاً (لازم تضيف actual جديد في كل مكان مستخدم فيه). البديل المفضّل هو تعريف interface عادي في commonMain (زي PlatformContext أو Clock) وحقن الـ implementation بتاعه بـ constructor injection أو عن طريق DI framework زي Koin. الطريقة دي أسهل للـ testing (تقدر تعمل fake implementation بسهولة)، وأنضف من ناحية الـ architecture لأنها بتفصل الـ 'العقد' (contract) عن التنفيذ زي أي dependency inversion عادي، وبتسيب expect/actual للحالات البسيطة جداً زي قراءة اسم المنصة أو الوصول لـ low-level platform API مالوش abstraction مناسب.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="expectActual-3">
+        <button class="qa-toggle" aria-expanded="false" data-target="expectActual-3">
+          <span class="qa-num">03</span>
+          <span class="qa-question">إيه المحدوديات (limitations) لـ expect/actual اللي ممكن تقابلك في مقابلة؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>أول حاجة، الـ expect declarations لازم توفر default values في الـ common side بس، مش في الـ actual، عشان يفضل التوقيع موحد. تاني حاجة، لغاية إصدارات قريبة، expect/actual functions ماكانوش بيدعموا default parameter values بشكل كامل في كل السيناريوهات، وكان فيه قيود على استخدام inline functions مع reified type parameters عبر expect/actual. كمان، الـ expect classes ماكانتش بتقدر implement interface بشكل مباشر بسهولة في كل الحالات القديمة (اتحسنت الميزة دي لاحقاً بمسمى 'expect/actual classes' اللي كانت experimental فترة طويلة). وأخيراً، كتر استخدامها بيخلي الـ commonMain مليان 'توقيعات فاضية' يصعب فهم سلوكها الفعلي من غير ما تفتح كل target لوحده، وده بيأثر على قابلية القراءة (readability) للكود.</p>
+          
+        </div>
+      </article>
+      </div>
+    </section>
+
+    <section class="category-section" id="concurrency" data-cat="concurrency">
+      <header class="category-header">
+        <div class="category-kicker">
+          <span class="kicker-index">04</span>
+          <span class="kicker-path" dir="ltr">src/concurrency/</span>
+        </div>
+        <h2 class="category-title">Coroutines والـ Concurrency</h2>
+        <p class="category-subtitle">الفروق بين JVM وNative، والـ threading model</p>
+        <div class="category-meta">4 أسئلة</div>
+      </header>
+      <div class="qa-list">
+        
+      <article class="qa-card" id="concurrency-1">
+        <button class="qa-toggle" aria-expanded="false" data-target="concurrency-1">
+          <span class="qa-num">01</span>
+          <span class="qa-question">إزاي بتشتغل kotlinx.coroutines على iOS، وإيه الفرق عن تشغيلها على Android؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>على Android (JVM)، الـ coroutines بتشتغل فوق thread pool حقيقي، والـ Dispatchers.Default وDispatchers.IO بيستخدموا threads فعلية متوازية استفادة من الـ multi-core. على iOS، الوضع كان مختلف تاريخياً بسبب الـ old memory model، لكن مع الـ new memory model، الـ coroutines بقت بتقدر تستخدم multiple native threads فعلاً بنفس الفلسفة الموجودة على JVM. الفرق العملي الأهم اللي لازم تعرفه إن Dispatchers.Main على iOS لازم يشتغل جوه الـ main run loop زي أي UI framework تاني، وإن أي تعديل على الـ UI لازم يرجع للـ main thread زي بالظبط ما بيحصل في Compose على Android.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="concurrency-2">
+        <button class="qa-toggle" aria-expanded="false" data-target="concurrency-2">
+          <span class="qa-num">02</span>
+          <span class="qa-question">إيه هي freeze() وليه اختفت من الاستخدام العادي دلوقتي؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>في الـ old memory model، عشان تشارك object بين threads على Kotlin/Native كان لازم تستدعي freeze() عليه، وده كان بيحوّله لـ immutable بشكل نهائي، وأي محاولة تعديل بعد كده كانت بترمي exception وقت الـ runtime، وده كان بيسبب bugs صعبة الاكتشاف لأنها بتظهر بس وقت التنفيذ الفعلي مش وقت الـ compile. مع الـ new memory model اللي بقى default، مفيش حاجة اسمها freezing إجباري خالص، ومشاركة الـ state بين threads بقت بتعتمد على نفس أدوات التزامن العادية (زي Mutex أو Atomic references أو الاعتماد على immutability الطبيعي للـ data classes)، فمفهوم freeze() بقى قديم (deprecated) دلوقتي وموجود بس للتوافق مع كود قديم.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="concurrency-3">
+        <button class="qa-toggle" aria-expanded="false" data-target="concurrency-3">
+          <span class="qa-num">03</span>
+          <span class="qa-question">إزاي بتتعامل مع الـ StateFlow في commonMain عشان يتلاحظ (observe) بشكل صحيح من SwiftUI؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>المشكلة إن Swift مالوش فهم طبيعي لـ Kotlin's StateFlow، فمحتاج طبقة تحويل. الحل الشائع هو استخدام مكتبة زي KMP-NativeCoroutines أو SKIE اللي بتولّد wrappers تلقائية تحول الـ Flow/StateFlow لـ async sequences أو Combine publishers قابلة للاستخدام مباشرة من Swift بشكل idiomatic. البديل اليدوي (قبل ظهور المكتبات دي) كان بتعمل function زي fun observe(scope: CoroutineScope, onEach: (T) -&gt; Unit): Closeable بتستخدم .onEach { }.launchIn(scope) وترجع كائن تقدر تلغي بيه الـ subscription من الـ Swift side. النقطة المهمة في المقابلة إنك تفهم إن الـ StateFlow نفسه Kotlin-native ومحتاج جسر (bridge) صريح للتعامل معاه من عالم Swift.</p>
+          <pre class="code-block" dir="ltr"><code>// SKIE أو KMPNativeCoroutines بتولد تلقائيًا استخدام زي ده في Swift:
+// for await state in viewModel.uiState {
+//     self.state = state
+// }</code></pre>
+        </div>
+      </article>
+
+      <article class="qa-card" id="concurrency-4">
+        <button class="qa-toggle" aria-expanded="false" data-target="concurrency-4">
+          <span class="qa-num">04</span>
+          <span class="qa-question">إيه الفرق بين Dispatchers.Default وDispatchers.IO في مشروع KMP، وهل بيتصرفوا نفس الشيء على كل المنصات؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>على JVM/Android، Dispatchers.Default مخصص للـ CPU-intensive work وبيستخدم thread pool بعدد يساوي عدد الـ CPU cores، بينما Dispatchers.IO مخصص للـ blocking I/O operations وعنده thread pool أكبر بكتير (limit افتراضي 64 على الأقل) عشان يقدر يستوعب عدد كبير من الـ blocking calls المتزامنة من غير ما يستنزف الـ cores. على Kotlin/Native، الاتنين كانوا بيستخدموا نفس الآلية الأساسية لإدارة الـ worker threads بس بفلسفة مختلفة شوية لأن مفيش JVM thread pool تحتهم، والـ runtime بيدير الـ threads بنفسه. عملياً في الكود المشترك، أهم حاجة إنك تستخدم Dispatchers.Default للحسابات التقيلة وDispatchers.IO (أو حتى custom dispatcher لو محتاج تحكم أدق) للعمليات اللي فيها انتظار زي الشبكة أو قاعدة البيانات، بغض النظر عن الاختلافات الداخلية بين المنصات.</p>
+          
+        </div>
+      </article>
+      </div>
+    </section>
+
+    <section class="category-section" id="cmpUi" data-cat="cmpUi">
+      <header class="category-header">
+        <div class="category-kicker">
+          <span class="kicker-index">05</span>
+          <span class="kicker-path" dir="ltr">src/cmpUi/</span>
+        </div>
+        <h2 class="category-title">Compose Multiplatform (UI)</h2>
+        <p class="category-subtitle">الرسم عبر Skia، الموارد، والتنقل بين المنصات</p>
+        <div class="category-meta">5 أسئلة</div>
+      </header>
+      <div class="qa-list">
+        
+      <article class="qa-card" id="cmpUi-1">
+        <button class="qa-toggle" aria-expanded="false" data-target="cmpUi-1">
+          <span class="qa-num">01</span>
+          <span class="qa-question">إزاي CMP بيرسم UI واحد على Android وiOS وDesktop وWeb؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>على Android، Compose Multiplatform بيستخدم نفس Jetpack Compose الأصلي اللي بيرسم فوق الـ Android Canvas/RenderNode العادي، يعني مفيش أي فرق عن مشروع Compose تقليدي. على المنصات التانية (iOS، Desktop، وWeb عبر Wasm)، الرسم بيتم عن طريق مكتبة Skia (نفس الـ rendering engine اللي Flutter وChrome بيستخدموه) اللي بترسم كل الـ pixels بنفسها من غير الاعتماد على UIKit أو AppKit widgets، وبعدين بتوصل الناتج (buffer) لـ native view واحدة بسيطة (زي UIView على iOS) بتستضيف الرسمة دي. ده معناه إن الـ layout والـ styling بيبقوا متطابقين تماماً بكسل بكسل بين المنصات، بعكس الـ UI الـ native الصرف اللي بيختلف شكله حسب فلسفة كل منصة، وده trade-off مهم لازم تعرفه: consistency بصرية مقابل native look-and-feel.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="cmpUi-2">
+        <button class="qa-toggle" aria-expanded="false" data-target="cmpUi-2">
+          <span class="qa-num">02</span>
+          <span class="qa-question">إزاي بتتعامل مع الموارد (Resources) زي الصور والـ strings في مشروع CMP بشكل multiplatform؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>JetBrains وفروا مكتبة رسمية اسمها compose.components.resources بتسمحلك تحط الملفات في composeResources/ (زي drawable/ وvalues/ وfont/) في commonMain، وبعدين بتولّد accessors آمنة النوع (type-safe) تلقائياً زي Res.drawable.logo أو Res.string.app_name تقدر تستخدمها مباشرة جوه أي @Composable في أي platform، والمكتبة بتتكفل بتحميلها بالطريقة المناسبة لكل target (asset loading على Android، bundle resource على iOS، إلخ) من غير ما تكتب expect/actual يدوي. قبل ظهور المكتبة دي كانت الحلول بديلة زي moko-resources، لكن الحل الرسمي بقى الخيار الافتراضي في المشاريع الجديدة.</p>
+          <pre class="code-block" dir="ltr"><code>// commonMain/composeResources/drawable/logo.xml
+// وبعدين في أي composable:
+Image(
+    painter = painterResource(Res.drawable.logo),
+    contentDescription = stringResource(Res.string.logo_description)
+)</code></pre>
+        </div>
+      </article>
+
+      <article class="qa-card" id="cmpUi-3">
+        <button class="qa-toggle" aria-expanded="false" data-target="cmpUi-3">
+          <span class="qa-num">03</span>
+          <span class="qa-question">إيه استراتيجيات الـ Navigation في CMP، وإيه الفرق بينها وبين Jetpack Navigation العادية؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>فيه خيارين رئيسيين: الأول استخدام Jetpack Navigation Compose نفسها اللي بقت multiplatform-ready من الإصدارات الحديثة، وبتديك نفس الـ NavHost/NavController اللي معتاد عليهم في Android لكن شغالة على كل المنصات. الخيار التاني هو مكتبات navigation مبنية خصيصاً للـ multiplatform زي Voyager أو Decompose، اللي بتوفر مميزات إضافية زي better state preservation عبر configuration changes، ودعم أوضح لـ Compose Multiplatform-specific concerns زي التعامل مع الـ back gesture على iOS (اللي مختلف تماماً عن نظام الـ back button في Android). الاختيار العملي بيعتمد على مدى تعقيد التطبيق: لو التطبيق بسيط، Jetpack Navigation الرسمية كافية، لو عندك متطلبات معقدة في الـ state management أو تحتاج تحكم أدق في الـ lifecycle، مكتبة زي Decompose بتوفر مرونة أكبر لأنها مبنية على مبدأ component-based architecture مش screen-based.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="cmpUi-4">
+        <button class="qa-toggle" aria-expanded="false" data-target="cmpUi-4">
+          <span class="qa-num">04</span>
+          <span class="qa-question">إزاي بتتعامل مع الفروق في الـ platform conventions زي الـ Back gesture على iOS مقابل الـ Back button على Android جوه تطبيق CMP واحد؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>لازم تفهم إن CMP بيديك نفس الـ pixels على كل منصة، لكن مش بيديك تلقائياً نفس الـ interaction patterns، فده مسؤوليتك كمطور. على Android، النظام بيعطيك predictive back gesture callback عن طريق OnBackPressedCallback، وممكن تستخدمه مع BackHandler composable. على iOS، المفهوم مختلف: مفيش نظام back button، وبدل كده المستخدم بيعمل swipe من حافة الشاشة، ولو عايز تحاكي السلوك ده جوه CMP لازم تتعامل مع الـ UIKit gesture recognizers من الـ native layer وتوصل الحدث للـ Compose layer عن طريق interop. الممارسة الأفضل عملياً إنك تستخدم مكتبة navigation بتجرد (abstracts) الفرق ده عنك زي Decompose بدل ما تعيد اختراعه يدوياً، لكن المهم في المقابلة إنك توضح إنك واعي إن 'نفس الكود' مش معناه 'نفس تجربة المستخدم' تلقائياً.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="cmpUi-5">
+        <button class="qa-toggle" aria-expanded="false" data-target="cmpUi-5">
+          <span class="qa-num">05</span>
+          <span class="qa-question">إيه هو الـ interop بين CMP وUIKit/SwiftUI على iOS، وإمتى بتحتاجه؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>لو محتاج تستخدم native iOS component معندوش مقابل جاهز في CMP (زي MapKit view أو camera picker أصلي، أو حتى SwiftUI view جاهزة من الفريق)، بتقدر تستضيف الـ Compose UI بتاعتك جوه UIViewController من خلال ComposeUIViewController، وده هو نقطة الدخول الأساسية اللي مشروع iOS بيستخدمها. للاتجاه المعاكس (استضافة native view جوه شجرة Compose)، فيه UIKitView composable بيسمحلك تحط أي UIView جواه، مع التحكم في كيفية تحديثه (update block) وربط الـ lifecycle بتاعه بشكل صحيح. المهم تفهم إن ده hybrid approach: مش كل التطبيق لازم يبقى CMP بالكامل، وده أحد أهم نقاط قوة الحل إن التبني ممكن يكون تدريجي (incremental adoption).</p>
+          
+        </div>
+      </article>
+      </div>
+    </section>
+
+    <section class="category-section" id="networkingData" data-cat="networkingData">
+      <header class="category-header">
+        <div class="category-kicker">
+          <span class="kicker-index">06</span>
+          <span class="kicker-path" dir="ltr">src/networkingData/</span>
+        </div>
+        <h2 class="category-title">Networking و Data Layer</h2>
+        <p class="category-subtitle">Ktor، SQLDelight، kotlinx.serialization</p>
+        <div class="category-meta">5 أسئلة</div>
+      </header>
+      <div class="qa-list">
+        
+      <article class="qa-card" id="networkingData-1">
+        <button class="qa-toggle" aria-expanded="false" data-target="networkingData-1">
+          <span class="qa-num">01</span>
+          <span class="qa-question">ليه Ktor Client هو الاختيار الأشهر للـ networking في KMP بدل Retrofit؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>Retrofit مبني أساساً على JVM annotation processing وOkHttp، وده بيخليه محصور في targets اللي عندها JVM (زي Android وDesktop)، ومش شغال على iOS أو Wasm. Ktor Client، بالعكس، مبني بفلسفة multiplatform من الأساس، وعنده engine مختلف لكل platform: OkHttp أو CIO على Android/JVM، وDarwin (اللي بيستخدم NSURLSession تحت السطح) على iOS، وJs engine للويب. الـ API نفسه (HttpClient, request builders, plugins زي ContentNegotiation وLogging وAuth) موحد وبيتكتب مرة واحدة في commonMain، والـ engine بس هو اللي بيتغير حسب الـ platform عن طريق dependency injection بسيطة في الـ Gradle configuration.</p>
+          <pre class="code-block" dir="ltr"><code>// commonMain
+val client = HttpClient {
+    install(ContentNegotiation) { json() }
+}
+
+// androidMain build.gradle.kts
+implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+
+// iosMain build.gradle.kts
+implementation("io.ktor:ktor-client-darwin:$ktorVersion")</code></pre>
+        </div>
+      </article>
+
+      <article class="qa-card" id="networkingData-2">
+        <button class="qa-toggle" aria-expanded="false" data-target="networkingData-2">
+          <span class="qa-num">02</span>
+          <span class="qa-question">إزاي SQLDelight بتوفر type-safe database access عبر المنصات؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>SQLDelight بتاخد نهج مختلف عن Room: بتكتب استعلامات SQL خام في ملفات .sq، والـ Gradle plugin بتاعها بيقرا الملفات دي وقت الـ build ويولّد Kotlin classes وfunctions آمنة النوع (type-safe) تمثل كل query، بما فيها الـ result types. المميز إن الـ driver (طبقة التنفيذ الفعلية اللي بتتكلم مع SQLite) قابل للتبديل حسب المنصة: AndroidSqliteDriver على Android بيستخدم SQLite المدمج في النظام، NativeSqliteDriver على iOS بيستخدم SQLite.framework المدمج في iOS، وJdbcSqliteDriver على Desktop. زي Ktor، الكود اللي بتكتبه وبتستدعيه (الـ generated Queries object) موحد 100% في commonMain، والاختلاف بيقتصر بس على تهيئة الـ driver في كل platform module.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="networkingData-3">
+        <button class="qa-toggle" aria-expanded="false" data-target="networkingData-3">
+          <span class="qa-num">03</span>
+          <span class="qa-question">إيه دور kotlinx.serialization، وليه مش بنستخدم Gson أو Moshi في مشروع KMP؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>Gson وMoshi بيعتمدوا على الـ Java reflection API عشان يقرأوا الـ classes وقت الـ runtime ويحولوها لـ JSON، والـ reflection ده مش متاح أصلاً على Kotlin/Native أو Wasm، فالمكتبتين دول مش هيشتغلوا برة الـ JVM. kotlinx.serialization بتحل المشكلة دي بطريقة مختلفة تماماً: بدل الـ reflection، فيه compiler plugin (kotlinx-serialization-plugin) بيشتغل وقت الـ compile time وبيولّد كود serialization فعلي (serializer) لكل data class معمول عليه @Serializable، فمفيش أي اعتماد على reflection في الـ runtime، وده بيخليها تشتغل بنفس الكفاءة على أي target مدعوم من Kotlin، بالإضافة لكونها أسرع من الحلول اللي بتعتمد على reflection حتى على JVM نفسها.</p>
+          <pre class="code-block" dir="ltr"><code>@Serializable
+data class UserDto(
+    val id: Int,
+    val name: String,
+    @SerialName("email_address") val email: String? = null
+)
+
+val json = Json { ignoreUnknownKeys = true }
+val user = json.decodeFromString&lt;UserDto&gt;(jsonString)</code></pre>
+        </div>
+      </article>
+
+      <article class="qa-card" id="networkingData-4">
+        <button class="qa-toggle" aria-expanded="false" data-target="networkingData-4">
+          <span class="qa-num">04</span>
+          <span class="qa-question">إزاي بتعمل offline-first architecture في تطبيق KMP باستخدام SQLDelight كـ single source of truth؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>الباترن الشائع (زي ما هو معروف في Android من مكتبة Sunflower/Now-in-Android) بيتطبق بنفس الفلسفة في KMP: الـ repository بيرجع دايماً Flow من الـ SQLDelight database كـ single source of truth للـ UI layer، وبيعمل sync مع الـ remote API (عن طريق Ktor) في الخلفية، وبيكتب أي نتيجة جديدة في نفس الـ database بدل ما يرجعها مباشرة للـ UI. الفايدة إن الـ UI بيفضل reactive وconsistent حتى لو مفيش إنترنت، لأنه بيقرا من DB مش من الـ network مباشرة، وSQLDelight بيديك .asFlow().mapToList() جاهزة عشان تحول أي query لـ Flow&lt;List&lt;T&gt;&gt; تلقائياً، وده بيتكامل بشكل طبيعي جداً مع StateFlow في الـ ViewModel المشترك.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="networkingData-5">
+        <button class="qa-toggle" aria-expanded="false" data-target="networkingData-5">
+          <span class="qa-num">05</span>
+          <span class="qa-question">إيه هو multiplatform-settings ولية بنستخدمها بدل SharedPreferences مباشرة؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>SharedPreferences هي Android API بحتة مش متاحة على iOS، فلو محتاج تخزين key-value بسيط (زي flags أو user preferences أو tokens) في الكود المشترك، بتستخدم مكتبة زي multiplatform-settings (من Touchlab) اللي بتوفر واجهة موحدة (Settings interface) في commonMain، وبتنفذها فعلياً باستخدام SharedPreferences على Android وNSUserDefaults على iOS. المكتبة كمان بتوفر إصدار Coroutines-friendly (ObservableSettings) بيسمحلك تعمل .listen() أو تحوّل قيمة لـ Flow، وده مفيد جداً لو محتاج الـ UI يعمل react تلقائياً لتغيير setting معين.</p>
+          
+        </div>
+      </article>
+      </div>
+    </section>
+
+    <section class="category-section" id="architecture" data-cat="architecture">
+      <header class="category-header">
+        <div class="category-kicker">
+          <span class="kicker-index">07</span>
+          <span class="kicker-path" dir="ltr">src/architecture/</span>
+        </div>
+        <h2 class="category-title">Architecture و DI</h2>
+        <p class="category-subtitle">MVVM/MVI multiplatform، Koin، وClean Architecture</p>
+        <div class="category-meta">4 أسئلة</div>
+      </header>
+      <div class="qa-list">
+        
+      <article class="qa-card" id="architecture-1">
+        <button class="qa-toggle" aria-expanded="false" data-target="architecture-1">
+          <span class="qa-num">01</span>
+          <span class="qa-question">إزاي بتطبق Clean Architecture في مشروع KMP، وإيه الفرق عن تطبيقها في مشروع Android عادي؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>المبدأ الأساسي نفسه: طبقات Presentation وDomain وData، مع اعتماد الطبقات الخارجية على الداخلية مش العكس (Dependency Rule). الفرق الجوهري إن في KMP، الـ Domain layer بالكامل (use cases، entities، repository interfaces) والـ Data layer بالكامل (repository implementations، Ktor، SQLDelight) بيعيشوا في commonMain، يعني بيتشاركوا 100% بين Android وiOS. الـ Presentation layer هو نقطة الانقسام: الـ ViewModel (لو بتستخدم مكتبة زي Voyager أو حتى androidx.lifecycle.ViewModel اللي بقت multiplatform) ممكن كمان يتشارك في commonMain، لكن شجرة الـ UI الفعلية بتفترق: Jetpack Compose على Android وSwiftUI (أو CMP لو مستخدمها) على iOS. النقطة اللي بتتسأل عنها كتير في المقابلات: 'فين بتوقف مشاركة الكود؟' والإجابة الناضجة إنها بتوصل غالباً لحد الـ ViewModel/State، وبعدها الـ rendering بيبقى platform-specific إلا لو مستخدمين CMP.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="architecture-2">
+        <button class="qa-toggle" aria-expanded="false" data-target="architecture-2">
+          <span class="qa-num">02</span>
+          <span class="qa-question">ليه Koin أشهر من Dagger/Hilt في مشاريع KMP، رغم إن Hilt أقوى من ناحية compile-time safety؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>Dagger وHilt بيعتمدوا بشكل جوهري على الـ Java Annotation Processing Tool (APT) أو KAPT/KSP بطريقة مرتبطة بـ JVM tooling، ومش مصممين أصلاً للعمل على Kotlin/Native targets، فمحاولة استخدامهم في commonMain مليانة عوائق تقنية حقيقية. Koin، بالعكس، حل DI بسيط بيعتمد على Kotlin DSL عادي وservice locator pattern بيشتغل وقت الـ runtime من غير أي code generation أو annotation processing، فهو multiplatform بطبيعته من الأول. التريد أوف (trade-off) اللي لازم تعرفه: Koin بيفقد بعض الـ compile-time safety اللي Dagger بيوفرها (يعني ممكن تكتشف dependency ناقصة وقت الـ runtime مش وقت الـ compile)، لكن المميزات دي بتتعوض بسهولة الإعداد والسرعة في التطوير. فيه كمان مكتبة Kotlin-Inject بتحاول توفر compile-time safety زي Dagger لكن بفلسفة KSP متوافقة مع multiplatform، وده اتجاه بيكبر تدريجياً.</p>
+          <pre class="code-block" dir="ltr"><code>// commonMain
+val commonModule = module {
+    single { HttpClient { install(ContentNegotiation) { json() } } }
+    single&lt;UserRepository&gt; { UserRepositoryImpl(get(), get()) }
+    factory { GetUserUseCase(get()) }
+}
+
+// androidMain
+val androidModule = module {
+    single { DatabaseDriverFactory(androidContext()) }
+}</code></pre>
+        </div>
+      </article>
+
+      <article class="qa-card" id="architecture-3">
+        <button class="qa-toggle" aria-expanded="false" data-target="architecture-3">
+          <span class="qa-num">03</span>
+          <span class="qa-question">إزاي بتصمم ViewModel واحد يتشارك بين Android وiOS، وإيه التحديات في الـ lifecycle؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>من Kotlin/Jetpack بقى فيه androidx.lifecycle:lifecycle-viewmodel متاحة كـ multiplatform artifact، فبتقدر تكتب class بيرث من ViewModel() في commonMain نفسه، وتستخدم viewModelScope اللي متاح كمان multiplatform (مبني فوق نفس المفهوم بتاع Coroutines المرتبط بـ lifecycle). التحدي الحقيقي مش في تعريف الـ ViewModel نفسه لكن في التكامل مع lifecycle كل منصة: على Android، النظام بيدير الـ ViewModel tied لـ Activity/Fragment scope تلقائياً عن طريق ViewModelStoreOwner. على iOS مفيش مفهوم مطابق، فمحتاج تدير الـ instance creation والـ clearing يدوياً (أو عن طريق مكتبة زي Voyager/Moko-MVVM اللي بتوفر لك helper)، وده معناه إنك المسؤول عن استدعاء onCleared() في الوقت المناسب (زي وقت اختفاء الـ SwiftUI view) عشان تتجنب memory leaks أو استمرار الـ coroutines شغالة من غير داعي.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="architecture-4">
+        <button class="qa-toggle" aria-expanded="false" data-target="architecture-4">
+          <span class="qa-num">04</span>
+          <span class="qa-question">إيه الفرق بين MVVM وMVI في سياق مشروع KMP، وإيه الأنسب؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>MVVM بيعتمد على تعدد الـ states والـ events المنفصلة (زي عدة StateFlow/LiveData لكل جزء من الشاشة)، وده مريح ومباشر لكن ممكن يبقى صعب التتبع لما الشاشة تكبر وتتعقد. MVI بيفرض state واحد غير قابل للتغيير (immutable single state) بيتمثل غالباً في sealed class أو data class شامل، وكل تفاعل من المستخدم بيتحول لـ 'Intent' واضح بيتعالج بشكل مركزي وبينتج state جديد كامل، وده بيخلي الـ debugging والـ testing أسهل جداً لأن كل تغيير قابل للتتبع (predictable state transitions) وده مهم جداً في بيئة multiplatform لأنك عايز الـ Presentation logic يبقى متوقع بنفس الشكل تماماً سواء استهلكه Jetpack Compose أو SwiftUI. عملياً، فرق كتير بيميلوا لـ MVI في مشاريع KMP بالذات لأن الـ single state object بيبقى أسهل تحويله (mapping) وقراءته من طرف Swift عن طريق KMP-NativeCoroutines أو SKIE.</p>
+          
+        </div>
+      </article>
+      </div>
+    </section>
+
+    <section class="category-section" id="iosInterop" data-cat="iosInterop">
+      <header class="category-header">
+        <div class="category-kicker">
+          <span class="kicker-index">08</span>
+          <span class="kicker-path" dir="ltr">src/iosInterop/</span>
+        </div>
+        <h2 class="category-title">Kotlin/Native و iOS Interop</h2>
+        <p class="category-subtitle">Swift interop، إدارة الذاكرة، وأداء الـ Native binary</p>
+        <div class="category-meta">5 أسئلة</div>
+      </header>
+      <div class="qa-list">
+        
+      <article class="qa-card" id="iosInterop-1">
+        <button class="qa-toggle" aria-expanded="false" data-target="iosInterop-1">
+          <span class="qa-num">01</span>
+          <span class="qa-question">إزاي Kotlin/Native بيتفاعل مع Objective-C/Swift runtime على مستوى الـ memory management؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>Kotlin/Native عنده الـ garbage collector بتاعه الخاص (tracing GC، بقى بيستخدم default الـ Concurrent Mark and Sweep من الإصدارات الحديثة) بيدير objects اللي اتعملها من كود Kotlin، بينما Objective-C/Swift بيستخدموا Automatic Reference Counting (ARC) لإدارة الذاكرة بتاعتهم. لما الكائنات دي تتفاعل مع بعض عبر الـ interop layer، Kotlin/Native بيولّد Objective-C headers للكلاسات بتاعته، وأي Kotlin object بيتم تمريره لـ Swift/Obj-C بيتغلف في ref-counted wrapper بيتكامل مع ARC بحيث لو الـ Swift side مسكه بـ strong reference، الـ Kotlin GC مش هيجمعه (collect) لغاية ما الـ ARC refcount يوصل للصفر. التحدي الحقيقي بيظهر في الـ retain cycles: لو عندك Kotlin object ماسك closure أو delegate من Swift والعكس صحيح، ممكن يحصل memory leak حقيقي محتاج انتباه خاص، وده سبب شائع لأسئلة الـ debugging في المقابلات.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="iosInterop-2">
+        <button class="qa-toggle" aria-expanded="false" data-target="iosInterop-2">
+          <span class="qa-num">02</span>
+          <span class="qa-question">إيه هو الفرق الجوهري في الأداء بين تطبيق KMP بيستخدم Kotlin/Native للـ business logic على iOS، مقارنة بتطبيق Swift 100%؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>من ناحية تنفيذ الكود نفسه، Kotlin/Native بيتحول لـ LLVM IR وبعدين لـ native machine code زي بالظبط Swift، يعني مفيش interpreter أو VM overhead في تنفيذ منطق الأعمال نفسه، والأداء الخام (raw execution) قريب جداً من Swift. الفرق الحقيقي بيظهر في نقطتين: الأولى startup time، لأن الـ Kotlin/Native runtime (بما فيه الـ GC والـ Kotlin standard library) بيضيف حجم إضافي للـ binary وبيحتاج تهيئة (initialization) بسيطة وقت إطلاق التطبيق. التانية هي الـ interop overhead عند كل استدعاء بيعدي الحدود (boundary) بين Kotlin وSwift، لأن فيه تكلفة تحويل أنواع البيانات (type marshalling) وإدارة الـ reference counting المتبادل، فلو عندك كود بيعمل استدعاءات كتيرة جداً ومتكررة عبر الـ boundary دي (زي حلقة (loop) بتستدعي دالة Kotlin آلاف المرات)، ده ممكن يبقى أبطأ من نفس الكود لو كان Swift خالص، فالممارسة الأفضل تقليل عدد الـ boundary crossings وتصميم الـ API بحيث تمرر بيانات مجمعة (batched) بدل استدعاءات صغيرة متكررة.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="iosInterop-3">
+        <button class="qa-toggle" aria-expanded="false" data-target="iosInterop-3">
+          <span class="qa-num">03</span>
+          <span class="qa-question">إزاي بتعمل debug لكود Kotlin شغال جوه تطبيق iOS من داخل Xcode؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>Kotlin/Native بيولّد debug symbols (dSYM) لو الـ framework اتبنى بـ debug configuration، وده بيسمح لـ Xcode's LLDB debugger إنه يقف على breakpoints جوه ملفات .kt نفسها زي أي ملف Swift عادي، تقدر تتفحص فيها الـ variables وتعمل step-through للكود. المهم عملياً إنك تتأكد إن الـ Gradle build بتاع الـ framework شغال في Debug mode (مش Release) عشان الـ symbols تتولد صح، وإن مسار الملفات المصدرية (source paths) متاح للـ Xcode. في حالة تعقيدات أكتر، أدوات زي Kotlin/Native Memory Tool بتساعد في تتبع الـ memory leaks، وLLDB نفسه بيقدر يعرض قيم الـ Kotlin objects بشكل مقروء لو الـ debug info متظبطة صح.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="iosInterop-4">
+        <button class="qa-toggle" aria-expanded="false" data-target="iosInterop-4">
+          <span class="qa-num">04</span>
+          <span class="qa-question">إيه هو Static Framework مقابل Dynamic Framework في تصدير مكتبة KMP لـ iOS، وإمتى تختار كل واحد؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>الـ Static Framework (isStatic = true) بيتضمن الكود مباشرة جوه الـ binary بتاع تطبيق iOS النهائي وقت الـ linking، وده الخيار الموصى بيه من JetBrains حالياً لمعظم الحالات لأنه بيقلل مشاكل الـ App Store validation وبيبسط عملية الـ distribution، خصوصاً مع SPM. الـ Dynamic Framework بيفضل ملف منفصل بيتحمل وقت الـ runtime، وكان أنسب لو محتاج تشارك نفس الـ framework بين أكتر من target جوه نفس مشروع iOS (زي main app وextension) من غير ما تكرر الكود في كل واحد، لكنه بيزود وقت الإطلاق (launch time) شوية بسبب dynamic linking، وبيحتاج إعداد أدق في مشروع Xcode. القرار الشائع في الشركات دلوقتي: static افتراضياً إلا لو فيه حاجة صريحة تستلزم dynamic.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="iosInterop-5">
+        <button class="qa-toggle" aria-expanded="false" data-target="iosInterop-5">
+          <span class="qa-num">05</span>
+          <span class="qa-question">إيه هو الـ Swift Export الجديد اللي JetBrains بتشتغل عليه، وليه هو نقلة نوعية؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>قبل كده، أي Kotlin API بيتصدّر لـ iOS كان لازم يعدي على 'Objective-C bridge' الأول، يعني حتى لو الفريق كله Swift، الـ types والـ generics والـ sealed classes بتاعة Kotlin كانت بتتحول لصيغة Objective-C-compatible أولاً وده كان بيفقد كتير من التعبيرية (زي sealed classes بتتحول لـ enum-like structure أقل قوة، أو الـ default arguments مش بتتدعم مباشرة). Swift Export هي ميزة جديدة (لسه بتتطور) بتسمح بتوليد Swift APIs مباشرة من Kotlin من غير المرور بالـ Objective-C bridge، وده بيحافظ على تعبيرية أكتر من ناحية الـ generics والـ null-safety وnamed parameters، وبيخلي تجربة استهلاك مكتبة KMP من Swift أقرب بكتير لإحساس مكتبة Swift أصلية 100%.</p>
+          
+        </div>
+      </article>
+      </div>
+    </section>
+
+    <section class="category-section" id="testing" data-cat="testing">
+      <header class="category-header">
+        <div class="category-kicker">
+          <span class="kicker-index">09</span>
+          <span class="kicker-path" dir="ltr">src/testing/</span>
+        </div>
+        <h2 class="category-title">Testing في KMP</h2>
+        <p class="category-subtitle">kotlin.test، fakes، وplatform-specific test runners</p>
+        <div class="category-meta">3 أسئلة</div>
+      </header>
+      <div class="qa-list">
+        
+      <article class="qa-card" id="testing-1">
+        <button class="qa-toggle" aria-expanded="false" data-target="testing-1">
+          <span class="qa-num">01</span>
+          <span class="qa-question">إزاي بتكتب unit tests في commonTest تشتغل على كل الـ targets في وقت واحد؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>بتستخدم مكتبة kotlin.test اللي هي abstraction طبقة فوق أطر الاختبار المختلفة لكل منصة: بتتحول لـ JUnit على JVM/Android، وXCTest تلقائياً على iOS، وnodejs test runner على JS/Wasm. بتكتب الاختبار مرة واحدة في commonTest باستخدام @Test وassertEquals وباقي assertions المتاحة، والـ Gradle plugin بيتكفل بتشغيله لكل target عند تنفيذ ./gradlew allTests أو ./gradlew iosSimulatorArm64Test مثلاً. الميزة الكبيرة إنك بتضمن إن الـ business logic بيشتغل صح فعلياً على كل platform runtime مش بس على JVM، لأن فيه فروق دقيقة أحياناً في سلوك بعض الـ APIs (زي التعامل مع الـ floating point precision أو الـ date/time) بين الـ runtimes المختلفة.</p>
+          <pre class="code-block" dir="ltr"><code>// commonTest
+class UserValidatorTest {
+    @Test
+    fun `email بدون @ لازم يفشل`() {
+        val result = UserValidator.isValidEmail("invalid-email")
+        assertFalse(result)
+    }
+}</code></pre>
+        </div>
+      </article>
+
+      <article class="qa-card" id="testing-2">
+        <button class="qa-toggle" aria-expanded="false" data-target="testing-2">
+          <span class="qa-num">02</span>
+          <span class="qa-question">إزاي بتعمل fake implementation لـ expect/actual class عشان تختبر الكود المشترك بمعزل عن المنصة؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>لو الكود مصمم صح (يعني بيعتمد على interfaces بدل expect/actual مباشرة زي ما اتكلمنا قبل كده)، بتقدر ببساطة تعمل fake class عادي بيطبق نفس الـ interface وتحقنه في الـ constructor، وده الأسلوب الأنظف للـ testability. لو مضطر تتعامل مع expect/actual class فعلاً (لحالات نادرة)، الممارسة الشائعة إنك تعمل actual implementation خاص بـ commonTest source set نفسه (لو الـ target بيدعم كده) أو تستخدم fake عادي جواه wrapper interface بحيث الـ expect/actual يفضل thin layer بس، والمنطق الحقيقي كله بيتحط جواه class تاني قابل لل mocking بسهولة، وده بيرجعنا لنفس المبدأ: قلل الاعتماد المباشر على expect/actual في الأماكن اللي محتاجة اختبار مكثف.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="testing-3">
+        <button class="qa-toggle" aria-expanded="false" data-target="testing-3">
+          <span class="qa-num">03</span>
+          <span class="qa-question">هل مكتبات mocking زي Mockito أو MockK بتشتغل في commonTest؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>لأ، Mockito وMockK الاتنين مبنيين على آليات JVM-specific (زي bytecode manipulation عن طريق Java's dynamic proxy أو ByteBuddy)، فمش هيشتغلوا في commonTest لأنه لازم يكون portable لكل target. البديل المستخدم في مشاريع KMP هو مكتبة multiplatform حقيقية زي MockKMP أو ببساطة كتابة manual fakes/stubs (يعني تعمل class بسيط بيطبق الـ interface ويرجعلك قيم ثابتة أو بيسجل الاستدعاءات في list يدوي عشان تتحقق منها بعدين). كتير من الفرق المحترفة بتفضل فعلياً الـ manual fakes حتى لو كانوا بيستخدموا Mockito على JVM، لأنها أوضح وأسهل صيانة على المدى الطويل، وده اتجاه معروف حتى في مجتمع Android بشكل عام مش بس KMP.</p>
+          
+        </div>
+      </article>
+      </div>
+    </section>
+
+    <section class="category-section" id="advancedComparisons" data-cat="advancedComparisons">
+      <header class="category-header">
+        <div class="category-kicker">
+          <span class="kicker-index">10</span>
+          <span class="kicker-path" dir="ltr">src/advancedComparisons/</span>
+        </div>
+        <h2 class="category-title">أسئلة متقدمة ومقارنات</h2>
+        <p class="category-subtitle">قرارات معمارية، أداء، ومقارنة مع Flutter/RN، وسيناريوهات مقابلات فعلية</p>
+        <div class="category-meta">5 أسئلة</div>
+      </header>
+      <div class="qa-list">
+        
+      <article class="qa-card" id="advancedComparisons-1">
+        <button class="qa-toggle" aria-expanded="false" data-target="advancedComparisons-1">
+          <span class="qa-num">01</span>
+          <span class="qa-question">لو مدير هندسي سألك: 'ليه نختار KMP على Flutter؟' إزاي تجاوب بشكل موزون؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>الإجابة الناضجة مش 'KMP أفضل مطلقاً' لكن توضيح الـ trade-offs: KMP بيسيبلك حرية الـ native UI الكامل (لو مش مستخدم CMP)، فده مثالي لو الشركة عندها فريقين Android/iOS ناضجين وعايزة تحافظ على أعلى درجة native feel وaccessibility وperformance للـ UI، مع تقليل تكرار منطق الأعمال بس. Flutter بالعكس بيديك consistency بصرية كاملة وسرعة تطوير أعلى من البداية لأن الـ UI نفسه مشترك 100% دايماً، وده أنسب لشركة ناشئة عايزة تطلق منتج بفريق واحد بسرعة، أو منتج شكله البصري أهم من مطابقته الكاملة لكل platform convention. عيب Flutter الأساسي إنه بيجيب معاه الـ Dart runtime كامل وبيرسم كل حاجة بنفسه (حتى الـ text rendering)، وده بيسبب أحياناً اختلافات دقيقة عن سلوك النظام (زي text selection أو IME behavior) لازم تتحل يدوياً. القرار الصح بيعتمد على نضج الفريق، حجم المنتج، ومدى أهمية الـ native fidelity بالنسبة للمنتج.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="advancedComparisons-2">
+        <button class="qa-toggle" aria-expanded="false" data-target="advancedComparisons-2">
+          <span class="qa-num">02</span>
+          <span class="qa-question">إيه أكبر خطر معماري (architectural risk) في مشروع KMP كبير، وإزاي تتفاداه؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>أكبر خطر هو 'leaky abstraction' في اتجاه عكسي: إنك تكتب commonMain code بس فعلياً بيفترض سلوك platform معين (زي الاعتماد الضمني على إن الـ threading model زي Android بالظبط، أو استخدام مكتبة JVM-only من غير الانتباه)، وده بيتكشف متأخر جداً وقت محاولة إضافة target جديد أو حتى وقت اختبار الكود على iOS لأول مرة، وبيكون التصحيح مكلف جداً في المرحلة دي. الحل العملي إنك من أول يوم تشغّل CI على كل الـ targets المستهدفة (مش بس Android)، حتى لو iOS UI لسه مش جاهز، عشان تكتشف مشاكل الـ compilation والـ runtime behavior بدري. كمان مهم جداً وضع 'حدود' واضحة (architectural boundaries) من الأول لمين مسؤول عن الـ platform-specific concerns زي permissions أو navigation، بدل ما الفريق يكتشفها بالتجربة والخطأ مع كل feature جديد.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="advancedComparisons-3">
+        <button class="qa-toggle" aria-expanded="false" data-target="advancedComparisons-3">
+          <span class="qa-num">03</span>
+          <span class="qa-question">إيه الفرق الجوهري بين React Native's New Architecture (JSI/Fabric/TurboModules) وKMP من ناحية فلسفة التنفيذ؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>React Native حتى بعد الـ New Architecture لسه بيعتمد أساساً على تشغيل JavaScript على محرك (JS engine زي Hermes)، والـ JSI (JavaScript Interface) بس قلّلت الـ overhead في التواصل بين JS والـ native code (بدل الـ old bridge اللي كان async وبطيء نسبياً وبيحول كل حاجة لـ JSON)، لكن الـ business logic نفسه لسه بيتفسر (interpreted/JIT-compiled) عن طريق الـ JS engine وقت الـ runtime. KMP مختلف جذرياً: مفيش JS engine ولا تفسير وقت التشغيل خالص، الكود بيتحول (compiled) لـ native machine code وقت البناء نفسه (ahead-of-time)، سواء JVM bytecode أو LLVM-based native binary، يعني مفيش أي 'محرك تفسير' وسيط بين الكود ومنطق التشغيل، وده الفرق الأساسي في نقطة الأداء والـ startup time، حتى لو الـ New Architecture قربت React Native كتير من ناحية سرعة الـ interop.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="advancedComparisons-4">
+        <button class="qa-toggle" aria-expanded="false" data-target="advancedComparisons-4">
+          <span class="qa-num">04</span>
+          <span class="qa-question">إزاي تتعامل مع سيناريو إن مكتبة تالتة (third-party) مهمة للمشروع لسه مش بتدعم KMP؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>أول خطوة عملية إنك تدور على multiplatform alternative موجودة فعلاً (المجتمع بقى كبير نسبياً: Ktor بدل Retrofit، SQLDelight بدل Room التقليدي، kotlinx-datetime بدل java.time المباشر، kotlinx.serialization بدل Gson). لو مفيش بديل، الخيار التاني إنك تعزل استخدام المكتبة دي جوه الـ platform-specific source set (androidMain مثلاً) وتوفر abstraction (interface) في commonMain بحيث باقي الكود المشترك مش بيعرف تفاصيل المكتبة دي، وتكتب actual implementation منفصل لكل platform حتى لو ده معناه تكرار جزء من المنطق. الخيار الأخير والأصعب هو المساهمة (contribution) في المكتبة نفسها أو كتابة KMP wrapper بنفسك حواليها، وده قرار بيتاخد لو المكتبة استراتيجية جداً للمنتج ومفيش بديل مقبول.</p>
+          
+        </div>
+      </article>
+
+      <article class="qa-card" id="advancedComparisons-5">
+        <button class="qa-toggle" aria-expanded="false" data-target="advancedComparisons-5">
+          <span class="qa-num">05</span>
+          <span class="qa-question">إزاي بتوضح في مقابلة إزاي خبرتك في AOSP/Android Automotive بتفيدك في فهم KMP بشكل أعمق من مطور جاي من عالم الـ app layer بس؟</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer">
+          <p>خبرة الـ AOSP والـ VHAL بتعطيك حس عملي بمفاهيم زي الـ HAL abstraction layers، الـ Binder IPC، وإدارة الـ process boundaries، وده نفس المنطق الذهني المستخدم في فهم إزاي KMP بيعزل الـ platform-specific behavior عن طريق expect/actual، أو إزاي Kotlin/Native بيتفاعل مع ARC عبر حدود process/memory مختلفة. كمان فهمك العميق لـ ART (Android Runtime) وbytecode compilation بيدّيك أساس قوي لفهم الفرق الجوهري بين إزاي Kotlin بيتحول لـ JVM bytecode مقابل إزاي بيتحول لـ LLVM IR ثم native binary على Kotlin/Native، وده تحديداً النوع من الفهم اللي بيميّزك في مقابلة senior/staff عن مطور بيتعامل مع KMP كـ 'framework' بس من غير فهم لطبقات الـ runtime تحته.</p>
+          
+        </div>
+      </article>
+      </div>
+    </section>
+
+    <footer class="doc-footer">
+      <p>اتبنى الملف عشان يساعدك تراجع بعمق قبل مقابلات KMP / CMP — رَكّز على الأسئلة اللي فيها trade-offs، دي غالباً اللي بتفرّق بين إجابة Junior وإجابة Senior.</p>
+    </footer>
+  </main>
+</div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toggles = document.querySelectorAll(".qa-toggle");
+  const total = toggles.length;
+  const seen = new Set();
+  const progressFill = document.getElementById("progressFill");
+  const progressCount = document.getElementById("progressCount");
+
+  function updateProgress(){
+    progressFill.style.width = (seen.size/total*100).toFixed(1)+"%";
+    progressCount.textContent = seen.size + " / " + total;
+  }
+
+  toggles.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const card = btn.closest(".qa-card");
+      const answer = card.querySelector(".qa-answer");
+      const isOpen = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!isOpen));
+      card.classList.toggle("open", !isOpen);
+      if(!isOpen){
+        answer.style.maxHeight = answer.scrollHeight + 40 + "px";
+        seen.add(btn.dataset.target);
+        updateProgress();
+      } else {
+        answer.style.maxHeight = "0px";
+      }
+    });
+  });
+
+  // Sidebar mobile toggle
+  const sidebar = document.getElementById("sidebar");
+  const openBtn = document.getElementById("sidebarToggle");
+  const closeBtn = document.getElementById("sidebarClose");
+  if(openBtn) openBtn.addEventListener("click", () => sidebar.classList.add("open"));
+  if(closeBtn) closeBtn.addEventListener("click", () => sidebar.classList.remove("open"));
+
+  // Active link on scroll
+  const sections = document.querySelectorAll(".category-section");
+  const links = document.querySelectorAll(".tree-link");
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        links.forEach(l => l.classList.remove("active"));
+        const active = document.querySelector('.tree-link[data-cat="'+entry.target.dataset.cat+'"]');
+        if(active) active.classList.add("active");
+      }
+    });
+  }, { rootMargin: "-20% 0px -70% 0px" });
+  sections.forEach(s => io.observe(s));
+
+  links.forEach(l => l.addEventListener("click", () => {
+    if(window.innerWidth <= 980) sidebar.classList.remove("open");
+  }));
+});
+
+</script>
+</body>
+</html>

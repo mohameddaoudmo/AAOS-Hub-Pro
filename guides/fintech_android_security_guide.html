@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinTech & Payment Security لمطوري Android</title>
+<style>
+:root{
+  --bg:#0a0e14;
+  --bg2:#0f1420;
+  --panel:#131926;
+  --panel2:#1a2233;
+  --border:#232d42;
+  --text:#dbe4f0;
+  --text-dim:#8a96ac;
+  --accent:#00e5a0;
+  --accent2:#4fc3ff;
+  --accent3:#ff5c8a;
+  --accent4:#ffb84f;
+  --code-bg:#0c1018;
+  --shadow: 0 8px 30px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:radial-gradient(1200px 800px at 80% -10%, #10233a 0%, transparent 60%),
+              radial-gradient(1000px 700px at -10% 20%, #1a1030 0%, transparent 55%),
+              var(--bg);
+  color:var(--text);
+  font-family:'Tahoma','Segoe UI',system-ui,sans-serif;
+  line-height:1.9;
+  min-height:100vh;
+}
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:#2a3550; border-radius:10px;}
+::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+
+/* ---- Layout ---- */
+.wrap{display:flex; min-height:100vh;}
+.sidebar{
+  width:300px; flex-shrink:0;
+  background:linear-gradient(180deg,#0d1220,#0a0e18);
+  border-left:1px solid var(--border);
+  padding:26px 18px;
+  position:sticky; top:0; height:100vh; overflow-y:auto;
+}
+.sidebar h1{
+  font-size:19px; color:var(--accent); margin-bottom:4px; line-height:1.5;
+}
+.sidebar .sub{color:var(--text-dim); font-size:12.5px; margin-bottom:22px;}
+.nav-group{margin-bottom:18px;}
+.nav-group-title{
+  font-size:11.5px; color:var(--accent4); text-transform:uppercase; letter-spacing:.5px;
+  margin:14px 0 8px; opacity:.85; font-weight:bold; border-bottom:1px dashed #2a3550; padding-bottom:6px;
+}
+.nav-link{
+  display:block; padding:8px 10px; border-radius:8px; color:var(--text-dim);
+  text-decoration:none; font-size:13.5px; margin-bottom:2px; transition:.15s;
+  border-right:2px solid transparent;
+}
+.nav-link:hover{background:var(--panel2); color:var(--text); border-color:var(--accent2);}
+
+.main{flex:1; padding:40px 60px; max-width:980px;}
+@media(max-width:900px){
+  .wrap{flex-direction:column;}
+  .sidebar{width:100%; height:auto; position:relative;}
+  .main{padding:24px;}
+}
+
+/* ---- Hero ---- */
+.hero{
+  background:linear-gradient(135deg, #0e2436, #10182c 60%, #1a1030);
+  border:1px solid var(--border); border-radius:20px; padding:40px 34px; margin-bottom:44px;
+  box-shadow:var(--shadow); position:relative; overflow:hidden;
+}
+.hero:before{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+  height:3px; top:0;
+}
+.hero h1{font-size:34px; background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom:10px;}
+.hero p{color:var(--text-dim); font-size:15.5px; max-width:700px;}
+.badges{display:flex; gap:8px; flex-wrap:wrap; margin-top:18px;}
+.badge{background:var(--panel2); border:1px solid var(--border); color:var(--accent2);
+  font-size:12px; padding:5px 12px; border-radius:20px;}
+
+/* ---- Sections ---- */
+section{margin-bottom:56px; scroll-margin-top:20px;}
+.section-head{display:flex; align-items:center; gap:14px; margin-bottom:18px;}
+.section-num{
+  width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+  font-weight:bold; font-size:16px; flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#04121a;
+}
+.section-head h2{font-size:24px; color:var(--text);}
+.section-head .en{color:var(--text-dim); font-size:13px; font-weight:normal;}
+
+.card{
+  background:var(--panel); border:1px solid var(--border); border-radius:14px;
+  padding:22px 24px; margin-bottom:16px;
+}
+.card h3{color:var(--accent2); font-size:17px; margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+.card p{margin-bottom:10px; color:var(--text);}
+.card ul, .card ol{margin:8px 0 8px 0; padding-right:22px;}
+.card li{margin-bottom:6px;}
+
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+@media(max-width:700px){.grid2{grid-template-columns:1fr;}}
+
+.note{
+  border-right:4px solid var(--accent2); background:#0f1c2c; padding:14px 18px; border-radius:8px;
+  margin:14px 0; font-size:14px; color:var(--text-dim);
+}
+.warn{
+  border-right:4px solid var(--accent3); background:#2a1420; padding:14px 18px; border-radius:8px;
+  margin:14px 0; font-size:14px; color:#ffd0dd;
+}
+.android-tag{
+  border-right:4px solid var(--accent); background:#0c1f18; padding:14px 18px; border-radius:8px;
+  margin:14px 0;
+}
+.android-tag .tag-label{color:var(--accent); font-weight:bold; font-size:12.5px; margin-bottom:6px; display:block;}
+
+pre{
+  background:var(--code-bg); border:1px solid var(--border); border-radius:10px;
+  padding:16px 18px; overflow-x:auto; margin:12px 0; direction:ltr; text-align:left;
+  font-family:'Consolas','Courier New',monospace; font-size:13px; line-height:1.6;
+}
+code{font-family:'Consolas','Courier New',monospace;}
+.card code, p code{background:#1a2233; color:var(--accent4); padding:2px 6px; border-radius:5px; font-size:13px;}
+.kw{color:#c586c0;} .str{color:#ce9178;} .fn{color:#dcdcaa;} .cm{color:#6a9955;} .tp{color:#4ec9b0;}
+
+table{width:100%; border-collapse:collapse; margin:14px 0; font-size:13.5px;}
+th,td{border:1px solid var(--border); padding:10px 12px; text-align:right;}
+th{background:var(--panel2); color:var(--accent2);}
+tr:nth-child(even){background:#101726;}
+
+.flow{display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin:16px 0;}
+.flow-step{
+  background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:10px 16px;
+  font-size:13.5px; color:var(--accent2); white-space:nowrap;
+}
+.flow-arrow{color:var(--text-dim); font-size:18px;}
+
+.compare{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0;}
+.compare .col{border-radius:12px; padding:16px 18px;}
+.compare .col.a{background:#0f1c2c; border:1px solid #1d3a52;}
+.compare .col.b{background:#1c1226; border:1px solid #3a1d4a;}
+.compare h4{margin-bottom:8px; font-size:15px;}
+.compare .col.a h4{color:var(--accent2);}
+.compare .col.b h4{color:var(--accent3);}
+@media(max-width:700px){.compare{grid-template-columns:1fr;}}
+
+footer{border-top:1px solid var(--border); padding:30px 0; text-align:center; color:var(--text-dim); font-size:13px; margin-top:60px;}
+.back-top{position:fixed; bottom:24px; left:24px; background:var(--accent); color:#04121a; width:44px; height:44px;
+  border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; text-decoration:none;
+  box-shadow:var(--shadow); opacity:.9;}
+.toc-mini{color:var(--text-dim); font-size:12px; margin-bottom:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="sidebar">
+  <h1>⚡ FinTech Security</h1>
+  <div class="sub">دليل شامل للمطورين — مربوط بـ Android</div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">مقدمة</div>
+    <a class="nav-link" href="#fintech">1. ما هو FinTech</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">معايير ومفاهيم الدفع</div>
+    <a class="nav-link" href="#pci">2. PCI DSS</a>
+    <a class="nav-link" href="#acceptance">3. Card Acceptance</a>
+    <a class="nav-link" href="#emv">4. EMV</a>
+    <a class="nav-link" href="#iso8583">5. ISO 8583</a>
+    <a class="nav-link" href="#prepaid">6. Prepaid & Postpaid</a>
+    <a class="nav-link" href="#cards">7. Visa & MasterCard</a>
+    <a class="nav-link" href="#pos">8. POS Devices</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">أساسيات الحماية</div>
+    <a class="nav-link" href="#eeh">9. Encoding vs Encryption vs Hashing</a>
+    <a class="nav-link" href="#encoding">10. Encoding بالتفصيل</a>
+    <a class="nav-link" href="#encryption">11. Encryption بالتفصيل</a>
+    <a class="nav-link" href="#hashing">12. Hashing بالتفصيل</a>
+    <a class="nav-link" href="#sha256">13. SHA-256</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">خوارزميات التشفير</div>
+    <a class="nav-link" href="#secretkey">14. SecretKey</a>
+    <a class="nav-link" href="#aes">15. AES Encryption</a>
+    <a class="nav-link" href="#aes-behind">16. AES Behind The Scenes</a>
+    <a class="nav-link" href="#rsa">17. RSA Algorithm</a>
+    <a class="nav-link" href="#rsa-aes">18. RSA with AES</a>
+    <a class="nav-link" href="#aesdes">19. AES vs DES</a>
+    <a class="nav-link" href="#aesrsa">20. AES vs RSA</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">أمان بروتوكولات الدفع</div>
+    <a class="nav-link" href="#pinblock">21. PIN Block</a>
+    <a class="nav-link" href="#panparser">22. PAN Parser</a>
+    <a class="nav-link" href="#de55">23. DE55 - Chip Data</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">أمان التطبيق على Android</div>
+    <a class="nav-link" href="#sniffing">24. Sniffing</a>
+    <a class="nav-link" href="#prevent-sniffing">25. Prevent Sniffing</a>
+    <a class="nav-link" href="#copypaste">26. Prevent Copy & Paste</a>
+  </div>
+</nav>
+
+<main class="main">
+
+  <div class="hero">
+    <h1>FinTech & Payment Security</h1>
+    <p>
+      المرجع ده بيشرح كل حاجة متعلقة بعالم الـ FinTech وأمان أنظمة الدفع (PCI، EMV، ISO 8583، التشفير بأنواعه)
+      وبيربطها بشكل مباشر بتطبيقات Android — يعني مش بس نظرية، كل موضوع فيه إزاي تطبّقه في Kotlin،
+      وإزاي يستخدم Android Keystore و JCA/JCE، وإيه العلاقة بـ NFC/EMV في تطبيقات الدفع.
+    </p>
+    <div class="badges">
+      <span class="badge">Kotlin</span>
+      <span class="badge">Android Keystore</span>
+      <span class="badge">JCA / JCE</span>
+      <span class="badge">NFC / EMV</span>
+      <span class="badge">ISO 8583</span>
+      <span class="badge">AES / RSA / SHA-256</span>
+    </div>
+  </div>
+
+  <!-- 1 -->
+  <section id="fintech">
+    <div class="section-head">
+      <div class="section-num">1</div>
+      <h2>ما هو FinTech <span class="en">(Financial Technology)</span></h2>
+    </div>
+    <div class="card">
+      <p>
+        FinTech هو استخدام التكنولوجيا عشان تحسّن أو تُتمتة الخدمات المالية: الدفع، التحويلات، الإقراض،
+        إدارة الاستثمار، والبنوك الرقمية. بدل ما العميل يروح فرع بنك، بقى يقدر يدفع بموبايله أو يفتح حساب من التطبيق.
+      </p>
+      <h3>🧩 أهم مجالات FinTech</h3>
+      <ul>
+        <li><b>Payments</b>: محافظ إلكترونية، تحويلات فورية، NFC payments (زي Google Pay).</li>
+        <li><b>Digital Banking</b>: بنوك بدون فروع (Neobanks).</li>
+        <li><b>Lending</b>: قروض رقمية بتقييم ائتماني آلي.</li>
+        <li><b>InsurTech</b>: تأمين رقمي.</li>
+        <li><b>RegTech</b>: أدوات الامتثال والمراقبة ضد الاحتيال (AML/KYC).</li>
+      </ul>
+      <div class="android-tag">
+        <span class="tag-label">📱 علاقتها بـ Android</span>
+        كمطوّر Android في مجال FinTech، غالبًا هتشتغل على: تطبيقات محافظ، قراءة كروت عبر NFC (EMV)،
+        تخزين مفاتيح تشفير آمن عبر <code>Android Keystore</code>، وتكامل مع أجهزة POS عبر Bluetooth/Serial باستخدام بروتوكول ISO 8583.
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section id="pci">
+    <div class="section-head">
+      <div class="section-num">2</div>
+      <h2>PCI DSS <span class="en">(Payment Card Industry Data Security Standard)</span></h2>
+    </div>
+    <div class="card">
+      <p>
+        معيار أمان عالمي أنشأته Visa وMasterCard وAmex وغيرهم، بيحدد إزاي أي شركة أو تطبيق بيتعامل مع بيانات الكروت
+        (رقم الكارت PAN، تاريخ الانتهاء، CVV) لازم يحميها.
+      </p>
+      <h3>🔑 أهم متطلبات PCI DSS</h3>
+      <ol>
+        <li>عدم تخزين CVV نهائيًا بعد إتمام العملية.</li>
+        <li>تشفير رقم الكارت (PAN) أثناء التخزين والنقل.</li>
+        <li>Firewall وتحكم صارم في الوصول للأنظمة.</li>
+        <li>مراقبة وتسجيل كل عملية وصول لبيانات الكروت (Logging).</li>
+        <li>اختبار أمان دوري (Penetration Testing).</li>
+      </ol>
+      <div class="warn">
+        <b>⚠️ تحذير مهم لمطوري Android:</b> ممنوع تخزّن PAN كامل أو CVV في SharedPreferences أو حتى في Room DB
+        بدون تشفير قوي — ده مخالفة مباشرة لـ PCI DSS وممكن يعرّض التطبيق للرفض من متاجر التطبيقات أو من البنك المُصدر.
+        الحل: استخدم Tokenization بدل تخزين البيانات الحقيقية.
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section id="acceptance">
+    <div class="section-head">
+      <div class="section-num">3</div>
+      <h2>Card Acceptance</h2>
+    </div>
+    <div class="card">
+      <p>
+        Card Acceptance هو مصطلح بيوصف قدرة نظام (تاجر، تطبيق، أو جهاز POS) على قبول كارت كوسيلة دفع.
+        فيه أنواع قبول مختلفة حسب طريقة إدخال بيانات الكارت:
+      </p>
+      <table>
+        <tr><th>النوع</th><th>الوصف</th><th>مستوى الأمان</th></tr>
+        <tr><td>Chip & PIN (EMV)</td><td>إدخال الكارت في الشريحة + كتابة الرقم السري</td><td>الأعلى</td></tr>
+        <tr><td>Contactless / NFC</td><td>تقريب الكارت أو الموبايل من الجهاز</td><td>عالي</td></tr>
+        <tr><td>Magnetic Stripe</td><td>تمرير الشريط المغناطيسي</td><td>منخفض (قديم)</td></tr>
+        <tr><td>Card Not Present (CNP)</td><td>إدخال البيانات يدويًا أونلاين</td><td>متوسط (يحتاج 3D-Secure)</td></tr>
+      </table>
+      <div class="android-tag">
+        <span class="tag-label">📱 علاقتها بـ Android</span>
+        تطبيقات الـ mPOS (Mobile POS) على Android بتستخدم NFC API عشان تقرأ الكروت Contactless،
+        وبتتواصل مع قارئ EMV خارجي (Reader) عبر Bluetooth لو الدفع بـ Chip & PIN.
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section id="emv">
+    <div class="section-head">
+      <div class="section-num">4</div>
+      <h2>EMV <span class="en">(Europay, MasterCard, Visa)</span></h2>
+    </div>
+    <div class="card">
+      <p>
+        EMV هو المعيار العالمي للكروت الذكية (Chip Cards) اللي بيحل محل الشريط المغناطيسي.
+        بدل ما بيانات الكارت تكون ثابتة (سهلة النسخ)، الشريحة بتولّد <b>Cryptogram</b> فريد لكل عملية،
+        فحتى لو حد سرق البيانات مش هيقدر يستخدمها تاني.
+      </p>
+      <h3>⚙️ خطوات معاملة EMV</h3>
+      <div class="flow">
+        <div class="flow-step">1. Application Selection</div><div class="flow-arrow">←</div>
+        <div class="flow-step">2. Initiate Transaction</div><div class="flow-arrow">←</div>
+        <div class="flow-step">3. Read Card Data</div><div class="flow-arrow">←</div>
+        <div class="flow-step">4. Offline/Online Auth</div><div class="flow-arrow">←</div>
+        <div class="flow-step">5. Generate Cryptogram</div><div class="flow-arrow">←</div>
+        <div class="flow-step">6. Transaction Completion</div>
+      </div>
+      <p>
+        الفرق الأساسي بين EMV والشريط المغناطيسي: EMV بيستخدم تشفير غير متماثل (Asymmetric) بين الشريحة
+        والبنك عشان يتأكد إن الكارت أصلي (Card Authentication) وإن الـ PIN صحيح بدون ما يبعته Plain Text.
+      </p>
+      <div class="android-tag">
+        <span class="tag-label">📱 علاقتها بـ Android</span>
+        قراءة كارت EMV عبر NFC في Android بتتم باستخدام <code>IsoDep</code> class من حزمة <code>android.nfc.tech</code>،
+        وبيتم تبادل أوامر APDU (Application Protocol Data Unit) مباشرة مع شريحة الكارت.
+      </div>
+      <pre><span class="cm">// مثال مبسّط لقراءة كارت EMV عبر NFC في Android</span>
+<span class="kw">val</span> isoDep = IsoDep.get(tag)
+isoDep.connect()
+<span class="kw">val</span> selectAidCommand = byteArrayOf(
+    <span class="str">0x00</span>, <span class="str">0xA4</span>.toByte(), <span class="str">0x04</span>, <span class="str">0x00</span>,
+    <span class="str">0x07</span>, <span class="str">0xA0</span>.toByte(), <span class="str">0x00</span>, <span class="str">0x00</span>,
+    <span class="str">0x00</span>, <span class="str">0x03</span>, <span class="str">0x10</span>, <span class="str">0x10</span>
+)
+<span class="kw">val</span> response = isoDep.transceive(selectAidCommand) <span class="cm">// APDU response</span>
+isoDep.close()</pre>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section id="iso8583">
+    <div class="section-head">
+      <div class="section-num">5</div>
+      <h2>ISO 8583</h2>
+    </div>
+    <div class="card">
+      <p>
+        هو المعيار الدولي لتبادل رسائل المعاملات المالية بين الأنظمة (POS ↔ Acquirer ↔ Network ↔ Issuer).
+        كل رسالة ISO 8583 بتتكون من: <b>MTI</b> (Message Type Indicator) + <b>Bitmap</b> + <b>Data Elements</b>.
+      </p>
+      <h3>🧱 تركيب الرسالة</h3>
+      <table>
+        <tr><th>الجزء</th><th>الوصف</th><th>مثال</th></tr>
+        <tr><td>MTI</td><td>نوع الرسالة (4 أرقام)</td><td>0200 = طلب معاملة مالية</td></tr>
+        <tr><td>Bitmap</td><td>يحدد أي Data Elements موجودة</td><td>64 أو 128 بت</td></tr>
+        <tr><td>Data Elements (DE)</td><td>الحقول الفعلية للبيانات</td><td>DE2=PAN, DE3=Processing Code, DE55=Chip Data</td></tr>
+      </table>
+      <h3>📋 أشهر الـ Data Elements</h3>
+      <ul>
+        <li><b>DE2</b>: رقم الكارت (PAN)</li>
+        <li><b>DE3</b>: كود المعالجة (Processing Code)</li>
+        <li><b>DE4</b>: مبلغ العملية</li>
+        <li><b>DE35</b>: Track 2 Data</li>
+        <li><b>DE52</b>: PIN Block</li>
+        <li><b>DE55</b>: بيانات الشريحة (EMV Data)</li>
+      </ul>
+      <div class="note">
+        MTI بيتقرأ كـ 4 أرقام: <b>الرقم الأول</b> = إصدار المعيار، <b>الثاني</b> = فئة الرسالة (0=Auth, 2=Financial...)،
+        <b>الثالث</b> = دالة الرسالة (طلب/رد)، <b>الرابع</b> = من بدأ الرسالة.
+      </div>
+      <div class="android-tag">
+        <span class="tag-label">📱 علاقتها بـ Android</span>
+        لو بتبني تطبيق mPOS، هتحتاج تبني/تقرأ رسائل ISO 8583 بنفسك (أو تستخدم مكتبة زي jPOS إذا الجزء ده على السيرفر)،
+        وتبعتها عبر Socket TCP للـ Acquirer. في Kotlin غالبًا بتبني الـ Bitmap والـ DE يدويًا بـ ByteArray processing.
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section id="prepaid">
+    <div class="section-head">
+      <div class="section-num">6</div>
+      <h2>Prepaid & Postpaid Cards</h2>
+    </div>
+    <div class="card">
+      <div class="compare">
+        <div class="col a">
+          <h4>💳 Prepaid</h4>
+          <p>الرصيد بيتشحن مقدمًا. مفيش ائتمان — العميل بيصرف من فلوسه بس. مثالي لتطبيقات المحافظ الإلكترونية والكروت المؤقتة (Gift Cards).</p>
+        </div>
+        <div class="col b">
+          <h4>🧾 Postpaid</h4>
+          <p>الشراء الأول والدفع لاحقًا (زي كروت الائتمان). البنك بيحدد حد ائتماني (Credit Limit) والعميل بيسدد شهريًا.</p>
+        </div>
+      </div>
+      <div class="android-tag">
+        <span class="tag-label">📱 علاقتها بـ Android</span>
+        تطبيقات المحافظ الرقمية (زي Vodafone Cash، InstaPay) غالبًا بتشتغل بمنطق Prepaid: بتتحقق من الرصيد
+        محليًا/عبر API قبل ما تسمح بالعملية، وده بيقلل الحاجة لعمليات Authorization المعقدة.
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section id="cards">
+    <div class="section-head">
+      <div class="section-num">7</div>
+      <h2>Visa & MasterCard</h2>
+    </div>
+    <div class="card">
+      <p>
+        Visa وMasterCard مش بنوك — هما <b>شبكات دفع (Payment Networks)</b> بتربط بين البنك المُصدر للكارت (Issuer)
+        والتاجر/البنك المستقبل (Acquirer). هما اللي بيحددوا المعايير الفنية زي شكل رقم الكارت وبروتوكولات EMV الخاصة بيهم.
+      </p>
+      <h3>🔢 تمييز الكارت من رقمه (BIN/IIN)</h3>
+      <table>
+        <tr><th>يبدأ بـ</th><th>الشبكة</th></tr>
+        <tr><td>4</td><td>Visa</td></tr>
+        <tr><td>51-55 أو 2221-2720</td><td>MasterCard</td></tr>
+        <tr><td>34 أو 37</td><td>American Express</td></tr>
+      </table>
+      <p>أول 6-8 أرقام من الكارت بتُسمى <b>BIN (Bank Identification Number)</b> وبتحدد البنك المُصدر ونوع الكارت.</p>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section id="pos">
+    <div class="section-head">
+      <div class="section-num">8</div>
+      <h2>POS Devices <span class="en">(Point of Sale)</span></h2>
+    </div>
+    <div class="card">
+      <p>جهاز أو تطبيق بيستقبل عملية الدفع من العميل ويبعتها للشبكة المصرفية. أنواعه:</p>
+      <ul>
+        <li><b>Traditional POS</b>: جهاز مستقل بشاشة وقارئ كارت خاص فيه.</li>
+        <li><b>mPOS (Mobile POS)</b>: قارئ صغير بيتوصل بموبايل/تابلت عبر Bluetooth أو Audio Jack.</li>
+        <li><b>SoftPOS / Tap to Phone</b>: الموبايل نفسه بيبقى جهاز الدفع باستخدام NFC، من غير هارد وير إضافي.</li>
+      </ul>
+      <div class="android-tag">
+        <span class="tag-label">📱 علاقتها بـ Android</span>
+        SoftPOS هو أكتر اتجاه حالي بيهم مطور Android — بيعتمد على <code>HostApduService</code>
+        (Host Card Emulation) و NFC APIs، ولازم يمر باعتماد PCI CPoC (Contactless Payments on COTS) قبل الإطلاق.
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section id="eeh">
+    <div class="section-head">
+      <div class="section-num">9</div>
+      <h2>Encoding vs Encryption vs Hashing</h2>
+    </div>
+    <div class="card">
+      <p>ده أهم فرق لازم أي مطور FinTech يفهمه صح، لأن كتير بيخلطوا بينهم:</p>
+      <table>
+        <tr><th>الخاصية</th><th>Encoding</th><th>Encryption</th><th>Hashing</th></tr>
+        <tr><td>الهدف</td><td>تحويل شكل البيانات للنقل</td><td>حماية سرية البيانات</td><td>التحقق من سلامة البيانات</td></tr>
+        <tr><td>يحتاج مفتاح؟</td><td>لا</td><td>نعم</td><td>لا (عادة)</td></tr>
+        <tr><td>عكسه ممكن؟</td><td>نعم دايمًا (Decode)</td><td>نعم بالمفتاح الصح (Decrypt)</td><td>لا — عملية باتجاه واحد</td></tr>
+        <tr><td>مثال</td><td>Base64, URL Encoding</td><td>AES, RSA</td><td>SHA-256, MD5</td></tr>
+      </table>
+      <div class="note">
+        قاعدة ذهبية: <b>Encoding مش تشفير</b>. لو حد شافك بتـ Base64 كلمة سر وتقول "مشفرة" — ده غلط،
+        لأن أي حد يقدر يعمل Decode ليها فورًا بدون أي مفتاح.
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section id="encoding">
+    <div class="section-head">
+      <div class="section-num">10</div>
+      <h2>Encoding بالتفصيل</h2>
+    </div>
+    <div class="card">
+      <p>
+        Encoding بيحوّل البيانات لصيغة تانية عشان تتنقل بأمان عبر أنظمة مختلفة (شبكة، ملفات نصية...) —
+        مثلاً تحويل صورة Binary لنص عشان تتبعت في JSON.
+      </p>
+      <pre><span class="cm">// Base64 Encoding في Kotlin</span>
+<span class="kw">val</span> original = <span class="str">"4111111111111111"</span>
+<span class="kw">val</span> encoded = Base64.encodeToString(original.toByteArray(), Base64.DEFAULT)
+<span class="kw">val</span> decoded = String(Base64.decode(encoded, Base64.DEFAULT))
+<span class="cm">// أي حد معاه الـ encoded string يقدر يرجعها زي ما هي، مفيش سرية هنا</span></pre>
+      <div class="warn">في الشرائح السابقة كان فيه سؤال "ماذا يحدث لو الرسالة مش Encoded أثناء النقل؟" —
+        الإجابة: ممكن تتلف البيانات (Binary data جوه بروتوكولات نصية زي HTTP)، مش مشكلة أمان لكن مشكلة توافقية (Compatibility).</div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section id="encryption">
+    <div class="section-head">
+      <div class="section-num">11</div>
+      <h2>Encryption بالتفصيل</h2>
+    </div>
+    <div class="card">
+      <p>
+        Encryption بيحوّل البيانات لصيغة غير مفهومة (Ciphertext) باستخدام مفتاح، ومينفعش ترجعها للأصل غير بنفس
+        المفتاح (أو المفتاح المقابل له في التشفير الغير متماثل).
+      </p>
+      <h3>نوعين أساسيين</h3>
+      <div class="compare">
+        <div class="col a">
+          <h4>🔑 Symmetric Encryption</h4>
+          <p>نفس المفتاح للتشفير وفك التشفير. أسرع، مثال: AES.</p>
+        </div>
+        <div class="col b">
+          <h4>🔐 Asymmetric Encryption</h4>
+          <p>مفتاحين: عام (Public) وخاص (Private). أبطأ، مثال: RSA.</p>
+        </div>
+      </div>
+      <div class="warn">
+        <b>ماذا يحدث لو مفيش Encryption؟</b> أي حد على الشبكة (Man-in-the-middle) يقدر يقرأ بيانات الكارت
+        كاملة كـ Plain Text — ده أخطر سيناريو ممكن يحصل في تطبيق دفع، وسبب مباشر لرفض PCI DSS Compliance.
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section id="hashing">
+    <div class="section-head">
+      <div class="section-num">12</div>
+      <h2>Hashing بالتفصيل</h2>
+    </div>
+    <div class="card">
+      <p>
+        Hashing بيحوّل أي بيانات لبصمة (Hash) ثابتة الطول، وعملية باتجاه واحد يعني مينفعش ترجع البيانات الأصلية
+        من الـ Hash. بيُستخدم للتحقق من سلامة البيانات (Integrity) أو تخزين كلمات السر بأمان.
+      </p>
+      <div class="note">أي تغيير بسيط جدًا في البيانات (حتى حرف واحد) بيغيّر الـ Hash بالكامل — ده بيُسمى <b>Avalanche Effect</b>.</div>
+      <pre><span class="cm">// Hashing باستخدام SHA-256 في Kotlin</span>
+<span class="kw">fun</span> <span class="fn">sha256</span>(input: String): String {
+    <span class="kw">val</span> bytes = MessageDigest.getInstance(<span class="str">"SHA-256"</span>).digest(input.toByteArray())
+    <span class="kw">return</span> bytes.joinToString(<span class="str">""</span>) { <span class="str">"%02x"</span>.format(it) }
+}</pre>
+    </div>
+  </section>
+
+  <!-- 13 -->
+  <section id="sha256">
+    <div class="section-head">
+      <div class="section-num">13</div>
+      <h2>SHA-256</h2>
+    </div>
+    <div class="card">
+      <p>
+        خوارزمية Hashing من عائلة SHA-2، بتنتج بصمة طولها ثابت 256 بت (64 حرف Hex) مهما كان طول المدخل.
+        بتُستخدم في التحقق من سلامة رسائل ISO 8583، توليد MAC، وفي Blockchain.
+      </p>
+      <div class="android-tag">
+        <span class="tag-label">📱 استخدامها في Android</span>
+        بتستخدمها للتحقق من سلامة ملف تم تنزيله، أو عمل Hash لمفتاح API قبل تخزينه، أو التحقق من صحة توقيع
+        (Signature verification) على APK وقت الـ Runtime.
+      </div>
+    </div>
+  </section>
+
+  <!-- 14 -->
+  <section id="secretkey">
+    <div class="section-head">
+      <div class="section-num">14</div>
+      <h2>SecretKey</h2>
+    </div>
+    <div class="card">
+      <p>
+        الـ SecretKey هو المفتاح المستخدم في التشفير المتماثل (Symmetric). في Android، أفضل وأأمن طريقة لتوليده
+        وتخزينه هي عبر <code>Android Keystore System</code> — المفتاح بيتولد ويتخزن جوه Hardware-backed area
+        ومستحيل يتسحب برة الجهاز حتى لو التطبيق نفسه اتعمله Reverse Engineering.
+      </p>
+      <pre><span class="cm">// توليد SecretKey داخل Android Keystore</span>
+<span class="kw">val</span> keyGenerator = KeyGenerator.getInstance(
+    KeyProperties.KEY_ALGORITHM_AES, <span class="str">"AndroidKeyStore"</span>
+)
+keyGenerator.init(
+    KeyGenParameterSpec.Builder(<span class="str">"paymentKey"</span>,
+        KeyProperties.PURPOSE_ENCRYPT <span class="kw">or</span> KeyProperties.PURPOSE_DECRYPT)
+        .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+        .setKeySize(<span class="str">256</span>)
+        .build()
+)
+<span class="kw">val</span> secretKey = keyGenerator.generateKey()</pre>
+      <div class="note">مبدأ أساسي: <b>SecretKey ما ينفعش يتخزن Hardcoded في الكود</b> — لو حد عمل Decompile للـ APK هيلاقيه فورًا.</div>
+    </div>
+  </section>
+
+  <!-- 15 -->
+  <section id="aes">
+    <div class="section-head">
+      <div class="section-num">15</div>
+      <h2>AES Encryption <span class="en">(Advanced Encryption Standard)</span></h2>
+    </div>
+    <div class="card">
+      <p>
+        خوارزمية تشفير متماثل (نفس المفتاح للتشفير وفك التشفير)، بتشتغل بحجم مفتاح 128/192/256 بت.
+        هي المعيار العالمي حاليًا لتشفير البيانات الحساسة (بيانات الكارت، الجلسات، ملفات).
+      </p>
+      <pre><span class="cm">// تشفير بيانات باستخدام AES/GCM في Kotlin (JCA)</span>
+<span class="kw">val</span> cipher = Cipher.getInstance(<span class="str">"AES/GCM/NoPadding"</span>)
+cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+<span class="kw">val</span> iv = cipher.iv <span class="cm">// لازم تخزن الـ IV مع الـ ciphertext</span>
+<span class="kw">val</span> encryptedBytes = cipher.doFinal(cardData.toByteArray())</pre>
+      <div class="note">
+        استخدم دايمًا <b>GCM mode</b> بدل ECB أو حتى CBC العادي، لأن GCM بيوفر <b>Authenticated Encryption</b>
+        يعني بيتأكد كمان إن البيانات ما اتغيرتش (Integrity) مش بس سرية.
+      </div>
+    </div>
+  </section>
+
+  <!-- 16 -->
+  <section id="aes-behind">
+    <div class="section-head">
+      <div class="section-num">16</div>
+      <h2>AES Behind The Scenes</h2>
+    </div>
+    <div class="card">
+      <p>AES بيشتغل على كتل بيانات (Blocks) حجم كل واحدة 128 بت، وبيمر بعدة جولات (Rounds) حسب طول المفتاح:</p>
+      <table>
+        <tr><th>حجم المفتاح</th><th>عدد الجولات</th></tr>
+        <tr><td>128-bit</td><td>10 جولات</td></tr>
+        <tr><td>192-bit</td><td>12 جولة</td></tr>
+        <tr><td>256-bit</td><td>14 جولة</td></tr>
+      </table>
+      <p>كل جولة فيها 4 خطوات رئيسية:</p>
+      <div class="flow">
+        <div class="flow-step">SubBytes</div><div class="flow-arrow">→</div>
+        <div class="flow-step">ShiftRows</div><div class="flow-arrow">→</div>
+        <div class="flow-step">MixColumns</div><div class="flow-arrow">→</div>
+        <div class="flow-step">AddRoundKey</div>
+      </div>
+      <ul>
+        <li><b>SubBytes</b>: استبدال كل بايت بقيمة من جدول ثابت (S-Box) لإضافة عدم خطية.</li>
+        <li><b>ShiftRows</b>: تحريك الصفوف في المصفوفة لخلط البيانات مكانيًا.</li>
+        <li><b>MixColumns</b>: خلط الأعمدة رياضيًا (باستثناء الجولة الأخيرة).</li>
+        <li><b>AddRoundKey</b>: عملية XOR بين البيانات ومفتاح الجولة (Round Key) المشتق من المفتاح الأساسي.</li>
+      </ul>
+      <div class="note">كل ده بيخلي أي تغيير بسيط في المدخل أو المفتاح ينتج Ciphertext مختلف تمامًا — ومفيش طريقة عملية لكسره بالقوة الغاشمة (Brute Force) بمفتاح 256-bit بالتقنية الحالية.</div>
+    </div>
+  </section>
+
+  <!-- 17 -->
+  <section id="rsa">
+    <div class="section-head">
+      <div class="section-num">17</div>
+      <h2>RSA Algorithm</h2>
+    </div>
+    <div class="card">
+      <p>
+        خوارزمية تشفير غير متماثل (Asymmetric) بتعتمد على الصعوبة الرياضية لتحليل حاصل ضرب عددين أوليين كبيرين
+        (Integer Factorization). بتُستخدم غالبًا مش لتشفير البيانات الكبيرة نفسها (بطيئة) لكن لـ:
+      </p>
+      <ul>
+        <li>تبادل مفتاح AES بأمان (Key Exchange).</li>
+        <li>التوقيع الرقمي (Digital Signature) للتأكد من هوية المرسل.</li>
+        <li>تشفير TLS/HTTPS في مرحلة الـ Handshake.</li>
+      </ul>
+      <pre><span class="cm">// توليد زوج مفاتيح RSA وتشفير بيانات في Kotlin</span>
+<span class="kw">val</span> keyPairGen = KeyPairGenerator.getInstance(<span class="str">"RSA"</span>)
+keyPairGen.initialize(<span class="str">2048</span>)
+<span class="kw">val</span> keyPair = keyPairGen.generateKeyPair()
+
+<span class="kw">val</span> cipher = Cipher.getInstance(<span class="str">"RSA/ECB/OAEPWithSHA-256AndMGF1Padding"</span>)
+cipher.init(Cipher.ENCRYPT_MODE, keyPair.public)
+<span class="kw">val</span> encrypted = cipher.doFinal(aesKeyBytes) <span class="cm">// تشفير مفتاح AES بمفتاح RSA العام</span></pre>
+    </div>
+  </section>
+
+  <!-- 18 -->
+  <section id="rsa-aes">
+    <div class="section-head">
+      <div class="section-num">18</div>
+      <h2>RSA with AES Encryption <span class="en">(Hybrid Encryption)</span></h2>
+    </div>
+    <div class="card">
+      <p>
+        النظام الأمثل عمليًا هو دمج الاتنين — ده اللي بيحصل فعليًا في TLS/HTTPS وفي أنظمة الدفع:
+      </p>
+      <div class="flow">
+        <div class="flow-step">1. توليد مفتاح AES عشوائي (Session Key)</div><div class="flow-arrow">←</div>
+        <div class="flow-step">2. تشفير البيانات الفعلية بـ AES (سريع)</div><div class="flow-arrow">←</div>
+        <div class="flow-step">3. تشفير مفتاح AES نفسه بـ RSA Public Key</div><div class="flow-arrow">←</div>
+        <div class="flow-step">4. إرسال الاثنين معًا للطرف الآخر</div>
+      </div>
+      <p>
+        الطرف المستقبل بيفك تشفير مفتاح AES باستخدام RSA Private Key بتاعه، وبعدين يستخدم مفتاح AES ده
+        عشان يفك باقي البيانات. كده استفدنا من سرعة AES وأمان RSA في تبادل المفتاح.
+      </p>
+      <div class="android-tag">
+        <span class="tag-label">📱 استخدامها في Android</span>
+        نفس المبدأ ده بيُستخدم لما التطبيق بيحتاج يبعت بيانات حساسة للسيرفر بدون الاعتماد الكامل على HTTPS
+        (Defense in depth) — أو في تشفير End-to-End داخل التطبيق نفسه.
+      </div>
+    </div>
+  </section>
+
+  <!-- 19 -->
+  <section id="aesdes">
+    <div class="section-head">
+      <div class="section-num">19</div>
+      <h2>AES vs DES</h2>
+    </div>
+    <div class="card">
+      <table>
+        <tr><th></th><th>DES</th><th>AES</th></tr>
+        <tr><td>حجم المفتاح</td><td>56-bit (ضعيف)</td><td>128/192/256-bit</td></tr>
+        <tr><td>حجم الكتلة</td><td>64-bit</td><td>128-bit</td></tr>
+        <tr><td>الأمان</td><td>مكسور فعليًا بالـ Brute Force من سنين</td><td>آمن حاليًا وللمستقبل المنظور</td></tr>
+        <tr><td>الاستخدام حاليًا</td><td>قديم / بعض الأنظمة Legacy فقط (أو 3DES في بعض بروتوكولات الدفع القديمة)</td><td>المعيار الحالي</td></tr>
+      </table>
+      <div class="note">لسه هتلاقي 3DES (Triple DES) مستخدم في بعض معايير الدفع القديمة زي تشفير PIN Block على مستوى الشبكة، لكن الأنظمة الحديثة بتتحول لـ AES.</div>
+    </div>
+  </section>
+
+  <!-- 20 -->
+  <section id="aesrsa">
+    <div class="section-head">
+      <div class="section-num">20</div>
+      <h2>AES vs RSA</h2>
+    </div>
+    <div class="card">
+      <table>
+        <tr><th></th><th>AES</th><th>RSA</th></tr>
+        <tr><td>النوع</td><td>Symmetric</td><td>Asymmetric</td></tr>
+        <tr><td>السرعة</td><td>سريع جدًا</td><td>أبطأ بكثير (~1000x)</td></tr>
+        <tr><td>حجم البيانات المناسبة له</td><td>بيانات كبيرة</td><td>بيانات صغيرة (مفاتيح، توقيعات)</td></tr>
+        <tr><td>إدارة المفاتيح</td><td>صعبة (لازم توصيل المفتاح بأمان)</td><td>أسهل (المفتاح العام يُنشر بحرية)</td></tr>
+      </table>
+      <div class="note">القاعدة العملية: استخدم RSA لتبادل المفاتيح والتوقيع، واستخدم AES لتشفير البيانات الفعلية.</div>
+    </div>
+  </section>
+
+  <!-- 21 -->
+  <section id="pinblock">
+    <div class="section-head">
+      <div class="section-num">21</div>
+      <h2>PIN Block in Payment Systems</h2>
+    </div>
+    <div class="card">
+      <p>
+        الـ PIN مينفعش يتبعت زي ما هو أبدًا — لازم يتحط جوه هيكل يُسمى <b>PIN Block</b> بعدين يتشفر (تقليديًا بـ 3DES،
+        وحديثًا AES) قبل ما يترسل من الـ POS أو الـ Reader للـ Acquirer.
+      </p>
+      <h3>تركيب PIN Block (فورمات ISO-0 الأشهر)</h3>
+      <div class="flow">
+        <div class="flow-step">Field 1: طول الـ PIN + الـ PIN نفسه + Padding (F)</div>
+        <div class="flow-arrow">XOR</div>
+        <div class="flow-step">Field 2: آخر 12 رقم من الـ PAN (بدون check digit)</div>
+      </div>
+      <p>ناتج الـ XOR ده هو الـ PIN Block اللي بيتشفر بمفتاح خاص (PIN Encryption Key) قبل الإرسال ضمن DE52 في رسالة ISO 8583.</p>
+      <div class="warn">
+        <b>مهم:</b> الـ PIN مينفعش أبدًا يتخزن أو يُعرض حتى داخليًا — الأجهزة المعتمدة (PIN Pads) بتكون معزولة
+        هاردوير (Tamper-resistant) وبتشفّر الـ PIN فورًا جوه نفس الجهاز.
+      </div>
+    </div>
+  </section>
+
+  <!-- 22 -->
+  <section id="panparser">
+    <div class="section-head">
+      <div class="section-num">22</div>
+      <h2>PAN Parser</h2>
+    </div>
+    <div class="card">
+      <p>
+        الأداة/المنطق المسؤول عن قراءة رقم الكارت (Primary Account Number) من مصادر مختلفة (Track 1/2 Data,
+        Chip Data) واستخراج المعلومات منه: BIN، طول الرقم، Check Digit عبر خوارزمية Luhn.
+      </p>
+      <pre><span class="cm">// التحقق من صحة رقم الكارت بخوارزمية Luhn</span>
+<span class="kw">fun</span> <span class="fn">isValidLuhn</span>(cardNumber: String): Boolean {
+    <span class="kw">var</span> sum = <span class="str">0</span>
+    <span class="kw">var</span> alternate = <span class="kw">false</span>
+    <span class="kw">for</span> (i <span class="kw">in</span> cardNumber.length - <span class="str">1</span> downTo <span class="str">0</span>) {
+        <span class="kw">var</span> n = cardNumber[i].digitToInt()
+        <span class="kw">if</span> (alternate) { n *= <span class="str">2</span>; <span class="kw">if</span> (n > <span class="str">9</span>) n -= <span class="str">9</span> }
+        sum += n
+        alternate = !alternate
+    }
+    <span class="kw">return</span> sum % <span class="str">10</span> == <span class="str">0</span>
+}</pre>
+      <div class="android-tag">
+        <span class="tag-label">📱 في Android</span>
+        نفس اللوجيك ده بتستخدمه في validation فوري لحقل رقم الكارت في UI (Compose TextField) قبل ما تبعت أي حاجة للسيرفر.
+      </div>
+    </div>
+  </section>
+
+  <!-- 23 -->
+  <section id="de55">
+    <div class="section-head">
+      <div class="section-num">23</div>
+      <h2>DE55 (Data Element 55) — Chip Data</h2>
+    </div>
+    <div class="card">
+      <p>
+        Data Element رقم 55 في رسالة ISO 8583 بيحمل بيانات EMV الكاملة الجاية من شريحة الكارت — وده بيشمل
+        Tags متعددة (زي TLV - Tag Length Value) منها:
+      </p>
+      <table>
+        <tr><th>Tag</th><th>الوصف</th></tr>
+        <tr><td>9F26</td><td>Application Cryptogram</td></tr>
+        <tr><td>9F27</td><td>Cryptogram Information Data</td></tr>
+        <tr><td>9F10</td><td>Issuer Application Data</td></tr>
+        <tr><td>95</td><td>Terminal Verification Results</td></tr>
+        <tr><td>9F37</td><td>Unpredictable Number</td></tr>
+      </table>
+      <p>الـ Issuer بيستخدم الـ Cryptogram ده عشان يتأكد إن الكارت الفعلي (مش نسخة/محاكاة) هو اللي عمل العملية.</p>
+    </div>
+  </section>
+
+  <!-- 24 -->
+  <section id="sniffing">
+    <div class="section-head">
+      <div class="section-num">24</div>
+      <h2>Sniffing</h2>
+    </div>
+    <div class="card">
+      <p>
+        عملية اعتراض ومراقبة البيانات وهي بتتنقل عبر شبكة أو داخل جهاز (Traffic interception)، مثلاً باستخدام
+        أدوات زي Wireshark أو Proxy tools زي Burp Suite لالتقاط الطلبات بين التطبيق والسيرفر.
+      </p>
+      <div class="warn">
+        لو التطبيق مش عامل Certificate Pinning، أي حد يقدر يستخدم Proxy (زي mitmproxy) عشان يشوف كل الـ HTTPS
+        requests وbodies كاملة — حتى لو كانت "مشفرة بـ HTTPS"، لأن الـ Proxy بيبقى Man-in-the-middle موثوق فيه من الجهاز.
+      </div>
+    </div>
+  </section>
+
+  <!-- 25 -->
+  <section id="prevent-sniffing">
+    <div class="section-head">
+      <div class="section-num">25</div>
+      <h2>Prevent Sniffing</h2>
+    </div>
+    <div class="card">
+      <h3>🛡️ طرق الحماية في Android</h3>
+      <ul>
+        <li><b>Certificate/Public Key Pinning</b>: التطبيق يرفض أي اتصال SSL ما كانتش شهادته مطابقة للمتوقعة.</li>
+        <li><b>Network Security Config</b>: منع Cleartext traffic بالكامل.</li>
+        <li><b>Root/Debug detection</b>: كشف لو الجهاز فيه Proxy CA مثبت أو الجهاز Rooted.</li>
+        <li>تشفير إضافي على مستوى الـ Application layer فوق HTTPS للبيانات شديدة الحساسية.</li>
+      </ul>
+      <pre><span class="cm">// مثال Certificate Pinning عبر OkHttp</span>
+<span class="kw">val</span> certificatePinner = CertificatePinner.Builder()
+    .add(<span class="str">"api.mybank.com"</span>, <span class="str">"sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="</span>)
+    .build()
+
+<span class="kw">val</span> client = OkHttpClient.Builder()
+    .certificatePinner(certificatePinner)
+    .build()</pre>
+      <pre><span class="cm">// network_security_config.xml - منع الاتصال الغير مشفر</span>
+&lt;network-security-config&gt;
+    &lt;base-config cleartextTrafficPermitted=<span class="str">"false"</span>&gt;
+        &lt;trust-anchors&gt;
+            &lt;certificates src=<span class="str">"system"</span> /&gt;
+        &lt;/trust-anchors&gt;
+    &lt;/base-config&gt;
+&lt;/network-security-config&gt;</pre>
+    </div>
+  </section>
+
+  <!-- 26 -->
+  <section id="copypaste">
+    <div class="section-head">
+      <div class="section-num">26</div>
+      <h2>Prevent Copy & Paste</h2>
+    </div>
+    <div class="card">
+      <p>
+        في تطبيقات الدفع، لازم تمنع نسخ بيانات حساسة (رقم كارت، CVV، PIN) من حقول الإدخال أو الشاشة —
+        عشان تقلل خطر إن الـ Clipboard (اللي أي تطبيق تاني ممكن يقراه على أندرويد القديم) يسرب البيانات دي.
+      </p>
+      <pre><span class="cm">// منع النسخ من EditText في Android (View system)</span>
+editText.customSelectionActionModeCallback = <span class="kw">object</span> : ActionMode.Callback {
+    <span class="kw">override</span> <span class="kw">fun</span> <span class="fn">onPrepareActionMode</span>(mode: ActionMode?, menu: Menu?): Boolean {
+        menu?.clear() <span class="cm">// يشيل خيارات Copy/Cut/Share</span>
+        <span class="kw">return</span> <span class="kw">true</span>
+    }
+    <span class="kw">override</span> <span class="kw">fun</span> <span class="fn">onCreateActionMode</span>(m: ActionMode?, menu: Menu?) = <span class="kw">true</span>
+    <span class="kw">override</span> <span class="kw">fun</span> <span class="fn">onActionItemClicked</span>(m: ActionMode?, item: MenuItem?) = <span class="kw">false</span>
+    <span class="kw">override</span> <span class="kw">fun</span> <span class="fn">onDestroyActionMode</span>(mode: ActionMode?) {}
+}
+editText.isLongClickable = <span class="kw">false</span></pre>
+      <pre><span class="cm">// في Jetpack Compose - منع التحديد/النسخ</span>
+BasicTextField(
+    value = cardNumber,
+    onValueChange = { cardNumber = it },
+    modifier = Modifier.pointerInteropFilter { <span class="kw">true</span> } <span class="cm">// يمنع الـ long press selection</span>
+)</pre>
+      <div class="android-tag">
+        <span class="tag-label">📱 خطوات إضافية موصى بيها</span>
+        استخدم <code>FLAG_SECURE</code> على الـ Window عشان تمنع Screenshot/Screen recording لشاشات إدخال بيانات الكارت،
+        وامسح أي بيانات حساسة من الـ Clipboard برمجيًا فورًا بعد استخدامها لو مكانش عندك بديل.
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    مرجع تقني شامل — FinTech & Payment Security for Android Developers 🇪🇬
+  </footer>
+
+</main>
+</div>
+
+<a href="#" class="back-top">↑</a>
+
+</body>
+</html>

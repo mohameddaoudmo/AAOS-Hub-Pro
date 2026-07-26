@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ورقة المقابلة الشاملة | من Android الأصلي إلى React Native</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-950:#080d18;
+    --navy-900:#0b1220;
+    --navy-800:#111a2e;
+    --navy-700:#1b2740;
+    --indigo:#6366f1;
+    --blue:#3b82f6;
+    --cyan:#22d3ee;
+    --slate-50:#f8fafc;
+    --amber:#f59e0b;
+  }
+  *{font-family:'Tajawal', sans-serif;}
+  h1,h2,h3,h4,.font-display{font-family:'Cairo', sans-serif;}
+  code, .font-mono{font-family:'JetBrains Mono', monospace; direction:ltr; unicode-bidi: embed; display:inline-block;}
+
+  body{background:var(--slate-50);}
+
+  .bg-hero{
+    background:
+      radial-gradient(1100px 500px at 15% -10%, rgba(99,102,241,0.35), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(34,211,238,0.18), transparent 55%),
+      linear-gradient(180deg, var(--navy-950) 0%, var(--navy-900) 55%, var(--navy-800) 100%);
+  }
+
+  .card{
+    background:#fff;
+    border:1px solid #e6e9f2;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.04);
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  }
+  .card:hover{
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -15px rgba(30,41,89,0.25);
+    border-color:#c7d2fe;
+  }
+
+  .chip{
+    display:inline-flex; align-items:center; gap:.4rem;
+    font-size:.72rem; font-weight:700; letter-spacing:.02em;
+    padding:.28rem .7rem; border-radius:999px;
+  }
+
+  .divider-glow{
+    height:2px;
+    background:linear-gradient(90deg, transparent, var(--indigo), var(--cyan), transparent);
+  }
+
+  /* bridge signature element */
+  .bridge-wrap{ position:relative; }
+  .bridge-line{
+    position:absolute; top:50%; right:0; left:0; height:2px;
+    background:repeating-linear-gradient(90deg, rgba(148,163,255,.55) 0 10px, transparent 10px 18px);
+    transform: translateY(-50%);
+    z-index:0;
+  }
+  .pulse-dot{
+    position:absolute; top:50%; width:10px; height:10px; border-radius:999px;
+    background: var(--cyan);
+    box-shadow:0 0 14px 4px rgba(34,211,238,.65);
+    transform:translateY(-50%);
+    animation: crossBridge 3.2s linear infinite;
+  }
+  @keyframes crossBridge{
+    0%{ right:calc(100% - 10px); opacity:0;}
+    8%{opacity:1;}
+    92%{opacity:1;}
+    100%{ right:0%; opacity:0;}
+  }
+
+  .nav-link{ position:relative; }
+  .nav-link::after{
+    content:""; position:absolute; bottom:-6px; right:0; right:0; width:0%; height:2px;
+    background: linear-gradient(90deg, var(--indigo), var(--cyan));
+    transition: width .25s ease;
+  }
+  .nav-link:hover::after, .nav-link.active::after{ width:100%; }
+
+  .table-row:hover{ background:#f4f6ff; }
+
+  ::selection{ background: rgba(99,102,241,.25); }
+
+  .scrollbar-thin::-webkit-scrollbar{height:6px; width:6px;}
+  .scrollbar-thin::-webkit-scrollbar-thumb{background:#c7d2fe; border-radius:99px;}
+
+  @media (prefers-reduced-motion: reduce){
+    .pulse-dot{ animation: none; }
+  }
+</style>
+</head>
+<body class="text-slate-800">
+
+<!-- ============ STICKY NAV ============ -->
+<header id="topnav" class="sticky top-0 z-50 backdrop-blur bg-[var(--navy-950)]/90 border-b border-white/10">
+  <div class="max-w-6xl mx-auto px-5 md:px-8 py-3 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-2 shrink-0">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center font-display font-black text-white text-sm">RN</div>
+      <span class="font-display font-bold text-white text-sm hidden sm:block">ورقة الجسر المعرفي</span>
+    </div>
+    <nav class="flex items-center gap-4 md:gap-6 text-[13px] md:text-sm text-slate-300 overflow-x-auto scrollbar-thin whitespace-nowrap">
+      <a href="#intro" class="nav-link hover:text-white transition-colors">الاستراتيجية</a>
+      <a href="#architecture" class="nav-link hover:text-white transition-colors">البنية المعمارية</a>
+      <a href="#mapping" class="nav-link hover:text-white transition-colors">جدول المقارنة</a>
+      <a href="#qa" class="nav-link hover:text-white transition-colors">أسئلة المقابلة</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="bg-hero text-white pt-16 pb-24 px-5 md:px-8 relative overflow-hidden">
+  <div class="max-w-6xl mx-auto relative z-10">
+    <div class="chip bg-white/10 text-cyan-300 border border-white/10 mb-6">
+      <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+      ملف تحضير المقابلة التقنية
+    </div>
+    <h1 class="font-display font-black text-3xl sm:text-4xl md:text-5xl leading-[1.25] max-w-3xl">
+      من مطوّر <span class="text-cyan-300">Android أصلي</span> إلى خبير
+      <span class="text-indigo-300"> React Native</span>
+    </h1>
+    <p class="mt-5 text-slate-300 text-base md:text-lg max-w-2xl leading-loose">
+      خلفيتك في Kotlin وJetpack Compose ليست عائقًا في المقابلة — إنها ورقتك الرابحة.
+      هذه الورقة تلخّص البنية الداخلية، المفاهيم المتقابلة، وأهم الأسئلة التقنية
+      التي ستحتاجها لتُظهر جاهزية فورية للانتقال.
+    </p>
+
+    <!-- signature bridge visual -->
+    <div class="bridge-wrap mt-14 flex items-center justify-between max-w-2xl">
+      <div class="bridge-line"></div>
+      <div class="pulse-dot"></div>
+      <div class="relative z-10 bg-[var(--navy-800)] border border-white/15 rounded-2xl px-5 py-4 text-center w-40">
+        <div class="text-2xl mb-1">🤖</div>
+        <div class="font-display font-bold text-sm">Kotlin</div>
+        <div class="text-[11px] text-slate-400">Jetpack Compose</div>
+      </div>
+      <div class="relative z-10 bg-[var(--navy-800)] border border-white/15 rounded-2xl px-5 py-4 text-center w-40">
+        <div class="text-2xl mb-1">⚛️</div>
+        <div class="font-display font-bold text-sm">React Native</div>
+        <div class="text-[11px] text-slate-400">JavaScript / TS</div>
+      </div>
+    </div>
+    <p class="text-xs text-slate-500 mt-3">فكّر في نفسك كمهندس بنية معمارية يعبر الجسر — وليس كمبتدئ يبدأ من الصفر</p>
+  </div>
+</section>
+
+<main class="max-w-6xl mx-auto px-5 md:px-8 -mt-12 relative z-20 pb-24">
+
+  <!-- ============ SECTION 1: INTRO / STRATEGY ============ -->
+  <section id="intro" class="scroll-mt-20 mb-20">
+    <div class="card rounded-3xl p-6 md:p-10">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-display font-bold">1</div>
+        <h2 class="font-display font-extrabold text-2xl md:text-3xl text-[var(--navy-900)]">المقدمة واستراتيجية المقابلة</h2>
+      </div>
+      <p class="text-slate-600 leading-loose mb-8">
+        الشركات التي توظّف مطوّري Android للانتقال إلى React Native لا تبحث عن خبرة سابقة بـ JSX،
+        بل تبحث عن <span class="font-bold text-slate-800">عقلية معمارية جاهزة</span>. مهمتك في المقابلة
+        هي ترجمة خبرتك — وليس إخفاءها.
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="rounded-2xl border border-slate-200 p-6 bg-gradient-to-b from-indigo-50/60 to-transparent">
+          <h3 class="font-display font-bold text-lg mb-3 text-indigo-700 flex items-center gap-2">
+            <span>💡</span> كيف تسوّق خلفيتك الأصلية
+          </h3>
+          <ul class="space-y-3 text-sm text-slate-700 leading-relaxed">
+            <li class="flex gap-2"><span class="text-indigo-500 mt-0.5">▸</span> اربط <span class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">@Composable</span> بمفهوم المكوّنات (Components) في React — كلاهما دالة تُعيد بناء الواجهة استجابةً لتغيّر الحالة.</li>
+            <li class="flex gap-2"><span class="text-indigo-500 mt-0.5">▸</span> اذكر خبرتك في التعامل مع دورة حياة الشاشة (Lifecycle)، الـ Threading، والذاكرة — هذه مفاهيم النظام الأساسية التي لا يمتلكها مطوّر ويب عادي.</li>
+            <li class="flex gap-2"><span class="text-indigo-500 mt-0.5">▸</span> برهن فهمك العميق لتحسين الأداء (Recomposition في Compose ≈ Re-render في React) لتثبت أن التفكير في الأداء عادة راسخة لديك، لا مهارة جديدة.</li>
+          </ul>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 p-6 bg-gradient-to-b from-cyan-50/60 to-transparent">
+          <h3 class="font-display font-bold text-lg mb-3 text-cyan-700 flex items-center gap-2">
+            <span>⚡</span> إثبات سرعة التكيّف
+          </h3>
+          <ul class="space-y-3 text-sm text-slate-700 leading-relaxed">
+            <li class="flex gap-2"><span class="text-cyan-600 mt-0.5">▸</span> وضّح أن الفجوة الحقيقية هي فقط في الصياغة (Syntax) — الـ JavaScript/TypeScript، وليست في طريقة التفكير بالواجهات التصريحية (Declarative UI) التي أتقنتها بالفعل عبر Compose.</li>
+            <li class="flex gap-2"><span class="text-cyan-600 mt-0.5">▸</span> اعرض أمثلة عملية أو مشاريع شخصية بسيطة أنجزتها بـ React Native خلال فترة قصيرة.</li>
+            <li class="flex gap-2"><span class="text-cyan-600 mt-0.5">▸</span> أكّد أن معرفتك بـ Kotlin/Java تمنحك ميزة تنافسية حقيقية عند الحاجة لكتابة أو تصحيح Native Modules — وهذه نقطة ضعف شائعة لدى مطوّري React Native القادمين من خلفية ويب بحتة.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-6 rounded-2xl bg-[var(--navy-900)] text-white p-6">
+        <p class="text-xs uppercase tracking-widest text-cyan-300 font-bold mb-2">جملة مفتاحية جاهزة للمقابلة</p>
+        <p class="leading-loose text-slate-200 text-[15px]">
+          «أنا لا أنتقل من الصفر — أنا أحمل بالفعل عقلية الواجهات التصريحية وإدارة الحالة من Jetpack Compose،
+          وما أحتاجه فقط هو تبديل الصياغة إلى JavaScript. بالإضافة إلى ذلك، خلفيتي الأصلية تمنح فريقكم
+          قدرة إضافية على حل مشاكل الأداء العميقة وكتابة الوحدات الأصلية (Native Modules) التي يصعب
+          على مطوّر React Native التقليدي التعامل معها.»
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 2: ARCHITECTURE ============ -->
+  <section id="architecture" class="scroll-mt-20 mb-20">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-display font-bold">2</div>
+      <h2 class="font-display font-extrabold text-2xl md:text-3xl text-[var(--navy-900)]">تحت الغطاء: البنية المعمارية</h2>
+    </div>
+    <p class="text-slate-600 leading-loose mb-8 max-w-3xl">
+      هذا الجزء هو الأكثر تأثيرًا في المقابلات التقنية المتقدمة — فهمك له يميّزك فورًا عن المطوّرين
+      الذين يستخدمون React Native دون فهم ما يجري خلف الكواليس.
+    </p>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      <!-- Bridge -->
+      <div class="card rounded-2xl p-6">
+        <div class="chip bg-amber-50 text-amber-700 mb-4">البنية القديمة</div>
+        <h3 class="font-display font-bold text-lg mb-3 text-[var(--navy-900)]">الجسر (The Bridge)</h3>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">
+          في البنية القديمة، تعمل JavaScript على خيط منفصل تمامًا عن خيط الواجهة الأصلية (UI Thread).
+          للتواصل بينهما، يتم تحويل كل استدعاء إلى نص JSON عبر عملية تسلسل (Serialization)،
+          ثم إرساله بشكل غير متزامن (Asynchronous) عبر «الجسر».
+        </p>
+        <div class="rounded-xl bg-slate-50 border border-slate-200 p-3 text-xs text-slate-500 leading-relaxed">
+          <span class="font-bold text-slate-700">نقطة الضعف:</span> التسلسل المستمر لكل رسالة يخلق عنق زجاجة (Bottleneck) في الأداء، خصوصًا مع الرسوم المتحركة أو القوائم الكبيرة.
+        </div>
+      </div>
+
+      <!-- Message Queue -->
+      <div class="card rounded-2xl p-6">
+        <div class="chip bg-blue-50 text-blue-700 mb-4">آلية النقل</div>
+        <h3 class="font-display font-bold text-lg mb-3 text-[var(--navy-900)]">طابور الرسائل (Message Queue)</h3>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">
+          بدلًا من إرسال كل استدعاء فوريًا، تُجمَّع الاستدعاءات (Batching) في طابور،
+          ثم تُرسل دفعة واحدة عبر الجسر في نهاية كل دورة تنفيذ (Event Loop Tick)
+          لتقليل عدد الرحلات ذهابًا وإيابًا بين الخيطين.
+        </p>
+        <div class="rounded-xl bg-slate-50 border border-slate-200 p-3 text-xs text-slate-500 leading-relaxed">
+          <span class="font-bold text-slate-700">التشبيه:</span> يشبه إرسال دفعة من الطلبات في رسالة واحدة بدل رسالة منفصلة لكل طلب.
+        </div>
+      </div>
+
+      <!-- New Architecture -->
+      <div class="card rounded-2xl p-6 ring-1 ring-indigo-100">
+        <div class="chip bg-indigo-50 text-indigo-700 mb-4">البنية الجديدة</div>
+        <h3 class="font-display font-bold text-lg mb-3 text-[var(--navy-900)]">JSI و TurboModules</h3>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">
+          واجهة <span class="font-bold">JSI (JavaScript Interface)</span> تسمح لـ JavaScript بالاحتفاظ
+          بمرجع مباشر (Direct Reference) إلى كائنات ++C، وتنفيذ استدعاءات متزامنة (Synchronous) دون تسلسل JSON،
+          مما يُلغي عنق الزجاجة تمامًا.
+        </p>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">
+          <span class="font-bold">TurboModules</span> تستبدل NativeModules القديمة بتحميل كسول
+          (Lazy Loading) — الوحدة الأصلية تُحمَّل فقط عند الحاجة الفعلية إليها، ما يُسرّع بدء التشغيل.
+        </p>
+        <div class="rounded-xl bg-indigo-50/60 border border-indigo-100 p-3 text-xs text-indigo-800 leading-relaxed">
+          <span class="font-bold">ملاحظة إضافية:</span> يرافقها محرك عرض جديد اسمه <span class="font-mono text-[11px]">Fabric</span> يجعل الرسم (Rendering) متزامنًا أيضًا.
+        </div>
+      </div>
+    </div>
+
+    <div class="divider-glow my-10 rounded-full"></div>
+
+    <div class="card rounded-2xl p-6 md:p-8">
+      <h3 class="font-display font-bold text-lg mb-4 text-[var(--navy-900)]">لماذا هذا مهم في المقابلة؟</h3>
+      <p class="text-sm text-slate-600 leading-loose">
+        قدرتك على شرح الانتقال من <span class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">Bridge (JSON serialization)</span>
+        إلى <span class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">JSI (direct memory access)</span>
+        تُظهر أنك تفهم React Native كنظام هندسي، لا كمجرد إطار عمل (Framework) سطحي — وهذا بالضبط
+        نوع العمق الذي يتوقعه القائم بالمقابلة من مطوّر أصلي بخلفية أنظمة قوية.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 3: MAPPING GRID ============ -->
+  <section id="mapping" class="scroll-mt-20 mb-20">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-display font-bold">3</div>
+      <h2 class="font-display font-extrabold text-2xl md:text-3xl text-[var(--navy-900)]">شبكة مطابقة المفاهيم الأساسية</h2>
+    </div>
+    <p class="text-slate-600 leading-loose mb-8 max-w-3xl">
+      أسرع طريقة لبناء ثقتك هي ربط كل مفهوم جديد بمكافئه الذي تعرفه جيدًا في عالم Android الأصلي.
+    </p>
+
+    <div class="card rounded-2xl overflow-hidden">
+      <div class="overflow-x-auto scrollbar-thin">
+        <table class="w-full text-sm min-w-[720px]">
+          <thead>
+            <tr class="bg-[var(--navy-900)] text-white text-right">
+              <th class="px-6 py-4 font-display font-bold">المفهوم</th>
+              <th class="px-6 py-4 font-display font-bold text-cyan-300">⚛️ React Native</th>
+              <th class="px-6 py-4 font-display font-bold text-indigo-300">🤖 Android الأصلي</th>
+              <th class="px-6 py-4 font-display font-bold hidden md:table-cell">الفكرة الجوهرية</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr class="table-row transition-colors">
+              <td class="px-6 py-4 font-bold text-slate-800">إدارة الحالة</td>
+              <td class="px-6 py-4 font-mono text-[12.5px] text-slate-600">useState / props</td>
+              <td class="px-6 py-4 font-mono text-[12.5px] text-slate-600">remember { mutableStateOf() }</td>
+              <td class="px-6 py-4 text-slate-500 hidden md:table-cell">كلاهما يُطلق إعادة رسم الواجهة تلقائيًا عند تغيّر القيمة</td>
+            </tr>
+            <tr class="table-row transition-colors">
+              <td class="px-6 py-4 font-bold text-slate-800">القوائم الطويلة</td>
+              <td class="px-6 py-4 font-mono text-[12.5px] text-slate-600">FlatList / FlashList</td>
+              <td class="px-6 py-4 font-mono text-[12.5px] text-slate-600">RecyclerView</td>
+              <td class="px-6 py-4 text-slate-500 hidden md:table-cell">إعادة تدوير العناصر خارج الشاشة (Virtualization) بدل رسمها كلها</td>
+            </tr>
+            <tr class="table-row transition-colors">
+              <td class="px-6 py-4 font-bold text-slate-800">التنقل بين الشاشات</td>
+              <td class="px-6 py-4 font-mono text-[12.5px] text-slate-600">React Navigation</td>
+              <td class="px-6 py-4 font-mono text-[12.5px] text-slate-600">Navigation Component</td>
+              <td class="px-6 py-4 text-slate-500 hidden md:table-cell">مكتبة تدير مكدّس الشاشات (Stack) وحالة الرجوع للخلف</td>
+            </tr>
+            <tr class="table-row transition-colors">
+              <td class="px-6 py-4 font-bold text-slate-800">التنسيق والأنماط</td>
+              <td class="px-6 py-4 font-mono text-[12.5px] text-slate-600">StyleSheet.create()</td>
+              <td class="px-6 py-4 font-mono text-[12.5px] text-slate-600">Modifier chain</td>
+              <td class="px-6 py-4 text-slate-500 hidden md:table-cell">تعريف الأنماط بشكل برمجي بدل XML، Flexbox بدل ConstraintLayout</td>
+            </tr>
+            <tr class="table-row transition-colors">
+              <td class="px-6 py-4 font-bold text-slate-800">مشاركة الحالة العامة</td>
+              <td class="px-6 py-4 font-mono text-[12.5px] text-slate-600">Context API / Redux / Zustand</td>
+              <td class="px-6 py-4 font-mono text-[12.5px] text-slate-600">ViewModel + Hilt</td>
+              <td class="px-6 py-4 text-slate-500 hidden md:table-cell">فصل منطق العمل عن الواجهة وحقنه في المكوّنات التي تحتاجه</td>
+            </tr>
+            <tr class="table-row transition-colors">
+              <td class="px-6 py-4 font-bold text-slate-800">التخزين المحلي</td>
+              <td class="px-6 py-4 font-mono text-[12.5px] text-slate-600">AsyncStorage / MMKV</td>
+              <td class="px-6 py-4 font-mono text-[12.5px] text-slate-600">SharedPreferences / DataStore</td>
+              <td class="px-6 py-4 text-slate-500 hidden md:table-cell">تخزين أزواج مفتاح-قيمة بسيطة على الجهاز</td>
+            </tr>
+            <tr class="table-row transition-colors">
+              <td class="px-6 py-4 font-bold text-slate-800">أداة البناء والتجميع</td>
+              <td class="px-6 py-4 font-mono text-[12.5px] text-slate-600">Metro Bundler</td>
+              <td class="px-6 py-4 font-mono text-[12.5px] text-slate-600">Gradle</td>
+              <td class="px-6 py-4 text-slate-500 hidden md:table-cell">تجميع الكود وموارده في حزمة قابلة للتشغيل</td>
+            </tr>
+            <tr class="table-row transition-colors">
+              <td class="px-6 py-4 font-bold text-slate-800">الوصول لميزات الجهاز</td>
+              <td class="px-6 py-4 font-mono text-[12.5px] text-slate-600">Native Modules / TurboModules</td>
+              <td class="px-6 py-4 font-mono text-[12.5px] text-slate-600">كتابة الكود الأصلي مباشرة</td>
+              <td class="px-6 py-4 text-slate-500 hidden md:table-cell">جسر برمجي يكشف واجهات Kotlin/Java أو Swift لـ JavaScript</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 4: TOP 5 Q&A ============ -->
+  <section id="qa" class="scroll-mt-20">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-display font-bold">4</div>
+      <h2 class="font-display font-extrabold text-2xl md:text-3xl text-[var(--navy-900)]">أهم 5 أسئلة في المقابلة</h2>
+    </div>
+    <p class="text-slate-600 leading-loose mb-8 max-w-3xl">
+      إجابات مركّزة وعالية التأثير — نقاط قصيرة يسهل تذكّرها لحظة الضغط في المقابلة.
+    </p>
+
+    <div class="grid md:grid-cols-2 gap-6">
+
+      <!-- Q1 -->
+      <div class="card rounded-2xl p-6">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="font-display font-black text-3xl text-indigo-100">01</span>
+          <h3 class="font-display font-bold text-base md:text-lg text-[var(--navy-900)] pt-1.5">
+            كيف تُحسّن أداء قائمة طويلة أو مكوّن يعيد الرسم بكثرة؟
+          </h3>
+        </div>
+        <ul class="space-y-2.5 text-[13.5px] text-slate-600 leading-relaxed">
+          <li class="flex gap-2"><span class="text-indigo-500">◆</span> استخدم <code class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">useMemo</code> لتخزين نتائج حسابات مكلفة مؤقتًا وتفادي إعادة حسابها في كل رسم.</li>
+          <li class="flex gap-2"><span class="text-indigo-500">◆</span> استخدم <code class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">useCallback</code> لتثبيت مرجع الدالة ومنع إعادة رسم المكوّنات الأبناء غير الضرورية.</li>
+          <li class="flex gap-2"><span class="text-indigo-500">◆</span> لف المكوّنات بـ <code class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">React.memo</code> لتخطي إعادة الرسم إذا لم تتغيّر الخصائص (props).</li>
+          <li class="flex gap-2"><span class="text-indigo-500">◆</span> في القوائم: استخدم <code class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">keyExtractor</code> صحيحًا، فعّل <code class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">getItemLayout</code>، واضبط <code class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">windowSize</code> لتقليل العناصر المرسومة خارج الشاشة.</li>
+        </ul>
+      </div>
+
+      <!-- Q2 -->
+      <div class="card rounded-2xl p-6">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="font-display font-black text-3xl text-indigo-100">02</span>
+          <h3 class="font-display font-bold text-base md:text-lg text-[var(--navy-900)] pt-1.5">
+            ما الفرق بين useMemo و useCallback ومتى تستخدم كل واحدة؟
+          </h3>
+        </div>
+        <ul class="space-y-2.5 text-[13.5px] text-slate-600 leading-relaxed">
+          <li class="flex gap-2"><span class="text-indigo-500">◆</span> <code class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">useMemo</code> يخزّن <span class="font-bold">قيمة</span> ناتجة عن حساب، ويعيد حسابها فقط عند تغيّر الاعتماديات.</li>
+          <li class="flex gap-2"><span class="text-indigo-500">◆</span> <code class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">useCallback</code> يخزّن <span class="font-bold">مرجع الدالة</span> نفسها — وهو مفيد بشكل خاص عند تمرير دوال كخصائص لمكوّنات أبناء ملفوفة بـ memo.</li>
+          <li class="flex gap-2"><span class="text-indigo-500">◆</span> التشبيه من Compose: يشبهان <code class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">remember(key)</code> — كلاهما آلية تخزين مؤقت مرتبطة بالاعتماديات.</li>
+          <li class="flex gap-2"><span class="text-amber-600">⚠</span> تحذير مهم: الاستخدام المفرط لهما دون داعٍ قد يزيد التعقيد ويُبطئ الأداء بدل تحسينه.</li>
+        </ul>
+      </div>
+
+      <!-- Q3 -->
+      <div class="card rounded-2xl p-6">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="font-display font-black text-3xl text-indigo-100">03</span>
+          <h3 class="font-display font-bold text-base md:text-lg text-[var(--navy-900)] pt-1.5">
+            كيف تكتب وتربط وحدة أصلية (Native Module) بلغة Kotlin؟
+          </h3>
+        </div>
+        <ul class="space-y-2.5 text-[13.5px] text-slate-600 leading-relaxed">
+          <li class="flex gap-2"><span class="text-indigo-500">◆</span> أنشئ صنفًا في Kotlin يرث من <code class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">ReactContextBaseJavaModule</code> (أو TurboModule في البنية الجديدة).</li>
+          <li class="flex gap-2"><span class="text-indigo-500">◆</span> علّم الدوال المراد كشفها لـ JavaScript بـ <code class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">@ReactMethod</code>.</li>
+          <li class="flex gap-2"><span class="text-indigo-500">◆</span> سجّل الوحدة داخل <code class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">ReactPackage</code> ليتم التعرّف عليها عند بدء التشغيل.</li>
+          <li class="flex gap-2"><span class="text-indigo-500">◆</span> نقطة تميّز في المقابلة: اذكر أن خلفيتك الأصلية تجعلك الأنسب لهذه المهمة تحديدًا، فهي غالبًا نقطة ضعف لدى المطوّرين القادمين من JS بحت.</li>
+        </ul>
+      </div>
+
+      <!-- Q4 -->
+      <div class="card rounded-2xl p-6">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="font-display font-black text-3xl text-indigo-100">04</span>
+          <h3 class="font-display font-bold text-base md:text-lg text-[var(--navy-900)] pt-1.5">
+            اشرح الفرق بين البنية القديمة والبنية الجديدة (Bridge مقابل JSI)
+          </h3>
+        </div>
+        <ul class="space-y-2.5 text-[13.5px] text-slate-600 leading-relaxed">
+          <li class="flex gap-2"><span class="text-indigo-500">◆</span> القديمة: تواصل غير متزامن عبر تسلسل JSON على «الجسر» — بطيء نسبيًا مع الأحمال الثقيلة.</li>
+          <li class="flex gap-2"><span class="text-indigo-500">◆</span> الجديدة: JSI يسمح بوصول مباشر ومتزامن لذاكرة ++C دون تسلسل، ما يقلل زمن الاستجابة بشكل كبير.</li>
+          <li class="flex gap-2"><span class="text-indigo-500">◆</span> TurboModules تُحمَّل عند الطلب فقط (Lazy)، مقارنة بتحميل كل الوحدات دفعة واحدة عند الإقلاع في البنية القديمة.</li>
+          <li class="flex gap-2"><span class="text-indigo-500">◆</span> Fabric يرافقها كمحرّك عرض جديد يجعل تحديثات الواجهة أيضًا أكثر تزامنًا وسلاسة.</li>
+        </ul>
+      </div>
+
+      <!-- Q5 - full width -->
+      <div class="card rounded-2xl p-6 md:col-span-2">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="font-display font-black text-3xl text-indigo-100">05</span>
+          <h3 class="font-display font-bold text-base md:text-lg text-[var(--navy-900)] pt-1.5">
+            كيف تدير الحالة في تطبيق React Native كبير، وكيف تقارنها بـ ViewModel في Android؟
+          </h3>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <ul class="space-y-2.5 text-[13.5px] text-slate-600 leading-relaxed">
+            <li class="flex gap-2"><span class="text-indigo-500">◆</span> للحالة المحلية البسيطة: <code class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">useState</code> / <code class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">useReducer</code>.</li>
+            <li class="flex gap-2"><span class="text-indigo-500">◆</span> للحالة المشتركة عبر عدة شاشات: <code class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">Context API</code> للحالات البسيطة، أو <code class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">Redux Toolkit / Zustand</code> للحالات المعقدة وواسعة النطاق.</li>
+          </ul>
+          <ul class="space-y-2.5 text-[13.5px] text-slate-600 leading-relaxed">
+            <li class="flex gap-2"><span class="text-indigo-500">◆</span> المقارنة: <code class="font-mono text-[12px] bg-slate-100 px-1.5 py-0.5 rounded">ViewModel</code> في Android يعزل الحالة عن دورة حياة الواجهة بنفس فلسفة عزل «المتجر» (Store) في Redux عن شجرة المكوّنات.</li>
+            <li class="flex gap-2"><span class="text-indigo-500">◆</span> اربطها بمبدأ «مصدر الحقيقة الواحد» (Single Source of Truth) الذي تعرفه جيدًا من بنية MVVM.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="bg-[var(--navy-950)] text-slate-400 text-center py-8 px-5 text-xs">
+  <p>ورقة مرجعية للمقابلات التقنية — صُممت لمطوّري Android الأصليين المنتقلين إلى React Native</p>
+</footer>
+
+<script>
+  // active nav link highlighting on scroll
+  const sections = document.querySelectorAll('main section[id]');
+  const navLinks = document.querySelectorAll('.nav-link');
+  const setActive = () => {
+    let current = '';
+    sections.forEach(sec => {
+      const rect = sec.getBoundingClientRect();
+      if (rect.top <= 120) current = sec.id;
+    });
+    navLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+  };
+  window.addEventListener('scroll', setActive);
+  setActive();
+
+  // smooth scroll
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelector(link.getAttribute('href')).scrollIntoView({behavior:'smooth'});
+    });
+  });
+</script>
+
+</body>
+</html>

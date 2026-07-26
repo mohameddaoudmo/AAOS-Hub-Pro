@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AAOS Mastery Hub Pro</title>
+<title>Software Engineering Mastery Hub Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script>
   (function(){
@@ -261,6 +261,12 @@ body::before{
 }
 .hero-pill b{color:var(--text);}
 
+
+/* ── TRACK FILTERS ── */
+.filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;}
+.flt{padding:8px 18px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text2);cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.85rem;font-weight:600;transition:.2s;}
+.flt:hover,.flt.active{border-color:var(--p2);color:var(--p2);background:var(--p-dim);}
+
 /* ── SECTION HEADING ── */
 .sec-head{
   display:flex;align-items:center;gap:.75rem;
@@ -412,22 +418,28 @@ footer a{color:var(--p2);text-decoration:none;}
 
   <!-- Hero -->
   <section class="hero fade-up">
-    <div class="hero-tag"><div class="hero-tag-dot"></div> AAOS Mastery Hub</div>
+    <div class="hero-tag"><div class="hero-tag-dot"></div> Software Engineering Hub</div>
     <h1 class="hero-h">
-      دليلك الاحترافي في<br>
-      <span class="hero-grad">أندرويد للسيارات</span>
+      دليلك الهندسي الشامل في<br>
+      <span class="hero-grad">برمجة وتطوير الأنظمة</span>
     </h1>
     <p class="hero-sub">
-      من VHAL وCI/CD إلى Compose وOTA — كل التقنيات شرح مفصل باللغة العربية مع أمثلة حقيقية.
+      من Fintech & Security وCompose إلى VHAL وCarUI وDSA — مكتبة هندسية متكاملة باللغة العربية.
     </p>
     <div class="hero-pills">
-      <div class="hero-pill"><b>19</b> دليلاً تقنياً</div>
-      <div class="hero-pill"><b>500+</b> مثال عملي</div>
+      <div class="hero-pill"><b>33+</b> دليلاً هندسياً</div>
+      <div class="hero-pill"><b>3</b> مسارات متكاملة</div>
       <div class="hero-pill"><b>100%</b> عربي</div>
     </div>
   </section>
 
   <!-- Cards -->
+  <div class="filter-row" id="track-filters">
+    <button class="flt active" data-sec="all">الكل (33)</button>
+    <button class="flt" data-sec="android">📱 Android & Fintech (14)</button>
+    <button class="flt" data-sec="aaos">🚗 Automotive AAOS (15)</button>
+    <button class="flt" data-sec="dsa">🧠 Problem Solving (4)</button>
+  </div>
   <div class="sec-head">
     <div class="sec-bar"></div>
     <div class="sec-title">جميع الأدلة</div>
@@ -446,25 +458,44 @@ footer a{color:var(--p2);text-decoration:none;}
 
 <script>
 const G=[
-  {id:'vhal',  ico:'🚗', color:'c-p',  tag:'tag-p',  label:'نظام',   title:'دليل VHAL الشامل',         desc:'فهم طبقة تجريد الأجهزة — CarPropertyManager، IPC، والتكامل الكامل مع الهارد وير.', path:'guides/vhal-guide-arabic.html'},
-  {id:'compose',ico:'⚛️',color:'c-p',  tag:'tag-p',  label:'UI',     title:'Compose for Automotive',   desc:'Jetpack Compose وCarUi Library لبناء واجهات مستخدم حديثة ومتوافقة مع القيادة.',path:'guides/compose_for_automotive_guide.html'},
-  {id:'ipc',   ico:'📡', color:'c-rose',tag:'tag-rose',label:'متقدم', title:'IPC & Binder & AIDL',      desc:'التواصل بين العمليات — Binder Driver، AIDL، وكل ما تحتاجه لربط الخدمات.',path:'guides/ipc-binder-aidl-guide.html'},
-  {id:'cicd',  ico:'🚀', color:'c-g',  tag:'tag-g',  label:'DevOps', title:'Android CI/CD',            desc:'أتمتة البناء والاختبار والنشر مع GitHub Actions وFastlane خطوة بخطوة.',path:'guides/android-cicd-guide.html'},
-  {id:'ota',   ico:'📲', color:'c-g',  tag:'tag-g',  label:'نظام',   title:'OTA Updates & A/B',        desc:'تحديثات النظام الهوائية وإدارة تقسيم القرص — من الصفر للتطبيق.',path:'guides/android-ota-updates-guide.html'},
-  {id:'media', ico:'🎵', color:'c-amb',tag:'tag-amb', label:'وسائط', title:'Android Media Session',     desc:'إدارة الوسائط والتحكم في تشغيل الصوت في بيئة السيارة الاحترافية.',path:'guides/android_media_vehicle_guide.html'},
-  {id:'conn',  ico:'📶', color:'c-cyan',tag:'tag-cyan',label:'شبكات', title:'Connectivity Stack',       desc:'البلوتوث، الواي فاي، وتكامل Android Auto — الدليل الكامل.',path:'guides/connectivity-bt-wifi-androidauto.html'},
-  {id:'build', ico:'🛠️', color:'c-amb',tag:'tag-amb', label:'بناء',  title:'Android Build System',     desc:'أسرار نظام AOSP Build — Soong، Makefile، وكل خطوة في عملية البناء.',path:'guides/android-build-guide.html'},
-  {id:'can',   ico:'🔌', color:'c-rose',tag:'tag-rose',label:'هارد',  title:'CAN Bus & VHAL',           desc:'ربط أندرويد بناقل بيانات السيارة الحقيقي وإرسال الإشارات واستقبالها.',path:'guides/can_bus_vhal_guide.html'},
-  {id:'carui', ico:'🖥️', color:'c-p',  tag:'tag-p',  label:'UI',     title:'CarUI Library',            desc:'مكتبة CarUI لبناء واجهات متوافقة مع متطلبات الأمان والقيادة.',path:'guides/caruilib_driving_deep_dive.html'},
-  {id:'aaos',  ico:'🤖', color:'c-cyan',tag:'tag-cyan',label:'أساسيات',title:'AAOS Deep Dive',         desc:'الغوص العميق في Android Automotive OS — المعمارية الداخلية والطبقات.',path:'guides/aaos_deep_arabic.html'},
-  {id:'selinux',ico:'🛡️',color:'c-rose',tag:'tag-rose',label:'نظام',  title:'SELinux for Automotive',  desc:'إدارة الأمان والصلاحيات في أندرويد — Enforcing، Policies، و Security contexts.',path:'guides/selinux-guide.html'},
-  {id:'career',ico:'💼', color:'c-g',  tag:'tag-g',  label:'مهني',   title:'Professional Hub',         desc:'نصائح وموارد وخارطة طريق لتطوير مسارك المهني في تقنيات السيارات.',path:'guides/career-hub.html'},
-  {id:'oop',    ico:'💎', color:'c-p',  tag:'tag-p',  label:'مهني',   title:'OOP Interview Mastery',    desc:'أكثر من 300 سؤال وجواب احترافي في OOP وأنماط التصميم لأندرويد.',path:'guides/oop_questions.html'},
-  {id:'dsa',   ico:'🧠', color:'c-rose',tag:'tag-rose',label:'أساسيات',title:'DSA Mastery Guide',        desc:'الدليل الشامل للخوارزميات وهياكل البيانات — من الصفر للاحتراف.',path:'guides/dsa_guide.html'},
-  {id:'ll',    ico:'🔗', color:'c-cyan',tag:'tag-cyan',label:'أساسيات',title:'Linked Lists Deep Dive',   desc:'شرح مفصل للـ Linked Lists بأنواعها مع أمثلة C++ احترافية.',path:'guides/linked_lists_guide.html'},
-  {id:'dsa-hub',ico:'🧠',color:'c-rose',tag:'tag-rose',label:'DSA Hub',title:'DSA Mastery Hub',        desc:'لوحة تحكم الخوارزميات وهياكل البيانات — Arrays، Linked Lists، HashMaps وأكثر.',path:'guides/dsa_dashboard.html'},
-  {id:'hm',    ico:'🗺️', color:'c-amb', tag:'tag-amb', label:'أساسيات',title:'HashMaps & Sets',         desc:'unordered_map، Two Sum، Frequency Count — البحث في O(1) مع أمثلة C++ كاملة.',path:'guides/hashmaps_sets_guide.html'},
-  {id:'ndk',   ico:'⚡', color:'c-p',   tag:'tag-p',   label:'نظام',  title:'دليل NDK & JNI الشامل',    desc:'احتراف البرمجة بلغة C++ والتواصل مع الـ Java Framework عبر JNI.', path:'guides/ndk_jni_guide.html'},
+  // ── Android Core (جديد) ──
+  {id:'act-life', ico:'📱', color:'c-g', tag:'tag-g', sec:'android', label:'Android Core', title:'Activity Lifecycle Masterclass', desc:'المرجع الشامل لدورة حياة الأكتيفيتي، الحالات المتعددة وأسئلة المقابلات.', path:'guides/activity_lifecycle_guide.html'},
+  {id:'components', ico:'🧱', color:'c-p', tag:'tag-p', sec:'android', label:'Android Core', title:'Core Components Masterclass', desc:'المرجع الهندسي الشامل لمكونات أندرويد الأساسية (Activity, Service, Broadcast, Content Provider).', path:'guides/android_components_masterclass.html'},
+  {id:'life-master', ico:'🔄', color:'c-g', tag:'tag-g', sec:'android', label:'Android Core', title:'Android Lifecycle Masterclass', desc:'احتراف إدارة State وViewModel والحفاظ على البيانات أثناء إعادة البناء.', path:'guides/android_lifecycle_masterclass.html'},
+  {id:'sec-master', ico:'🛡️', color:'c-rose', tag:'tag-rose', sec:'android', label:'Security', title:'Android Security Masterclass', desc:'المرجع الشامل لأمان أندرويد — الثغرات، التشفير، الحماية والتأمين الهندسي.', path:'guides/android_security_masterclass.html'},
+  {id:'fintech-master', ico:'🏦', color:'c-rose', tag:'tag-rose', sec:'android', label:'Fintech & Architecture', title:'Fintech Android Masterclass', desc:'المرجع الهندسي الشامل لبناء وتأمين تطبيقات البنوك والدفع الإلكتروني.', path:'guides/fintech_android_masterclass.html'},
+  {id:'fintech-sec', ico:'💳', color:'c-rose', tag:'tag-rose', sec:'android', label:'Security', title:'Fintech Android Security Guide', desc:'حماية وتأمين تطبيقات البنوك والدفع الإلكتروني ضد الهندسة العكسية والاختراق.', path:'guides/fintech_android_security_guide.html'},
+  {id:'kmp-cmp', ico:'🚀', color:'c-cyan', tag:'tag-cyan', sec:'android', label:'Multiplatform', title:'KMP & CMP Interview Guide', desc:'دليل المقابلات الشامل لـ Kotlin Multiplatform وCompose Multiplatform.', path:'guides/kmp_cmp_interview_guide.html'},
+  {id:'kt-coll', ico:'📦', color:'c-amb', tag:'tag-amb', sec:'android', label:'Kotlin', title:'Kotlin Collections & Sequences', desc:'المقارنة التفصيلية بين Collections وSequences في كوتلن لتحسين الأداء Memory & CPU.', path:'guides/kotlin_collections_sequence_guide.html'},
+  {id:'pagination', ico:'📄', color:'c-cyan', tag:'tag-cyan', sec:'android', label:'Architecture', title:'Modern Pagination Guide', desc:'تصميم معمارية التصفح والتحميل اللانهائي بطريقة عصرية وسلسة.', path:'guides/pagination_guide.html'},
+  {id:'frag-nav', ico:'🧩', color:'c-p', tag:'tag-p', sec:'android', label:'UI & Nav', title:'Fragment & Navigation Guide', desc:'إدارة الفراجمينت والتنقل الشامل مع Navigation Component وحماية State.', path:'guides/fragment_navigation_guide.html'},
+  {id:'detekt-cicd', ico:'⚙️', color:'c-g', tag:'tag-g', sec:'android', label:'DevOps', title:'CI/CD with Git & Detekt', desc:'أتمتة جودة الكود، التفتيش الساكن Detekt، وربط البناء السحابي مع Git.', path:'guides/cicd_git_detekt_android.html'},
+  {id:'oop-master', ico:'💎', color:'c-p', tag:'tag-p', sec:'android', label:'OOP', title:'OOP & Design Patterns Masterclass', desc:'المرجع الهندسي الشامل — البرمجة الكائنية المتقدمة وأنماط التصميم لأندرويد.', path:'guides/oop_masterclass.html'},
+  {id:'oop-chal', ico:'🎯', color:'c-p', tag:'tag-p', sec:'android', label:'OOP', title:'OOP Interview Challenges', desc:'أصعب أسئلة البرمجة كائنية التوجه وتحديات المقابلات المتقدمة في أندرويد.', path:'guides/oop_interview_challenges.html'},
+  {id:'rn-sheet', ico:'⚛️', color:'c-cyan', tag:'tag-cyan', sec:'android', label:'CrossPlatform', title:'React Native Interview Sheet', desc:'دليل المقابلات السريع والمعمارية الداخلية لـ React Native مقارنة بالـ Native.', path:'guides/react_native_interview_sheet.html'},
+
+  // ── Android Automotive (AAOS) ──
+  {id:'vhal', ico:'🚗', color:'c-p', tag:'tag-p', sec:'aaos', label:'AAOS System', title:'دليل VHAL الشامل', desc:'فهم طبقة تجريد الأجهزة — CarPropertyManager، IPC، والتكامل الكامل مع الهارد وير.', path:'guides/vhal-guide-arabic.html'},
+  {id:'compose-auto', ico:'⚛️', color:'c-p', tag:'tag-p', sec:'aaos', label:'Automotive UI', title:'Compose for Automotive', desc:'Jetpack Compose وCarUi Library لبناء واجهات مستخدم حديثة ومتوافقة مع القيادة.', path:'guides/compose_for_automotive_guide.html'},
+  {id:'ipc', ico:'📡', color:'c-rose', tag:'tag-rose', sec:'aaos', label:'AAOS IPC', title:'IPC & Binder & AIDL', desc:'التواصل بين العمليات — Binder Driver، AIDL، وكل ما تحتاجه لربط الخدمات.', path:'guides/ipc-binder-aidl-guide.html'},
+  {id:'cicd-auto', ico:'🚀', color:'c-g', tag:'tag-g', sec:'aaos', label:'AAOS DevOps', title:'Android CI/CD for AAOS', desc:'أتمتة البناء والاختبار والنشر مع GitHub Actions وFastlane خطوة بخطوة.', path:'guides/android-cicd-guide.html'},
+  {id:'ota', ico:'📲', color:'c-g', tag:'tag-g', sec:'aaos', label:'AAOS System', title:'OTA Updates & A/B', desc:'تحديثات النظام الهوائية وإدارة تقسيم القرص — من الصفر للتطبيق.', path:'guides/android-ota-updates-guide.html'},
+  {id:'media', ico:'🎵', color:'c-amb', tag:'tag-amb', sec:'aaos', label:'Media', title:'Android Media Session', desc:'إدارة الوسائط والتحكم في تشغيل الصوت في بيئة السيارة الاحترافية.', path:'guides/android_media_vehicle_guide.html'},
+  {id:'conn', ico:'📶', color:'c-cyan', tag:'tag-cyan', sec:'aaos', label:'Connectivity', title:'Connectivity Stack', desc:'البلوتوث، الواي فاي، وتكامل Android Auto — الدليل الكامل.', path:'guides/connectivity-bt-wifi-androidauto.html'},
+  {id:'build', ico:'🛠️', color:'c-amb', tag:'tag-amb', sec:'aaos', label:'Build System', title:'Android Build System', desc:'أسرار نظام AOSP Build — Soong، Makefile، وكل خطوة في عملية البناء.', path:'guides/android-build-guide.html'},
+  {id:'can', ico:'🔌', color:'c-rose', tag:'tag-rose', sec:'aaos', label:'Hardware', title:'CAN Bus & VHAL', desc:'ربط أندرويد بناقل بيانات السيارة الحقيقي وإرسال الإشارات واستقبالها.', path:'guides/can_bus_vhal_guide.html'},
+  {id:'carui', ico:'🖥️', color:'c-p', tag:'tag-p', sec:'aaos', label:'CarUI', title:'CarUI Library', desc:'مكتبة CarUI لبناء واجهات متوافقة مع متطلبات الأمان والقيادة.', path:'guides/caruilib_driving_deep_dive.html'},
+  {id:'aaos-deep', ico:'🤖', color:'c-cyan', tag:'tag-cyan', sec:'aaos', label:'AAOS Deep', title:'AAOS Deep Dive', desc:'الغوص العميق في Android Automotive OS — المعمارية الداخلية والطبقات.', path:'guides/aaos_deep_arabic.html'},
+  {id:'selinux', ico:'🛡️', color:'c-rose', tag:'tag-rose', sec:'aaos', label:'Security', title:'SELinux for Automotive', desc:'إدارة الأمان والصلاحيات في أندرويد — Enforcing، Policies، و Security contexts.', path:'guides/selinux-guide.html'},
+  {id:'career', ico:'💼', color:'c-g', tag:'tag-g', sec:'aaos', label:'Career', title:'Professional Hub', desc:'نصائح وموارد وخارطة طريق لتطوير مسارك المهني في تقنيات السيارات.', path:'guides/career-hub.html'},
+  {id:'ndk', ico:'⚡', color:'c-p', tag:'tag-p', sec:'aaos', label:'NDK & JNI', title:'دليل NDK & JNI الشامل', desc:'احتراف البرمجة بلغة C++ والتواصل مع الـ Java Framework عبر JNI.', path:'guides/ndk_jni_guide.html'},
+  {id:'adb', ico:'📟', color:'c-g', tag:'tag-g', sec:'aaos', label:'Tools', title:'دليل ADB الشامل', desc:'Android Debug Bridge — الدليل الشامل A to Z للأوامر والتشخيص.', path:'guides/adb_guide.html'},
+
+  // ── Problem Solving & DSA ──
+  {id:'dsa', ico:'🧠', color:'c-rose', tag:'tag-rose', sec:'dsa', label:'DSA Core', title:'DSA Mastery Guide', desc:'الدليل الشامل للخوارزميات وهياكل البيانات — من الصفر للاحتراف.', path:'guides/dsa_guide.html'},
+  {id:'ll', ico:'🔗', color:'c-cyan', tag:'tag-cyan', sec:'dsa', label:'Data Structures', title:'Linked Lists Deep Dive', desc:'شرح مفصل للـ Linked Lists بأنواعها مع أمثلة C++ احترافية.', path:'guides/linked_lists_guide.html'},
+  {id:'dsa-hub', ico:'📊', color:'c-rose', tag:'tag-rose', sec:'dsa', label:'DSA Hub', title:'DSA Mastery Dashboard', desc:'لوحة تحكم الخوارزميات وهياكل البيانات — Arrays، Linked Lists، HashMaps وأكثر.', path:'guides/dsa_dashboard.html'},
+  {id:'hm', ico:'🗺️', color:'c-amb', tag:'tag-amb', sec:'dsa', label:'Data Structures', title:'HashMaps & Sets', desc:'unordered_map، Two Sum، Frequency Count — البحث في O(1) مع أمثلة C++ كاملة.', path:'guides/hashmaps_sets_guide.html'},
 ];
 
 // Sidebar
@@ -476,22 +507,54 @@ sideNav.innerHTML=G.map(g=>`
     <span class="side-badge">${g.label}</span>
   </a>`).join('');
 
-// Cards
+// Cards rendering & Track Filter Logic
 const grid=document.getElementById('grid');
-document.getElementById('cnt').textContent=`${G.length} أدلة`;
-grid.innerHTML=G.map((g,i)=>`
-  <a class="card ${g.color} fade-up" href="${g.path}" style="animation-delay:${i*.05}s">
-    <div class="card-top">
-      <span class="card-ico">${g.ico}</span>
-      <span class="card-tag ${g.tag}">${g.label}</span>
-    </div>
-    <div class="card-title">${g.title}</div>
-    <div class="card-desc">${g.desc}</div>
-    <div class="card-footer">
-      <span></span>
-      <div class="card-arrow">←</div>
-    </div>
-  </a>`).join('');
+let currentSec='all';
+
+function renderCards(filterSec='all'){
+  currentSec=filterSec;
+  const list = filterSec==='all' ? G : G.filter(g=>g.sec===filterSec);
+  document.getElementById('cnt').textContent=`${list.length} أدلة`;
+  grid.innerHTML=list.map((g,i)=>`
+    <a class="card ${g.color} fade-up" href="${g.path}" style="animation-delay:${i*.03}s">
+      <div class="card-top">
+        <span class="card-ico">${g.ico}</span>
+        <span class="card-tag ${g.tag}">${g.label}</span>
+      </div>
+      <div class="card-title">${g.title}</div>
+      <div class="card-desc">${g.desc}</div>
+      <div class="card-footer">
+        <span></span>
+        <div class="card-arrow">←</div>
+      </div>
+    </a>`).join('');
+}
+
+renderCards();
+
+// Handle tab clicks
+document.querySelectorAll('#track-filters .flt').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#track-filters .flt').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderCards(btn.dataset.sec);
+  });
+});
+
+// Handle Hash navigation on load
+function checkHash(){
+  const h=window.location.hash.slice(1);
+  if(['android','aaos','dsa'].includes(h)){
+    const btn=document.querySelector(`#track-filters .flt[data-sec="${h}"]`);
+    if(btn){
+      document.querySelectorAll('#track-filters .flt').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      renderCards(h);
+    }
+  }
+}
+window.addEventListener('hashchange', checkHash);
+checkHash();
 
 // Search
 const inp=document.getElementById('search-inp');
@@ -529,6 +592,7 @@ document.getElementById('theme-btn').addEventListener('click',()=>{
   applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
 });
 applyTheme(localStorage.getItem('aaos_theme')||'dark');
+
 </script>
 </body>
 </html>

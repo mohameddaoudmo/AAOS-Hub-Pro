@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CI/CD, Git &amp; Detekt in Android — الدليل الشامل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&family=Tajawal:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0f14;
+  --bg-alt:#0d141b;
+  --surface:#121a22;
+  --surface2:#182029;
+  --surface3:#1d2733;
+  --border:#232f3d;
+  --border-soft:#1a2430;
+  --text:#e7edf3;
+  --text-dim:#93a2b0;
+  --text-faint:#5c6b7a;
+  --gold:#e3b341;
+  --gold-soft:#e3b34122;
+  --teal:#39d0d8;
+  --teal-soft:#39d0d822;
+  --green:#3fb950;
+  --green-soft:#3fb95022;
+  --red:#f85149;
+  --red-soft:#f8514922;
+  --purple:#bc8cff;
+  --purple-soft:#bc8cff22;
+  --radius:12px;
+  --sidebar-w:300px;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:
+    radial-gradient(1200px 600px at 85% -10%, #16202c 0%, transparent 60%),
+    radial-gradient(900px 500px at -10% 20%, #131c26 0%, transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:'Tajawal','JetBrains Mono',sans-serif;
+  line-height:1.9;
+  min-height:100vh;
+}
+::selection{background:var(--gold); color:#0a0f14;}
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--surface3); border-radius:10px;}
+::-webkit-scrollbar-thumb:hover{background:var(--gold);}
+
+.en{font-family:'JetBrains Mono',monospace; direction:ltr; unicode-bidi:isolate;}
+
+/* ===== Progress bar ===== */
+#progress-bar{
+  position:fixed; top:0; right:0; left:0; height:3px; z-index:200;
+  background:var(--border-soft);
+}
+#progress-fill{
+  height:100%; width:0%;
+  background:linear-gradient(90deg,var(--teal),var(--gold));
+  transition:width .25s ease;
+}
+
+/* ===== Layout ===== */
+.layout{
+  display:grid;
+  grid-template-columns: 1fr var(--sidebar-w);
+  max-width:1440px;
+  margin:0 auto;
+  align-items:start;
+}
+main{min-width:0; padding:0 48px 120px;}
+aside#nav{
+  position:sticky; top:0; height:100vh;
+  padding:28px 24px 28px 8px;
+  border-right:1px solid var(--border-soft);
+  overflow-y:auto;
+}
+aside#nav::-webkit-scrollbar{width:6px;}
+
+.nav-head{margin-bottom:18px;}
+.nav-head .tag{
+  font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--gold);
+  letter-spacing:.12em; text-transform:uppercase;
+}
+.nav-head h2{font-family:'Cairo',sans-serif; font-size:16px; font-weight:800; margin-top:6px;}
+.nav-progress-label{font-size:11px; color:var(--text-faint); margin-top:8px; font-family:'JetBrains Mono',monospace;}
+
+.graph{position:relative; padding-right:6px;}
+.graph-line{
+  position:absolute; top:6px; bottom:6px; right:15px; width:2px;
+  background:linear-gradient(var(--border) 0 0);
+  background-image:repeating-linear-gradient(var(--border-soft), var(--border-soft) 4px, transparent 4px, transparent 8px);
+}
+.commit{
+  position:relative; display:flex; align-items:flex-start; gap:10px;
+  padding:9px 0 9px 6px; cursor:pointer; user-select:none;
+}
+.dot{
+  position:relative; z-index:2; margin-top:4px; flex:0 0 auto;
+  width:11px; height:11px; border-radius:50%;
+  background:var(--surface3); border:2px solid var(--border);
+  transition:all .2s ease;
+}
+.commit[data-cat="cicd"] .dot{ box-shadow:0 0 0 0 transparent; }
+.commit.active .dot{background:var(--gold); border-color:var(--gold); box-shadow:0 0 0 4px var(--gold-soft);}
+.commit[data-cat="git"].active .dot{background:var(--teal); border-color:var(--teal); box-shadow:0 0 0 4px var(--teal-soft);}
+.commit[data-cat="detekt"].active .dot{background:var(--purple); border-color:var(--purple); box-shadow:0 0 0 4px var(--purple-soft);}
+.commit.done .dot{background:var(--green); border-color:var(--green);}
+.commit.done .dot::after{content:"✓"; position:absolute; inset:-5px; display:flex; align-items:center; justify-content:center; font-size:9px; color:#04180a; font-weight:900;}
+.commit .label{font-size:13px; color:var(--text-dim); transition:color .2s ease; line-height:1.5;}
+.commit.active .label{color:var(--text); font-weight:700;}
+.commit:hover .label{color:var(--text);}
+.commit .sha{font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-faint); display:block; direction:ltr; text-align:right;}
+
+.legend{display:flex; gap:14px; margin-top:20px; padding-top:16px; border-top:1px solid var(--border-soft); flex-wrap:wrap;}
+.legend span{font-size:10px; font-family:'JetBrains Mono',monospace; color:var(--text-faint); display:flex; align-items:center; gap:5px;}
+.legend i{width:8px; height:8px; border-radius:50%; display:inline-block;}
+
+/* ===== Hero ===== */
+.hero{padding:80px 0 56px; border-bottom:1px solid var(--border-soft); margin-bottom:56px;}
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--gold);
+  border:1px solid var(--gold-soft); background:var(--gold-soft);
+  padding:6px 14px; border-radius:100px; letter-spacing:.05em;
+}
+.hero h1{
+  font-family:'Cairo',sans-serif; font-weight:900; font-size:52px;
+  margin:26px 0 16px; line-height:1.25;
+  background:linear-gradient(90deg,#fff,var(--text-dim));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.hero p.sub{font-size:18px; color:var(--text-dim); max-width:720px;}
+.hero-meta{display:flex; gap:28px; margin-top:32px; flex-wrap:wrap;}
+.hero-meta div{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+.hero-meta strong{display:block; color:var(--text); font-size:20px; font-family:'Cairo',sans-serif; margin-bottom:2px;}
+
+.pipeline-viz{margin-top:44px; display:flex; align-items:center; overflow-x:auto; padding:6px 2px 14px;}
+.pv-stage{
+  flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:8px;
+  min-width:96px; position:relative;
+}
+.pv-node{
+  width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+  background:var(--surface2); border:1px solid var(--border); font-size:20px;
+  transition:transform .3s ease;
+}
+.pv-stage:hover .pv-node{transform:translateY(-4px); border-color:var(--gold);}
+.pv-stage span{font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-faint); text-align:center;}
+.pv-connector{flex:0 0 32px; height:2px; background:repeating-linear-gradient(90deg,var(--border) 0 6px,transparent 6px 10px); margin:0 -2px 26px;}
+
+/* ===== Sections ===== */
+section.topic{padding:64px 0; border-bottom:1px solid var(--border-soft); scroll-margin-top:24px;}
+section.topic:last-child{border-bottom:none;}
+.topic-head{display:flex; align-items:flex-start; justify-content:space-between; gap:24px; margin-bottom:28px;}
+.topic-index{
+  font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-faint);
+  display:flex; align-items:center; gap:10px; margin-bottom:10px;
+}
+.cat-chip{
+  font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase;
+  padding:3px 10px; border-radius:100px; border:1px solid;
+}
+.cat-chip.cicd{color:var(--gold); border-color:var(--gold-soft); background:var(--gold-soft);}
+.cat-chip.git{color:var(--teal); border-color:var(--teal-soft); background:var(--teal-soft);}
+.cat-chip.detekt{color:var(--purple); border-color:var(--purple-soft); background:var(--purple-soft);}
+
+.topic h2{font-family:'Cairo',sans-serif; font-weight:800; font-size:32px; line-height:1.4;}
+.topic h2 .en{font-size:26px; color:var(--text-dim); display:block; margin-top:4px;}
+
+.mark-btn{
+  flex:0 0 auto; display:flex; align-items:center; gap:8px;
+  background:var(--surface2); border:1px solid var(--border); color:var(--text-dim);
+  font-family:'JetBrains Mono',monospace; font-size:12px; padding:9px 16px; border-radius:100px;
+  cursor:pointer; transition:all .2s ease; white-space:nowrap;
+}
+.mark-btn:hover{border-color:var(--gold); color:var(--text);}
+.mark-btn.done{background:var(--green-soft); border-color:var(--green); color:var(--green);}
+
+.topic p{color:var(--text-dim); font-size:16.5px; margin-bottom:18px; max-width:880px;}
+.topic p strong{color:var(--text); font-weight:700;}
+.topic h3{font-family:'Cairo',sans-serif; font-weight:700; font-size:21px; margin:32px 0 14px; color:var(--text);}
+.topic h4{font-family:'Cairo',sans-serif; font-weight:700; font-size:17px; margin:22px 0 10px; color:var(--gold);}
+
+ul.list, ol.list{margin:0 0 20px; padding-right:22px; max-width:880px;}
+ul.list li, ol.list li{color:var(--text-dim); margin-bottom:10px; font-size:15.5px;}
+ul.list li strong, ol.list li strong{color:var(--text);}
+ul.list li::marker{color:var(--gold);}
+ol.list li::marker{color:var(--teal); font-family:'JetBrains Mono',monospace;}
+
+/* code blocks */
+.code{
+  direction:ltr; text-align:left; background:#0d1218; border:1px solid var(--border);
+  border-radius:var(--radius); margin:18px 0 26px; overflow:hidden; max-width:880px;
+}
+.code-top{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 16px; background:var(--surface2); border-bottom:1px solid var(--border);
+  font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint);
+}
+.code-top .dots{display:flex; gap:6px;}
+.code-top .dots i{width:9px; height:9px; border-radius:50%; background:var(--border);}
+.copy-btn{background:none; border:1px solid var(--border); color:var(--text-faint); font-family:'JetBrains Mono',monospace; font-size:10px; padding:3px 10px; border-radius:6px; cursor:pointer;}
+.copy-btn:hover{color:var(--gold); border-color:var(--gold);}
+.code pre{padding:18px 20px; overflow-x:auto; font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.7; color:#c9d6e0;}
+.code pre .c-key{color:var(--teal);}
+.code pre .c-str{color:var(--green);}
+.code pre .c-com{color:var(--text-faint); font-style:italic;}
+.code pre .c-fn{color:var(--gold);}
+
+/* table */
+table.tbl{width:100%; max-width:880px; border-collapse:collapse; margin:18px 0 26px; font-size:14.5px;}
+table.tbl th{
+  background:var(--surface2); color:var(--gold); text-align:right; padding:12px 14px;
+  font-family:'Cairo',sans-serif; font-weight:700; border:1px solid var(--border); font-size:13.5px;
+}
+table.tbl td{padding:12px 14px; border:1px solid var(--border-soft); color:var(--text-dim); vertical-align:top;}
+table.tbl td .en, table.tbl th .en{font-size:13px;}
+table.tbl tr:hover td{background:var(--surface);}
+
+/* callouts */
+.callout{
+  max-width:880px; border-radius:var(--radius); padding:18px 20px; margin:20px 0 26px;
+  border:1px solid; display:flex; gap:14px; align-items:flex-start;
+}
+.callout .icon{font-size:20px; flex:0 0 auto;}
+.callout p{margin:0; font-size:15px; color:var(--text-dim);}
+.callout.tip{background:var(--teal-soft); border-color:var(--teal-soft);}
+.callout.tip p strong{color:var(--teal);}
+.callout.warn{background:var(--red-soft); border-color:var(--red-soft);}
+.callout.warn p strong{color:var(--red);}
+.callout.good{background:var(--green-soft); border-color:var(--green-soft);}
+.callout.good p strong{color:var(--green);}
+
+/* two column cards */
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px; max-width:880px; margin:18px 0 26px;}
+.card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px;}
+.card h5{font-family:'Cairo',sans-serif; font-weight:700; font-size:15px; margin-bottom:10px; color:var(--text);}
+.card p{margin:0; font-size:14px; color:var(--text-dim);}
+@media(max-width:720px){.grid2{grid-template-columns:1fr;}}
+
+.stage-flow{display:flex; flex-wrap:wrap; gap:10px; max-width:880px; margin:18px 0 26px;}
+.stage-flow .s{
+  background:var(--surface2); border:1px solid var(--border); border-radius:10px;
+  padding:10px 16px; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text);
+  display:flex; align-items:center; gap:8px;
+}
+.stage-flow .arrow{color:var(--text-faint); align-self:center;}
+
+/* footer */
+footer{padding:60px 0 100px; text-align:center; color:var(--text-faint); font-family:'JetBrains Mono',monospace; font-size:12px;}
+footer .fh{font-family:'Cairo',sans-serif; font-size:20px; color:var(--text); margin-bottom:10px; font-weight:800;}
+
+/* mobile */
+.nav-toggle{display:none;}
+@media(max-width:980px){
+  .layout{grid-template-columns:1fr;}
+  aside#nav{
+    position:fixed; z-index:150; right:0; top:0; bottom:0; width:82vw; max-width:320px;
+    background:var(--bg); border-right:none; border-left:1px solid var(--border);
+    transform:translateX(100%); transition:transform .3s ease; box-shadow:-20px 0 40px #000a;
+  }
+  aside#nav.open{transform:translateX(0);}
+  main{padding:0 20px 100px;}
+  .hero h1{font-size:34px;}
+  .nav-toggle{
+    display:flex; position:fixed; z-index:160; bottom:22px; left:22px;
+    width:52px; height:52px; border-radius:50%; background:var(--gold); color:#0a0f14;
+    align-items:center; justify-content:center; font-size:20px; border:none; cursor:pointer;
+    box-shadow:0 8px 24px #0008;
+  }
+  .grid2{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"><div id="progress-fill"></div></div>
+
+<div class="layout">
+<main>
+
+  <div class="hero">
+    <span class="eyebrow">📘 <span class="en">Chapter 08</span> — CI/CD · Git · Detekt</span>
+    <h1>الأتمتة، التحكم بالإصدارات، وجودة الكود في تطبيقات Android</h1>
+    <p class="sub">دليل شامل ومفصّل لكل مفاهيم DevOps و Code Quality اللي محتاجها أي مطور Android عشان يبني Pipeline احترافي، يدير الـ Git بشكل صح، ويحافظ على جودة الكود بـ Detekt — من الأساسيات لحد التطبيق العملي في الشغل.</p>
+    <div class="hero-meta">
+      <div><strong>18</strong>مواضيع رئيسية</div>
+      <div><strong>3</strong>محاور: CI/CD · Git · Detekt</div>
+      <div><strong id="progress-count">0/18</strong>تقدمك في القراءة</div>
+    </div>
+
+    <div class="pipeline-viz">
+      <div class="pv-stage"><div class="pv-node">📥</div><span class="en">Checkout</span></div>
+      <div class="pv-connector"></div>
+      <div class="pv-stage"><div class="pv-node">🧹</div><span class="en">Lint / Detekt</span></div>
+      <div class="pv-connector"></div>
+      <div class="pv-stage"><div class="pv-node">🧪</div><span class="en">Unit Tests</span></div>
+      <div class="pv-connector"></div>
+      <div class="pv-stage"><div class="pv-node">🏗️</div><span class="en">Build</span></div>
+      <div class="pv-connector"></div>
+      <div class="pv-stage"><div class="pv-node">✍️</div><span class="en">Sign</span></div>
+      <div class="pv-connector"></div>
+      <div class="pv-stage"><div class="pv-node">🚀</div><span class="en">Deploy</span></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 -->
+  <section class="topic" id="s1" data-cat="cicd">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip cicd">CI/CD</span><span class="en">01 / 18</span></div>
+        <h2>مفاهيم CI/CD في Android<span class="en">CI/CD Concepts in Android</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s1">☐ حددها كمكتملة</button>
+    </div>
+
+    <p><strong>CI</strong> اختصار لـ <span class="en">Continuous Integration</span>، و<strong>CD</strong> ممكن تعني <span class="en">Continuous Delivery</span> أو <span class="en">Continuous Deployment</span>. الفكرة الأساسية إنك بدل ما تدمج التعديلات وتبني وتختبر التطبيق يدويًا كل شوية، بتخلي السيرفر يعمل ده أوتوماتيك في كل مرة حد يعمل push للكود.</p>
+
+    <div class="grid2">
+      <div class="card">
+        <h5><span class="en">Continuous Integration (CI)</span></h5>
+        <p>كل مرة يتعمل push أو Pull Request، السيرفر بيسحب الكود أوتوماتيك، يبنيه، يشغل الـ Unit Tests والـ Static Analysis (زي Detekt وktlint) عشان يتأكد إن الكود الجديد ملوش تعارض أو أخطاء قبل ما يتدمج.</p>
+      </div>
+      <div class="card">
+        <h5><span class="en">Continuous Delivery</span></h5>
+        <p>بعد نجاح الـ CI، التطبيق بيتجهز كـ APK/AAB جاهز للنشر في أي وقت، لكن الـ deploy الفعلي لسه بيحتاج موافقة يدوية (زر واحد فقط).</p>
+      </div>
+      <div class="card">
+        <h5><span class="en">Continuous Deployment</span></h5>
+        <p>خطوة أبعد من الـ Delivery — التطبيق بينزل أوتوماتيك على Play Store (غالبًا على قناة Internal Testing أو Beta) من غير أي تدخل بشري، طالما كل الاختبارات نجحت.</p>
+      </div>
+      <div class="card">
+        <h5>ليه مهم في Android بالذات؟</h5>
+        <p>تعدد الأجهزة والـ API Levels، وقت بناء الـ Gradle الطويل، تعقيد الـ Signing، وتعدد الـ Product Flavors — كل ده بيخلي الأتمتة ضرورة مش رفاهية في أي مشروع فيه أكتر من مطور.</p>
+      </div>
+    </div>
+
+    <h3>الفايدة الحقيقية في فريق Android</h3>
+    <ul class="list">
+      <li><strong>اكتشاف الأخطاء بدري:</strong> لو حد كسر الـ build أو فشل test، تعرف في نفس الدقيقة مش بعد أسبوع.</li>
+      <li><strong>ثبات بيئة البناء:</strong> الـ build بيحصل على سيرفر نظيف كل مرة، مش على جهاز مطور فيه إعدادات مختلفة (No "works on my machine").</li>
+      <li><strong>سرعة الإصدار:</strong> تقدر تنزل نسخة جديدة لأي قناة اختبار في دقايق بدل ساعات من الخطوات اليدوية.</li>
+      <li><strong>ثقة أعلى في الدمج:</strong> فريق كبير يقدر يدمج Pull Requests كتير في اليوم من غير خوف إنهم يكسروا بعض.</li>
+    </ul>
+
+    <div class="callout tip">
+      <div class="icon">💡</div>
+      <p><strong>قاعدة ذهبية:</strong> لو خطوة بتتعمل يدويًا أكتر من مرتين، اعتبرها مرشحة للأتمتة داخل الـ Pipeline.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="topic" id="s2" data-cat="cicd">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip cicd">CI/CD</span><span class="en">02 / 18</span></div>
+        <h2>مراحل الـ CI/CD Workflow<span class="en">CI/CD Workflow Stages</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s2">☐ حددها كمكتملة</button>
+    </div>
+
+    <p>الـ Pipeline النموذجي لتطبيق Android بيتكون من مجموعة مراحل متتالية، كل مرحلة لازم تنجح عشان ننتقل للي بعدها (<span class="en">fail-fast</span>):</p>
+
+    <div class="stage-flow">
+      <div class="s">1. Checkout</div><div class="arrow">←</div>
+      <div class="s">2. Setup (JDK/Gradle Cache)</div><div class="arrow">←</div>
+      <div class="s">3. Static Analysis</div><div class="arrow">←</div>
+      <div class="s">4. Unit Tests</div><div class="arrow">←</div>
+      <div class="s">5. Instrumented Tests</div><div class="arrow">←</div>
+      <div class="s">6. Assemble</div><div class="arrow">←</div>
+      <div class="s">7. Sign</div><div class="arrow">←</div>
+      <div class="s">8. Publish/Deploy</div><div class="arrow">←</div>
+      <div class="s">9. Notify</div>
+    </div>
+
+    <h3>شرح كل مرحلة بالتفصيل</h3>
+    <table class="tbl">
+      <tr><th>المرحلة</th><th>الوصف</th></tr>
+      <tr><td><span class="en">Checkout</span></td><td>سحب آخر نسخة من الكود من الـ Git repository على الـ runner.</td></tr>
+      <tr><td><span class="en">Setup</span></td><td>تثبيت JDK المناسب، تفعيل Gradle Cache وDependency Cache لتقليل وقت البناء.</td></tr>
+      <tr><td><span class="en">Static Analysis</span></td><td>تشغيل Detekt وktlint وAndroid Lint لفحص جودة الكود قبل حتى تشغيل أي اختبار.</td></tr>
+      <tr><td><span class="en">Unit Tests</span></td><td>تشغيل اختبارات JVM السريعة (JUnit, MockK, Turbine...) اللي بتتنفذ من غير محاكي.</td></tr>
+      <tr><td><span class="en">Instrumented Tests</span></td><td>اختبارات محتاجة محاكي/جهاز فعلي (Espresso, Compose UI Tests) — غالبًا أبطأ فبتتشغل على branch رئيسي فقط أو بالتوازي مع Firebase Test Lab.</td></tr>
+      <tr><td><span class="en">Assemble</span></td><td>بناء الـ APK أو الـ AAB بالـ variant المطلوب (debug/release).</td></tr>
+      <tr><td><span class="en">Sign</span></td><td>توقيع الملف بمفتاح الإصدار (keystore) لو النسخة release.</td></tr>
+      <tr><td><span class="en">Publish/Deploy</span></td><td>رفع الملف لـ Firebase App Distribution أو Play Console (internal/alpha/beta/production).</td></tr>
+      <tr><td><span class="en">Notify</span></td><td>إرسال إشعار على Slack/Teams بنتيجة الـ Pipeline (نجاح/فشل) مع رابط التقرير.</td></tr>
+    </table>
+
+    <div class="callout warn">
+      <div class="icon">⚠️</div>
+      <p><strong>مهم:</strong> رتّب المراحل من الأسرع للأبطأ. متشغلش Instrumented Tests (اللي بتاخد دقايق) قبل ما تتأكد إن Unit Tests وStatic Analysis عدّوا، عشان توفر وقت ومصاريف الـ CI.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="topic" id="s3" data-cat="cicd">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip cicd">CI/CD</span><span class="en">03 / 18</span></div>
+        <h2>الأدوات المستخدمة في Android CI/CD<span class="en">Tools Used in Android CI/CD</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s3">☐ حددها كمكتملة</button>
+    </div>
+
+    <table class="tbl">
+      <tr><th>الأداة</th><th>النوع</th><th>ملاحظات</th></tr>
+      <tr><td><span class="en">GitHub Actions</span></td><td>CI/CD مستضاف</td><td>الأكثر شيوعًا حاليًا، مدمج مع GitHub مباشرة، فيه Marketplace ضخم من الإضافات الجاهزة لـ Android.</td></tr>
+      <tr><td><span class="en">GitLab CI/CD</span></td><td>CI/CD مستضاف/ذاتي</td><td>مبني على ملف <span class="en">.gitlab-ci.yml</span>، قوي في الشركات اللي بتستضيف GitLab بنفسها.</td></tr>
+      <tr><td><span class="en">Bitrise</span></td><td>متخصص Mobile</td><td>مصمم خصيصًا لتطبيقات الموبايل، واجهة Workflow بصرية سهلة، فيه Steps جاهزة لكل حاجة Android/iOS.</td></tr>
+      <tr><td><span class="en">Jenkins</span></td><td>ذاتي الاستضافة</td><td>مرن جدًا لكنه يحتاج صيانة وسيرفر خاص، شائع في الشركات الكبيرة اللي عندها بنية تحتية خاصة.</td></tr>
+      <tr><td><span class="en">CircleCI</span></td><td>CI/CD مستضاف</td><td>سريع في التنفيذ، بيدعم Docker layer caching وOrbs جاهزة.</td></tr>
+      <tr><td><span class="en">Fastlane</span></td><td>أتمتة الإصدار</td><td>مش CI بحد ذاته، لكنه أداة Ruby بتشتغل جوه أي CI وبتؤتمت التوقيع، رفع الـ Play Store، الـ Screenshots، والـ Changelogs.</td></tr>
+      <tr><td><span class="en">Firebase App Distribution</span></td><td>توزيع اختبار</td><td>لتوزيع نسخ الاختبار الداخلي على الفريق/QA بسرعة من غير المرور بـ Play Store.</td></tr>
+      <tr><td><span class="en">Gradle Play Publisher</span></td><td>Gradle Plugin</td><td>بلجن Gradle بيرفع الـ AAB مباشرة على Play Console من داخل سكريبت البناء نفسه.</td></tr>
+    </table>
+
+    <h3>مثال: أبسط GitHub Actions Workflow لمشروع Android</h3>
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>.github/workflows/android-ci.yml</span><button class="copy-btn">نسخ</button></div>
+      <pre><span class="c-key">name:</span> <span class="c-str">Android CI</span>
+<span class="c-key">on:</span>
+  <span class="c-key">pull_request:</span>
+    <span class="c-key">branches:</span> [ <span class="c-str">main</span> ]
+
+<span class="c-key">jobs:</span>
+  <span class="c-key">build:</span>
+    <span class="c-key">runs-on:</span> <span class="c-str">ubuntu-latest</span>
+    <span class="c-key">steps:</span>
+      <span class="c-key">-</span> <span class="c-key">uses:</span> actions/checkout@v4
+      <span class="c-key">-</span> <span class="c-key">uses:</span> actions/setup-java@v4
+        <span class="c-key">with:</span>
+          <span class="c-key">distribution:</span> <span class="c-str">temurin</span>
+          <span class="c-key">java-version:</span> <span class="c-str">17</span>
+      <span class="c-key">-</span> <span class="c-key">name:</span> <span class="c-str">Run Detekt</span>
+        <span class="c-key">run:</span> ./gradlew detekt
+      <span class="c-key">-</span> <span class="c-key">name:</span> <span class="c-str">Run Unit Tests</span>
+        <span class="c-key">run:</span> ./gradlew testDebugUnitTest
+      <span class="c-key">-</span> <span class="c-key">name:</span> <span class="c-str">Assemble Debug APK</span>
+        <span class="c-key">run:</span> ./gradlew assembleDebug</pre>
+    </div>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="topic" id="s4" data-cat="cicd">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip cicd">CI/CD</span><span class="en">04 / 18</span></div>
+        <h2>تقنيات أتمتة الإصدار<span class="en">Release Automation Techniques</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s4">☐ حددها كمكتملة</button>
+    </div>
+
+    <p>الهدف من أتمتة الإصدار إنك توصل لمرحلة تقدر فيها تنزل نسخة جديدة بـ Trigger واحد (زر أو Tag) من غير أي خطوة يدوية عرضة للخطأ.</p>
+
+    <h3>1. الترقيم الدلالي — Semantic Versioning</h3>
+    <p>نظام <span class="en">MAJOR.MINOR.PATCH</span> (مثال: <span class="en">2.4.1</span>) — MAJOR لما يبقى فيه Breaking Change، MINOR لميزة جديدة متوافقة مع القديم، PATCH لإصلاح باگ. في Android بنربطها بـ:</p>
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>app/build.gradle.kts</span><button class="copy-btn">نسخ</button></div>
+      <pre><span class="c-fn">android</span> {
+    defaultConfig {
+        <span class="c-key">versionCode</span> = <span class="c-fn">generateVersionCode</span>()  <span class="c-com">// رقم داخلي متزايد، إلزامي لكل رفعة على Play Store</span>
+        <span class="c-key">versionName</span> = <span class="c-str">"2.4.1"</span>          <span class="c-com">// الاسم الظاهر للمستخدم</span>
+    }
+}</pre>
+    </div>
+
+    <h3>2. أتمتة زيادة رقم الإصدار</h3>
+    <p>بدل ما تزود <span class="en">versionCode</span> يدويًا، بتخليه يعتمد على عدد الـ commits أو على <span class="en">CI build number</span> أوتوماتيك، أو تستخدم بلجن زي <span class="en">gradle-versioner</span>.</p>
+
+    <h3>3. Fastlane Lanes</h3>
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>fastlane/Fastfile</span><button class="copy-btn">نسخ</button></div>
+      <pre><span class="c-fn">lane</span> <span class="c-str">:beta</span> <span class="c-key">do</span>
+  gradle(task: <span class="c-str">"bundleRelease"</span>)
+  upload_to_play_store(
+    track: <span class="c-str">"beta"</span>,
+    aab: <span class="c-str">"app/build/outputs/bundle/release/app-release.aab"</span>
+  )
+  slack(message: <span class="c-str">"نسخة Beta جديدة اتنزلت 🚀"</span>)
+<span class="c-key">end</span></pre>
+    </div>
+
+    <h3>4. النشر التدريجي — Staged Rollouts</h3>
+    <p>Play Console بيسمحلك تنزل النسخة على نسبة صغيرة من المستخدمين الأول (زي 10%)، وتراقب الـ Crash rate وANR قبل ما توسّع النسبة تدريجيًا لحد 100%، وده بتقدر تؤتمته بـ Fastlane أو Google Play Developer API.</p>
+
+    <h3>5. توليد الـ Changelog أوتوماتيك</h3>
+    <p>باستخدام <span class="en">Conventional Commits</span> (زي <span class="en">feat:</span>, <span class="en">fix:</span>, <span class="en">chore:</span>) تقدر تولّد ملاحظات الإصدار أوتوماتيك بأدوات زي <span class="en">git-cliff</span> أو <span class="en">release-please</span>.</p>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="topic" id="s5" data-cat="cicd">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip cicd">CI/CD</span><span class="en">05 / 18</span></div>
+        <h2>تحسين البناء متعدد الموديولات<span class="en">Multi-module Build Optimization</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s5">☐ حددها كمكتملة</button>
+    </div>
+
+    <p>في مشاريع كبيرة مقسّمة لـ Modules (زي <span class="en">:core</span>, <span class="en">:feature:home</span>, <span class="en">:feature:profile</span>)، وقت البناء ممكن يبقى مشكلة حقيقية. أهم التقنيات لتسريع الـ build:</p>
+
+    <ul class="list">
+      <li><strong>Gradle Build Cache:</strong> بيحفظ نتائج المهام (outputs) ويعيد استخدامها لو نفس المدخلات ماتغيّرتش — محلي أو Remote Cache مشترك بين الفريق والـ CI.</li>
+      <li><strong>Configuration Cache:</strong> بيحفظ نتيجة مرحلة الـ configuration نفسها (قبل التنفيذ)، فبيقلل وقت البداية بشكل كبير في المشاريع الكبيرة.</li>
+      <li><strong>Parallel Execution:</strong> <span class="en">org.gradle.parallel=true</span> — بيخلي Gradle يبني الموديولات المستقلة عن بعض بالتوازي.</li>
+      <li><strong>Convention Plugins:</strong> بدل ما تكرر نفس إعدادات <span class="en">build.gradle.kts</span> في كل موديول، بتعمل Plugin مشترك (في <span class="en">build-logic</span> module) يطبّق نفس الإعدادات بشكل موحّد.</li>
+      <li><strong>Module Graph الصحيح:</strong> تجنب الاعتماديات الدائرية (Circular Dependencies) واستخدم <span class="en">api</span> vs <span class="en">implementation</span> بذكاء عشان تقلل إعادة الترجمة غير الضرورية عند تغيير موديول واحد.</li>
+      <li><strong>Build Scan:</strong> <span class="en">./gradlew build --scan</span> بيديك تقرير تفصيلي يوضح أبطأ المهام والاعتماديات اللي بتعطل الـ parallelism.</li>
+    </ul>
+
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>gradle.properties</span><button class="copy-btn">نسخ</button></div>
+      <pre>org.gradle.caching=true
+org.gradle.parallel=true
+org.gradle.configuration-cache=true
+org.gradle.jvmargs=-Xmx4g -XX:+UseParallelGC</pre>
+    </div>
+
+    <div class="callout tip">
+      <div class="icon">💡</div>
+      <p><strong>نصيحة عملية:</strong> في CI، فعّل <span class="en">Remote Build Cache</span> (زي Gradle Enterprise أو حل بديل مجاني على S3) عشان كل الفريق والـ pipeline يستفيدوا من نفس نتائج البناء المحفوظة.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 6 -->
+  <section class="topic" id="s6" data-cat="cicd">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip cicd">CI/CD</span><span class="en">06 / 18</span></div>
+        <h2>إدارة الأسرار وتوقيع التطبيق<span class="en">Secrets and Signing Management</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s6">☐ حددها كمكتملة</button>
+    </div>
+
+    <p>ملف الـ Keystore ومفاتيح الـ API من أخطر الأشياء اللي لازم متتسربش. القواعد الأساسية:</p>
+
+    <ol class="list">
+      <li>خزّن الـ Keystore كـ <span class="en">Base64</span> داخل <span class="en">GitHub Secrets</span> أو <span class="en">GitLab CI/CD Variables</span> — مش أبدًا في الكود أو ملف مرفوع على الـ repo.</li>
+      <li>استخدم متغيرات بيئة للـ passwords بدل كتابتها في <span class="en">build.gradle</span> مباشرة.</li>
+      <li>فعّل <span class="en">Play App Signing</span> عشان جوجل تدير مفتاح التوقيع النهائي، وإنت بس تحتاج مفتاح الرفع (Upload Key) اللي أسهل استبداله لو اتسرب.</li>
+      <li>استخدم <span class="en">.gitignore</span> لاستبعاد <span class="en">*.jks</span> و<span class="en">local.properties</span> و<span class="en">.env</span> من الرفع نهائيًا.</li>
+    </ol>
+
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>GitHub Actions — فك تشفير الـ Keystore</span><button class="copy-btn">نسخ</button></div>
+      <pre><span class="c-key">- name:</span> <span class="c-str">Decode Keystore</span>
+  <span class="c-key">env:</span>
+    KEYSTORE_BASE64: ${{'{{'}} secrets.KEYSTORE_BASE64 }}
+  <span class="c-key">run:</span> |
+    echo $KEYSTORE_BASE64 | base64 -d > app/release.keystore</pre>
+    </div>
+
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>app/build.gradle.kts</span><button class="copy-btn">نسخ</button></div>
+      <pre>signingConfigs {
+    create(<span class="c-str">"release"</span>) {
+        storeFile = file(System.getenv(<span class="c-str">"KEYSTORE_PATH"</span>) ?: <span class="c-str">"release.keystore"</span>)
+        storePassword = System.getenv(<span class="c-str">"KEYSTORE_PASSWORD"</span>)
+        keyAlias = System.getenv(<span class="c-str">"KEY_ALIAS"</span>)
+        keyPassword = System.getenv(<span class="c-str">"KEY_PASSWORD"</span>)
+    }
+}</pre>
+    </div>
+
+    <div class="callout warn">
+      <div class="icon">🔒</div>
+      <p><strong>خطأ شائع جدًا:</strong> رفع <span class="en">local.properties</span> فيه <span class="en">API keys</span> بالغلط على GitHub Public Repo. لو حصل، غيّر المفتاح فورًا — مسحه من الكود مش كافي لأنه لسه موجود في الـ Git history.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 7 -->
+  <section class="topic" id="s7" data-cat="cicd">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip cicd">CI/CD</span><span class="en">07 / 18</span></div>
+        <h2>أفضل ممارسات CI/CD<span class="en">CI/CD Best Practices</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s7">☐ حددها كمكتملة</button>
+    </div>
+
+    <ul class="list">
+      <li><strong>Fail Fast:</strong> رتّب المراحل السريعة (lint/unit tests) قبل البطيئة (instrumented tests/build) عشان توفر وقت ومصاريف.</li>
+      <li><strong>Cache كل حاجة ممكنة:</strong> Gradle dependencies، Gradle wrapper، وحتى الـ Docker layers لو بتستخدم Containers.</li>
+      <li><strong>Matrix Builds:</strong> شغّل نفس الـ tests على أكتر من API level أو device config بالتوازي بدل التسلسل.</li>
+      <li><strong>احتفظ بالـ Artifacts:</strong> ملفات الـ APK/AAB، تقارير الاختبارات، وتقارير Detekt تتحفظ كـ build artifacts لفترة محددة عشان الرجوع ليها وقت الحاجة.</li>
+      <li><strong>Branch Protection Rules:</strong> اربط قواعد الحماية على الـ main branch بنجاح الـ CI checks — محدش يقدر يعمل merge لو الـ pipeline فشل.</li>
+      <li><strong>إشعارات فورية:</strong> ربط الـ pipeline بـ Slack/Teams عشان الفريق يعرف فورًا لو حصل فشل، مش يكتشفوا بعد يوم.</li>
+      <li><strong>Pipeline كملف واحد قابل للقراءة:</strong> تجنب الـ scripts المبعثرة، خلي الـ workflow file نفسه موثّق وواضح الخطوات.</li>
+      <li><strong>Timeouts:</strong> حدد وقت أقصى لكل job عشان لو حصل تعليق (hang) ما يفضلش الـ runner شغال لساعات بلاش.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 8 -->
+  <section class="topic" id="s8" data-cat="git">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip git">Git</span><span class="en">08 / 18</span></div>
+        <h2>أساسيات Git<span class="en">Git Essentials</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s8">☐ حددها كمكتملة</button>
+    </div>
+
+    <p>Git نظام تحكم بالإصدارات موزّع (<span class="en">Distributed Version Control System</span>) — كل مطور عنده نسخة كاملة من تاريخ المشروع على جهازه، مش بس على سيرفر مركزي.</p>
+
+    <h3>الأوامر الأساسية</h3>
+    <table class="tbl">
+      <tr><th>الأمر</th><th>الوظيفة</th></tr>
+      <tr><td class="en">git init</td><td>إنشاء repository جديد في المجلد الحالي.</td></tr>
+      <tr><td class="en">git clone &lt;url&gt;</td><td>نسخ repository موجود من سيرفر بعيد.</td></tr>
+      <tr><td class="en">git status</td><td>عرض حالة الملفات (متغيّرة/مضافة/غير متتبّعة).</td></tr>
+      <tr><td class="en">git add &lt;file&gt;</td><td>إضافة التعديلات لمنطقة الـ Staging.</td></tr>
+      <tr><td class="en">git commit -m "msg"</td><td>حفظ التعديلات المضافة كـ commit جديد بالتاريخ.</td></tr>
+      <tr><td class="en">git push</td><td>رفع الـ commits المحلية للـ remote repository.</td></tr>
+      <tr><td class="en">git pull</td><td>سحب ودمج آخر تعديلات من الـ remote.</td></tr>
+      <tr><td class="en">git branch &lt;name&gt;</td><td>إنشاء فرع جديد.</td></tr>
+      <tr><td class="en">git checkout -b &lt;name&gt;</td><td>إنشاء فرع جديد والانتقال له مباشرة.</td></tr>
+      <tr><td class="en">git merge &lt;branch&gt;</td><td>دمج فرع تاني في الفرع الحالي.</td></tr>
+      <tr><td class="en">git rebase &lt;branch&gt;</td><td>إعادة تطبيق الـ commits فوق فرع تاني (تاريخ أنظف من merge).</td></tr>
+      <tr><td class="en">git stash</td><td>تخزين مؤقت للتعديلات غير المحفوظة من غير commit.</td></tr>
+      <tr><td class="en">git cherry-pick &lt;sha&gt;</td><td>نقل commit واحد بعينه من فرع لفرع تاني.</td></tr>
+      <tr><td class="en">git reset --soft/--hard</td><td>الرجوع لـ commit سابق (soft بيحافظ على التعديلات، hard بيمسحها).</td></tr>
+      <tr><td class="en">git revert &lt;sha&gt;</td><td>عمل commit جديد بيلغي تأثير commit قديم — آمن للتاريخ المشترك.</td></tr>
+    </table>
+
+    <h3>Merge vs Rebase — الفرق العملي</h3>
+    <div class="grid2">
+      <div class="card">
+        <h5><span class="en">git merge</span></h5>
+        <p>بيحافظ على التاريخ الحقيقي كامل، لكن بيضيف "merge commits" بتخلي الـ log مليان تفريعات. آمن للاستخدام دايمًا حتى على فروع مشتركة.</p>
+      </div>
+      <div class="card">
+        <h5><span class="en">git rebase</span></h5>
+        <p>بيدي تاريخ خطي نظيف (linear history) بدون merge commits، لكن بيغيّر الـ commit hashes — خطير لو استخدمته على فرع الفريق مشترك بيشتغل عليه ناس تانية.</p>
+      </div>
+    </div>
+
+    <h3>ملف .gitignore الأساسي لمشروع Android</h3>
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>.gitignore</span><button class="copy-btn">نسخ</button></div>
+      <pre>*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+*.keystore
+*.jks
+/app/release/</pre>
+    </div>
+  </section>
+
+  <!-- SECTION 9 -->
+  <section class="topic" id="s9" data-cat="git">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip git">Git</span><span class="en">09 / 18</span></div>
+        <h2>استراتيجيات الـ Pull Request<span class="en">Pull Request (PR) Strategies</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s9">☐ حددها كمكتملة</button>
+    </div>
+
+    <p>الـ Pull Request مش بس وسيلة لدمج الكود، ده أهم أداة لمراجعة الجودة ونقل المعرفة داخل الفريق.</p>
+
+    <h3>استراتيجيات التفريع الشائعة</h3>
+    <table class="tbl">
+      <tr><th>الاستراتيجية</th><th>الوصف</th><th>مناسبة لـ</th></tr>
+      <tr><td><span class="en">Trunk-Based Development</span></td><td>فروع صغيرة عمرها ساعات، بتتدمج على <span class="en">main</span> بسرعة وباستمرار، مع Feature Flags لإخفاء الميزات الغير مكتملة.</td><td>فرق CI/CD ناضجة، إصدار مستمر.</td></tr>
+      <tr><td><span class="en">Git Flow</span></td><td>فروع منظمة: <span class="en">main</span>, <span class="en">develop</span>, <span class="en">feature/*</span>, <span class="en">release/*</span>, <span class="en">hotfix/*</span>.</td><td>مشاريع بإصدارات مجدولة (App Store releases).</td></tr>
+      <tr><td><span class="en">GitHub Flow</span></td><td>فرع واحد رئيسي + فروع feature قصيرة تتدمج مباشرة بعد المراجعة.</td><td>فرق صغيرة/متوسطة، نشر مستمر.</td></tr>
+    </table>
+
+    <h3>نصائح لـ PR فعّال</h3>
+    <ul class="list">
+      <li><strong>حجم صغير:</strong> PR أقل من 400 سطر أسهل بكتير في المراجعة من PR ضخم بـ 3000 سطر.</li>
+      <li><strong>وصف واضح:</strong> استخدم <span class="en">PR Template</span> فيه: الهدف، طريقة الاختبار، Screenshots لو UI، وربط بالـ Issue.</li>
+      <li><strong>Conventional Commits:</strong> <span class="en">feat:</span>, <span class="en">fix:</span>, <span class="en">refactor:</span>, <span class="en">chore:</span>, <span class="en">docs:</span> — بتسهّل توليد الـ changelog وفهم التاريخ.</li>
+      <li><strong>Draft PRs:</strong> افتح PR كـ Draft وإنت لسه بتشتغل عشان تاخد Feedback مبكر من غير ما تطلب موافقة نهائية.</li>
+      <li><strong>CI Checks إلزامية:</strong> امنع الـ merge لو الـ Detekt أو الـ Tests فشلوا (Required Status Checks في GitHub).</li>
+    </ul>
+
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>.github/pull_request_template.md</span><button class="copy-btn">نسخ</button></div>
+      <pre>## الهدف من الـ PR
+وصف مختصر للتغيير وسببه
+
+## طريقة الاختبار
+- [ ] Unit Tests
+- [ ] اختبار يدوي على جهاز حقيقي
+
+## Screenshots (لو فيه تغيير UI)
+
+## Checklist
+- [ ] الكود عدّى Detekt
+- [ ] مفيش secrets متسربة
+- [ ] الـ PR مرتبط بـ Issue</pre>
+    </div>
+  </section>
+
+  <!-- SECTION 10 -->
+  <section class="topic" id="s10" data-cat="git">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip git">Git</span><span class="en">10 / 18</span></div>
+        <h2>Git لإدارة الإصدارات<span class="en">Git for Release Management</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s10">☐ حددها كمكتملة</button>
+    </div>
+
+    <p>إدارة الإصدار بشكل صحيح في Git بتخليك تقدر ترجع لأي نسخة نزلت للمستخدمين وقت ما تحتاج، وتتعامل مع Hotfixes بسرعة من غير ما تكسر التطوير الجاري.</p>
+
+    <h3>Tags للإصدارات</h3>
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>Terminal</span><button class="copy-btn">نسخ</button></div>
+      <pre>git tag -a v2.4.1 -m <span class="c-str">"Release 2.4.1 - إصلاح مشكلة تسجيل الدخول"</span>
+git push origin v2.4.1
+
+<span class="c-com"># عرض كل الإصدارات</span>
+git tag -l <span class="c-str">"v2.*"</span></pre>
+    </div>
+
+    <h3>فرع الـ Release</h3>
+    <p>لما التطوير على <span class="en">develop</span> يوصل لمرحلة الاستقرار، بتعمل فرع <span class="en">release/2.5.0</span> — عليه بس إصلاحات صغيرة وتجهيزات النشر (رقم الإصدار، الـ changelog)، مفيش ميزات جديدة تتضاف عليه، وبعد ما ينزل بيتدمج في <span class="en">main</span> و<span class="en">develop</span> مع بعض.</p>
+
+    <h3>فروع الـ Hotfix</h3>
+    <p>لو ظهر باگ حرج في نسخة الإنتاج، بتعمل فرع <span class="en">hotfix/2.4.2</span> مباشرة من <span class="en">main</span>، تصلحه، تنزله بسرعة، وبعدين تدمجه في كل من <span class="en">main</span> و<span class="en">develop</span> عشان الإصلاح ميضيعش في الإصدار الجاي.</p>
+
+    <div class="callout tip">
+      <div class="icon">💡</div>
+      <p><strong>نصيحة:</strong> اربط كل Tag إصدار بـ GitHub Release فيه ملاحظات الإصدار (Release Notes) وملف الـ APK/mapping.txt الخاص بالـ ProGuard/R8، عشان تقدر تفك أي Crash Report بعدين بسهولة.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 11 -->
+  <section class="topic" id="s11" data-cat="git">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip git">Git</span><span class="en">11 / 18</span></div>
+        <h2>تجنب أخطاء Git الشائعة<span class="en">Avoiding Git Mistakes</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s11">☐ حددها كمكتملة</button>
+    </div>
+
+    <table class="tbl">
+      <tr><th>الخطأ</th><th>ليه خطير</th><th>الحل</th></tr>
+      <tr><td class="en">git push --force</td><td>بيمسح تاريخ زملائك على الفرع المشترك ويسبب فقدان commits.</td><td>استخدم <span class="en">git push --force-with-lease</span> اللي بيرفض لو حد عمل push بعدك من غير ما تعرف.</td></tr>
+      <tr><td>رفع secrets بالغلط</td><td>الملف بيفضل في تاريخ Git حتى لو اتمسح بعدين.</td><td>استخدم <span class="en">git filter-repo</span> أو <span class="en">BFG Repo-Cleaner</span> لمسحه من التاريخ كامل، وغيّر المفتاح فورًا.</td></tr>
+      <tr><td>Commit كبير بملفات ثنائية</td><td>بيضخّم حجم الـ repo ويبطّئ الـ clone لكل الفريق.</td><td>استخدم <span class="en">Git LFS</span> للملفات الكبيرة زي الفيديوهات أو الـ assets الضخمة.</td></tr>
+      <tr><td>Merge conflicts متكررة</td><td>علامة على فروع طويلة العمر بتبعد كتير عن main.</td><td>ادمج/rebase من main بشكل متكرر، وخلي الفروع قصيرة العمر.</td></tr>
+      <tr><td>Detached HEAD مش مفهوم</td><td>أي commit جديد ممكن يضيع لو عملت checkout لفرع تاني.</td><td>لو عايز تحتفظ بالتعديلات، اعمل فرع جديد فورًا: <span class="en">git checkout -b fix-branch</span>.</td></tr>
+      <tr><td>Commit messages غامضة زي "fix"</td><td>بيصعّب فهم التاريخ وقت الـ debugging أو الـ git blame.</td><td>استخدم Conventional Commits ووصف واضح للسبب مش بس للفعل.</td></tr>
+    </table>
+
+    <div class="callout warn">
+      <div class="icon">⚠️</div>
+      <p><strong>لو حصل غلط فعلاً:</strong> <span class="en">git reflog</span> بيحتفظ بسجل كل حركة عملتها حتى لو مسحت commit بالغلط — غالبًا تقدر تسترجعه منه قبل ما تدخل في حالة هلع.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 12 -->
+  <section class="topic" id="s12" data-cat="git">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip git">Git</span><span class="en">12 / 18</span></div>
+        <h2>Pre-commit Hooks في Android<span class="en">Pre-commit Hooks for Android</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s12">☐ حددها كمكتملة</button>
+    </div>
+
+    <p><span class="en">Git Hooks</span> سكريبتات بتتشغل أوتوماتيك عند حدث معين (زي قبل الـ commit أو قبل الـ push)، وبتساعدك تمسك المشاكل محليًا قبل ما توصل للـ CI أصلاً.</p>
+
+    <h3>الأنواع الشائعة</h3>
+    <table class="tbl">
+      <tr><th>الـ Hook</th><th>يتشغل متى</th><th>استخدام نموذجي</th></tr>
+      <tr><td class="en">pre-commit</td><td>قبل حفظ الـ commit</td><td>تشغيل ktlintFormat وDetekt على الملفات المتغيّرة فقط.</td></tr>
+      <tr><td class="en">commit-msg</td><td>بعد كتابة الرسالة</td><td>التأكد إن الرسالة متوافقة مع Conventional Commits.</td></tr>
+      <tr><td class="en">pre-push</td><td>قبل رفع الكود للـ remote</td><td>تشغيل Unit Tests سريعة قبل ما توصل التعديلات للفريق.</td></tr>
+    </table>
+
+    <h3>مثال Hook بسيط بـ Shell Script</h3>
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>.git/hooks/pre-commit</span><button class="copy-btn">نسخ</button></div>
+      <pre><span class="c-com">#!/bin/sh</span>
+echo <span class="c-str">"⏳ Running Detekt before commit..."</span>
+./gradlew detekt --daemon
+
+<span class="c-key">if</span> [ $? -ne 0 ]; <span class="c-key">then</span>
+  echo <span class="c-str">"❌ Detekt found issues. Commit aborted."</span>
+  <span class="c-key">exit</span> 1
+<span class="c-key">fi</span>
+
+echo <span class="c-str">"✅ Detekt passed."</span>
+<span class="c-key">exit</span> 0</pre>
+    </div>
+
+    <p>بما إن Hooks المحلية العادية متتشاركش أوتوماتيك مع الفريق، الحل الأفضل هو استخدام أداة زي <span class="en">Husky</span> (لو المشروع فيه Node) أو Gradle plugin زي <span class="en">gradle-git-hooks-plugin</span> اللي بينسخ الـ hooks لكل مطور أول ما يعمل sync للمشروع.</p>
+
+    <div class="callout tip">
+      <div class="icon">💡</div>
+      <p><strong>نصيحة أداء:</strong> شغّل Detekt على الملفات المتغيّرة فقط في الـ pre-commit (باستخدام <span class="en">--input</span> على الملفات من <span class="en">git diff</span>) عشان الـ hook يفضل سريع ومايضايقش المطور في كل commit.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 13 -->
+  <section class="topic" id="s13" data-cat="detekt">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip detekt">Detekt</span><span class="en">13 / 18</span></div>
+        <h2>ما هو Detekt؟<span class="en">What is Detekt?</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s13">☐ حددها كمكتملة</button>
+    </div>
+
+    <p><span class="en">Detekt</span> أداة تحليل ساكن (<span class="en">Static Code Analysis</span>) مخصصة للغة Kotlin، بتفحص الكود من غير ما تشغّله فعليًا، وبتكتشف: الأكواد المعقدة زيادة، مشاكل الأسلوب (style)، الأخطاء المحتملة (potential bugs)، ومشاكل الأداء — كل ده قبل ما توصل للمراجعة البشرية أصلاً.</p>
+
+    <h3>ليه Detekt مش مجرد "linter عادي"؟</h3>
+    <ul class="list">
+      <li>بيبني <span class="en">Abstract Syntax Tree (AST)</span> كامل للكود Kotlin، فبيقدر يفهم البنية مش بس يقارن نصوص.</li>
+      <li>قابل للتوسعة بالكامل — تقدر تكتب Rules خاصة بمعايير فريقك.</li>
+      <li>بيدعم <span class="en">Type Resolution</span> (فحص الأنواع الفعلية) مش بس تحليل نصي سطحي.</li>
+      <li>بيتكامل مباشرة مع Gradle وAndroid Studio وGitHub Actions.</li>
+    </ul>
+
+    <h3>Detekt مقابل أدوات تانية</h3>
+    <table class="tbl">
+      <tr><th>الأداة</th><th>تركيزها</th></tr>
+      <tr><td class="en">Detekt</td><td>جودة الكود، التعقيد، الأخطاء المحتملة، الـ code smells في Kotlin.</td></tr>
+      <tr><td class="en">ktlint</td><td>تنسيق الكود (formatting) فقط — مسافات، ترتيب imports، أسلوب الكتابة الرسمي لـ Kotlin.</td></tr>
+      <tr><td class="en">Android Lint</td><td>مشاكل خاصة بـ Android SDK نفسه — resources غير مستخدمة، مشاكل accessibility، API compatibility.</td></tr>
+    </table>
+    <p>في الغالب بتستخدم الثلاثة مع بعض — كل واحدة بتغطي زاوية مختلفة، ومفيش تعارض بينهم.</p>
+  </section>
+
+  <!-- SECTION 14 -->
+  <section class="topic" id="s14" data-cat="detekt">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip detekt">Detekt</span><span class="en">14 / 18</span></div>
+        <h2>مجموعات القواعد في Detekt<span class="en">Detekt Rule Sets</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s14">☐ حددها كمكتملة</button>
+    </div>
+
+    <table class="tbl">
+      <tr><th>مجموعة القواعد</th><th>أمثلة على المشاكل اللي بتكتشفها</th></tr>
+      <tr><td class="en">complexity</td><td>Functions طويلة أوي، Cyclomatic Complexity عالي، عدد باراميترات كبير، Nested blocks عميقة.</td></tr>
+      <tr><td class="en">style</td><td>Magic Numbers، wildcard imports، استخدام غير ضروري لـ !!، تسمية غير واضحة.</td></tr>
+      <tr><td class="en">potential-bugs</td><td>مقارنة غير آمنة، Unreachable code، استخدام خاطئ لـ equals/hashCode.</td></tr>
+      <tr><td class="en">performance</td><td>استخدام غير فعال للـ collections، عمليات غير ضرورية داخل loops.</td></tr>
+      <tr><td class="en">coroutines</td><td>استخدام GlobalScope الخطير، عدم التعامل الصحيح مع الاستثناءات في coroutines.</td></tr>
+      <tr><td class="en">naming</td><td>مخالفة قواعد تسمية Kotlin (camelCase, PascalCase للـ classes).</td></tr>
+      <tr><td class="en">comments</td><td>TODO/FIXME متروكة، تعليقات فاضية أو زايدة عن الحاجة.</td></tr>
+      <tr><td class="en">exceptions</td><td>catch(Exception) عام جدًا، throw generic exceptions، ابتلاع الأخطاء بصمت.</td></tr>
+      <tr><td class="en">formatting</td><td>(عبر تكامل ktlint) مسافات، أقواس، ترتيب استيراد.</td></tr>
+    </table>
+
+    <h3>مثال تكوين مجموعات القواعد</h3>
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>config/detekt/detekt.yml</span><button class="copy-btn">نسخ</button></div>
+      <pre>complexity:
+  LongMethod:
+    active: true
+    threshold: 40
+  LongParameterList:
+    active: true
+    functionThreshold: 6
+  TooManyFunctions:
+    active: true
+    thresholdInClasses: 15
+
+style:
+  MagicNumber:
+    active: true
+    ignoreNumbers: [<span class="c-str">'-1'</span>, <span class="c-str">'0'</span>, <span class="c-str">'1'</span>, <span class="c-str">'2'</span>]
+  WildcardImport:
+    active: true
+
+potential-bugs:
+  UnsafeCallOnNullableType:
+    active: true</pre>
+    </div>
+  </section>
+
+  <!-- SECTION 15 -->
+  <section class="topic" id="s15" data-cat="detekt">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip detekt">Detekt</span><span class="en">15 / 18</span></div>
+        <h2>تشغيل Detekt<span class="en">Running Detekt</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s15">☐ حددها كمكتملة</button>
+    </div>
+
+    <h3>1. إضافة الـ Plugin</h3>
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>build.gradle.kts (project level)</span><button class="copy-btn">نسخ</button></div>
+      <pre>plugins {
+    id(<span class="c-str">"io.gitlab.arturbosch.detekt"</span>) version <span class="c-str">"1.23.6"</span>
+}
+
+detekt {
+    config.setFrom(<span class="c-str">"config/detekt/detekt.yml"</span>)
+    buildUponDefaultConfig = true
+    autoCorrect = true
+}</pre>
+    </div>
+
+    <h3>2. تشغيله من الـ Terminal</h3>
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>Terminal</span><button class="copy-btn">نسخ</button></div>
+      <pre><span class="c-com"># فحص كل المشروع</span>
+./gradlew detekt
+
+<span class="c-com"># فحص موديول واحد بس</span>
+./gradlew :feature:home:detekt
+
+<span class="c-com"># تصحيح تلقائي للمشاكل القابلة للإصلاح (formatting)</span>
+./gradlew detekt --auto-correct</pre>
+    </div>
+
+    <h3>3. التكامل مع Android Studio</h3>
+    <p>فيه Plugin رسمي اسمه <span class="en">Detekt</span> في الـ Marketplace بيديك تظليل حي (inline highlighting) للمشاكل جوه الـ IDE نفسه لحظة الكتابة، مش لازم تستنى الـ CI عشان تشوف النتيجة.</p>
+
+    <h3>4. أنواع التقارير</h3>
+    <p>Detekt بيقدر يطلّع تقارير بصيغ متعددة في نفس الوقت — HTML لمراجعة بصرية سريعة، XML/Checkstyle للتكامل مع أدوات تانية، وSARIF لعرض النتائج مباشرة كتعليقات على الـ Pull Request في GitHub.</p>
+  </section>
+
+  <!-- SECTION 16 -->
+  <section class="topic" id="s16" data-cat="detekt">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip detekt">Detekt</span><span class="en">16 / 18</span></div>
+        <h2>إعداد الـ Baseline<span class="en">Detekt Baseline Setup</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s16">☐ حددها كمكتملة</button>
+    </div>
+
+    <p>لو Detekt بيتضاف على مشروع قديم فيه آلاف المشاكل الموجودة بالفعل، مش منطقي تطلب من الفريق يصلحهم كلهم قبل ما يقدروا يعملوا commit. الحل هو <strong>Baseline</strong>: ملف بيسجل كل المشاكل الحالية ويستثنيها من الفحص، وأي مشكلة جديدة بعد كده هي اللي بتوقّف الـ build.</p>
+
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>Terminal — توليد الـ Baseline</span><button class="copy-btn">نسخ</button></div>
+      <pre>./gradlew detektBaseline</pre>
+    </div>
+
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>build.gradle.kts</span><button class="copy-btn">نسخ</button></div>
+      <pre>detekt {
+    baseline = file(<span class="c-str">"config/detekt/baseline.xml"</span>)
+}</pre>
+    </div>
+
+    <h3>استراتيجية التبني التدريجي</h3>
+    <ol class="list">
+      <li>ولّد الـ baseline أول مرة عشان تجمّد المشاكل الموجودة حاليًا.</li>
+      <li>خلي الـ CI يفشل بس على المشاكل الجديدة (مش الموجودة في الـ baseline).</li>
+      <li>خصص وقت دوري (Sprint واحد كل شهر مثلاً) لتقليل حجم الـ baseline تدريجيًا وإصلاح الديون القديمة.</li>
+      <li>لما الـ baseline يوصل صفر، احذف الملف نهائيًا وخلي المشروع نظيف 100%.</li>
+    </ol>
+
+    <div class="callout good">
+      <div class="icon">✅</div>
+      <p><strong>الفايدة:</strong> الفريق بيقدر يبدأ فرض جودة الكود من النهاردة على أي كود جديد، من غير ما يتوقف التطوير أسابيع عشان يصلّح تاريخ قديم كامل.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 17 -->
+  <section class="topic" id="s17" data-cat="detekt">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip detekt">Detekt</span><span class="en">17 / 18</span></div>
+        <h2>قواعد مخصصة في Detekt<span class="en">Custom Rules in Detekt</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s17">☐ حددها كمكتملة</button>
+    </div>
+
+    <p>لو فريقك عنده معايير خاصة (زي منع استخدام <span class="en">LiveData</span> لصالح <span class="en">StateFlow</span> في مشروع بيهاجر تدريجيًا)، تقدر تكتب Rule مخصصة بنفسك.</p>
+
+    <h3>1. إنشاء موديول Rules منفصل</h3>
+    <p>بتعمل موديول Gradle مستقل (مثلاً <span class="en">:detekt-rules</span>) فيه الكلاسات دي، وبيتصدّر كـ jar يتحمّل في مرحلة الـ Detekt.</p>
+
+    <h3>2. كتابة Rule بسيطة</h3>
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>NoLiveDataRule.kt</span><button class="copy-btn">نسخ</button></div>
+      <pre><span class="c-key">class</span> <span class="c-fn">NoLiveDataRule</span>(config: Config) : Rule(config) {
+
+    <span class="c-key">override val</span> issue = Issue(
+        id = <span class="c-str">"NoLiveData"</span>,
+        severity = Severity.Defect,
+        description = <span class="c-str">"استخدم StateFlow بدل LiveData في الكود الجديد"</span>,
+        debt = Debt.TWENTY_MINS
+    )
+
+    <span class="c-key">override fun</span> <span class="c-fn">visitImportDirective</span>(importDirective: KtImportDirective) {
+        <span class="c-key">super</span>.visitImportDirective(importDirective)
+        <span class="c-key">if</span> (importDirective.importedFqName?.asString() == <span class="c-str">"androidx.lifecycle.LiveData"</span>) {
+            report(CodeSmell(issue, Entity.from(importDirective), issue.description))
+        }
+    }
+}</pre>
+    </div>
+
+    <h3>3. تسجيل الـ RuleSetProvider</h3>
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>CustomRuleSetProvider.kt</span><button class="copy-btn">نسخ</button></div>
+      <pre><span class="c-key">class</span> <span class="c-fn">CustomRuleSetProvider</span> : RuleSetProvider {
+    <span class="c-key">override val</span> ruleSetId = <span class="c-str">"custom-rules"</span>
+    <span class="c-key">override fun</span> <span class="c-fn">instance</span>(config: Config): RuleSet =
+        RuleSet(ruleSetId, listOf(NoLiveDataRule(config)))
+}</pre>
+    </div>
+
+    <h3>4. تفعيلها في build.gradle.kts</h3>
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>app/build.gradle.kts</span><button class="copy-btn">نسخ</button></div>
+      <pre>dependencies {
+    detektPlugins(project(<span class="c-str">":detekt-rules"</span>))
+}</pre>
+    </div>
+
+    <p>لازم كمان تعمل ملف <span class="en">resources/META-INF/services/io.gitlab.arturbosch.detekt.api.RuleSetProvider</span> فيه اسم الكلاس الكامل عشان Detekt يقدر يكتشف الـ Rule تلقائيًا (Service Loader mechanism).</p>
+  </section>
+
+  <!-- SECTION 18 -->
+  <section class="topic" id="s18" data-cat="detekt">
+    <div class="topic-head">
+      <div>
+        <div class="topic-index"><span class="cat-chip detekt">Detekt</span><span class="en">18 / 18</span></div>
+        <h2>دمج Detekt في CI/CD<span class="en">Integrating Detekt in CI/CD</span></h2>
+      </div>
+      <button class="mark-btn" data-id="s18">☐ حددها كمكتملة</button>
+    </div>
+
+    <p>هنا بنقفل الدايرة — بندمج المحورين التانيين مع بعض: Detekt كـ Quality Gate جوه Pipeline الـ CI/CD.</p>
+
+    <div class="code">
+      <div class="code-top"><div class="dots"><i></i><i></i><i></i></div><span>.github/workflows/detekt.yml</span><button class="copy-btn">نسخ</button></div>
+      <pre><span class="c-key">name:</span> <span class="c-str">Code Quality</span>
+<span class="c-key">on:</span> [pull_request]
+
+<span class="c-key">jobs:</span>
+  <span class="c-key">detekt:</span>
+    <span class="c-key">runs-on:</span> <span class="c-str">ubuntu-latest</span>
+    <span class="c-key">steps:</span>
+      <span class="c-key">-</span> <span class="c-key">uses:</span> actions/checkout@v4
+
+      <span class="c-key">-</span> <span class="c-key">name:</span> <span class="c-str">Run Detekt</span>
+        <span class="c-key">run:</span> ./gradlew detekt
+
+      <span class="c-key">-</span> <span class="c-key">name:</span> <span class="c-str">Upload SARIF report</span>
+        <span class="c-key">if:</span> always()
+        <span class="c-key">uses:</span> github/codeql-action/upload-sarif@v3
+        <span class="c-key">with:</span>
+          sarif_file: build/reports/detekt/detekt.sarif
+
+      <span class="c-key">-</span> <span class="c-key">name:</span> <span class="c-str">Upload HTML report as artifact</span>
+        <span class="c-key">if:</span> always()
+        <span class="c-key">uses:</span> actions/upload-artifact@v4
+        <span class="c-key">with:</span>
+          name: detekt-report
+          path: build/reports/detekt/detekt.html</pre>
+    </div>
+
+    <h3>لماذا SARIF مهم؟</h3>
+    <p>رفع تقرير <span class="en">SARIF</span> (Static Analysis Results Interchange Format) بيخلي GitHub يعرض كل مشكلة Detekt كتعليق مباشر على السطر بالظبط جوه الـ Pull Request نفسه — المراجع (Reviewer) بيشوف المشكلة جنب الكود من غير ما يفتح تقرير منفصل.</p>
+
+    <h3>خلي الفشل واضح ومفيد</h3>
+    <ul class="list">
+      <li>خلي الـ job يفشل (<span class="en">exit code 1</span>) لو فيه أي مشكلة جديدة خارج الـ baseline — ده اللي بيمنع الـ merge أصلاً عبر Branch Protection.</li>
+      <li>ارفع تقرير HTML كـ artifact دايمًا (<span class="en">if: always()</span>) حتى لو الخطوة فشلت، عشان المطور يقدر يفتحه ويشوف التفاصيل كاملة.</li>
+      <li>لو عندك موديولات كتير، شغّل Detekt بالتوازي مع باقي الفحوصات (unit tests, lint) مش بالتسلسل، عشان توفر وقت.</li>
+    </ul>
+
+    <div class="callout good">
+      <div class="icon">🎯</div>
+      <p><strong>الخلاصة:</strong> لما تجمع CI/CD وGit Workflow وDetekt مع بعض بالشكل ده، بتضمن إن أي كود يوصل لـ main يكون: مبني بنجاح، معدّى الاختبارات، وموافق لمعايير جودة الفريق — كل ده أوتوماتيك وبدون تدخل بشري بعد لحظة الـ push.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="fh">CI/CD, Git &amp; Detekt in Android</div>
+    <p>دليل تقني شامل — 18 موضوع عبر 3 محاور رئيسية</p>
+  </footer>
+
+</main>
+
+<aside id="nav">
+  <div class="nav-head">
+    <span class="tag">Table of Contents</span>
+    <h2>خريطة الدليل</h2>
+    <div class="nav-progress-label" id="nav-progress">0 / 18 مكتمل</div>
+  </div>
+
+  <div class="graph">
+    <div class="graph-line"></div>
+    <div class="commit" data-cat="cicd" data-target="s1"><div class="dot"></div><div><span class="label">مفاهيم CI/CD</span><span class="sha">#s1 · cicd</span></div></div>
+    <div class="commit" data-cat="cicd" data-target="s2"><div class="dot"></div><div><span class="label">مراحل الـ Workflow</span><span class="sha">#s2 · cicd</span></div></div>
+    <div class="commit" data-cat="cicd" data-target="s3"><div class="dot"></div><div><span class="label">الأدوات المستخدمة</span><span class="sha">#s3 · cicd</span></div></div>
+    <div class="commit" data-cat="cicd" data-target="s4"><div class="dot"></div><div><span class="label">أتمتة الإصدار</span><span class="sha">#s4 · cicd</span></div></div>
+    <div class="commit" data-cat="cicd" data-target="s5"><div class="dot"></div><div><span class="label">تحسين البناء متعدد الموديولات</span><span class="sha">#s5 · cicd</span></div></div>
+    <div class="commit" data-cat="cicd" data-target="s6"><div class="dot"></div><div><span class="label">إدارة الأسرار والتوقيع</span><span class="sha">#s6 · cicd</span></div></div>
+    <div class="commit" data-cat="cicd" data-target="s7"><div class="dot"></div><div><span class="label">أفضل ممارسات CI/CD</span><span class="sha">#s7 · cicd</span></div></div>
+    <div class="commit" data-cat="git" data-target="s8"><div class="dot"></div><div><span class="label">أساسيات Git</span><span class="sha">#s8 · git</span></div></div>
+    <div class="commit" data-cat="git" data-target="s9"><div class="dot"></div><div><span class="label">استراتيجيات PR</span><span class="sha">#s9 · git</span></div></div>
+    <div class="commit" data-cat="git" data-target="s10"><div class="dot"></div><div><span class="label">Git لإدارة الإصدارات</span><span class="sha">#s10 · git</span></div></div>
+    <div class="commit" data-cat="git" data-target="s11"><div class="dot"></div><div><span class="label">تجنب أخطاء Git</span><span class="sha">#s11 · git</span></div></div>
+    <div class="commit" data-cat="git" data-target="s12"><div class="dot"></div><div><span class="label">Pre-commit Hooks</span><span class="sha">#s12 · git</span></div></div>
+    <div class="commit" data-cat="detekt" data-target="s13"><div class="dot"></div><div><span class="label">ما هو Detekt؟</span><span class="sha">#s13 · detekt</span></div></div>
+    <div class="commit" data-cat="detekt" data-target="s14"><div class="dot"></div><div><span class="label">مجموعات القواعد</span><span class="sha">#s14 · detekt</span></div></div>
+    <div class="commit" data-cat="detekt" data-target="s15"><div class="dot"></div><div><span class="label">تشغيل Detekt</span><span class="sha">#s15 · detekt</span></div></div>
+    <div class="commit" data-cat="detekt" data-target="s16"><div class="dot"></div><div><span class="label">إعداد الـ Baseline</span><span class="sha">#s16 · detekt</span></div></div>
+    <div class="commit" data-cat="detekt" data-target="s17"><div class="dot"></div><div><span class="label">قواعد مخصصة</span><span class="sha">#s17 · detekt</span></div></div>
+    <div class="commit" data-cat="detekt" data-target="s18"><div class="dot"></div><div><span class="label">دمج Detekt في CI/CD</span><span class="sha">#s18 · detekt</span></div></div>
+  </div>
+
+  <div class="legend">
+    <span><i style="background:var(--gold)"></i> CI/CD</span>
+    <span><i style="background:var(--teal)"></i> Git</span>
+    <span><i style="background:var(--purple)"></i> Detekt</span>
+    <span><i style="background:var(--green)"></i> مكتمل</span>
+  </div>
+</aside>
+</div>
+
+<button class="nav-toggle" id="nav-toggle">☰</button>
+
+<script>
+(function(){
+  const TOTAL = 18;
+  const commits = Array.from(document.querySelectorAll('.commit'));
+  const sections = Array.from(document.querySelectorAll('section.topic'));
+  const markBtns = Array.from(document.querySelectorAll('.mark-btn'));
+  const progressFill = document.getElementById('progress-fill');
+  const progressCount = document.getElementById('progress-count');
+  const navProgress = document.getElementById('nav-progress');
+
+  let done = new Set();
+  try{
+    const saved = JSON.parse(localStorage.getItem('cicd-git-detekt-progress') || '[]');
+    done = new Set(saved);
+  }catch(e){ done = new Set(); }
+
+  function save(){
+    try{ localStorage.setItem('cicd-git-detekt-progress', JSON.stringify(Array.from(done))); }catch(e){}
+  }
+
+  function refreshUI(){
+    commits.forEach(c=>{
+      const id = c.dataset.target;
+      c.classList.toggle('done', done.has(id));
+    });
+    markBtns.forEach(b=>{
+      const id = b.dataset.id;
+      const isDone = done.has(id);
+      b.classList.toggle('done', isDone);
+      b.textContent = isDone ? '✓ تمت القراءة' : '☐ حددها كمكتملة';
+    });
+    const n = done.size;
+    progressFill.style.width = (n/TOTAL*100)+'%';
+    progressCount.textContent = n+'/'+TOTAL;
+    navProgress.textContent = n+' / '+TOTAL+' مكتمل';
+  }
+
+  markBtns.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.dataset.id;
+      if(done.has(id)) done.delete(id); else done.add(id);
+      save(); refreshUI();
+    });
+  });
+
+  commits.forEach(c=>{
+    c.addEventListener('click', ()=>{
+      const el = document.getElementById(c.dataset.target);
+      if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+      document.getElementById('nav').classList.remove('open');
+    });
+  });
+
+  // active section highlight
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        const id = entry.target.id;
+        commits.forEach(c=> c.classList.toggle('active', c.dataset.target===id));
+      }
+    });
+  }, {rootMargin:'-20% 0px -70% 0px', threshold:0});
+  sections.forEach(s=>io.observe(s));
+
+  // copy buttons
+  document.querySelectorAll('.copy-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const pre = btn.closest('.code').querySelector('pre');
+      const text = pre.innerText;
+      navigator.clipboard.writeText(text).then(()=>{
+        const old = btn.textContent;
+        btn.textContent = 'تم!';
+        setTimeout(()=> btn.textContent = old, 1200);
+      });
+    });
+  });
+
+  // mobile nav toggle
+  const toggle = document.getElementById('nav-toggle');
+  const nav = document.getElementById('nav');
+  toggle.addEventListener('click', ()=> nav.classList.toggle('open'));
+
+  refreshUI();
+})();
+</script>
+
+</body>
+</html>

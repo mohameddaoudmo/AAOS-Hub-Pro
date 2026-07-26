@@ -1,0 +1,3058 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المرجع الهندسي الشامل لمكونات أندرويد الأساسية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Noto+Kufi+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --secondary: #1e293b;
+            --accent: #3b82f6;
+            --accent-light: #60a5fa;
+            --accent-dark: #1d4ed8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --code-bg: #0d1117;
+            --card-bg: #1e293b;
+            --hover: #334155;
+            --gradient-start: #1e293b;
+            --gradient-end: #0f172a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans Arabic', 'Cairo', sans-serif;
+            background: var(--primary);
+            color: var(--text-primary);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Noto Kufi Arabic', 'Cairo', sans-serif;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        code, pre, .code-block {
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            direction: ltr;
+            text-align: left;
+        }
+
+        /* Navigation */
+        .nav-container {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100vh;
+            background: var(--secondary);
+            border-left: 1px solid var(--border);
+            overflow-y: auto;
+            z-index: 1000;
+            padding: 2rem 1.5rem;
+        }
+
+        .nav-logo {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-light);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.5rem 0.75rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .nav-link:hover {
+            background: var(--hover);
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            background: var(--accent-dark);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-right: 300px;
+            min-height: 100vh;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            padding: 6rem 4rem;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-light);
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+        }
+
+        /* Sections */
+        .section {
+            padding: 4rem;
+            max-width: 1000px;
+        }
+
+        .section-header {
+            margin-bottom: 3rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .section-number {
+            display: inline-block;
+            width: 48px;
+            height: 48px;
+            background: var(--accent);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .section h2 {
+            font-size: 2.25rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .section-description {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin: 2.5rem 0 1.25rem;
+            color: var(--accent-light);
+        }
+
+        h4 {
+            font-size: 1.25rem;
+            margin: 2rem 0 1rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 2rem 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-warning {
+            border-right: 4px solid var(--warning);
+        }
+
+        .card-danger {
+            border-right: 4px solid var(--danger);
+        }
+
+        .card-success {
+            border-right: 4px solid var(--success);
+        }
+
+        .card-info {
+            border-right: 4px solid var(--accent);
+        }
+
+        .card-title {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: #161b22;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .code-title {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .code-lang {
+            background: var(--accent-dark);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        pre {
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        code {
+            color: #e6edf3;
+        }
+
+        .keyword { color: #ff7b72; }
+        .function { color: #d2a8ff; }
+        .string { color: #a5d6ff; }
+        .comment { color: #8b949e; font-style: italic; }
+        .type { color: #ffa657; }
+        .annotation { color: #d2a8ff; }
+        .number { color: #79c0ff; }
+
+        /* Inline Code */
+        code:not(pre code) {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-light);
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.9em;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1.25rem 0;
+            padding-right: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        li::marker {
+            color: var(--accent);
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+
+        th {
+            background: var(--secondary);
+            padding: 1rem;
+            text-align: right;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--accent);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        tr:hover td {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        /* Interview Questions */
+        .interview-card {
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(59, 130, 246, 0.05) 100%);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .interview-label {
+            position: absolute;
+            top: -12px;
+            right: 2rem;
+            background: var(--danger);
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+        }
+
+        .interview-question {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            padding-top: 0.5rem;
+        }
+
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-light);
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            margin-left: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tag-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+
+        .tag-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
+        }
+
+        /* Architecture Diagrams (ASCII/Text based) */
+        .diagram {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin: 2rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            direction: ltr;
+            text-align: center;
+            color: var(--text-secondary);
+            line-height: 2;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--hover);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .nav-container {
+                transform: translateX(100%);
+                transition: transform 0.3s;
+            }
+
+            .main-content {
+                margin-right: 0;
+            }
+
+            .hero {
+                padding: 4rem 2rem;
+            }
+
+            .section {
+                padding: 2rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: rgba(59, 130, 246, 0.1);
+            border-right: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Step by Step */
+        .step {
+            display: flex;
+            gap: 1.5rem;
+            margin: 2rem 0;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 700;
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        /* Comparison Grid */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--secondary);
+            padding: 3rem 4rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-container">
+        <div class="nav-logo">📱 مرجع أندرويد الهندسي</div>
+
+        <div class="nav-section">
+            <div class="nav-title">المحتويات</div>
+            <a href="#intro" class="nav-link">المقدمة الاستراتيجية</a>
+            <a href="#intents" class="nav-link">Intents و IntentFilters</a>
+            <a href="#services" class="nav-link">Services العميقة</a>
+            <a href="#broadcasts" class="nav-link">Broadcast Receivers</a>
+            <a href="#providers" class="nav-link">Content Providers</a>
+            <a href="#pending" class="nav-link">Pending Intents</a>
+            <a href="#interviews" class="nav-link">أسئلة المقابلات</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">مواضيع سريعة</div>
+            <a href="#binder" class="nav-link">آلية Binder</a>
+            <a href="#ipc" class="nav-link">Inter-Process Communication</a>
+            <a href="#security" class="nav-link">الأمان والثغرات</a>
+            <a href="#memory" class="nav-link">إدارة الذاكرة</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header class="hero">
+            <div class="hero-content">
+                <div class="hero-badge">دليل شاملة ومُعمقة</div>
+                <h1>المرجع الهندسي الشامل لمكونات أندرويد الأساسية</h1>
+                <p>رحلة عميقة في عالم Services, Intents, Broadcast Receivers, Content Providers, و Pending Intents — من مستوى Mid-Level إلى استعدادات FAANG والشركات التقنية الأوروبية.</p>
+            </div>
+        </header>
+
+        <section id="intro" class="section">
+            <div class="section-header">
+                <div class="section-number">١</div>
+                <h2>المقدمة الاستراتيجية المعمارية</h2>
+                <p class="section-description">كيف تتفاعل مكونات أندرويد الأساسية (App Components) مع النظام عبر الـ IPC والـ Binder، ولماذا يعتبر فهمها عميقاً الفيصل بين مطور عادي ومبتكر أنظمة محترف؟</p>
+            </div>
+
+            <h3>نموذج مكونات التطبيق في أندرويد</h3>
+            <p>عندما يتعلم المطورون أندرويد لأول مرة، غالباً ما ينظرون إلى المكونات الأساسية — Activity, Service, BroadcastReceiver, ContentProvider — على أنها مجرد "فئات" (Classes) يرثون منها ويكتبون بعض التعليمات البرمجية. لكن هذا المنظور سطحي وخطير. الحقيقة أن هذه المكونات ليست مجرد فئات برمجية، بل هي <strong>عقود ديناميكية (Dynamic Contracts)</strong> بين تطبيقك ونظام التشغيل أندرويد.</p>
+
+            <p>كل مكون من هذه المكونات يُعلن عن وجوده للنظام عبر ملف <code>AndroidManifest.xml</code>. عند تثبيت التطبيق، يقوم PackageManagerService بقراءة هذا الملف وبناء ما يُعرف بـ <strong>Package Object</strong> داخل ذاكرة النظام، يحتوي على كل المعلومات اللازمة لإدارة دورة حياة هذا المكون. هذا يعني أن النظام يعرف عن مكوناتك أكثر مما تعرف أنت أحياناً.</p>
+
+            <div class="card card-info">
+                <div class="card-title"><span class="card-icon">💡</span> لماذا هذا الفهم العميق مهم؟</div>
+                <p>في مقابلات FAANG والشركات التقنية الكبرى في أوروبا (مثل Zalando, N26, Spotify, Bolt)، لا يُسأل المهندسون عن "كيف تكتب Service"، بل يُسألون عن:</p>
+                <ul>
+                    <li>ما الذي يحدث بالضبط عندما يستدعي النظام <code>onStartCommand()</code>؟ أي Thread يعمل عليه؟</li>
+                    <li>كيف يتم تمرير الـ Intent عبر Binder وما هي حدود حجم البيانات؟</li>
+                    <li>لماذا قد يتسبب PendingIntent غير المُؤمّن في ثغرة أمنية تسمح بتنفيذ كود ضار بصلاحيات تطبيقك؟</li>
+                    <li>ما الفرق الدقيق بين <code>ActivityManagerService</code> و <code>ActivityTaskManagerService</code> في إدارة دورة الحياة؟</li>
+                </ul>
+            </div>
+
+            <h3>آلية IPC و Binder: القلب النابض لأندرويد</h3>
+            <p>أندرويد نظام تشغيل مبني على نواة Linux، لكنه يضيف طبقة فوق Linux Kernel تُدعى <strong>Binder</strong>. Binder هو آلية Inter-Process Communication (IPC) مخصصة لأندرويد، مصممة لتكون:</p>
+            <ul>
+                <li><strong>عالية الأداء:</strong> تستخدم مشاركة الذاكرة (Memory Mapping) بدلاً من النسخ المزدوج للبيانات.</li>
+                <li><strong>آمنة:</strong> تتحقق من هوية العملية المرسلة (UID/PID) عبر كل استدعاء.</li>
+                <li><strong>موجهة للكائنات:</strong> تسمح باستدعاء methods على كائنات تعيش في عمليات أخرى وكأنها محلية (Remote Procedure Call).</li>
+            </ul>
+
+            <div class="diagram">
+┌─────────────────────────────────────────────────────────────┐
+│                    Application Process                       │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐  │
+│  │   Activity   │◄──►│  ActivityThread  │◄──►│  Binder Proxy  │  │
+│  └──────────────┘    └──────────────┘    └──────┬───────┘  │
+└───────────────────────────────────────────────────┼─────────┘
+                                                    │
+                    Binder Driver (Kernel Space)     │
+                           ▲                        │
+                           │                        ▼
+                           │              ┌─────────────────┐
+                           │              │  Binder Thread  │
+                           │              │   (System Server) │
+                           │              └────────┬────────┘
+                           │                       │
+                           │    ┌──────────────────┘
+                           │    │
+└──────────────────────────┼────┼────────────────────────────────┘
+                           │    │         System Server Process
+                           │    │
+                    ┌──────▼────▼──────┐
+                    │  ActivityManagerService  │
+                    │  (AMS / ATMS in Android 10+) │
+                    └──────────────────┘
+            </div>
+
+            <p>عندما يستدعي تطبيقك <code>startService()</code>، لا يحدث ذلك مباشرة. بدلاً من ذلك:</p>
+            <ol>
+                <li>يتصل تطبيقك بـ <strong>ActivityManagerService</strong> (AMS) عبر Binder.</li>
+                <li>يتحقق AMS من صلاحيات التطبيق (هل لديه الإذن لبدء Service في الخلفية؟).</li>
+                <li>يحدد AMS العملية المستهدفة (هل هي قيد التشغيل أم يجب إنشاؤها؟).</li>
+                <li>يرسل AMS رسالة عبر Binder إلى <strong>ActivityThread</strong> في العملية المستهدفة.</li>
+                <li>يقوم ActivityThread بإنشاء instance من Service عبر Reflection واستدعاء <code>onCreate()</code> ثم <code>onStartCommand()</code>.</li>
+            </ol>
+
+            <div class="card card-warning">
+                <div class="card-title"><span class="card-icon">⚠️</span> فخ الذاكرة: Binder Transaction Buffer</div>
+                <p>كل عملية في أندرويد تمتلك <strong>حصة مشتركة من الذاكرة</strong> لمعاملات Binder تبلغ حوالي <strong>1 ميغابايت</strong>. هذا لا يعني أن كل رسالة يمكن أن تكون 1MB، بل أن <strong>جميع</strong> المعاملات النشطة في العملية تشترك هذا الحد. إذا حاولت تمرير Bitmap كبير أو قائمة ضخمة عبر Intent، ستواجه <code>TransactionTooLargeException</code> في وقت التشغيل.</p>
+                <p>هذا السؤال يأتي بشكل متكرر في مقابلات Google: <em>"كيف تنقل بيانات ضخمة بين بروسيسين؟"</em> الإجابة ليست Intent، بل ContentProvider مع FileDescriptor، أو Memory File، أو Shared Memory (ASHMEM).</p>
+            </div>
+
+            <h3>ActivityManagerService مقابل ActivityTaskManagerService</h3>
+            <p>في إصدارات أندرويد القديمة، كان <code>ActivityManagerService</code> (AMS) هو المسؤول الوحيد عن إدارة جميع المكونات. لكن مع تزايد تعقيد إدارة المهام (Tasks) والأنشطة (Activities) في أندرويد 10+، تم تقسيم المسؤوليات:</p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الخدمة</th>
+                            <th>المسؤوليات</th>
+                            <th>العمليات المُدارة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>ActivityTaskManagerService</code> (ATMS)</td>
+                            <td>إدارة دورة حياة Activity، المهام (Tasks)، Stacks، والتنقل بين الشاشات</td>
+                            <td>Activity فقط</td>
+                        </tr>
+                        <tr>
+                            <td><code>ActivityManagerService</code> (AMS)</td>
+                            <td>إدارة Service, BroadcastReceiver, ContentProvider، وقرارات البقاء على قيد الحياة (OOM Adj)</td>
+                            <td>Service, Broadcast, Provider</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>عندما يستدعي <code>Context.startService()</code>، يصل الاستدعاء إلى AMS. يقوم AMS بتحديد ما إذا كان التطبيق يعمل في الخلفية (Background) وما إذا كان مسموحاً له بتشغيل Service (Background Execution Limits). إذا كان كل شيء صحيحاً، يُرسّل AMS الأمر إلى العملية المستهدفة.</p>
+
+            <h3>لماذا يفصل هذا الفهم بين المطور العادي والخبير؟</h3>
+            <p>المطور العادي يعرف أن <code>startService()</code> يبدأ Service. المهندس المحترف يعرف:</p>
+            <ul>
+                <li>أن الاستدعاء يمر عبر Binder، ويحتاج إلى Thread خاص (Binder Thread) في العملية المستهدفة.</li>
+                <li>أن <code>onStartCommand()</code> يعمل على <strong>Main Thread</strong> افتراضياً، وأي عملية حجب (Blocking) ستتسبب في ANR.</li>
+                <li>أن النظام قد يقتل العملية (Process Kill) تحت ضغط الذاكرة، ويجب التعامل مع <code>START_STICKY</code> vs <code>START_NOT_STICKY</code> بذكاء.</li>
+                <li>أن كل عملية لها <strong>OOM Adj Score</strong> يحدد أولوية البقاء في الذاكرة، واستخدام Foreground Service يخفض هذا الرقم (أي يزيد الأولوية).</li>
+            </ul>
+
+            <div class="highlight-box">
+                <p><strong>الخلاصة المعمارية:</strong> مكونات أندرويد ليست مجرد Classes. هي نقاط تفاعل (Interaction Points) مع نظام التشغيل يتم التفاوض عليها عبر Binder IPC. فهم هذه الآلية يسمح لك بتصميم تطبيقات مستقرة، آمنة، وقابلة للاختبار، وهو ما تبحث عنه الشركات الكبرى في مهندسيها.</p>
+            </div>
+        </section>
+
+        <section id="intents" class="section">
+            <div class="section-header">
+                <div class="section-number">٢</div>
+                <h2>التشريح الهندسي للـ Intents و Intent Filters</h2>
+                <p class="section-description">الفرق الجذري بين Explicit و Implicit Intents، آلية Intent Resolution الداخلية، والثغرات الأمنية مثل Intent Redirection.</p>
+            </div>
+
+            <h3>ما هو Intent؟</h3>
+            <p>Intent هو <strong>رسالة غير متزامنة (Asynchronous Message)</strong> تُستخدم لطلب إجراء من مكون آخر. لكنه ليس مجرد "رسالة" — هو كائن يحمل <strong>نية (Intention)</strong> مرفقة ببيانات وصفية تسمح لنظام أندرويد بتحديد المكون المناسب لتنفيذها.</p>
+
+            <p>من الناحية الداخلية، Intent هو Parcelable Object يحتوي على:</p>
+            <ul>
+                <li><code>ComponentName</code>: الاسم الدقيق للمكون المستهدف (لـ Explicit Intents).</li>
+                <li><code>Action</code>: سلسلة نصية تصف الإجراء المطلوب (مثل <code>ACTION_VIEW</code> أو <code>ACTION_SEND</code>).</li>
+                <li><code>Data</code>: URI يشير إلى البيانات التي سيتم التعامل معها.</li>
+                <li><code>Type</code>: MIME Type للبيانات (مثل <code>image/jpeg</code>).</li>
+                <li><code>Categories</code>: مجموعة من السلاسل النصية التي توفر معلومات إضافية عن الإجراء.</li>
+                <li><code>Extras</code>: Bundle يحمل بيانات إضافية على شكل أزواج مفتاح/قيمة.</li>
+                <li><code>Flags</code>: تعديلات على كيفية التعامل مع Intent (مثل <code>FLAG_ACTIVITY_NEW_TASK</code>).</li>
+            </ul>
+
+            <h3>الفرق الجذري: Explicit Intent مقابل Implicit Intent</h3>
+
+            <div class="comparison-grid">
+                <div class="card card-success">
+                    <div class="card-title">Explicit Intent</div>
+                    <p>يحدد المكون المستهدف <strong>بالاسم الدقيق</strong> عبر <code>ComponentName</code>. يستخدم عادةً للتنقل داخل نفس التطبيق.</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">Kotlin - Explicit Intent</span>
+                            <span class="code-lang">KOTLIN</span>
+                        </div>
+                        <pre><code><span class="keyword">val</span> intent = <span class="function">Intent</span>(<span class="keyword">this</span>, DetailActivity::<span class="keyword">class</span>.java)
+intent.<span class="function">putExtra</span>(<span class="string">"item_id"</span>, itemId)
+<span class="function">startActivity</span>(intent)</code></pre>
+                    </div>
+                    <p><strong>الأمان:</strong> آمن افتراضياً لأن النظام يعرف بالضبط أي مكون يجب استدعاؤه. لا يحتاج إلى IntentFilter.</p>
+                </div>
+
+                <div class="card card-warning">
+                    <div class="card-title">Implicit Intent</div>
+                    <p>لا يحدد مكوناً محدداً. بدلاً من ذلك، يعلن عن <strong>إجراء</strong> يريد التطبيق تنفيذه، ويترك للنظام تحديد المكون الأنسب.</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">Kotlin - Implicit Intent</span>
+                            <span class="code-lang">KOTLIN</span>
+                        </div>
+                        <pre><code><span class="keyword">val</span> intent = <span class="function">Intent</span>(Intent.ACTION_VIEW).<span class="function">apply</span> {
+    data = Uri.<span class="function">parse</span>(<span class="string">"https://example.com"</span>)
+}
+<span class="function">startActivity</span>(intent)</code></pre>
+                    </div>
+                    <p><strong>الأمان:</strong> يتطلب IntentFilter. يمكن أن يؤدي إلى Intent Hijacking إذا لم يتم التحقق من النتائج.</p>
+                </div>
+            </div>
+
+            <div class="card card-danger">
+                <div class="card-title"><span class="card-icon">🚨</span> تحذير أمني حاسم: Implicit Intent في Android 12+</div>
+                <p>بدءاً من Android 12 (API 31)، إذا قمت بإرسال Implicit Intent وكان هناك أكثر من تطبيق واحد يمكنه التعامل معه، سيُظهر النظام مربع حوار للمستخدم. لكن المشكلة الأكبر: إذا كان تطبيقك يستقبل Implicit Intent عبر مكون <code>exported="true"</code>، فأي تطبيق آخر يمكنه إرسال Intent إليك.</p>
+                <p>الحل: دائماً استخدم <code>exported="false"</code> للمكونات الداخلية، وإذا احتجت إلى <code>exported="true"</code>، فرض <code>android:permission</code> على المكون.</p>
+            </div>
+
+            <h3>آلية Intent Resolution: ما الذي يحدث تحت الغطاء؟</h3>
+            <p>عندما يستدعي تطبيقك <code>startActivity(intent)</code> أو <code>sendBroadcast(intent)</code>، يقوم النظام بعملية تُعرف بـ <strong>Intent Resolution</strong>. هذه العملية تحدث داخل <code>PackageManagerService</code> و <code>ActivityManagerService</code>، وتتكون من ثلاثة اختبارات (Tests) يجب أن يجتازها المكون:</p>
+
+            <h4>١. اختبار الـ Action</h4>
+            <p>يجب أن يتطابق Action في Intent مع Action واحد على الأقل في IntentFilter. إذا لم يحدد Intent أي Action، يجتاز الاختبار افتراضياً. لكن إذا حدد Intent Action ولم يكن موجوداً في IntentFilter، يفشل الاختبار.</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">AndroidManifest.xml - IntentFilter</span>
+                    <span class="code-lang">XML</span>
+                </div>
+                <pre><code><span class="keyword">&lt;activity</span> android:name=<span class="string">".ShareActivity"</span>
+          android:exported=<span class="string">"true"</span><span class="keyword">&gt;</span>
+    <span class="keyword">&lt;intent-filter&gt;</span>
+        <span class="keyword">&lt;action</span> android:name=<span class="string">"android.intent.action.SEND"</span> <span class="keyword">/&gt;</span>
+        <span class="keyword">&lt;category</span> android:name=<span class="string">"android.intent.category.DEFAULT"</span> <span class="keyword">/&gt;</span>
+        <span class="keyword">&lt;data</span> android:mimeType=<span class="string">"text/plain"</span> <span class="keyword">/&gt;</span>
+    <span class="keyword">&lt;/intent-filter&gt;</span>
+<span class="keyword">&lt;/activity&gt;</span></code></pre>
+            </div>
+
+            <h4>٢. اختبار الـ Category</h4>
+            <p>يجب أن تحتوي IntentFilter على <strong>جميع</strong> Categories الموجودة في Intent. إذا كان Intent يحتوي على <code>CATEGORY_LAUNCHER</code> و <code>CATEGORY_DEFAULT</code>، يجب أن يحتوي IntentFilter على الاثنين.</p>
+            <p><strong>ملاحظة حاسمة:</strong> عند استخدام <code>startActivity()</code> أو <code>startActivityForResult()</code>، يضيف النظام تلقائياً <code>CATEGORY_DEFAULT</code> إلى Intent. لذلك، أي Activity يريد استقبال Implicit Intent <strong>يجب</strong> أن يعلن عن <code>CATEGORY_DEFAULT</code> في IntentFilter.</p>
+
+            <h4>٣. اختبار الـ Data (الأكثر تعقيداً)</h4>
+            <p>يتكون اختبار Data من ثلاثة أجزاء: <strong>URI</strong> (Scheme, Authority, Path) و <strong>MIME Type</strong>.</p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>جزء URI</th>
+                            <th>الوصف</th>
+                            <th>مثال</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>Scheme</code></td>
+                            <td>البروتوكول</td>
+                            <td><code>http</code>, <code>https</code>, <code>content</code>, <code>file</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>Authority</code></td>
+                            <td>النطاق أو اسم المزود</td>
+                            <td><code>com.example.app.provider</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>Path</code></td>
+                            <td>المسار داخل النطاق</td>
+                            <td><code>/images/photo.jpg</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>MIME Type</code></td>
+                            <td>نوع البيانات</td>
+                            <td><code>image/jpeg</code>, <code>text/plain</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>قواعد مطابقة Data:</p>
+            <ul>
+                <li>إذا لم يحدد Intent أي Data (لا URI ولا MIME Type)، يجتاز الاختبار فقط إذا لم يحدد IntentFilter أي Data.</li>
+                <li>إذا حدد Intent URI فقط (بدون MIME Type)، يجب أن يتطابق Scheme و Authority و Path مع ما في IntentFilter.</li>
+                <li>إذا حدد Intent MIME Type فقط (بدون URI)، يجب أن يتطابق MIME Type مع IntentFilter، ويجب أن يدعم IntentFilter Scheme <code>content:</code> أو <code>file:</code>.</li>
+                <li>إذا حدد Intent URI و MIME Type معاً، يجب أن يتطابق الاثنان.</li>
+            </ul>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Kotlin - Intent Resolution مخصص</span>
+                    <span class="code-lang">KOTLIN</span>
+                </div>
+                <pre><code><span class="comment">// التحقق من وجود تطبيقات يمكنها التعامل مع Intent قبل إرساله</span>
+<span class="keyword">fun</span> <span class="function">isIntentSafe</span>(context: Context, intent: Intent): Boolean {
+    <span class="keyword">val</span> activities = context.packageManager
+        .<span class="function">queryIntentActivities</span>(intent, PackageManager.MATCH_DEFAULT_ONLY)
+    <span class="keyword">return</span> activities.isNotEmpty()
+}
+
+<span class="comment">// استخدام Intent.createChooser() لمنع التطبيق الافتراضي من الاستيلاء على Intent</span>
+<span class="keyword">val</span> chooser = Intent.<span class="function">createChooser</span>(shareIntent, <span class="string">"Share via"</span>)
+<span class="keyword">if</span> (shareIntent.<span class="function">resolveActivity</span>(packageManager) != <span class="keyword">null</span>) {
+    <span class="function">startActivity</span>(chooser)
+}</code></pre>
+            </div>
+
+            <h3>الثغرات الأمنية: Intent Redirection</h3>
+            <p>Intent Redirection هي ثغرة أمنية خطيرة تحدث عندما يقبل تطبيقك Intent من مصدر خارجي (عبر مكون <code>exported="true"</code>) ثم يستخدم جزءاً من هذا Intent لبدء مكون داخلي آخر. يمكن للمهاجم استغلال هذا لتخطي الحماية والوصول إلى مكونات داخلية.</p>
+
+            <div class="card card-danger">
+                <div class="card-title"><span class="card-icon">⚠️</span> مثال على ثغرة Intent Redirection</div>
+                <p>تخيل أن لديك Activity تصدّر (<code>exported="true"</code>) تستقبل Intent وتمرره إلى Activity داخلية:</p>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">كود ضعيف - يحتوي على ثغرة</span>
+                        <span class="code-lang">KOTLIN</span>
+                    </div>
+                    <pre><code><span class="keyword">class</span> <span class="type">ExportedActivity</span> : <span class="type">AppCompatActivity</span>() {
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.<span class="function">onCreate</span>(savedInstanceState)
+
+        <span class="comment">// ⚠️ خطر: استخدام Intent من مصدر خارجي مباشرة</span>
+        <span class="keyword">val</span> forwardIntent = intent.<span class="function">getParcelableExtra&lt;Intent&gt;</span>(<span class="string">"target_intent"</span>)
+        <span class="keyword">if</span> (forwardIntent != <span class="keyword">null</span>) {
+            <span class="function">startActivity</span>(forwardIntent) <span class="comment">// المهاجم يمكنه الوصول إلى أي Activity داخلية!</span>
+        }
+    }
+}</code></pre>
+                </div>
+                <p>المهاجم يمكنه إرسال Intent يحتوي على <code>target_intent</code> يشير إلى Activity داخلية حساسة (مثل شاشة إعدادات المسؤول) والوصول إليها.</p>
+            </div>
+
+            <h4>الحلول الأمنية لمنع Intent Redirection</h4>
+
+            <div class="step">
+                <div class="step-number">١</div>
+                <div class="step-content">
+                    <div class="step-title">استخدام ComponentName صريح</div>
+                    <p>عند إعادة توجيه Intent، حدد المكون المستهدف صراحةً باستخدام ComponentName بدلاً من السماح للنظام بتحديده.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">٢</div>
+                <div class="step-content">
+                    <div class="step-title">تعطيل Export للمكونات الداخلية</div>
+                    <p>جميع المكونات الداخلية يجب أن تكون <code>exported="false"</code>. في Android 12+، هذا إلزامي: أي Activity تحتوي على IntentFilter يجب أن تحدد <code>exported</code> صراحةً.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">٣</div>
+                <div class="step-content">
+                    <div class="step-title">التحقق من صلاحيات المرسل</div>
+                    <p>استخدم <code>checkCallingPermission()</code> للتحقق من أن التطبيق المرسل يملك الإذن المطلوب.</p>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Kotlin - حماية آمنة ضد Intent Redirection</span>
+                    <span class="code-lang">KOTLIN</span>
+                </div>
+                <pre><code><span class="keyword">class</span> <span class="type">SafeExportedActivity</span> : <span class="type">AppCompatActivity</span>() {
+
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.<span class="function">onCreate</span>(savedInstanceState)
+
+        <span class="comment">// ١. التحقق من صلاحية المرسل</span>
+        <span class="keyword">if</span> (<span class="function">checkCallingPermission</span>(<span class="string">"com.example.ALLOWED_PERMISSION"</span>) 
+            != PackageManager.PERMISSION_GRANTED) {
+            <span class="function">finish</span>()
+            <span class="keyword">return</span>
+        }
+
+        <span class="comment">// ٢. استخراج Intent مع التحقق من المكون المستهدف</span>
+        <span class="keyword">val</span> forwardIntent = intent
+            .<span class="function">getParcelableExtra&lt;Intent&gt;</span>(<span class="string">"target_intent"</span>)
+            ?.<span class="function">apply</span> {
+                <span class="comment">// تحديد المكون المسموح به فقط - لا تثق في بيانات Intent</span>
+                component = <span class="function">ComponentName</span>(
+                    <span class="keyword">this</span>@SafeExportedActivity,
+                    AllowedTargetActivity::<span class="keyword">class</span>.java
+                )
+                <span class="comment">// إزالة أي أعلام قد تكون خطرة</span>
+                <span class="function">removeUnsafeFlags</span>()
+            }
+
+        <span class="keyword">if</span> (forwardIntent != <span class="keyword">null</span>) {
+            <span class="function">startActivity</span>(forwardIntent)
+        }
+    }
+
+    <span class="keyword">private fun</span> Intent.<span class="function">removeUnsafeFlags</span>() {
+        <span class="comment">// إزالة أعلام قد تسمح بتجاوز الحماية</span>
+        <span class="function">setFlags</span>(flags and Intent.FLAG_GRANT_READ_URI_PERMISSION.inv())
+    }
+}</code></pre>
+            </div>
+
+            <h3>السمات الأمنية للمكونات: exported</h3>
+            <p>سمة <code>android:exported</code> هي خط الدفاع الأول. عندما تكون <code>true</code>، يمكن لتطبيقات أخرى (بما في ذلك التطبيقات الضارة) إرسال Intents إلى هذا المكون.</p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>المكون</th>
+                            <th>القيمة الافتراضية لـ exported</th>
+                            <th>التوصية الأمنية</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Activity (بدون IntentFilter)</td>
+                            <td><code>false</code></td>
+                            <td>آمن افتراضياً</td>
+                        </tr>
+                        <tr>
+                            <td>Activity (مع IntentFilter)</td>
+                            <td><code>true</code> (قبل Android 12)</td>
+                            <td>يجب تحديد <code>exported</code> صراحةً في Android 12+</td>
+                        </tr>
+                        <tr>
+                            <td>Service</td>
+                            <td><code>false</code> (إذا لم يكن هناك IntentFilters)</td>
+                            <td>تجنب exported Services إلا مع <code>android:permission</code></td>
+                        </tr>
+                        <tr>
+                            <td>BroadcastReceiver</td>
+                            <td>يعتمد على وجود IntentFilter</td>
+                            <td>استخدم <code>android:permission</code> للReceivers الحساسة</td>
+                        </tr>
+                        <tr>
+                            <td>ContentProvider</td>
+                            <td><code>true</code> افتراضياً!</td>
+                            <td>⚠️ دائماً استخدم <code>exported="false"</code> أو <code>android:readPermission</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card card-danger">
+                <div class="card-title"><span class="card-icon">🔒</span> قاعدة ذهبية: ContentProvider دائماً exported!</div>
+                <p>على عكس Activity و Service، الـ ContentProvider يكون <code>exported="true"</code> <strong>افتراضياً</strong>. هذا يعني أنه إذا نسيت تحديد exported، جميع التطبيقات على الجهاز يمكنها الوصول إلى بياناتك. هذا من أكثر الأخطاء شيوعاً التي تؤدي إلى تسريب بيانات.</p>
+            </div>
+
+            <h3>Android 12+ (API 31): تغييرات Intent الأمنية</h3>
+            <p>أدخل Android 12 تغييرات جذرية على آلية Intent:</p>
+            <ol>
+                <li><strong>إلزامية تحديد exported:</strong> أي Activity تحتوي على IntentFilter يجب أن تحدد <code>android:exported</code> صراحةً، وإلا فشل البناء.</li>
+                <li><strong>PendingIntent Mutable Flags:</strong> يجب تحديد <code>FLAG_IMMUTABLE</code> أو <code>FLAG_MUTABLE</code> صراحةً عند إنشاء PendingIntent.</li>
+                <li><strong>Intent Filters أكثر صرامة:</strong> يجب أن تكون Actions في IntentFilters فريدة وواضحة.</li>
+            </ol>
+        </section>
+
+        <section id="services" class="section">
+            <div class="section-header">
+                <div class="section-number">٣</div>
+                <h2>الـ Services بعمق الإنتاج (Android Services Masterclass)</h2>
+                <p class="section-description">Started Services مقابل Bound Services، قيود الخلفية الصارمة، Foreground Services، وبدائل الخدمات الحديثة.</p>
+            </div>
+
+            <h3>ما هو Service؟</h3>
+            <p>Service هو مكون أندرويد يمكنه تنفيذ عمليات طويلة الأمد في الخلفية <strong>بدون توفير واجهة مستخدم</strong>. لكن هذا التعريف السطحي يخفي حقيقة معقدة: Service <strong>لا يعمل في Thread منفصل</strong> افتراضياً. كل callbacks الخاصة بـ Service — <code>onCreate()</code>, <code>onStartCommand()</code>, <code>onBind()</code> — تعمل على <strong>Main Thread (UI Thread)</strong>.</p>
+
+            <div class="card card-danger">
+                <div class="card-title"><span class="card-icon">⚠️</span> الخطأ الشائع القاتل</div>
+                <p>الاعتقاد الخاطئ الأكثر شيوعاً: "Service يعمل في الخلفية = Thread منفصل". هذا غير صحيح. Service هو مجرد Context خاص يعيش في عملية تطبيقك. إذا نفذت عمليات حجب (Blocking Operations) داخل <code>onStartCommand()</code>، ستتسبب في <strong>Application Not Responding (ANR)</strong>.</p>
+            </div>
+
+            <h3>أنواع الخدمات: Started مقابل Bound</h3>
+
+            <div class="comparison-grid">
+                <div class="card">
+                    <div class="card-title">Started Service</div>
+                    <p>يُبدأ عبر <code>startService()</code> أو <code>ContextCompat.startForegroundService()</code>. يعمل حتى يستدعي <code>stopSelf()</code> أو <code>stopService()</code>.</p>
+                    <ul>
+                        <li>لا يوفر واجهة للتفاعل المباشر</li>
+                        <li>يعمل بشكل مستقل عن المكون الذي بدأه</li>
+                        <li>يستمر حتى بعد تدمير Activity</li>
+                        <li>يحتاج إلى Foreground Notification في الإصدارات الحديثة</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title">Bound Service</div>
+                    <p>يُربط عبر <code>bindService()</code>. يوفر واجهة برمجية (API) للمكونات الأخرى للتفاعل معه.</p>
+                    <ul>
+                        <li>يعمل فقط طالما هناك مكونات مرتبطة به</li>
+                        <li>يدعم Inter-Process Communication (IPC) عبر AIDL أو Messenger</li>
+                        <li>يتوقف تلقائياً عند فك الربط (Unbind)</li>
+                        <li>مثالي للتفاعل المستمر بين Activity و Service</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>دورة حياة Started Service بالتفصيل</h3>
+
+            <div class="diagram">
+┌─────────────┐    startService()    ┌─────────────┐
+│   غير موجود   │ ───────────────────► │   onCreate()  │
+└─────────────┘                      └──────┬──────┘
+                                           │
+                                           ▼
+                                    ┌─────────────┐
+                                    │ onStartCommand│◄──── startService() (مرة أخرى)
+                                    │   (Main Thread) │      (لا يستدعي onCreate مجدداً)
+                                    └──────┬──────┘
+                                           │
+                    ┌──────────────────────┼──────────────────────┐
+                    │                      │                      │
+                    ▼                      ▼                      ▼
+              stopSelf()            stopService()           النظام يقتل العملية
+                    │                      │                      │
+                    ▼                      ▼                      ▼
+               ┌─────────┐           ┌─────────┐           ┌─────────┐
+               │onDestroy│           │onDestroy│           │onDestroy│ (لا يُضمن دائماً)
+               └─────────┘           └─────────┘           └─────────┘
+            </div>
+
+            <h4>التحليل العميق لـ onStartCommand()</h4>
+            <p>تُستدعى <code>onStartCommand()</code> في كل مرة يُرسل فيها Intent جديد إلى Service. تقبل ثلاث معاملات:</p>
+            <ul>
+                <li><code>Intent?</code>: الـ Intent الذي تم إرساله (قد يكون null إذا أعاد النظام تشغيل Service بعد قتله).</li>
+                <li><code>flags</code>: معلومات إضافية عن طلب البدء (مثل <code>START_FLAG_REDELIVERY</code>).</li>
+                <li><code>startId</code>: معرف فريد لهذا الطلب، يُستخدم مع <code>stopSelf(startId)</code> لإيقاف Service فقط إذا كان هذا هو آخر طلب.</li>
+            </ul>
+
+            <p>يجب أن تُرجع إحدى القيم التالية:</p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>القيمة المُرجعة</th>
+                            <th>السلوك عند قتل النظام للService</th>
+                            <th>متى تستخدم؟</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>START_STICKY</code></td>
+                            <td>يُعيد النظام إنشاء Service واستدعاء <code>onStartCommand()</code> مع <code>intent = null</code></td>
+                            <td>خدمات موسيقى، تحديد الموقع المستمر — حيث الخدمة مهمة بحد ذاتها</td>
+                        </tr>
+                        <tr>
+                            <td><code>START_NOT_STICKY</code></td>
+                            <td>لا يُعيد النظام إنشاء Service</td>
+                            <td>مهام لمرة واحدة (One-off tasks) — إذا قُتلت، لا حاجة لإعادتها</td>
+                        </tr>
+                        <tr>
+                            <td><code>START_REDELIVER_INTENT</code></td>
+                            <td>يُعيد النظام إنشاء Service مع نفس الـ Intent الأصلي</td>
+                            <td>مهام حرجة يجب إكمالها (مثل رفع الملفات) — يضمن تسليم Intent</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Kotlin - Started Service متكامل مع Foreground Notification</span>
+                    <span class="code-lang">KOTLIN</span>
+                </div>
+                <pre><code><span class="keyword">class</span> <span class="type">MediaPlaybackService</span> : <span class="type">Service</span>() {
+
+    <span class="keyword">private val</span> binder = <span class="type">LocalBinder</span>()
+    <span class="keyword">private var</span> mediaPlayer: MediaPlayer? = <span class="keyword">null</span>
+    <span class="keyword">private val</span> serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    <span class="keyword">inner class</span> <span class="type">LocalBinder</span> : <span class="type">Binder</span>() {
+        <span class="keyword">fun</span> <span class="function">getService</span>(): MediaPlaybackService = <span class="keyword">this</span>@MediaPlaybackService
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>() {
+        <span class="keyword">super</span>.<span class="function">onCreate</span>()
+        <span class="comment">// تهيئة الموارد الثقيلة هنا وليس في onStartCommand</span>
+        mediaPlayer = MediaPlayer().<span class="function">apply</span> {
+            <span class="function">setAudioAttributes</span>(
+                AudioAttributes.Builder()
+                    .<span class="function">setUsage</span>(AudioAttributes.USAGE_MEDIA)
+                    .<span class="function">setContentType</span>(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .<span class="function">build</span>()
+            )
+        }
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onStartCommand</span>(intent: Intent?, flags: Int, startId: Int): Int {
+        <span class="comment">// ⚠️ هذا يعمل على Main Thread — أي عملية ثقيلة يجب نقلها</span>
+        <span class="keyword">when</span> (intent?.action) {
+            ACTION_PLAY -> {
+                <span class="function">startForeground</span>(NOTIFICATION_ID, <span class="function">buildNotification</span>(<span class="string">"Playing"</span>))
+                serviceScope.<span class="function">launch</span>(Dispatchers.IO) {
+                    <span class="function">playAudio</span>(intent.<span class="function">getStringExtra</span>(EXTRA_AUDIO_URL))
+                }
+            }
+            ACTION_PAUSE -> <span class="function">pauseAudio</span>()
+            ACTION_STOP -> <span class="function">stopSelf</span>(startId)
+        }
+        <span class="keyword">return</span> START_REDELIVER_INTENT
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onBind</span>(intent: Intent): IBinder = binder
+
+    <span class="keyword">override fun</span> <span class="function">onDestroy</span>() {
+        <span class="keyword">super</span>.<span class="function">onDestroy</span>()
+        <span class="comment">// تنظيف الموارد حاسم لمنع تسرب الذاكرة</span>
+        mediaPlayer?.<span class="function">release</span>()
+        mediaPlayer = <span class="keyword">null</span>
+        serviceScope.<span class="function">cancel</span>()
+    }
+
+    <span class="keyword">private fun</span> <span class="function">buildNotification</span>(contentText: String): Notification {
+        <span class="keyword">val</span> pendingIntent = PendingIntent.<span class="function">getActivity</span>(
+            <span class="keyword">this</span>,
+            <span class="number">0</span>,
+            Intent(<span class="keyword">this</span>, MainActivity::<span class="keyword">class</span>.java),
+            PendingIntent.FLAG_IMMUTABLE
+        )
+
+        <span class="keyword">return</span> NotificationCompat.Builder(<span class="keyword">this</span>, CHANNEL_ID)
+            .<span class="function">setContentTitle</span>(<span class="string">"Media Player"</span>)
+            .<span class="function">setContentText</span>(contentText)
+            .<span class="function">setSmallIcon</span>(R.drawable.ic_notification)
+            .<span class="function">setContentIntent</span>(pendingIntent)
+            .<span class="function">setOngoing</span>(<span class="keyword">true</span>)
+            .<span class="function">build</span>()
+    }
+
+    <span class="keyword">companion object</span> {
+        <span class="keyword">const val</span> ACTION_PLAY = <span class="string">"action_play"</span>
+        <span class="keyword">const val</span> ACTION_PAUSE = <span class="string">"action_pause"</span>
+        <span class="keyword">const val</span> ACTION_STOP = <span class="string">"action_stop"</span>
+        <span class="keyword">const val</span> EXTRA_AUDIO_URL = <span class="string">"extra_audio_url"</span>
+        <span class="keyword">const val</span> NOTIFICATION_ID = <span class="number">1</span>
+        <span class="keyword">const val</span> CHANNEL_ID = <span class="string">"media_playback_channel"</span>
+    }
+}</code></pre>
+            </div>
+
+            <h3>قيود الخلفية الصارمة: Background Execution Limits</h3>
+            <p>مع Android Oreo (API 26)، فرضت Google قيوداً صارمة على تشغيل الخدمات في الخلفية. السبب: التطبيقات كانت تسيء استخدام Services لإبقاء العملية حية بشكل دائم (Keep-alive)، مما يؤدي إلى استنزاف البطارية.</p>
+
+            <div class="card card-warning">
+                <div class="card-title"><span class="card-icon">🔋</span> ما هي Background Execution Limits؟</div>
+                <p>إذا كان تطبيقك في <strong>الخلفية</strong> (أي ليس لديه Activity مرئية أو Foreground Service نشط)، فإنه:</p>
+                <ul>
+                    <li>لا يمكنه استدعاء <code>startService()</code> — سيُرمى <code>IllegalStateException</code>.</li>
+                    <li>يمكنه استخدام <code>ContextCompat.startForegroundService()</code>، لكن <strong>يجب</strong> استدعاء <code>startForeground()</code> خلال 5 ثوانٍ، وإلا سيُرمى ANR.</li>
+                    <li>ستُقتل أي Service موجودة في الخلفية بعد فترة قصيرة من عدم النشاط.</li>
+                </ul>
+            </div>
+
+            <p>متى يُعتبر التطبيق في <strong>المقدمة (Foreground)</strong>؟</p>
+            <ul>
+                <li>لديه Activity مرئية (Resumed أو Paused ولكن Visible).</li>
+                <li>لديه Foreground Service نشط مع إشعار مستمر.</li>
+                <li>هو التطبيق الافتراضي الحالي (Top App) على الشاشة.</li>
+                <li>يستقبل Broadcast خاصاً به (مثل <code>BOOT_COMPLETED</code> بعد إعادة التشغيل).</li>
+            </ul>
+
+            <h3>Foreground Services: الحتمية في الإصدارات الحديثة</h3>
+            <p>إذا كنت بحاجة إلى تشغيل عملية طويلة الأمد (مثل تتبع الموقع، تشغيل الموسيقى، أو مزامنة الملفات)، يجب استخدام <strong>Foreground Service</strong>. الفرق الرئيسي: يجب عرض <strong>إشعار دائم (Ongoing Notification)</strong> يُعلم المستخدم بأن التطبيق يعمل.</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Kotlin - بدء Foreground Service بشكل آمن</span>
+                    <span class="code-lang">KOTLIN</span>
+                </div>
+                <pre><code><span class="keyword">class</span> <span class="type">LocationTrackingService</span> : <span class="type">Service</span>() {
+
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>() {
+        <span class="keyword">super</span>.<span class="function">onCreate</span>()
+        <span class="function">createNotificationChannel</span>()
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onStartCommand</span>(intent: Intent?, flags: Int, startId: Int): Int {
+        <span class="comment">// ⚠️ يجب استدعاء startForeground خلال 5 ثوانٍ!</span>
+        <span class="function">startForeground</span>(
+            NOTIFICATION_ID,
+            <span class="function">buildForegroundNotification</span>()
+        )
+
+        <span class="comment">// بدء تتبع الموقع...</span>
+        <span class="function">startLocationUpdates</span>()
+
+        <span class="keyword">return</span> START_STICKY
+    }
+
+    <span class="keyword">private fun</span> <span class="function">buildForegroundNotification</span>(): Notification {
+        <span class="keyword">return</span> NotificationCompat.Builder(<span class="keyword">this</span>, CHANNEL_ID)
+            .<span class="function">setContentTitle</span>(<span class="string">"جاري تتبع الموقع"</span>)
+            .<span class="function">setContentText</span>(<span class="string">"يتم تسجيل مسار الرحلة"</span>)
+            .<span class="function">setSmallIcon</span>(R.drawable.ic_location)
+            .<span class="function">setOngoing</span>(<span class="keyword">true</span>) <span class="comment">// إشعار دائم لا يمكن للمستخدم إزالته</span>
+            .<span class="function">setCategory</span>(NotificationCompat.CATEGORY_SERVICE)
+            .<span class="function">build</span>()
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onBind</span>(intent: Intent?): IBinder? = <span class="keyword">null</span>
+
+    <span class="keyword">companion object</span> {
+        <span class="keyword">const val</span> NOTIFICATION_ID = <span class="number">1001</span>
+        <span class="keyword">const val</span> CHANNEL_ID = <span class="string">"location_channel"</span>
+    }
+}</code></pre>
+            </div>
+
+            <h4>الأذونات المطلوبة لـ Foreground Service في Android 14+</h4>
+            <p>مع Android 14 (API 34)، أصبحت الأمور أكثر صرامة. يجب:</p>
+            <ol>
+                <li>إعلان <code>&lt;uses-permission android:name="android.permission.FOREGROUND_SERVICE" /&gt;</code> في Manifest.</li>
+                <li>تحديد نوع الخدمة (Service Type) في Manifest: <code>android:foregroundServiceType="location|camera|microphone|..."</code>.</li>
+                <li>في وقت التشغيل، يجب أن يكون لديك الأذونات الخاصة بالنوع (مثل <code>ACCESS_FINE_LOCATION</code> لنوع location).</li>
+            </ol>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">AndroidManifest.xml - Foreground Service Declaration</span>
+                    <span class="code-lang">XML</span>
+                </div>
+                <pre><code><span class="keyword">&lt;uses-permission</span> android:name=<span class="string">"android.permission.FOREGROUND_SERVICE"</span> <span class="keyword">/&gt;</span>
+<span class="keyword">&lt;uses-permission</span> android:name=<span class="string">"android.permission.FOREGROUND_SERVICE_LOCATION"</span> <span class="keyword">/&gt;</span>
+<span class="keyword">&lt;uses-permission</span> android:name=<span class="string">"android.permission.ACCESS_FINE_LOCATION"</span> <span class="keyword">/&gt;</span>
+
+<span class="keyword">&lt;service</span>
+    android:name=<span class="string">".LocationTrackingService"</span>
+    android:foregroundServiceType=<span class="string">"location"</span>
+    android:exported=<span class="string">"false"</span> <span class="keyword">/&gt;</span></code></pre>
+            </div>
+
+            <h3>Bound Services والـ IPC عبر AIDL و Messenger</h3>
+            <p>عندما تحتاج إلى تفاعل مستمر بين Activity و Service، أو حتى بين تطبيقات مختلفة، تستخدم Bound Service. توجد طريقتان رئيسيتان:</p>
+
+            <h4>الطريقة الأولى: Local Binder (داخل نفس العملية)</h4>
+            <p>عندما يكون Activity و Service في نفس العملية (وهو الأكثر شيوعاً)، يمكنك إرجاع Binder محلي يحتوي على مرجع مباشر للService.</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Kotlin - Local Binder Pattern</span>
+                    <span class="code-lang">KOTLIN</span>
+                </div>
+                <pre><code><span class="keyword">class</span> <span class="type">LocalMusicService</span> : <span class="type">Service</span>() {
+
+    <span class="keyword">private val</span> binder = <span class="type">MusicBinder</span>()
+    <span class="keyword">private var</span> currentPosition: Int = <span class="number">0</span>
+
+    <span class="keyword">inner class</span> <span class="type">MusicBinder</span> : <span class="type">Binder</span>() {
+        <span class="keyword">fun</span> <span class="function">getService</span>(): LocalMusicService = <span class="keyword">this</span>@LocalMusicService
+    }
+
+    <span class="keyword">fun</span> <span class="function">getCurrentPosition</span>(): Int = currentPosition
+    <span class="keyword">fun</span> <span class="function">seekTo</span>(position: Int) { currentPosition = position }
+
+    <span class="keyword">override fun</span> <span class="function">onBind</span>(intent: Intent): IBinder = binder
+}
+
+<span class="comment">// في الـ Activity:</span>
+<span class="keyword">private var</span> musicService: LocalMusicService? = <span class="keyword">null</span>
+<span class="keyword">private val</span> serviceConnection = <span class="keyword">object</span> : ServiceConnection {
+    <span class="keyword">override fun</span> <span class="function">onServiceConnected</span>(name: ComponentName?, service: IBinder?) {
+        <span class="keyword">val</span> binder = service <span class="keyword">as</span> LocalMusicService.MusicBinder
+        musicService = binder.<span class="function">getService</span>()
+        <span class="comment">// الآن يمكن استدعاء methods مباشرة!</span>
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onServiceDisconnected</span>(name: ComponentName?) {
+        musicService = <span class="keyword">null</span>
+    }
+}
+
+<span class="comment">// الربط:</span>
+<span class="function">bindService</span>(
+    Intent(<span class="keyword">this</span>, LocalMusicService::<span class="keyword">class</span>.java),
+    serviceConnection,
+    Context.BIND_AUTO_CREATE
+)</code></pre>
+            </div>
+
+            <h4>الطريقة الثانية: Messenger (IPC عبر Message Queue)</h4>
+            <p>إذا كنت بحاجة إلى التواصل بين عمليات مختلفة (مثل تطبيقك وService في عملية منفصلة)، لا يمكنك استخدام Binder محلي لأن الكائنات لا يمكن مشاركتها عبر العمليات. الحل هو <strong>Messenger</strong>، الذي يستخدم <code>Handler</code> و <code>Message</code> لتمرير البيانات عبر Binder.</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Kotlin - Messenger IPC</span>
+                    <span class="code-lang">KOTLIN</span>
+                </div>
+                <pre><code><span class="keyword">class</span> <span class="type">RemoteMusicService</span> : <span class="type">Service</span>() {
+
+    <span class="keyword">private lateinit var</span> messenger: Messenger
+
+    <span class="keyword">private val</span> handler = <span class="keyword">object</span> : Handler(Looper.getMainLooper()) {
+        <span class="keyword">override fun</span> <span class="function">handleMessage</span>(msg: Message) {
+            <span class="keyword">when</span> (msg.what) {
+                MSG_PLAY -> <span class="function">play</span>()
+                MSG_PAUSE -> <span class="function">pause</span>()
+                MSG_GET_POSITION -> {
+                    <span class="comment">// الرد على العميل</span>
+                    <span class="keyword">val</span> replyMessenger = msg.replyTo
+                    <span class="keyword">val</span> replyMsg = Message.<span class="function">obtain</span>(<span class="keyword">null</span>, MSG_POSITION_RESPONSE)
+                    replyMsg.arg1 = currentPosition
+                    replyMessenger?.<span class="function">send</span>(replyMsg)
+                }
+            }
+        }
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onBind</span>(intent: Intent): IBinder {
+        messenger = Messenger(handler)
+        <span class="keyword">return</span> messenger.binder
+    }
+
+    <span class="keyword">companion object</span> {
+        <span class="keyword">const val</span> MSG_PLAY = <span class="number">1</span>
+        <span class="keyword">const val</span> MSG_PAUSE = <span class="number">2</span>
+        <span class="keyword">const val</span> MSG_GET_POSITION = <span class="number">3</span>
+        <span class="keyword">const val</span> MSG_POSITION_RESPONSE = <span class="number">4</span>
+    }
+}</code></pre>
+            </div>
+
+            <h3>بدائل الخدمات الحديثة: WorkManager و AlarmManager</h3>
+            <p>مع تزايد قيود الخلفية، أصبحت الخدمات التقليدية غير مناسبة للعديد من حالات الاستخدام. Google توصي باستخدام البدائل التالية:</p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الحالة</th>
+                            <th>الحل الموصى به</th>
+                            <th>متى تستخدم Service؟</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>مهمة لمرة واحدة غير فورية</td>
+                            <td><code>WorkManager</code> (OneTimeWorkRequest)</td>
+                            <td>لا — WorkManager أكثر موثوقية</td>
+                        </tr>
+                        <tr>
+                            <td>مهمة دورية (مثل المزامنة)</td>
+                            <td><code>WorkManager</code> (PeriodicWorkRequest)</td>
+                            <td>لا — WorkManager يدير القيود والبطارية</td>
+                        </tr>
+                        <tr>
+                            <td>مهمة دقيقة الوقت (Exact Alarm)</td>
+                            <td><code>AlarmManager</code> + <code>SCHEDULE_EXACT_ALARM</code></td>
+                            <td>ربما — لكن يتطلب إذناً خاصاً</td>
+                        </tr>
+                        <tr>
+                            <td>تشغيل مستمر (موسيقى، موقع)</td>
+                            <td><code>Foreground Service</code></td>
+                            <td>نعم — هذا الاستخدام الصحيح الوحيد</td>
+                        </tr>
+                        <tr>
+                            <td>تنزيل ملف كبير</td>
+                            <td><code>DownloadManager</code> أو <code>WorkManager</code></td>
+                            <td>لا — النظام يدير التنزيل بكفاءة أكبر</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>WorkManager: المستقبل المُوصى به</h4>
+            <p>WorkManager هو جزء من Android Jetpack، ويوفر API بسيطة لجدولة المهام القابلة للتأجيل (Deferrable) التي يجب أن تُنفذ بشكل موثوق حتى بعد إعادة تشغيل الجهاز. يدير WorkManager تلقائياً:</p>
+            <ul>
+                <li>قيود الخلفية (Background Restrictions).</li>
+                <li>توافق البطارية (Doze Mode, App Standby).</li>
+                <li>إعادة المحاولة (Retry) مع سياسات التراجع (Backoff).</li>
+                <li>القيود (Constraints) مثل توفر الشبكة أو شحن البطارية.</li>
+            </ul>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Kotlin - WorkManager متكامل</span>
+                    <span class="code-lang">KOTLIN</span>
+                </div>
+                <pre><code><span class="keyword">class</span> <span class="type">SyncWorker</span>(
+    context: Context,
+    params: WorkerParameters
+) : <span class="type">CoroutineWorker</span>(context, params) {
+
+    <span class="keyword">override suspend fun</span> <span class="function">doWork</span>(): Result {
+        <span class="keyword">return try</span> {
+            <span class="comment">// العمل على Dispatchers.Default تلقائياً</span>
+            <span class="function">syncDataWithServer</span>()
+            Result.<span class="function">success</span>()
+        } <span class="keyword">catch</span> (e: Exception) {
+            <span class="keyword">if</span> (runAttemptCount < MAX_RETRY) {
+                Result.<span class="function">retry</span>()
+            } <span class="keyword">else</span> {
+                Result.<span class="function">failure</span>(<span class="function">workDataOf</span>(<span class="string">"error"</span> to e.message))
+            }
+        }
+    }
+
+    <span class="keyword">companion object</span> {
+        <span class="keyword">const val</span> MAX_RETRY = <span class="number">3</span>
+
+        <span class="keyword">fun</span> <span class="function">schedule</span>(context: Context) {
+            <span class="keyword">val</span> constraints = Constraints.Builder()
+                .<span class="function">setRequiredNetworkType</span>(NetworkType.CONNECTED)
+                .<span class="function">setRequiresBatteryNotLow</span>(<span class="keyword">true</span>)
+                .<span class="function">build</span>()
+
+            <span class="keyword">val</span> request = PeriodicWorkRequestBuilder&lt;SyncWorker&gt;(<span class="number">15</span>, TimeUnit.MINUTES)
+                .<span class="function">setConstraints</span>(constraints)
+                .<span class="function">setBackoffCriteria</span>(
+                    BackoffPolicy.EXPONENTIAL,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
+                    TimeUnit.MILLISECONDS
+                )
+                .<span class="function">build</span>()
+
+            WorkManager.<span class="function">getInstance</span>(context)
+                .<span class="function">enqueueUniquePeriodicWork</span>(
+                    <span class="string">"sync_work"</span>,
+                    ExistingPeriodicWorkPolicy.KEEP,
+                    request
+                )
+        }
+    }
+}</code></pre>
+            </div>
+
+            <div class="highlight-box">
+                <p><strong>القاعدة الذهبية:</strong> إذا كانت المهمة لا تحتاج إلى تشغيل فوري ولا تتطلب بقاء التطبيق في المقدمة، استخدم WorkManager. احتفظ بـ Foreground Service للحالات التي يتطلب فيها المستخدم إشعاراً دائماً (مثل الموسيقى أو التنقل).</p>
+            </div>
+        </section>
+
+        <section id="broadcasts" class="section">
+            <div class="section-header">
+                <div class="section-number">٤</div>
+                <h2>الـ Broadcast Receivers وإدارة الأحداث النظامية</h2>
+                <p class="section-description">تسجيل Receivers، التطور الأمني في أندرويد، والفخاخ القاتلة مثل ANR في onReceive.</p>
+            </div>
+
+            <h3>ما هو BroadcastReceiver؟</h3>
+            <p>BroadcastReceiver هو مكون يستمع إلى الأحداث (Events) على مستوى النظام أو التطبيق. يمكن تشبيهه بنظام "النشر والاشتراك" (Pub/Sub) على مستوى النظام. عندما يحدث حدث ما — مثل انتهاء شحن البطارية، أو تغير حالة الشبكة، أو إرسال تطبيقك إشعاراً مخصصاً — يقوم النظام ببث (Broadcast) رسالة، ويستقبلها جميع Receivers المسجلين والمهتمين بها.</p>
+
+            <p>لكن هذا المكون يحمل خصائص فريدة:</p>
+            <ul>
+                <li>دورة حياته <strong>قصيرة جداً</strong>: يُنشأ عند استلام البث، ويُدمّر مباشرة بعد انتهاء <code>onReceive()</code>.</li>
+                <li>يعمل على <strong>Main Thread</strong>: <code>onReceive()</code> يُستدعى على UI Thread، ويجب أن ينتهي خلال <strong>10 ثوانٍ</strong> وإلا سيحدث ANR.</li>
+                <li>لا يوفر <strong>Context طويل الأمد</strong>: لا يمكنك الاحتفاظ بمرجع إلى Receiver بعد انتهاء <code>onReceive()</code>.</li>
+            </ul>
+
+            <h3>طريقتان للتسجيل: Static مقابل Dynamic</h3>
+
+            <div class="comparison-grid">
+                <div class="card">
+                    <div class="card-title">Static Registration (عبر Manifest)</div>
+                    <p>يُعلن عن Receiver في <code>AndroidManifest.xml</code> باستخدام <code>&lt;receiver&gt;</code>.</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">AndroidManifest.xml</span>
+                            <span class="code-lang">XML</span>
+                        </div>
+                        <pre><code><span class="keyword">&lt;receiver</span> 
+    android:name=<span class="string">".BootReceiver"</span>
+    android:exported=<span class="string">"true"</span><span class="keyword">&gt;</span>
+    <span class="keyword">&lt;intent-filter&gt;</span>
+        <span class="keyword">&lt;action</span> android:name=<span class="string">"android.intent.action.BOOT_COMPLETED"</span> <span class="keyword">/&gt;</span>
+    <span class="keyword">&lt;/intent-filter&gt;</span>
+<span class="keyword">&lt;/receiver&gt;</span></code></pre>
+                    </div>
+                    <ul>
+                        <li>يعمل حتى لو لم يكن التطبيق قيد التشغيل (النظام يُشغله).</li>
+                        <li>مثالي للأحداث النظامية مثل <code>BOOT_COMPLETED</code>.</li>
+                        <li>مقيد بشدة في الإصدارات الحديثة (لا يمكن استخدامه مع معظم Implicit Broadcasts).</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Dynamic Registration (برمجياً)</div>
+                    <p>يُسجل Receiver في وقت التشغيل عبر <code>Context.registerReceiver()</code>.</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">Kotlin - Dynamic Registration</span>
+                            <span class="code-lang">KOTLIN</span>
+                        </div>
+                        <pre><code><span class="keyword">class</span> <span class="type">MainActivity</span> : <span class="type">AppCompatActivity</span>() {
+
+    <span class="keyword">private val</span> networkReceiver = <span class="keyword">object</span> : BroadcastReceiver() {
+        <span class="keyword">override fun</span> <span class="function">onReceive</span>(context: Context?, intent: Intent?) {
+            <span class="keyword">val</span> isConnected = intent?.getBooleanExtra(
+                ConnectivityManager.EXTRA_NO_CONNECTIVITY, <span class="keyword">false</span>
+            )?.<span class="function">not</span>() ?: <span class="keyword">false</span>
+            <span class="comment">// تحديث UI...</span>
+        }
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onResume</span>() {
+        <span class="keyword">super</span>.<span class="function">onResume</span>()
+        <span class="keyword">val</span> filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        <span class="function">registerReceiver</span>(networkReceiver, filter)
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onPause</span>() {
+        <span class="keyword">super</span>.<span class="function">onPause</span>()
+        <span class="function">unregisterReceiver</span>(networkReceiver)
+    }
+}</code></pre>
+                    </div>
+                    <ul>
+                        <li>يعمل فقط طالما التطبيق قيد التشغيل.</li>
+                        <li>يمكن تسجيله/إلغاء تسجيله ديناميكياً بناءً على حالة التطبيق.</li>
+                        <li>مثالي للأحداث المتعلقة بواجهة المستخدم.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>قيود البث الضمني في Android 8+ (Oreo)</h3>
+            <p>مع Android Oreo (API 26)، فرضت Google قيوداً صارمة على Static Registration للـ Implicit Broadcasts. السبب: التطبيقات كانت تسجل Receivers لأحداث النظام (مثل <code>CONNECTIVITY_CHANGE</code>) لتبقى نشطة في الخلفية باستمرار، مما يؤدي إلى استنزاف البطارية.</p>
+
+            <div class="card card-warning">
+                <div class="card-title"><span class="card-icon">🚫</span> ما الذي تغير في Android 8+؟</div>
+                <p>التطبيقات التي تستهدف API 26+ <strong>لا يمكنها</strong> استخدام Static Registration للعديد من Implicit System Broadcasts. لكن هناك استثناءات:</p>
+                <ul>
+                    <li>Broadcasts التي تُرسل فقط إلى تطبيقك (App-specific broadcasts).</li>
+                    <li>Broadcasts التي تتطلب أذونات خاصة (مثل <code>BOOT_COMPLETED</code> مع <code>RECEIVE_BOOT_COMPLETED</code>).</li>
+                    <li>Broadcasts المرسلة صراحةً (Explicit Broadcasts مع ComponentName).</li>
+                    <li>Broadcasts على قائمة الإعفاءات (مثل <code>LOCALE_CHANGED</code>, <code>TIMEZONE_CHANGED</code>).</li>
+                </ul>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الـ Broadcast</th>
+                            <th>Static Registration مسموح؟</th>
+                            <th>البديل الموصى به</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>ACTION_BOOT_COMPLETED</code></td>
+                            <td><span class="tag tag-success">نعم</span></td>
+                            <td>Static Registration (مع إذن)</td>
+                        </tr>
+                        <tr>
+                            <td><code>CONNECTIVITY_ACTION</code></td>
+                            <td><span class="tag tag-danger">لا</span></td>
+                            <td><code>ConnectivityManager.NetworkCallback</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>ACTION_NEW_PICTURE</code></td>
+                            <td><span class="tag tag-danger">لا</span></td>
+                            <td><code>JobScheduler</code> مع Trigger</td>
+                        </tr>
+                        <tr>
+                            <td><code>ACTION_PACKAGE_ADDED</code></td>
+                            <td><span class="tag tag-success">نعم</span></td>
+                            <td>Static Registration</td>
+                        </tr>
+                        <tr>
+                            <td>Custom Broadcasts</td>
+                            <td><span class="tag tag-success">نعم</span></td>
+                            <td>Dynamic Registration أو LocalBroadcastManager</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>LocalBroadcastManager والبدائل الحديثة</h3>
+            <p>كان <code>LocalBroadcastManager</code> (جزء من Support Library) يُستخدم لإرسال Broadcasts داخل نفس التطبيق فقط (Intra-app communication). الميزة: أكثر أماناً وكفاءة لأنه لا يستخدم IPC/Binder. لكنه <strong>مُهمل (Deprecated)</strong> الآن.</p>
+
+            <p>البدائل الموصى بها:</p>
+            <ol>
+                <li><strong>RxJava / RxKotlin:</strong> استخدام <code>PublishSubject</code> أو <code>BehaviorSubject</code>.</li>
+                <li><strong>Flow / SharedFlow:</strong> الحل الموصى به رسمياً من Google.</li>
+                <li><strong>EventBus Libraries:</strong> مثل GreenRobot's EventBus (لكنها تضيف اعتماديات).</li>
+            </ol>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Kotlin - SharedFlow كبديل لـ LocalBroadcastManager</span>
+                    <span class="code-lang">KOTLIN</span>
+                </div>
+                <pre><code><span class="keyword">object</span> <span class="type">AppEventBus</span> {
+
+    <span class="keyword">private val</span> _events = MutableSharedFlow&lt;AppEvent&gt;(
+        extraBufferCapacity = <span class="number">64</span>, <span class="comment">// تجنب فقدان الأحداث</span>
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    <span class="keyword">val</span> events: SharedFlow&lt;AppEvent&gt; = _events.<span class="function">asSharedFlow</span>()
+
+    <span class="keyword">fun</span> <span class="function">publish</span>(event: AppEvent) {
+        _events.<span class="function">tryEmit</span>(event)
+    }
+}
+
+<span class="keyword">sealed class</span> <span class="type">AppEvent</span> {
+    <span class="keyword">data class</span> <span class="type">UserLoggedIn</span>(<span class="keyword">val</span> userId: String) : AppEvent()
+    <span class="keyword">data class</span> <span class="type">DataSynced</span>(<span class="keyword">val</span> success: Boolean) : AppEvent()
+    <span class="keyword">object</span> <span class="type">Logout</span> : AppEvent()
+}
+
+<span class="comment">// الاشتراك في Activity أو ViewModel:</span>
+<span class="keyword">class</span> <span class="type">MainViewModel</span> : <span class="type">ViewModel</span>() {
+
+    <span class="keyword">init</span> {
+        viewModelScope.<span class="function">launch</span> {
+            AppEventBus.events
+                .<span class="function">filterIsInstance</span>&lt;AppEvent.UserLoggedIn&gt;()
+                .<span class="function">collect</span> { event ->
+                    <span class="comment">// التعامل مع تسجيل الدخول</span>
+                }
+        }
+    }
+}</code></pre>
+            </div>
+
+            <h3>فخاخ القاتلة: ANR في onReceive()</h3>
+            <p>أخطر خطأ في استخدام BroadcastReceiver هو تنفيذ عمليات ثقيلة داخل <code>onReceive()</code>. نظام أندرويد يفرض حداً زمنياً صارماً:</p>
+            <ul>
+                <li><strong>10 ثوانٍ</strong> للـ Foreground Broadcast (مثل <code>BOOT_COMPLETED</code>).</li>
+                <li><strong>10 ثوانٍ</strong> للـ Background Broadcast (قد تكون أقل في بعض الحالات).</li>
+            </ul>
+
+            <p>إذا تجاوزت هذه المدة، سيُظهر النظام مربع ANR وقد يقتل العملية.</p>
+
+            <div class="card card-danger">
+                <div class="card-title"><span class="card-icon">☠️</span> المثال القاتل: عمليات الشبكة في onReceive</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">كود خطأ - يسبب ANR</span>
+                        <span class="code-lang">KOTLIN</span>
+                    </div>
+                    <pre><code><span class="keyword">class</span> <span class="type">BadReceiver</span> : <span class="type">BroadcastReceiver</span>() {
+    <span class="keyword">override fun</span> <span class="function">onReceive</span>(context: Context, intent: Intent) {
+        <span class="comment">// ☠️ خطأ فادح: استدعاء شبكة مباشرة على Main Thread</span>
+        <span class="keyword">val</span> response = apiService.<span class="function">syncData</span>().<span class="function">execute</span>() <span class="comment">// ANR مضمون!</span>
+    }
+}</code></pre>
+                </div>
+            </div>
+
+            <h4>الحل: goAsync() و Foreground Services</h4>
+            <p>إذا كنت بحاجة إلى تنفيذ عمليات طويلة في Receiver، لديك خياران:</p>
+
+            <div class="step">
+                <div class="step-number">١</div>
+                <div class="step-content">
+                    <div class="step-title">goAsync() (للعمل القصير نسبياً)</div>
+                    <p>يسمح بإرجاع من <code>onReceive()</code> مبكراً بينما يستمر العمل في Thread منفصل. لكنه <strong>لا يزال محدوداً بـ 10 ثوانٍ</strong> من النظام.</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">Kotlin - goAsync Pattern</span>
+                            <span class="code-lang">KOTLIN</span>
+                        </div>
+                        <pre><code><span class="keyword">class</span> <span class="type">AsyncReceiver</span> : <span class="type">BroadcastReceiver</span>() {
+    <span class="keyword">override fun</span> <span class="function">onReceive</span>(context: Context, intent: Intent) {
+        <span class="keyword">val</span> pendingResult = <span class="function">goAsync</span>()
+
+        CoroutineScope(Dispatchers.IO).<span class="function">launch</span> {
+            <span class="keyword">try</span> {
+                <span class="function">performHeavyWork</span>()
+                pendingResult.<span class="function">setResult</span>(Activity.RESULT_OK, <span class="keyword">null</span>, <span class="keyword">null</span>)
+            } <span class="keyword">catch</span> (e: Exception) {
+                pendingResult.<span class="function">setResult</span>(Activity.RESULT_CANCELED, <span class="keyword">null</span>, <span class="keyword">null</span>)
+            } <span class="keyword">finally</span> {
+                pendingResult.<span class="function">finish</span>() <span class="comment">// ⚠️ يجب استدعاء finish()</span>
+            }
+        }
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">٢</div>
+                <div class="step-content">
+                    <div class="step-title">بدء Foreground Service (للعمل الطويل)</div>
+                    <p>إذا كانت المهمة ستستغرق أكثر من بضع ثوانٍ، <strong>يجب</strong> بدء Foreground Service. هذا هو الأسلوب الوحيد الموثوق.</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">Kotlin - بدء Service من Receiver</span>
+                            <span class="code-lang">KOTLIN</span>
+                        </div>
+                        <pre><code><span class="keyword">class</span> <span class="type">BootReceiver</span> : <span class="type">BroadcastReceiver</span>() {
+    <span class="keyword">override fun</span> <span class="function">onReceive</span>(context: Context, intent: Intent) {
+        <span class="keyword">if</span> (intent.action == Intent.ACTION_BOOT_COMPLETED) {
+            <span class="comment">// بدء Foreground Service للمزامنة الطويلة</span>
+            <span class="keyword">val</span> serviceIntent = Intent(context, SyncService::<span class="keyword">class</span>.java)
+            ContextCompat.<span class="function">startForegroundService</span>(context, serviceIntent)
+        }
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Ordered Broadcasts و Priority</h3>
+            <p>يمكن إرسال Broadcast كـ <strong>Ordered</strong> باستخدام <code>sendOrderedBroadcast()</code>. في هذه الحالة، يستقبل Receivers البث بالتسلسل حسب أولويتهم (<code>android:priority</code>)، ويمكن لكل Receiver:</p>
+            <ul>
+                <li>إيقاف البث (<code>abortBroadcast()</code>) لمنع وصوله إلى Receivers ذات الأولوية الأقل.</li>
+                <li>تعديل النتيجة (<code>setResultData()</code>, <code>setResultExtras()</code>) التي ستُمرر إلى Receivers التالية.</li>
+            </ul>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Kotlin - Ordered Broadcast</span>
+                    <span class="code-lang">KOTLIN</span>
+                </div>
+                <pre><code><span class="comment">// إرسال Ordered Broadcast</span>
+<span class="function">sendOrderedBroadcast</span>(
+    Intent(ACTION_CUSTOM_EVENT),
+    <span class="string">"com.example.permission.RECEIVE_EVENT"</span>, <span class="comment">// إذن مطلوب</span>
+    resultReceiver, <span class="comment">// Receiver نهائي يستلم النتيجة</span>
+    <span class="keyword">null</span>, <span class="comment">// Handler</span>
+    Activity.RESULT_OK,
+    <span class="string">"initial_data"</span>,
+    <span class="keyword">null</span> <span class="comment">// extras</span>
+)
+
+<span class="comment">// الاستقبال:</span>
+<span class="keyword">class</span> <span class="type">PriorityReceiver</span> : <span class="type">BroadcastReceiver</span>() {
+    <span class="keyword">override fun</span> <span class="function">onReceive</span>(context: Context, intent: Intent) {
+        <span class="keyword">if</span> (<span class="function">isOrderedBroadcast</span>) {
+            <span class="comment">// تعديل البيانات للـ Receivers التالية</span>
+            <span class="function">setResultData</span>(<span class="string">"modified_data"</span>)
+
+            <span class="comment">// أو إيقاف البث تماماً</span>
+            <span class="comment">// abortBroadcast()</span>
+        }
+    }
+}</code></pre>
+            </div>
+
+            <div class="highlight-box">
+                <p><strong>ملاحظة أمنية:</strong> Ordered Broadcasts مع <code>abortBroadcast()</code> يمكن أن تُستخدم للهجوم على التطبيقات الأخرى (Denial of Service). إذا كان Broadcast حساساً، استخدم <code>sendBroadcast()</code> العادي أو فرض إذن (<code>android:permission</code>) على Receiver.</p>
+            </div>
+        </section>
+
+        <section id="providers" class="section">
+            <div class="section-header">
+                <div class="section-number">٥</div>
+                <h2>مشاركة البيانات الآمنة عبر Content Providers</h2>
+                <p class="section-description">المعمارية الداخلية للـ ContentProvider، حماية قواعد البيانات، ونقل الملفات الآمن عبر FileProvider.</p>
+            </div>
+
+            <h3>ما هو ContentProvider؟</h3>
+            <p>ContentProvider هو بوابة (Gateway) موحدة للوصول إلى بيانات التطبيق. يُستخدم لمشاركة البيانات <strong>بين تطبيقات مختلفة</strong> أو حتى <strong>داخل نفس التطبيق</strong> عبر عزل الوصول في طبقة منفصلة. البيانات يمكن أن تكون:</p>
+            <ul>
+                <li>قاعدة بيانات SQLite.</li>
+                <li>ملفات على التخزين الداخلي أو الخارجي.</li>
+                <li>بيانات في الذاكرة (In-memory data).</li>
+                <li>بيانات شبكية (مع التخزين المؤقت).</li>
+            </ul>
+
+            <p>من الناحية المعمارية، ContentProvider يعمل كنموذج <strong> abstraction layer</strong> بين مصدر البيانات (Data Source) والمستهلكين (Consumers). يوفر واجهة CRUD موحدة: <code>query()</code>, <code>insert()</code>, <code>update()</code>, <code>delete()</code>.</p>
+
+            <div class="diagram">
+┌─────────────────────────────────────────────────────────────┐
+│                    Consumer Application                      │
+│                                                              │
+│   ContentResolver.query(Uri, ...) ──────────────────────┐   │
+└─────────────────────────────────────────────────────────┼───┘
+                                                          │
+                    IPC via Binder                         │
+                                                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   Provider Application                       │
+│                                                              │
+│   ┌──────────────┐    ┌──────────────┐    ┌──────────────┐ │
+│   │ ContentProvider│───►│   SQLiteOpenHelper  │───►│   SQLite DB   │ │
+│   │   (query/insert)   │    │   (Thread-safe)      │    │               │ │
+│   └──────────────┘    └──────────────┘    └──────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+            </div>
+
+            <h3>بنية URI في ContentProvider</h3>
+            <p>يتم تحديد البيانات عبر <strong>Content URI</strong> بتنسيق موحد:</p>
+            <p style="text-align: center; font-size: 1.2rem; margin: 2rem 0;"><code>content://com.example.app.provider/table_name/row_id</code></p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الجزء</th>
+                            <th>الوصف</th>
+                            <th>مثال</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>content://</code></td>
+                            <td>البروتوكول (Scheme) — يشير إلى ContentProvider</td>
+                            <td>ثابت</td>
+                        </tr>
+                        <tr>
+                            <td><code>authority</code></td>
+                            <td>اسم فريد عالمياً (Package-based)</td>
+                            <td><code>com.example.app.provider</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>path</code></td>
+                            <td>مسار الجدول أو نوع البيانات</td>
+                            <td><code>/users</code>, <code>/photos</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>معرف صف محدد (اختياري)</td>
+                            <td><code>/5</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>تنفيذ ContentProvider كامل وآمن</h3>
+            <p>إليك تنفيذاً إنتاجياً كاملاً لـ ContentProvider يتعامل مع SQLite بشكل آمن ومتزامن (Thread-safe).</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Kotlin - SecureContentProvider Implementation</span>
+                    <span class="code-lang">KOTLIN</span>
+                </div>
+                <pre><code><span class="keyword">class</span> <span class="type">SecureContentProvider</span> : <span class="type">ContentProvider</span>() {
+
+    <span class="keyword">private lateinit var</span> dbHelper: SecureDbHelper
+    <span class="keyword">private val</span> uriMatcher = UriMatcher(UriMatcher.NO_MATCH)
+
+    <span class="keyword">companion object</span> {
+        <span class="keyword">const val</span> AUTHORITY = <span class="string">"com.example.secureapp.provider"</span>
+        <span class="keyword">const val</span> PATH_USERS = <span class="string">"users"</span>
+        <span class="keyword">const val</span> PATH_USER_ID = <span class="string">"users/#"</span>
+
+        <span class="keyword">val</span> CONTENT_URI: Uri = Uri.<span class="function">parse</span>(<span class="string">"content://$AUTHORITY/$PATH_USERS"</span>)
+
+        <span class="keyword">const val</span> USERS = <span class="number">1</span>
+        <span class="keyword">const val</span> USER_ID = <span class="number">2</span>
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(): Boolean {
+        context?.let { ctx ->
+            dbHelper = SecureDbHelper(ctx)
+            uriMatcher.<span class="function">addURI</span>(AUTHORITY, PATH_USERS, USERS)
+            uriMatcher.<span class="function">addURI</span>(AUTHORITY, PATH_USER_ID, USER_ID)
+        }
+        <span class="keyword">return true</span>
+    }
+
+    <span class="keyword">override fun</span> <span class="function">query</span>(
+        uri: Uri,
+        projection: Array&lt;String&gt;?,
+        selection: String?,
+        selectionArgs: Array&lt;String&gt;?,
+        sortOrder: String?
+    ): Cursor? {
+        <span class="keyword">val</span> db = dbHelper.readableDatabase
+        <span class="keyword">val</span> cursor: Cursor
+
+        <span class="keyword">when</span> (uriMatcher.<span class="function">match</span>(uri)) {
+            USERS -> {
+                cursor = db.<span class="function">query</span>(
+                    TABLE_USERS,
+                    projection,
+                    selection, <span class="comment">// يجب أن يكون معاملاً وليس مدمجاً</span>
+                    selectionArgs, <span class="comment">// ✅ الوقاية من SQL Injection</span>
+                    <span class="keyword">null</span>,
+                    <span class="keyword">null</span>,
+                    sortOrder
+                )
+            }
+            USER_ID -> {
+                <span class="comment">// استخراج ID من URI بشكل آمن</span>
+                <span class="keyword">val</span> id = ContentUris.<span class="function">parseId</span>(uri)
+                cursor = db.<span class="function">query</span>(
+                    TABLE_USERS,
+                    projection,
+                    <span class="string">"$COLUMN_ID = ?"</span>,
+                    <span class="function">arrayOf</span>(id.<span class="function">toString</span>()),
+                    <span class="keyword">null</span>,
+                    <span class="keyword">null</span>,
+                    sortOrder
+                )
+            }
+            <span class="keyword">else</span> -> <span class="keyword">throw</span> IllegalArgumentException(<span class="string">"Unknown URI: $uri"</span>)
+        }
+
+        <span class="comment">// إعداد الإشعار بالتغييرات — حاسم للـ CursorLoader</span>
+        cursor.<span class="function">setNotificationUri</span>(context!!.contentResolver, uri)
+        <span class="keyword">return</span> cursor
+    }
+
+    <span class="keyword">override fun</span> <span class="function">insert</span>(uri: Uri, values: ContentValues?): Uri? {
+        <span class="keyword">val</span> db = dbHelper.writableDatabase
+
+        <span class="keyword">val</span> id = <span class="keyword">when</span> (uriMatcher.<span class="function">match</span>(uri)) {
+            USERS -> db.<span class="function">insert</span>(TABLE_USERS, <span class="keyword">null</span>, values)
+            <span class="keyword">else</span> -> <span class="keyword">throw</span> IllegalArgumentException(<span class="string">"Unknown URI: $uri"</span>)
+        }
+
+        <span class="keyword">if</span> (id == -1L) <span class="keyword">return null</span>
+
+        <span class="comment">// إخطار المستمعين بالتغيير</span>
+        context?.contentResolver?.<span class="function">notifyChange</span>(uri, <span class="keyword">null</span>)
+        <span class="keyword">return</span> ContentUris.<span class="function">withAppendedId</span>(CONTENT_URI, id)
+    }
+
+    <span class="keyword">override fun</span> <span class="function">update</span>(
+        uri: Uri,
+        values: ContentValues?,
+        selection: String?,
+        selectionArgs: Array&lt;String&gt;?
+    ): Int {
+        <span class="keyword">val</span> db = dbHelper.writableDatabase
+        <span class="keyword">val</span> count: Int
+
+        <span class="keyword">when</span> (uriMatcher.<span class="function">match</span>(uri)) {
+            USERS -> {
+                count = db.<span class="function">update</span>(TABLE_USERS, values, selection, selectionArgs)
+            }
+            USER_ID -> {
+                <span class="keyword">val</span> id = ContentUris.<span class="function">parseId</span>(uri)
+                count = db.<span class="function">update</span>(
+                    TABLE_USERS,
+                    values,
+                    <span class="string">"$COLUMN_ID = ?"</span>,
+                    <span class="function">arrayOf</span>(id.<span class="function">toString</span>())
+                )
+            }
+            <span class="keyword">else</span> -> <span class="keyword">throw</span> IllegalArgumentException(<span class="string">"Unknown URI: $uri"</span>)
+        }
+
+        <span class="keyword">if</span> (count > <span class="number">0</span>) {
+            context?.contentResolver?.<span class="function">notifyChange</span>(uri, <span class="keyword">null</span>)
+        }
+        <span class="keyword">return</span> count
+    }
+
+    <span class="keyword">override fun</span> <span class="function">delete</span>(uri: Uri, selection: String?, selectionArgs: Array&lt;String&gt;?): Int {
+        <span class="comment">// تنفيذ مشابه للـ update...</span>
+        <span class="keyword">val</span> db = dbHelper.writableDatabase
+        <span class="keyword">val</span> count = <span class="keyword">when</span> (uriMatcher.<span class="function">match</span>(uri)) {
+            USERS -> db.<span class="function">delete</span>(TABLE_USERS, selection, selectionArgs)
+            USER_ID -> {
+                <span class="keyword">val</span> id = ContentUris.<span class="function">parseId</span>(uri)
+                db.<span class="function">delete</span>(TABLE_USERS, <span class="string">"$COLUMN_ID = ?"</span>, <span class="function">arrayOf</span>(id.<span class="function">toString</span>()))
+            }
+            <span class="keyword">else</span> -> <span class="number">0</span>
+        }
+
+        <span class="keyword">if</span> (count > <span class="number">0</span>) {
+            context?.contentResolver?.<span class="function">notifyChange</span>(uri, <span class="keyword">null</span>)
+        }
+        <span class="keyword">return</span> count
+    }
+
+    <span class="keyword">override fun</span> <span class="function">getType</span>(uri: Uri): String? {
+        <span class="keyword">return when</span> (uriMatcher.<span class="function">match</span>(uri)) {
+            USERS -> <span class="string">"vnd.android.cursor.dir/vnd.$AUTHORITY.$PATH_USERS"</span>
+            USER_ID -> <span class="string">"vnd.android.cursor.item/vnd.$AUTHORITY.$PATH_USERS"</span>
+            <span class="keyword">else</span> -> <span class="keyword">throw</span> IllegalArgumentException(<span class="string">"Unknown URI: $uri"</span>)
+        }
+    }
+}</code></pre>
+            </div>
+
+            <h3>أمان قواعد البيانات: الوقاية من SQL Injection</h3>
+            <p>أخطر ثغرة في ContentProvider هي <strong>SQL Injection</strong>. تحدث عندما يتم دمج معاملات الاستعلام (Selection) مباشرة في سلسلة SQL بدلاً من استخدام <code>selectionArgs</code>.</p>
+
+            <div class="card card-danger">
+                <div class="card-title"><span class="card-icon">☠️</span> الكود الضعيف المعرض للاختراق</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">كود غير آمن - SQL Injection</span>
+                        <span class="code-lang">KOTLIN</span>
+                    </div>
+                    <pre><code><span class="comment">// ⚠️ خطر: دمج القيمة مباشرة في الاستعلام</span>
+<span class="keyword">val</span> cursor = db.<span class="function">rawQuery</span>(
+    <span class="string">"SELECT * FROM users WHERE name = '$userInput'"</span>, <span class="keyword">null</span>
+)
+<span class="comment">// إذا أدخل المهاجم: ' OR '1'='1</span>
+<span class="comment">// الاستعلام يصبح: SELECT * FROM users WHERE name = '' OR '1'='1'</span>
+<span class="comment">// مما يعيد جميع السجلات!</span></code></pre>
+                </div>
+            </div>
+
+            <div class="card card-success">
+                <div class="card-title"><span class="card-icon">🔒</span> الكود الآمن باستخدام selectionArgs</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">كود آمن - Parameterized Query</span>
+                        <span class="code-lang">KOTLIN</span>
+                    </div>
+                    <pre><code><span class="comment">// ✅ آمن: استخدام معاملات منفصلة</span>
+<span class="keyword">val</span> cursor = db.<span class="function">query</span>(
+    TABLE_USERS,
+    <span class="keyword">null</span>,
+    <span class="string">"name = ? AND active = ?"</span>, <span class="comment">// القالب مع علامات الاستفهام</span>
+    <span class="function">arrayOf</span>(userInput, <span class="string">"1"</span>), <span class="comment">// القيم المُمررة بشكل آمن</span>
+    <span class="keyword">null</span>,
+    <span class="keyword">null</span>,
+    <span class="keyword">null</span>
+)
+<span class="comment">// SQLite يعامل القيم كنص فقط، ولا يمكن حقن SQL</span></code></pre>
+                </div>
+            </div>
+
+            <h3>الاستهلاك الآمن: ContentResolver</h3>
+            <p>عند استهلاك بيانات من ContentProvider آخر (مثل Contacts أو MediaStore)، يجب اتباع أفضل الممارسات:</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Kotlin - استهلاك ContentProvider بأمان</span>
+                    <span class="code-lang">KOTLIN</span>
+                </div>
+                <pre><code><span class="keyword">class</span> <span class="type">ContactRepository</span>(<span class="keyword">private val</span> context: Context) {
+
+    <span class="keyword">fun</span> <span class="function">getContacts</span>(): List&lt;Contact&gt; {
+        <span class="keyword">val</span> contacts = mutableListOf&lt;Contact&gt;()
+
+        <span class="comment">// التحقق من الإذن قبل الوصول</span>
+        <span class="keyword">if</span> (ContextCompat.<span class="function">checkSelfPermission</span>(context, Manifest.permission.READ_CONTACTS)
+            != PackageManager.PERMISSION_GRANTED) {
+            <span class="keyword">return</span> emptyList()
+        }
+
+        <span class="keyword">val</span> projection = <span class="function">arrayOf</span>(
+            ContactsContract.Contacts._ID,
+            ContactsContract.Contacts.DISPLAY_NAME,
+            ContactsContract.Contacts.HAS_PHONE_NUMBER
+        )
+
+        <span class="comment">// استخدام try-with-resources (use) لضمان إغلاق Cursor</span>
+        context.contentResolver.<span class="function">query</span>(
+            ContactsContract.Contacts.CONTENT_URI,
+            projection,
+            <span class="keyword">null</span>,
+            <span class="keyword">null</span>,
+            <span class="string">"${ContactsContract.Contacts.DISPLAY_NAME} ASC"</span>
+        )?.<span class="function">use</span> { cursor ->
+            <span class="keyword">val</span> idIndex = cursor.<span class="function">getColumnIndexOrThrow</span>(ContactsContract.Contacts._ID)
+            <span class="keyword">val</span> nameIndex = cursor.<span class="function">getColumnIndexOrThrow</span>(ContactsContract.Contacts.DISPLAY_NAME)
+
+            <span class="keyword">while</span> (cursor.<span class="function">moveToNext</span>()) {
+                contacts.<span class="function">add</span>(
+                    Contact(
+                        id = cursor.<span class="function">getLong</span>(idIndex),
+                        name = cursor.<span class="function">getString</span>(nameIndex)
+                    )
+                )
+            }
+        }
+
+        <span class="keyword">return</span> contacts
+    }
+}</code></pre>
+            </div>
+
+            <h3>FileProvider ومشاركة الملفات الآمنة</h3>
+            <p>قبل Android 7.0 (API 24)، كان يمكن مشاركة الملفات عبر <code>file://</code> URIs. لكن هذا أدى إلى ثغرة أمنية: أي تطبيق يستلم <code>file://</code> URI يمكنه الوصول إلى الملف بصلاحيات النظام. لحل هذه المشكلة، أُدخل <strong>FileProvider</strong> الذي يستخدم <code>content://</code> URIs مع أذونات مؤقتة.</p>
+
+            <div class="card card-danger">
+                <div class="card-title"><span class="card-icon">🚫</span> FileUriExposedException</div>
+                <p>إذا حاولت مشاركة ملف عبر <code>file://</code> URI في تطبيق يستهدف Android 7.0+، سيُرمى <code>FileUriExposedException</code>. الحل الوحيد هو استخدام FileProvider.</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">XML - FileProvider Configuration (file_paths.xml)</span>
+                    <span class="code-lang">XML</span>
+                </div>
+                <pre><code><span class="comment">&lt;!-- res/xml/file_paths.xml --&gt;</span>
+<span class="keyword">&lt;paths&gt;</span>
+    <span class="comment">&lt;!-- الملفات في storage/emulated/0/Pictures/ --&gt;</span>
+    <span class="keyword">&lt;external-path</span> 
+        name=<span class="string">"my_images"</span> 
+        path=<span class="string">"Pictures/"</span> <span class="keyword">/&gt;</span>
+
+    <span class="comment">&lt;!-- الملفات في getFilesDir() --&gt;</span>
+    <span class="keyword">&lt;files-path</span> 
+        name=<span class="string">"internal_docs"</span> 
+        path=<span class="string">"documents/"</span> <span class="keyword">/&gt;</span>
+
+    <span class="comment">&lt;!-- الملفات في getCacheDir() --&gt;</span>
+    <span class="keyword">&lt;cache-path</span> 
+        name=<span class="string">"shared_cache"</span> 
+        path=<span class="string">"."</span> <span class="keyword">/&gt;</span>
+<span class="keyword">&lt;/paths&gt;</span></code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">AndroidManifest.xml - FileProvider Declaration</span>
+                    <span class="code-lang">XML</span>
+                </div>
+                <pre><code><span class="keyword">&lt;provider</span>
+    android:name=<span class="string">"androidx.core.content.FileProvider"</span>
+    android:authorities=<span class="string">"${applicationId}.fileprovider"</span>
+    android:exported=<span class="string">"false"</span>
+    android:grantUriPermissions=<span class="string">"true"</span><span class="keyword">&gt;</span>
+    <span class="keyword">&lt;meta-data</span>
+        android:name=<span class="string">"android.support.FILE_PROVIDER_PATHS"</span>
+        android:resource=<span class="string">"@xml/file_paths"</span> <span class="keyword">/&gt;</span>
+<span class="keyword">&lt;/provider&gt;</span></code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Kotlin - مشاركة الملف بأمان</span>
+                    <span class="code-lang">KOTLIN</span>
+                </div>
+                <pre><code><span class="keyword">fun</span> <span class="function">shareImageSecurely</span>(context: Context, imageFile: File) {
+    <span class="comment">// تحويل File إلى content:// URI آمن</span>
+    <span class="keyword">val</span> uri = FileProvider.<span class="function">getUriForFile</span>(
+        context,
+        <span class="string">"${context.packageName}.fileprovider"</span>,
+        imageFile
+    )
+
+    <span class="keyword">val</span> shareIntent = Intent(Intent.ACTION_SEND).<span class="function">apply</span> {
+        type = <span class="string">"image/jpeg"</span>
+        <span class="function">putExtra</span>(Intent.EXTRA_STREAM, uri)
+        <span class="comment">// منح إذن القراءة للتطبيق المستلم فقط</span>
+        <span class="function">addFlags</span>(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        <span class="function">addFlags</span>(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+    }
+
+    <span class="comment">// استخدام Chooser لمنع التطبيق الافتراضي من الاستيلاء</span>
+    <span class="keyword">val</span> chooser = Intent.<span class="function">createChooser</span>(shareIntent, <span class="string">"Share Image"</span>)
+
+    <span class="comment">// منح الإذن لجميع التطبيقات في Chooser</span>
+    <span class="keyword">val</span> resInfoList = context.packageManager
+        .<span class="function">queryIntentActivities</span>(chooser, PackageManager.MATCH_DEFAULT_ONLY)
+
+    resInfoList.<span class="function">forEach</span> { resolveInfo ->
+        <span class="keyword">val</span> packageName = resolveInfo.activityInfo.packageName
+        context.<span class="function">grantUriPermission</span>(
+            packageName,
+            uri,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION
+        )
+    }
+
+    context.<span class="function">startActivity</span>(chooser)
+}</code></pre>
+            </div>
+
+            <h3>grantUriPermissions: فهم الآلية الداخلية</h3>
+            <p>عندما تمنح <code>FLAG_GRANT_READ_URI_PERMISSION</code> على Intent، لا يمنح التطبيق المستلم إذناً دائماً. بدلاً من ذلك:</p>
+            <ol>
+                <li>يُخزن النظام هذا الإذن في <strong>URI Permission Grant Table</strong> (جدول إذن URI) في PackageManagerService.</li>
+                <li>هذا الإذن مؤقت: يستمر فقط طالما المهمة (Task) المرتبطة بالIntent نشطة.</li>
+                <li>عندما يُدمّر المستخدم المهمة، يُسحب الإذن تلقائياً.</li>
+                <li>يمكن جعل الإذن دائماً باستخدام <code>Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION</code> مع <code>takePersistableUriPermission()</code>.</li>
+            </ol>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Kotlin - Persistable URI Permissions</span>
+                    <span class="code-lang">KOTLIN</span>
+                </div>
+                <pre><code><span class="comment">// منح إذن دائم عند فتح مستند</span>
+<span class="keyword">val</span> openDocumentIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).<span class="function">apply</span> {
+    addCategory(Intent.CATEGORY_OPENABLE)
+    type = <span class="string">"*/*"</span>
+    <span class="function">addFlags</span>(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    <span class="function">addFlags</span>(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION) <span class="comment">// مفتاح الديمومة</span>
+}
+
+<span class="comment">// في onActivityResult:</span>
+<span class="keyword">override fun</span> <span class="function">onActivityResult</span>(requestCode: Int, resultCode: Int, data: Intent?) {
+    <span class="keyword">if</span> (requestCode == REQUEST_OPEN_DOCUMENT && resultCode == Activity.RESULT_OK) {
+        data?.data?.let { uri ->
+            <span class="comment">// حفظ الإذن دائماً</span>
+            contentResolver.<span class="function">takePersistableUriPermission</span>(
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+
+            <span class="comment">// الآن يمكن الوصول إلى هذا URI حتى بعد إعادة تشغيل التطبيق</span>
+            <span class="function">saveUriToPreferences</span>(uri.<span class="function">toString</span>())
+        }
+    }
+}</code></pre>
+            </div>
+
+            <div class="highlight-box">
+                <p><strong>الخلاصة الأمنية:</strong> ContentProvider هو البوابة الأكثر حساسية في تطبيقك. دائماً استخدم <code>selectionArgs</code> للوقاية من SQL Injection، حدد <code>exported="false"</code> إذا لم تكن بحاجة لمشاركة البيانات خارجياً، واستخدم FileProvider دائماً لمشاركة الملفات. تذكر: ContentProvider يكون <code>exported="true"</code> افتراضياً!</p>
+            </div>
+        </section>
+
+        <section id="pending" class="section">
+            <div class="section-header">
+                <div class="section-number">٦</div>
+                <h2>الـ Pending Intents وسياسة الاستخدام الأمني</h2>
+                <p class="section-description">Identity Grant، الكارثة الأمنية للـ Mutable PendingIntents، ومتطلبات Android 12+.</p>
+            </div>
+
+            <h3>ما هو PendingIntent؟</h3>
+            <p>PendingIntent هو رمز مميز (Token) يمنح تطبيقاً <strong>آخر</strong> القدرة على تنفيذ إجراء نيابة عن تطبيقك، باستخدام <strong>هويتك (Identity) وصلاحياتك</strong>. يمكن تشبيهه بـ "توكيل رسمي" — تمنح تطبيق آخر (مثل NotificationManager أو AlarmManager أو تطبيق جهاز آخر) الحق في استدعاء مكون في تطبيقك كما لو كان هو نفسه.</p>
+
+            <p>من الناحية الداخلية، PendingIntent ليس Intent. هو <strong>مرجع إلى Intent مخزن في النظام</strong> (System-side Reference). عند إنشائه:</p>
+            <ol>
+                <li>يرسل تطبيقك Intent إلى ActivityManagerService.</li>
+                <li>يُخزن AMS الIntent في جدول داخلي.</li>
+                <li>يُرجع AMS Token (PendingIntent) يمثل هذا الIntent.</li>
+                <li>عندما يُستخدم Token لاحقاً، يسترجع AMS الIntent الأصلي ويُنفذه بصلاحيات تطبيقك الأصلي.</li>
+            </ol>
+
+            <div class="diagram">
+┌─────────────────────────────────────────────────────────────┐
+│                  Your Application (UID 10085)                │
+│                                                              │
+│  val pi = PendingIntent.getActivity(                         │
+│      context, 0, intent, FLAG_IMMUTABLE                      │
+│  )                                                           │
+│                                                              │
+│  ┌──────────────┐         ┌──────────────┐                  │
+│  │   Intent     │────────►│  AMS Store   │                  │
+│  │  (Wrapped)   │         │  (Token 4521)│                  │
+│  └──────────────┘         └──────────────┘                  │
+│                                    │                         │
+└────────────────────────────────────┼────────────────────────┘
+                                     │
+                    IPC via Binder   │
+                                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│              Another App / System Service                    │
+│                                                              │
+│  notificationBuilder.setContentIntent(pi) ──────────────┐   │
+│                                                         │   │
+│  User clicks notification ──────────────────────────────┼───┘
+│                                                         │
+└─────────────────────────────────────────────────────────┼───┘
+                                                          │
+                    IPC via Binder                         │
+                                                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  ActivityManagerService                      │
+│                                                              │
+│  Token 4521 resolved ──► Original Intent                    │
+│  Execute with UID 10085 permissions ──► Start Activity      │
+└─────────────────────────────────────────────────────────────┘
+            </div>
+
+            <h3>أنواع PendingIntent</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الدالة</th>
+                            <th>الاستخدام</th>
+                            <th>المكون المستهدف</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>PendingIntent.getActivity()</code></td>
+                            <td>بدء Activity (مثل النقر على إشعار)</td>
+                            <td>Activity</td>
+                        </tr>
+                        <tr>
+                            <td><code>PendingIntent.getActivities()</code></td>
+                            <td>بدء stack من Activities</td>
+                            <td>Multiple Activities</td>
+                        </tr>
+                        <tr>
+                            <td><code>PendingIntent.getBroadcast()</code></td>
+                            <td>إرسال Broadcast (مثل AlarmManager)</td>
+                            <td>BroadcastReceiver</td>
+                        </tr>
+                        <tr>
+                            <td><code>PendingIntent.getService()</code></td>
+                            <td>بدء Service (مهمل في Android 8+)</td>
+                            <td>Service</td>
+                        </tr>
+                        <tr>
+                            <td><code>PendingIntent.getForegroundService()</code></td>
+                            <td>بدء Foreground Service (Android 8+)</td>
+                            <td>Foreground Service</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>الكارثة الأمنية: Mutable PendingIntents</h3>
+            <p>قبل Android 12 (API 31)، كان PendingIntent <strong>قابلاً للتعديل (Mutable)</strong> افتراضياً. هذا يعني أن التطبيق الذي يستلم PendingIntent يمكنه تعديل extras الخاصة به قبل تنفيذه. يبدو هذا innocent، لكنه يفتح باباً لهجوم خطير: <strong>PendingIntent Hijacking</strong>.</p>
+
+            <div class="card card-danger">
+                <div class="card-title"><span class="card-icon">🚨</span> سيناريو الهجوم: PendingIntent Hijacking</div>
+                <p>تخيل أن تطبيقك (التطبيق الضحية) ينشئ PendingIntent لبدء Activity داخلية:</p>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">كود ضحية - غير آمن قبل Android 12</span>
+                        <span class="code-lang">KOTLIN</span>
+                    </div>
+                    <pre><code><span class="comment">// ⚠️ خطر: PendingIntent قابل للتعديل (Mutable)</span>
+<span class="keyword">val</span> intent = Intent(context, InternalActivity::<span class="keyword">class</span>.java)
+intent.<span class="function">putExtra</span>(<span class="string">"user_id"</span>, currentUserId)
+
+<span class="keyword">val</span> pendingIntent = PendingIntent.<span class="function">getActivity</span>(
+    context,
+    <span class="number">0</span>,
+    intent,
+    <span class="number">0</span> <span class="comment">// ⚠️ لا يوجد FLAG_IMMUTABLE!</span>
+)</code></pre>
+                </div>
+                <p>التطبيق المهاجم يستلم هذا PendingIntent (مثلاً عبر sharing) ويقوم بتعديله:</p>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">كود مهاجم - استغلال الثغرة</span>
+                        <span class="code-lang">KOTLIN</span>
+                    </div>
+                    <pre><code><span class="comment">// التطبيق المهاجم يستلم PendingIntent ويعدله</span>
+<span class="keyword">val</span> maliciousIntent = Intent().<span class="function">apply</span> {
+    <span class="function">putExtra</span>(<span class="string">"user_id"</span>, <span class="string">"admin"</span>) <span class="comment">// تغيير معرف المستخدم!</span>
+    <span class="function">setClassName</span>(<span class="string">"com.victim.app"</span>, <span class="string">"com.victim.app.AdminActivity"</span>)
+}
+
+<span class="comment">// تنفيذ PendingIntent مع Intent معدل</span>
+pendingIntent.<span class="function">send</span>(context, <span class="number">0</span>, maliciousIntent)</code></pre>
+                </div>
+                <p>النتيجة: يتم تنفيذ PendingIntent بصلاحيات التطبيق الضحية، لكن مع Intent معدل يشير إلى Activity حساسة!</p>
+            </div>
+
+            <h3>Android 12+: FLAG_IMMUTABLE vs FLAG_MUTABLE</h3>
+            <p>مع Android 12 (API 31)، أصبح <strong>إلزامياً</strong> تحديد إحدى العلامتين عند إنشاء PendingIntent:</p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>العلم</th>
+                            <th>السلوك</th>
+                            <th>متى تستخدم؟</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>FLAG_IMMUTABLE</code></td>
+                            <td>لا يمكن لتطبيق آخر تعديل الIntent الأساسي. يُستخدم كما هو.</td>
+                            <td><strong>الافتراضي الموصى به.</strong> الإشعارات، Alarms، معظم حالات الاستخدام.</td>
+                        </tr>
+                        <tr>
+                            <td><code>FLAG_MUTABLE</code></td>
+                            <td>يسمح للتطبيق المستلم بتعديل extras (لكن ليس المكون المستهدف).</td>
+                            <td>عندما يحتاج النظام إلى تعديل extras (مثل Inline Reply في الإشعارات).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Kotlin - PendingIntent آمن (Android 12+ Compatible)</span>
+                    <span class="code-lang">KOTLIN</span>
+                </div>
+                <pre><code><span class="keyword">object</span> <span class="type">SafePendingIntentFactory</span> {
+
+    <span class="keyword">fun</span> <span class="function">createNotificationIntent</span>(
+        context: Context,
+        destination: Class&lt;*&gt;,
+        extras: Bundle? = <span class="keyword">null</span>
+    ): PendingIntent {
+        <span class="keyword">val</span> intent = Intent(context, destination).<span class="function">apply</span> {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            extras?.let { <span class="function">putExtras</span>(it) }
+        }
+
+        <span class="keyword">val</span> flags = <span class="keyword">if</span> (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        } <span class="keyword">else</span> {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
+
+        <span class="keyword">return</span> PendingIntent.<span class="function">getActivity</span>(context, REQUEST_CODE, intent, flags)
+    }
+
+    <span class="keyword">fun</span> <span class="function">createAlarmIntent</span>(context: Context, action: String): PendingIntent {
+        <span class="keyword">val</span> intent = Intent(context, AlarmReceiver::<span class="keyword">class</span>.java).<span class="function">apply</span> {
+            <span class="keyword">this</span>.action = action
+        }
+
+        <span class="keyword">val</span> flags = <span class="keyword">if</span> (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT
+        } <span class="keyword">else</span> {
+            PendingIntent.FLAG_CANCEL_CURRENT
+        }
+
+        <span class="keyword">return</span> PendingIntent.<span class="function">getBroadcast</span>(context, ALARM_REQUEST_CODE, intent, flags)
+    }
+
+    <span class="comment">// حالة خاصة: FLAG_MUTABLE للرد المباشر في الإشعارات</span>
+    <span class="keyword">fun</span> <span class="function">createReplyIntent</span>(context: Context): PendingIntent {
+        <span class="keyword">val</span> intent = Intent(context, ReplyReceiver::<span class="keyword">class</span>.java)
+
+        <span class="keyword">val</span> flags = <span class="keyword">if</span> (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            <span class="comment">// Android 12+: يجب استخدام FLAG_MUTABLE للردود المباشرة</span>
+            <span class="comment">// لأن النظام يحتاج إلى إضافة extra يحتوي على نص الرد</span>
+            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        } <span class="keyword">else if</span> (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        } <span class="keyword">else</span> {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
+
+        <span class="keyword">return</span> PendingIntent.<span class="function">getBroadcast</span>(context, REPLY_REQUEST_CODE, intent, flags)
+    }
+
+    <span class="keyword">private const val</span> REQUEST_CODE = <span class="number">1001</span>
+    <span class="keyword">private const val</span> ALARM_REQUEST_CODE = <span class="number">1002</span>
+    <span class="keyword">private const val</span> REPLY_REQUEST_CODE = <span class="number">1003</span>
+}</code></pre>
+            </div>
+
+            <h3>أعلام PendingIntent الأخرى</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>العلم</th>
+                            <th>الوظيفة</th>
+                            <th>ملاحظات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>FLAG_UPDATE_CURRENT</code></td>
+                            <td>إذا كان PendingIntent موجوداً، يُحدث extras بهذه النسخة الجديدة</td>
+                            <td>الأكثر استخداماً — يحافظ على الIntent ويُحدث البيانات</td>
+                        </tr>
+                        <tr>
+                            <td><code>FLAG_CANCEL_CURRENT</code></td>
+                            <td>إذا كان موجوداً، يُلغيه وينشئ واحداً جديداً</td>
+                            <td>مفيد عندما تريد ضمان عدم وجود بيانات قديمة</td>
+                        </tr>
+                        <tr>
+                            <td><code>FLAG_NO_CREATE</code></td>
+                            <td>إذا لم يكن موجوداً، يُرجع null بدلاً من إنشائه</td>
+                            <td>للتحقق من وجود PendingIntent دون إنشائه</td>
+                        </tr>
+                        <tr>
+                            <td><code>FLAG_ONE_SHOT</code></td>
+                            <td>يمكن استخدامه مرة واحدة فقط، ثم يُلغى تلقائياً</td>
+                            <td>مفيد للإشعارات التي لا يجب تكرارها</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>الأمان الإضافي: تحديد المكون صراحةً</h3>
+            <p>لمنع Intent Redirection عبر PendingIntent، دائماً حدد المكون المستهدف صراحةً باستخدام ComponentName. لا تعتمد على Action و Category للتعرف على المكون.</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Kotlin - PendingIntent مع ComponentName صريح</span>
+                    <span class="code-lang">KOTLIN</span>
+                </div>
+                <pre><code><span class="keyword">val</span> secureIntent = Intent().<span class="function">apply</span> {
+    <span class="comment">// ✅ آمن: تحديد المكون بالاسم الدقيق</span>
+    component = ComponentName(
+        context.packageName,
+        <span class="string">"com.example.app.NotificationTargetActivity"</span>
+    )
+    <span class="function">putExtra</span>(<span class="string">"notification_id"</span>, notificationId)
+    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+}
+
+<span class="keyword">val</span> pendingIntent = PendingIntent.<span class="function">getActivity</span>(
+    context,
+    notificationId,
+    secureIntent,
+    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+)</code></pre>
+            </div>
+
+            <div class="highlight-box">
+                <p><strong>قواعد أمنية ذهبية لـ PendingIntent:</strong></p>
+                <ol>
+                    <li>استخدم <code>FLAG_IMMUTABLE</code> دائماً إلا إذا كان هناك سبب قوي لاستخدام <code>FLAG_MUTABLE</code>.</li>
+                    <li>حدد المكون المستهدف باستخدام <code>ComponentName</code> بدلاً من Action/Category.</li>
+                    <li>لا تضع بيانات حساسة في extras إذا كان PendingIntent قابلاً للوصول من تطبيقات أخرى.</li>
+                    <li>استخدم <code>FLAG_CANCEL_CURRENT</code> إذا كانت البيانات في extras قد تتغير بشكل جوهري.</li>
+                    <li>تذكر: PendingIntent يمنح <strong>هويتك</strong> وصلاحياتك للتطبيق المستلم.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="interviews" class="section">
+            <div class="section-header">
+                <div class="section-number">٧</div>
+                <h2>بنك أصعب الأسئلة الخادعة ومواقف المقابلات</h2>
+                <p class="section-description">أسئلة سيناريو معقدة، تحليل دقيق لما يحدث في الذاكرة والنظام، وحلول معمارية كاملة.</p>
+            </div>
+
+            <h3>السؤال الأول: تمرير البيانات الضخمة عبر Binder</h3>
+
+            <div class="interview-card">
+                <div class="interview-label">سؤال FAANG</div>
+                <div class="interview-question">كيف تقوم بتمرير بيانات ضخمة (مثل صورة 10MB) بين بروسيسين مختلفين بأمان ودون تجاوز حدود Binder Transaction Buffer البالغة 1MB؟</div>
+
+                <h4>التحليل المعماري</h4>
+                <p>حد Binder Transaction Buffer (~1MB) هو حد <strong>للعملية بأكملها</strong> وليس لكل معاملة. هذا يعني أنه إذا كانت عمليتك تستخدم Binder بكثافة (مثل ContentProvider queries متعددة في نفس الوقت)، فإن حجم الصورة 10MB سيتجاوز الحد بسهولة.</p>
+
+                <h4>الحلول المعمارية</h4>
+
+                <div class="step">
+                    <div class="step-number">١</div>
+                    <div class="step-content">
+                        <div class="step-title">الحل الموصى به: ContentProvider مع ParcelFileDescriptor</div>
+                        <p>بدلاً من تمرير البيانات مباشرة، نمرر <strong>وصف ملف (File Descriptor)</strong> يشير إلى البيانات. المستهلك يقرأ البيانات عبر الـ Stream.</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Kotlin - Large Data Transfer via ContentProvider</span>
+                                <span class="code-lang">KOTLIN</span>
+                            </div>
+                            <pre><code><span class="keyword">class</span> <span class="type">ImageProvider</span> : <span class="type">ContentProvider</span>() {
+
+    <span class="keyword">override fun</span> <span class="function">openFile</span>(uri: Uri, mode: String): ParcelFileDescriptor? {
+        <span class="keyword">val</span> imageId = ContentUris.<span class="function">parseId</span>(uri)
+        <span class="keyword">val</span> imageFile = File(context!!.cacheDir, <span class="string">"images/$imageId.jpg"</span>)
+
+        <span class="comment">// ParcelFileDescriptor ينشئ pipe بين العمليتين</span>
+        <span class="comment">// البيانات تُقرأ بالتدريق (Streaming) بدلاً من النسخ الكامل</span>
+        <span class="keyword">return</span> ParcelFileDescriptor.<span class="function">open</span>(
+            imageFile,
+            ParcelFileDescriptor.MODE_READ_ONLY
+        )
+    }
+
+    <span class="comment">// ... implement other CRUD methods ...</span>
+}
+
+<span class="comment">// في العملية المستهلكة:</span>
+<span class="keyword">fun</span> <span class="function">loadLargeImage</span>(context: Context, imageUri: Uri): Bitmap? {
+    <span class="keyword">return try</span> {
+        <span class="comment">// فتح AssetFileDescriptor يعطينا وصولاً مباشراً للملف</span>
+        context.contentResolver.<span class="function">openAssetFileDescriptor</span>(imageUri, <span class="string">"r"</span>)?.
+            <span class="function">use</span> { afd ->
+                <span class="comment">// قراءة Bitmap مع خيارات التقليل (Downsampling)</span>
+                <span class="keyword">val</span> options = BitmapFactory.Options().<span class="function">apply</span> {
+                    inJustDecodeBounds = <span class="keyword">true</span>
+                }
+                BitmapFactory.<span class="function">decodeFileDescriptor</span>(afd.fileDescriptor, <span class="keyword">null</span>, options)
+
+                <span class="comment">// حساب inSampleSize لتقليل الذاكرة</span>
+                options.inSampleSize = <span class="function">calculateInSampleSize</span>(options, <span class="number">1024</span>, <span class="number">1024</span>)
+                options.inJustDecodeBounds = <span class="keyword">false</span>
+
+                BitmapFactory.<span class="function">decodeFileDescriptor</span>(afd.fileDescriptor, <span class="keyword">null</span>, options)
+            }
+    } <span class="keyword">catch</span> (e: Exception) {
+        <span class="keyword">null</span>
+    }
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">٢</div>
+                    <div class="step-content">
+                        <div class="step-title">الحل البديل: Shared Memory (ASHMEM)</div>
+                        <p>للبيانات الضخمة جداً أو العشوائية، يمكن استخدام <code>SharedMemory</code> (Android 8.1+) لإنشاء منطقة ذاكرة مشتركة بين العمليات.</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Kotlin - SharedMemory for IPC</span>
+                                <span class="code-lang">KOTLIN</span>
+                            </div>
+                            <pre><code><span class="keyword">fun</span> <span class="function">createSharedMemory</span>(data: ByteArray): SharedMemory {
+    <span class="keyword">val</span> sharedMemory = SharedMemory.<span class="function">create</span>(<span class="string">"image_data"</span>, data.size)
+    <span class="keyword">val</span> buffer = sharedMemory.<span class="function">mapReadWrite</span>()
+    buffer.<span class="function">put</span>(data)
+    SharedMemory.<span class="function">unmap</span>(buffer)
+    <span class="keyword">return</span> sharedMemory
+}
+
+<span class="comment">// تمرير SharedMemory عبر AIDL Binder</span>
+<span class="keyword">interface</span> <span class="type">ILargeDataService</span> : <span class="type">IInterface</span> {
+    <span class="keyword">fun</span> <span class="function">processLargeData</span>(sharedMemory: SharedMemory, size: Int)
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <p><strong>الإجابة المثالية في المقابلة:</strong> "لا يمكن تمرير بيانات ضخمة مباشرة عبر Intent/Binder بسبب حد 1MB. الحل هو استخدام ContentProvider مع ParcelFileDescriptor للـ Streaming، أو SharedMemory للبيانات العشوائية. المبدأ الأساسي هو تمرير <strong>مرجع (Reference)</strong> بدلاً من <strong>البيانات نفسها (Value)</strong>."</p>
+                </div>
+            </div>
+
+            <h3>السؤال الثاني: Stopped State واستقبال Broadcasts</h3>
+
+            <div class="interview-card">
+                <div class="interview-label">سؤال Google / DeepMind</div>
+                <div class="interview-question">ماذا يحدث بالضبط تحت الغطاء عندما يتلقى نظام أندرويد Broadcast بينما التطبيق في حالة Stopped State؟ وما الفرق بين Explicit و Implicit Broadcast في هذه الحالة؟</div>
+
+                <h4>تحليل حالة Stopped State</h4>
+                <p>التطبيق يدخل في <strong>Stopped State</strong> في حالتين:</p>
+                <ol>
+                    <li>عند تثبيته لأول مرة (قبل أن يُفتح التطبيق يدوياً من المستخدم).</li>
+                    <li>عندما يُجبر الإيقاف (Force Stop) من إعدادات النظام.</li>
+                </ol>
+
+                <p>في هذه الحالة، يضيف النظام علم <code>FLAG_EXCLUDE_STOPPED_PACKAGES</code> افتراضياً على جميع Broadcasts. هذا يعني:</p>
+                <ul>
+                    <li>التطبيقات في Stopped State <strong>لا تستقبل</strong> Implicit Broadcasts.</li>
+                    <li>التطبيقات في Stopped State <strong>تستقبل</strong> Explicit Broadcasts المُرسلة مباشرة إليها (مع ComponentName).</li>
+                    <li>التطبيقات في Stopped State <strong>تستقبل</strong> Broadcasts التي تستخدم <code>FLAG_INCLUDE_STOPPED_PACKAGES</code> (نادر).</li>
+                </ul>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">Kotlin - Explicit Broadcast يصل حتى في Stopped State</span>
+                        <span class="code-lang">KOTLIN</span>
+                    </div>
+                    <pre><code><span class="comment">// ✅ يصل حتى لو التطبيق في Stopped State</span>
+<span class="keyword">val</span> explicitIntent = Intent().<span class="function">apply</span> {
+    component = ComponentName(
+        <span class="string">"com.target.app"</span>,
+        <span class="string">"com.target.app.MyReceiver"</span>
+    )
+    <span class="function">putExtra</span>(<span class="string">"data"</span>, <span class="string">"important"</span>)
+}
+<span class="function">sendBroadcast</span>(explicitIntent)
+
+<span class="comment">// ❌ لا يصل إذا كان التطبيق في Stopped State</span>
+<span class="keyword">val</span> implicitIntent = Intent(<span class="string">"com.example.CUSTOM_ACTION"</span>)
+<span class="function">sendBroadcast</span>(implicitIntent)</code></pre>
+                </div>
+
+                <h4>الآلية الداخلية في PackageManagerService</h4>
+                <p>عندما يُرسل Broadcast، يقوم ActivityManagerService بالتحقق من حالة كل مستقبل محتمل:</p>
+                <ol>
+                    <li>يستعلم AMS من PackageManagerService عن حالة Package (التطبيق).</li>
+                    <li>إذا كان Package في حالة <code>STOPPED</code>، يتم استبعاده من القائمة.</li>
+                    <li>يُرسّل Broadcast فقط إلى التطبيقات النشطة.</li>
+                </ol>
+                <p>عندما يفتح المستخدم التطبيق يدوياً (أو عندما يُستدعى Explicitly)، يُخرج النظام التطبيق من Stopped State عبر إرسال <code>ACTION_PACKAGE_RESTARTED</code>.</p>
+            </div>
+
+            <h3>السؤال الثالث: ANR في Service وتحليل Thread</h3>
+
+            <div class="interview-card">
+                <div class="interview-label">سؤال Spotify / N26</div>
+                <div class="interview-question">لماذا يتسبب Service في ANR رغم أنه "يعمل في الخلفية"؟ وما الفرق بين Main Thread في Service و Main Thread في Activity من حيث المسؤوليات والقيود؟</div>
+
+                <h4>التحليل العميق</h4>
+                <p>الخدمة (Service) <strong>لا تعمل في Thread منفصل</strong>. Service هو مجرد كائن (Object) يعيش في نفس العملية (Process) ونفس الـ Thread الرئيسي (Main Thread / UI Thread) الخاص بالتطبيق. الفرق الوحيد بين Service و Activity هو أن Service لا يملك واجهة مستخدم.</p>
+
+                <p>عندما يستدعي النظام <code>onStartCommand()</code>:</p>
+                <ol>
+                    <li>يُرسل AMS رسالة عبر Binder إلى <strong>Main Thread</strong> في عملية تطبيقك.</li>
+                    <li>يقوم <code>ActivityThread</code> (الذي يدير Main Thread) باستدعاء <code>onStartCommand()</code> عبر Handler.</li>
+                    <li>إذا استغرقت العملية أكثر من ~5 ثوانٍ (للخدمات) أو ~10 ثوانٍ (للـ Broadcast)، يُظهر النظام ANR.</li>
+                </ol>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">Kotlin - Service Thread-safe Implementation</span>
+                        <span class="code-lang">KOTLIN</span>
+                    </div>
+                    <pre><code><span class="keyword">class</span> <span class="type">AnalyticsService</span> : <span class="type">Service</span>() {
+
+    <span class="comment">// ✅ استخدام CoroutineScope مخصص مع Dispatcher منفصل</span>
+    <span class="keyword">private val</span> serviceScope = CoroutineScope(
+        SupervisorJob() + 
+        Dispatchers.IO + 
+        CoroutineName(<span class="string">"AnalyticsService"</span>)
+    )
+
+    <span class="comment">// ❌ خطأ: استخدام Dispatchers.Main سيتسبب في ANR</span>
+    <span class="comment">// private val wrongScope = CoroutineScope(Dispatchers.Main)</span>
+
+    <span class="keyword">override fun</span> <span class="function">onStartCommand</span>(intent: Intent?, flags: Int, startId: Int): Int {
+        <span class="comment">// العمل على IO Dispatcher فوراً</span>
+        serviceScope.<span class="function">launch</span> {
+            <span class="keyword">try</span> {
+                <span class="function">sendAnalyticsBatch</span>()
+            } <span class="keyword">catch</span> (e: Exception) {
+                <span class="comment">// التعامل مع الأخطاء</span>
+            } <span class="keyword">finally</span> {
+                <span class="comment">// إيقاف الخدمة بعد انتهاء المهمة</span>
+                <span class="function">stopSelf</span>(startId)
+            }
+        }
+
+        <span class="keyword">return</span> START_NOT_STICKY
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onBind</span>(intent: Intent?): IBinder? = <span class="keyword">null</span>
+
+    <span class="keyword">override fun</span> <span class="function">onDestroy</span>() {
+        <span class="keyword">super</span>.<span class="function">onDestroy</span>()
+        <span class="comment">// ⚠️ تنظيف الموارد حاسم لمنع تسرب الذاكرة</span>
+        serviceScope.<span class="function">cancel</span>()
+    }
+
+    <span class="keyword">private suspend fun</span> <span class="function">sendAnalyticsBatch</span>() {
+        <span class="keyword">withContext</span>(Dispatchers.IO) {
+            <span class="comment">// عمليات الشبكة الثقيلة هنا</span>
+        }
+    }
+}</code></pre>
+                </div>
+
+                <div class="highlight-box">
+                    <p><strong>الجواب المثالي:</strong> "Service لا يملك Thread خاصاً. جميع callbacks تعمل على Main Thread. الفرق عن Activity هو أن Service لا يتعامل مع أحداث UI (Touch, Draw)، لكنه لا يزال يشارك نفس Looper. لذلك، أي عملية ثقيلة يجب نقلها إلى Worker Thread أو Coroutine بـ Dispatchers.IO."</p>
+                </div>
+            </div>
+
+            <h3>السؤال الرابع: تصميم IPC آمن بين تطبيقين</h3>
+
+            <div class="interview-card">
+                <div class="interview-label">سؤال Meta / Amazon</div>
+                <div class="interview-question">كيف تصمم آلية IPC آمنة بين تطبيقين مختلفين (مثل تطبيق رئيسي وتطبيق مساعد) تسمح بتبادل البيانات الحساسة دون ثغرات Intent Redirection أو Permission Escalation؟</div>
+
+                <h4>الحل المعماري المتكامل</h4>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">Kotlin - AIDL Interface with Permission Check</span>
+                        <span class="code-lang">KOTLIN</span>
+                    </div>
+                    <pre><code><span class="comment">// AIDL: ISecureService.aidl</span>
+<span class="keyword">interface</span> <span class="type">ISecureService</span> {
+    <span class="comment">// التحقق من الصلاحيات في كل استدعاء</span>
+    Bundle <span class="function">fetchSecureData</span>(in String requestId);
+    <span class="keyword">void</span> <span class="function">processSecureAction</span>(in SecureRequest request);
+}
+
+<span class="comment">// Implementation:</span>
+<span class="keyword">class</span> <span class="type">SecureService</span> : <span class="type">Service</span>() {
+
+    <span class="keyword">private val</span> binder = <span class="keyword">object</span> : ISecureService.Stub() {
+
+        <span class="keyword">override fun</span> <span class="function">fetchSecureData</span>(requestId: String?): Bundle {
+            <span class="comment">// ١. التحقق من هوية العملية المستدعية</span>
+            <span class="function">enforceCallingPermission</span>(
+                <span class="string">"com.example.permission.ACCESS_SECURE_DATA"</span>,
+                <span class="string">"Access denied"</span>
+            )
+
+            <span class="comment">// ٢. التحقق من توقيع التطبيق (Certificate Pinning)</span>
+            <span class="keyword">if</span> (!<span class="function">isCallerAllowed</span>()) {
+                <span class="keyword">throw</span> SecurityException(<span class="string">"Unauthorized caller"</span>)
+            }
+
+            <span class="comment">// ٣. معالجة الطلب</span>
+            <span class="keyword">return</span> <span class="function">handleSecureRequest</span>(requestId)
+        }
+
+        <span class="keyword">private fun</span> <span class="function">isCallerAllowed</span>(): Boolean {
+            <span class="keyword">val</span> callingUid = Binder.<span class="function">getCallingUid</span>()
+            <span class="keyword">val</span> callingPackage = packageManager.<span class="function">getNameForUid</span>(callingUid)
+
+            <span class="comment">// التحقق من Package Name والتوقيع</span>
+            <span class="keyword">return</span> callingPackage == <span class="string">"com.example.trusted.app"</span> &&
+                   <span class="function">verifySignature</span>(callingPackage)
+        }
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onBind</span>(intent: Intent): IBinder {
+        <span class="comment">// ٤. التحقق من Intent صراحةً</span>
+        <span class="keyword">if</span> (intent.component?.className != <span class="string">"com.example.SecureService"</span>) {
+            <span class="keyword">throw</span> SecurityException(<span class="string">"Invalid binding intent"</span>)
+        }
+        <span class="keyword">return</span> binder
+    }
+}</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">AndroidManifest.xml - Service with Custom Permission</span>
+                        <span class="code-lang">XML</span>
+                    </div>
+                    <pre><code><span class="comment">&lt;!-- تعريف إذن مخصص بمستوى الحماية signature --&gt;</span>
+<span class="keyword">&lt;permission</span>
+    android:name=<span class="string">"com.example.permission.ACCESS_SECURE_DATA"</span>
+    android:protectionLevel=<span class="string">"signature"</span>
+    android:label=<span class="string">"Access Secure Data"</span> <span class="keyword">/&gt;</span>
+
+<span class="keyword">&lt;service</span>
+    android:name=<span class="string">".SecureService"</span>
+    android:exported=<span class="string">"true"</span>
+    android:permission=<span class="string">"com.example.permission.ACCESS_SECURE_DATA"</span><span class="keyword">&gt;</span>
+    <span class="keyword">&lt;intent-filter&gt;</span>
+        <span class="keyword">&lt;action</span> android:name=<span class="string">"com.example.action.SECURE_SERVICE"</span> <span class="keyword">/&gt;</span>
+    <span class="keyword">&lt;/intent-filter&gt;</span>
+<span class="keyword">&lt;/service&gt;</span></code></pre>
+                </div>
+
+                <div class="highlight-box">
+                    <p><strong>طبقات الأمان المُطبقة:</strong></p>
+                    <ol>
+                        <li><code>android:permission</code> على Service — يضمن أن فقط التطبيقات التي تمتلك الإذن يمكنها الربط.</li>
+                        <li><code>protectionLevel="signature"</code> — يضمن أن فقط التطبيقات الموقعة بنفس المفتاح يمكنها الحصول على الإذن.</li>
+                        <li><code>enforceCallingPermission()</code> — تحقق runtime إضافي.</li>
+                        <li><code>Binder.getCallingUid()</code> — التحقق من هوية العملية المستدعية.</li>
+                        <li>التحقق من ComponentName — منع Intent Redirection.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <h3>السؤال الخامس: Foreground Service وقيود Android 14</h3>
+
+            <div class="interview-card">
+                <div class="interview-label">سؤال Bolt / Delivery Hero</div>
+                <div class="interview-question">كيف تتعامل مع قيود Android 14 التي تتطلب إذناً خاصاً لكل نوع من Foreground Services؟ وما هي استراتيجيتك للتعامل مع حالة رفض المستخدم لهذا الإذن؟</div>
+
+                <h4>التحليل المعماري</h4>
+                <p>Android 14 (API 34) فرض <strong>إذناً خاصاً لكل نوع</strong> من Foreground Services. لم يعد <code>FOREGROUND_SERVICE</code> العام كافياً. الآن يجب إعلان:</p>
+                <ul>
+                    <li><code>FOREGROUND_SERVICE_LOCATION</code> للموقع.</li>
+                    <li><code>FOREGROUND_SERVICE_MICROPHONE</code> للميكروفون.</li>
+                    <li><code>FOREGROUND_SERVICE_CAMERA</code> للكاميرا.</li>
+                    <li>... وأنواع أخرى.</li>
+                </ul>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">Kotlin - Android 14+ Foreground Service with Permission Handling</span>
+                        <span class="code-lang">KOTLIN</span>
+                    </div>
+                    <pre><code><span class="keyword">class</span> <span class="type">LocationService</span> : <span class="type">Service</span>() {
+
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>() {
+        <span class="keyword">super</span>.<span class="function">onCreate</span>()
+
+        <span class="comment">// التحقق من الإذن الخاص بـ Android 14+</span>
+        <span class="keyword">if</span> (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            <span class="keyword">if</span> (ContextCompat.<span class="function">checkSelfPermission</span>(
+                    <span class="keyword">this</span>,
+                    Manifest.permission.FOREGROUND_SERVICE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                <span class="comment">// لا يمكن تشغيل الخدمة — إخطار المستخدم</span>
+                <span class="function">stopSelf</span>()
+                <span class="keyword">return</span>
+            }
+        }
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onStartCommand</span>(intent: Intent?, flags: Int, startId: Int): Int {
+        <span class="function">startForeground</span>(NOTIFICATION_ID, <span class="function">buildNotification</span>())
+
+        <span class="comment">// التحقق من إذن الموقع الفعلي</span>
+        <span class="keyword">if</span> (!<span class="function">hasLocationPermission</span>()) {
+            <span class="comment">// إيقاف الخدمة بأمان وإخطار المستخدم</span>
+            <span class="function">sendPermissionDeniedBroadcast</span>()
+            <span class="function">stopSelf</span>(startId)
+            <span class="keyword">return</span> START_NOT_STICKY
+        }
+
+        <span class="function">startLocationUpdates</span>()
+        <span class="keyword">return</span> START_STICKY
+    }
+
+    <span class="keyword">private fun</span> <span class="function">buildNotification</span>(): Notification {
+        <span class="keyword">return</span> NotificationCompat.Builder(<span class="keyword">this</span>, CHANNEL_ID)
+            .<span class="function">setContentTitle</span>(<span class="string">"جاري تتبع الموقع"</span>)
+            .<span class="function">setContentText</span>(<span class="string">"انقر لإدارة الإعدادات"</span>)
+            .<span class="function">setSmallIcon</span>(R.drawable.ic_location)
+            .<span class="function">setOngoing</span>(<span class="keyword">true</span>)
+            .<span class="function">setForegroundServiceBehavior</span>(
+                NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
+            )
+            .<span class="function">build</span>()
+    }
+
+    <span class="keyword">companion object</span> {
+        <span class="keyword">const val</span> NOTIFICATION_ID = <span class="number">1001</span>
+        <span class="keyword">const val</span> CHANNEL_ID = <span class="string">"location_tracking"</span>
+
+        <span class="comment">// استراتيجية fallback إذا رفض المستخدم الإذن</span>
+        <span class="keyword">fun</span> <span class="function">startWithFallback</span>(context: Context) {
+            <span class="keyword">if</span> (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                <span class="keyword">if</span> (ContextCompat.<span class="function">checkSelfPermission</span>(
+                        context,
+                        Manifest.permission.FOREGROUND_SERVICE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    <span class="comment">// بديل: استخدام WorkManager مع تأخير</span>
+                    WorkManager.<span class="function">getInstance</span>(context)
+                        .<span class="function">enqueue</span>(
+                            OneTimeWorkRequestBuilder&lt;DeferredLocationWorker&gt;()
+                                .<span class="function">setConstraints</span>(
+                                    Constraints.Builder()
+                                        .<span class="function">setRequiresBatteryNotLow</span>(<span class="keyword">true</span>)
+                                        .<span class="function">build</span>()
+                                )
+                                .<span class="function">build</span>()
+                        )
+                    <span class="keyword">return</span>
+                }
+            }
+
+            ContextCompat.<span class="function">startForegroundService</span>(
+                context,
+                Intent(context, LocationService::<span class="keyword">class</span>.java)
+            )
+        }
+    }
+}</code></pre>
+                </div>
+            </div>
+
+            <h3>السؤال السادس: تحليل ذاكرة ContentProvider</h3>
+
+            <div class="interview-card">
+                <div class="interview-label">سؤال Zalando / Klarna</div>
+                <div class="interview-question">لماذا يُعتبر ContentProvider ثقيلاً على الذاكرة مقارنة بـ Repository Pattern عادي؟ ومتى تختار ContentProvider على SharedPreferences أو Room Database مباشرة؟</div>
+
+                <h4>تحليل التكلفة المعمارية</h4>
+                <p>ContentProvider يأتي بتكلفة إضافية لعدة أسباب:</p>
+                <ol>
+                    <li><strong>IPC Overhead:</strong> كل استدعاء query/insert/update/delete يمر عبر Binder IPC، مما يتطلب: تسلسل (Marshalling) للمعاملات، انتظار (Context Switch) بين العمليات، وإلغاء التسلسل (Unmarshalling).</li>
+                    <li><strong>Cursor Overhead:</strong> Cursor هو كائن ثقيل يحتفظ باتصال مفتوح بقاعدة البيانات حتى يُغلق. إذا لم يُغلق بشكل صحيح، يتسبب في تسرب ذاكرة وربما تسرب CursorWindow (2MB لكل Cursor).</li>
+                    <li><strong>Thread Synchronization:</strong> ContentProvider يُدار كنظام Singleton من قبل AMS، ويجب أن يكون Thread-safe، مما يضيف تكلفة المزامنة.</li>
+                </ol>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الحالة</th>
+                                <th>الحل الموصى به</th>
+                                <th>السبب</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>بيانات داخلية فقط</td>
+                                <td>Room + Repository</td>
+                                <td>لا حاجة لـ IPC، أداء أعلى، API أنظف</td>
+                            </tr>
+                            <tr>
+                                <td>مشاركة بيانات مع تطبيقات أخرى</td>
+                                <td>ContentProvider</td>
+                                <td>الحل الوحيد الموثوق للـ Cross-app data sharing</td>
+                            </tr>
+                            <tr>
+                                <td>إعدادات بسيطة</td>
+                                <td>DataStore / EncryptedSharedPreferences</td>
+                                <td>أخف من ContentProvider، دعم Async</td>
+                            </tr>
+                            <tr>
+                                <td>ملفات كبيرة</td>
+                                <td>FileProvider</td>
+                                <td>مصمم خصيصاً للملفات مع URI Permissions</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <p><strong>الخلاصة النهائية للمقابلات:</strong> فهم مكونات أندرويد على المستوى العميق يتطلب معرفة ثلاث طبقات: (1) <strong>واجهة المبرمج</strong> (APIs التي تستخدمها)، (2) <strong>آلية Framework</strong> (كيف يدير AMS/ATMS دورة الحياة)، و (3) <strong>آلية Kernel</strong> (كيف يعمل Binder IPC تحت الغطاء). المهندس الذي يجيب على أسئلة المستوى الثالث هو الذي يُقبل في FAANG والشركات الأوروبية الكبرى.</p>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>تم إعداد هذا المرجع بعناية فائقة للمهندسين العرب الساعين للتخصص في أندرويد على المستوى العالمي.</p>
+            <p style="margin-top: 1rem; font-size: 0.875rem;">المرجع الهندسي الشامل لمكونات أندرويد الأساسية © 2026</p>
+        </footer>
+    </main>
+
+    <script>
+        // Smooth scroll for navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Active section highlighting
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

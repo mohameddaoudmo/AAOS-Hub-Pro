@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Automotive Platform — منصة أندرويد للسيارات</title>
+<title>Software Engineering Platform — منصة الهندسة والتطوير</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#050a12;--bg2:#080f1e;--card:#0c1528;--border:#182036;--a1:#00d4ff;--a2:#7c3aed;--a3:#f59e0b;--a4:#10b981;--a5:#f43f5e;--text:#e2e8f0;--text2:#94a3b8;--text3:#475569;}
@@ -71,24 +71,24 @@ footer{text-align:center;padding:28px;border-top:1px solid var(--border);color:v
   <div class="search-bar"><span>🔍</span><input type="text" id="srch" placeholder="ابحث في الأدلة..."></div>
 </div>
 <div class="hero">
-  <div class="badge">ANDROID AUTOMOTIVE PLATFORM</div>
-  <h1><span class="ga">Android</span> <span class="ga2">Automotive</span></h1>
-  <p>الدليل الشامل لتطوير تطبيقات أندرويد للسيارات — من الـ VHAL حتى الـ OTA</p>
+  <div class="badge">SOFTWARE & MOBILE ENGINEERING PLATFORM</div>
+  <h1><span class="ga">Mobile</span> <span class="ga2">& Engineering</span></h1>
+  <p>الدليل الهندسي الشامل — تطبيقات أندرويد وفينتك، أنظمة السيارات، وهندسة الأنظمة</p>
   <div class="stats">
-    <div class="stat"><div class="stat-n">16</div><div class="stat-l">دليل تفصيلي</div></div>
+    <div class="stat"><div class="stat-n">33+</div><div class="stat-l">دليل تفصيلي</div></div>
     <div class="stat"><div class="stat-n">500+</div><div class="stat-l">مثال عملي</div></div>
     <div class="stat"><div class="stat-n">100%</div><div class="stat-l">عربي</div></div>
   </div>
 </div>
 <div class="container">
   <div class="filter-row" id="filters">
-    <button class="flt active" data-f="all">الكل</button>
-    <button class="flt" data-f="نظام">نظام</button>
-    <button class="flt" data-f="UI">UI</button>
-    <button class="flt" data-f="DevOps">DevOps</button>
-    <button class="flt" data-f="وسائط">وسائط</button>
-    <button class="flt" data-f="شبكات">شبكات</button>
-    <button class="flt" data-f="هارد">هارد</button>
+    <button class="flt active" data-f="all">الكل (33)</button>
+    <button class="flt" data-f="أندرويد">📱 أندرويد وفينتك</button>
+    <button class="flt" data-f="سيارات">🚗 أندرويد السيارات</button>
+    <button class="flt" data-f="أمان">🛡️ أمان وتشفير</button>
+    <button class="flt" data-f="UI">🎨 UI & Compose</button>
+    <button class="flt" data-f="DevOps">⚙️ DevOps & CI/CD</button>
+    <button class="flt" data-f="OOP">💎 OOP Masterclass</button>
   </div>
   <div class="guides-grid" id="grid"></div>
 </div>
@@ -96,22 +96,44 @@ footer{text-align:center;padding:28px;border-top:1px solid var(--border);color:v
 <button class="theme-fab" onclick="var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('aaos_theme',t);">🌙</button>
 <script>
 const G=[
-  {ico:'🚗',c:'cp',cat:'نظام',title:'دليل VHAL الشامل',desc:'CarPropertyManager، IPC، والتكامل الكامل مع الهارد وير.',path:'guides/vhal-guide-arabic.html'},
+  // Android Core (جديد)
+  {ico:'📱',c:'cg',cat:'أندرويد',title:'Activity Lifecycle Masterclass',desc:'المرجع الشامل لدورة حياة الأكتيفيتي وأسئلة المقابلات.',path:'guides/activity_lifecycle_guide.html'},
+  {ico:'🧱',c:'cp',cat:'أندرويد',title:'Core Components Masterclass',desc:'المرجع الهندسي الشامل لمكونات أندرويد الأساسية.',path:'guides/android_components_masterclass.html'},
+  {ico:'🔄',c:'cg',cat:'أندرويد',title:'Android Lifecycle Masterclass',desc:'احتراف إدارة State وViewModel أثناء إعادة البناء.',path:'guides/android_lifecycle_masterclass.html'},
+  {ico:'🛡️',c:'cr',cat:'أمان',title:'Android Security Masterclass',desc:'المرجع الشامل لأمان أندرويد — الثغرات والتشفير.',path:'guides/android_security_masterclass.html'},
+  {ico:'🏦',c:'cr',cat:'أمان',title:'Fintech Android Masterclass',desc:'المرجع الهندسي لبناء وتأمين تطبيقات البنوك والدفع الإلكتروني.',path:'guides/fintech_android_masterclass.html'},
+  {ico:'💳',c:'cr',cat:'أمان',title:'Fintech Security Guide',desc:'حماية وتأمين تطبيقات البنوك والدفع الإلكتروني.',path:'guides/fintech_android_security_guide.html'},
+  {ico:'🚀',c:'cv',cat:'أندرويد',title:'KMP & CMP Interview Guide',desc:'دليل المقابلات الشامل لـ Kotlin Multiplatform.',path:'guides/kmp_cmp_interview_guide.html'},
+  {ico:'📦',c:'ca',cat:'أندرويد',title:'Kotlin Collections & Sequences',desc:'مقارنة Collections وSequences في كوتلن لتحسين الأداء.',path:'guides/kotlin_collections_sequence_guide.html'},
+  {ico:'📄',c:'cv',cat:'UI',title:'Modern Pagination Guide',desc:'تصميم معمارية التصفح والتحميل اللانهائي.',path:'guides/pagination_guide.html'},
+  {ico:'🧩',c:'cp',cat:'UI',title:'Fragment & Navigation Guide',desc:'إدارة الفراجمينت والتنقل الشامل مع Navigation Component.',path:'guides/fragment_navigation_guide.html'},
+  {ico:'⚙️',c:'cg',cat:'DevOps',title:'CI/CD with Git & Detekt',desc:'أتمتة جودة الكود والتفتيش الساكن Detekt.',path:'guides/cicd_git_detekt_android.html'},
+  {ico:'💎',c:'cv',cat:'OOP',title:'OOP & Design Patterns Masterclass',desc:'المرجع الهندسي الشامل وأنماط التصميم لأندرويد.',path:'guides/oop_masterclass.html'},
+  {ico:'🎯',c:'cv',cat:'OOP',title:'OOP Interview Challenges',desc:'أصعب أسئلة البرمجة كائنية التوجه وتحديات المقابلات.',path:'guides/oop_interview_challenges.html'},
+  {ico:'⚛️',c:'cv',cat:'أندرويد',title:'React Native Interview Sheet',desc:'دليل المقابلات السريع والمعمارية لـ React Native.',path:'guides/react_native_interview_sheet.html'},
+
+  // AAOS Automotive
+  {ico:'🚗',c:'cp',cat:'سيارات',title:'دليل VHAL الشامل',desc:'CarPropertyManager، IPC، والتكامل الكامل مع الهارد وير.',path:'guides/vhal-guide-arabic.html'},
   {ico:'⚛️',c:'cv',cat:'UI',title:'Compose for Automotive',desc:'Jetpack Compose وCarUi لبناء واجهات حديثة متوافقة مع القيادة.',path:'guides/compose_for_automotive_guide.html'},
-  {ico:'📡',c:'cr',cat:'نظام',title:'IPC & Binder & AIDL',desc:'التواصل بين العمليات — Binder Driver، AIDL، ربط الخدمات.',path:'guides/ipc-binder-aidl-guide.html'},
-  {ico:'🚀',c:'cg',cat:'DevOps',title:'Android CI/CD',desc:'أتمتة البناء والاختبار والنشر مع GitHub Actions وFastlane.',path:'guides/android-cicd-guide.html'},
-  {ico:'📲',c:'cg',cat:'نظام',title:'OTA Updates & A/B',desc:'تحديثات النظام الهوائية وإدارة تقسيم القرص.',path:'guides/android-ota-updates-guide.html'},
-  {ico:'🎵',c:'ca',cat:'وسائط',title:'Android Media Session',desc:'إدارة الوسائط والتحكم في تشغيل الصوت في بيئة السيارة.',path:'guides/android_media_vehicle_guide.html'},
-  {ico:'📶',c:'cp',cat:'شبكات',title:'Connectivity Stack',desc:'البلوتوث， الواي فاي， وتكامل Android Auto.',path:'guides/connectivity-bt-wifi-androidauto.html'},
-  {ico:'🛠️',c:'ca',cat:'DevOps',title:'Android Build System',desc:'أسرار AOSP Build — Soong， Makefile， وعملية البناء.',path:'guides/android-build-guide.html'},
-  {ico:'🔌',c:'cr',cat:'هارد',title:'CAN Bus & VHAL',desc:'ربط أندرويد بناقل بيانات السيارة الحقيقي.',path:'guides/can_bus_vhal_guide.html'},
+  {ico:'📡',c:'cr',cat:'سيارات',title:'IPC & Binder & AIDL',desc:'التواصل بين العمليات — Binder Driver، AIDL، ربط الخدمات.',path:'guides/ipc-binder-aidl-guide.html'},
+  {ico:'🚀',c:'cg',cat:'DevOps',title:'Android CI/CD for AAOS',desc:'أتمتة البناء والاختبار والنشر مع GitHub Actions وFastlane.',path:'guides/android-cicd-guide.html'},
+  {ico:'📲',c:'cg',cat:'سيارات',title:'OTA Updates & A/B',desc:'تحديثات النظام الهوائية وإدارة تقسيم القرص.',path:'guides/android-ota-updates-guide.html'},
+  {ico:'🎵',c:'ca',cat:'سيارات',title:'Android Media Session',desc:'إدارة الوسائط والتحكم في تشغيل الصوت في بيئة السيارة.',path:'guides/android_media_vehicle_guide.html'},
+  {ico:'📶',c:'cp',cat:'سيارات',title:'Connectivity Stack',desc:'البلوتوث، الواي فاي، وتكامل Android Auto.',path:'guides/connectivity-bt-wifi-androidauto.html'},
+  {ico:'🛠️',c:'ca',cat:'DevOps',title:'Android Build System',desc:'أسرار AOSP Build — Soong، Makefile، وعملية البناء.',path:'guides/android-build-guide.html'},
+  {ico:'🔌',c:'cr',cat:'سيارات',title:'CAN Bus & VHAL',desc:'ربط أندرويد بناقل بيانات السيارة الحقيقي.',path:'guides/can_bus_vhal_guide.html'},
   {ico:'🖥️',c:'cv',cat:'UI',title:'CarUI Library',desc:'مكتبة CarUI لبناء واجهات متوافقة مع متطلبات الأمان.',path:'guides/caruilib_driving_deep_dive.html'},
-  {ico:'🤖',c:'cp',cat:'نظام',title:'AAOS Deep Dive',desc:'الغوص العميق في Android Automotive OS — المعمارية الداخلية.',path:'guides/aaos_deep_arabic.html'},
-  {ico:'🛡️',c:'cr',cat:'نظام',title:'SELinux for Automotive',desc:'إدارة الأمان والصلاحيات — Enforcing， Policies， و Security contexts.',path:'guides/selinux-guide.html'},
-  {ico:'💼',c:'cg',cat:'مهني',title:'Professional Hub',desc:'نصائح وموارد وخارطة طريق لتطوير مسارك المهني.',path:'guides/career-hub.html'},
-  {ico:'💎',c:'cv',cat:'مهني',title:'OOP Interview Mastery',desc:'أكثر من 300 سؤال وجواب احترافي في OOP وأنماط التصميم لأندرويد.',path:'guides/oop_questions.html'},
-  {ico:'⚡',c:'cp',cat:'نظام',title:'دليل NDK & JNI الشامل',desc:'احتراف البرمجة بلغة C++ والتواصل مع الـ Java Framework عبر JNI.',path:'guides/ndk_jni_guide.html'},
+  {ico:'🤖',c:'cp',cat:'سيارات',title:'AAOS Deep Dive',desc:'الغوص العميق في Android Automotive OS — المعمارية الداخلية.',path:'guides/aaos_deep_arabic.html'},
+  {ico:'🛡️',c:'cr',cat:'أمان',title:'SELinux for Automotive',desc:'إدارة الأمان والصلاحيات — Enforcing، Policies، و Security contexts.',path:'guides/selinux-guide.html'},
+  {ico:'💼',c:'cg',cat:'أندرويد',title:'Professional Hub',desc:'نصائح وموارد وخارطة طريق لتطوير مسارك المهني.',path:'guides/career-hub.html'},
+  {ico:'💎',c:'cv',cat:'OOP',title:'OOP Interview Mastery',desc:'أكثر من 300 سؤال وجواب احترافي في OOP وأنماط التصميم.',path:'guides/oop_questions.html'},
+  {ico:'⚡',c:'cp',cat:'سيارات',title:'دليل NDK & JNI الشامل',desc:'احتراف البرمجة بلغة C++ والتواصل مع الـ Java Framework عبر JNI.',path:'guides/ndk_jni_guide.html'},
   {ico:'📟',c:'cg',cat:'DevOps',title:'دليل ADB الشامل',desc:'Android Debug Bridge — الدليل الشامل A to Z.',path:'guides/adb_guide.html'},
+
+  // DSA
+  {ico:'🧠',c:'cr',cat:'أندرويد',title:'DSA Mastery Guide',desc:'الدليل الشامل للخوارزميات وهياكل البيانات.',path:'guides/dsa_guide.html'},
+  {ico:'🔗',c:'cv',cat:'أندرويد',title:'Linked Lists Deep Dive',desc:'شرح مفصل للـ Linked Lists أنواعها وأمثلة C++.',path:'guides/linked_lists_guide.html'},
+  {ico:'🗺️',c:'ca',cat:'أندرويد',title:'HashMaps & Sets',desc:'unordered_map، Two Sum، Frequency Count في O(1).',path:'guides/hashmaps_sets_guide.html'},
 ];
 const grid=document.getElementById('grid');
 function render(items){

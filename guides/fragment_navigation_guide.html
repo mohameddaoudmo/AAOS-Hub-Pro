@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fragment & Navigation — المرجع الشامل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1419;
+  --surface:#161c24;
+  --surface-2:#1c2430;
+  --wall:#2a3444;
+  --gold:#d4a35a;
+  --violet:#8f7fd9;
+  --blue:#5b8fa8;
+  --text:#e8e6e1;
+  --muted:#8b93a1;
+  --danger:#c96f5c;
+  --good:#7fae8e;
+  --code-bg:#0b0f14;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'IBM Plex Sans Arabic', sans-serif;
+  line-height:1.9;
+  font-size:16px;
+}
+::selection{background:var(--violet); color:#0f1419;}
+
+.blueprint-bg{
+  position:fixed; inset:0; z-index:-1; opacity:.05;
+  background-image:
+    radial-gradient(circle, var(--violet) 1px, transparent 1px);
+  background-size:34px 34px;
+}
+
+/* ============ Hero ============ */
+.hero{
+  min-height:92vh;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  text-align:center;
+  padding:40px 20px;
+  position:relative;
+  border-bottom:1px solid var(--wall);
+}
+.hero .eyebrow{
+  font-family:'IBM Plex Mono', monospace;
+  color:var(--violet);
+  letter-spacing:4px;
+  font-size:13px;
+  margin-bottom:24px;
+  text-transform:uppercase;
+}
+.hero h1{
+  font-family:'Space Grotesk', sans-serif;
+  font-size:clamp(38px,7.5vw,78px);
+  font-weight:700;
+  color:var(--text);
+  line-height:1.1;
+  margin-bottom:20px;
+}
+.hero h1 span{color:var(--gold);}
+.hero p.sub{
+  color:var(--muted);
+  font-size:19px;
+  max-width:660px;
+  margin-bottom:36px;
+}
+.routemap{width:min(700px,92vw); margin-top:16px;}
+.routemap svg{width:100%; height:auto; display:block;}
+.routemap .node{fill:var(--surface-2); stroke:var(--wall); stroke-width:2;}
+.routemap .node.active{stroke:var(--gold);}
+.routemap .path{stroke:var(--violet); stroke-width:2; fill:none; stroke-dasharray:6 6;}
+.routemap .label{font-family:'IBM Plex Mono', monospace; font-size:12px; fill:var(--muted);}
+.routemap .label.gold{fill:var(--gold);}
+
+/* ============ Layout ============ */
+.wrap{max-width:920px; margin:0 auto; padding:0 24px;}
+.toc{
+  background:var(--surface);
+  border:1px solid var(--wall);
+  border-radius:4px;
+  padding:32px;
+  margin:60px auto;
+}
+.toc h2{
+  font-family:'Space Grotesk', sans-serif;
+  color:var(--violet);
+  font-size:14px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-bottom:20px;
+}
+.toc ol{list-style:none; counter-reset:toc;}
+.toc li{
+  counter-increment:toc;
+  padding:10px 0;
+  border-bottom:1px dashed var(--wall);
+  display:flex; align-items:baseline; gap:14px;
+}
+.toc li:last-child{border-bottom:none;}
+.toc li::before{
+  content:counter(toc, decimal-leading-zero);
+  font-family:'IBM Plex Mono', monospace;
+  color:var(--blue);
+  font-size:13px;
+  min-width:28px;
+}
+.toc a{color:var(--text); text-decoration:none; font-weight:500;}
+.toc a:hover{color:var(--gold);}
+
+/* ============ Sections ============ */
+.stage{
+  position:relative;
+  margin:0 auto 0;
+  padding:70px 24px 80px;
+  border-bottom:2px solid var(--wall);
+}
+.stage::before{
+  content:'';
+  position:absolute; top:0; right:0; bottom:0; width:6px;
+  background:linear-gradient(var(--violet), transparent 80%);
+  opacity:.5;
+}
+.stage-tag{
+  font-family:'IBM Plex Mono', monospace;
+  color:var(--blue);
+  font-size:12px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-bottom:14px;
+}
+.stage h2{
+  font-family:'Space Grotesk', sans-serif;
+  font-size:clamp(26px,4vw,40px);
+  color:var(--text);
+  margin-bottom:8px;
+}
+.stage h2 em{color:var(--gold); font-style:normal;}
+.stage .lead{
+  color:var(--muted);
+  font-size:18px;
+  max-width:720px;
+  margin-bottom:40px;
+}
+.stage h3{
+  font-family:'Space Grotesk', sans-serif;
+  font-size:22px;
+  color:var(--violet);
+  margin:36px 0 14px;
+}
+.stage p{max-width:760px; margin-bottom:16px; color:#d3d1cc;}
+.stage ul, .stage ol{margin:0 0 20px 0; padding-right:22px; max-width:760px;}
+.stage li{margin-bottom:10px; color:#d3d1cc;}
+.stage li strong{color:var(--text);}
+
+/* ============ Code ============ */
+pre{
+  background:var(--code-bg);
+  border:1px solid var(--wall);
+  border-radius:6px;
+  padding:20px 22px;
+  overflow-x:auto;
+  margin:18px 0 26px;
+  direction:ltr;
+  text-align:left;
+  position:relative;
+}
+pre::before{
+  content:attr(data-lang);
+  position:absolute; top:8px; left:16px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px;
+  color:var(--muted);
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+code{font-family:'IBM Plex Mono', monospace; font-size:14px; color:#c9d4de; line-height:1.7;}
+pre code{display:block; padding-top:14px;}
+.kw{color:#c586c0;} .tp{color:#4ec9b0;} .an{color:var(--gold);} .st{color:#ce9178;} .cm{color:#6a9955;} .fn{color:#dcdcaa;}
+
+/* ============ Callouts ============ */
+.callout{
+  border-radius:6px; padding:18px 22px; margin:22px 0 28px; max-width:760px;
+  border-inline-start:4px solid var(--blue); background:var(--surface-2);
+}
+.callout.tip{border-inline-start-color:var(--good);}
+.callout.warn{border-inline-start-color:var(--danger);}
+.callout .label{
+  font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:2px;
+  text-transform:uppercase; color:var(--blue); margin-bottom:6px; display:block;
+}
+.callout.tip .label{color:var(--good);}
+.callout.warn .label{color:var(--danger);}
+.callout p{margin:0; max-width:none; color:#d3d1cc;}
+
+/* ============ Table ============ */
+table{width:100%; max-width:800px; border-collapse:collapse; margin:20px 0 30px; font-size:15px;}
+th, td{padding:12px 16px; text-align:right; border-bottom:1px solid var(--wall);}
+th{
+  font-family:'IBM Plex Mono', monospace; color:var(--violet); font-size:12px;
+  letter-spacing:1px; text-transform:uppercase; border-bottom:2px solid var(--violet);
+}
+td{color:#d3d1cc;}
+tr:hover td{background:var(--surface);}
+
+/* ============ Cards ============ */
+.anno-grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:14px; max-width:800px; margin:20px 0 30px;
+}
+.anno-card{background:var(--surface); border:1px solid var(--wall); border-radius:6px; padding:16px 18px;}
+.anno-card code.tag{font-family:'IBM Plex Mono', monospace; color:var(--gold); font-size:14px; display:block; margin-bottom:8px;}
+.anno-card p{margin:0; font-size:13.5px; color:var(--muted); max-width:none;}
+
+/* ============ Lifecycle timeline ============ */
+.lifecycle{
+  max-width:800px; margin:24px 0 34px;
+  display:flex; flex-direction:column; gap:0;
+  border-inline-start:2px solid var(--wall);
+  padding-inline-start:0;
+}
+.lc-step{
+  position:relative; padding:14px 0 14px 0; padding-inline-start:28px;
+}
+.lc-step::before{
+  content:''; position:absolute; right:-7px; top:20px; width:12px; height:12px;
+  border-radius:50%; background:var(--bg); border:2px solid var(--violet);
+}
+.lc-step .name{font-family:'IBM Plex Mono', monospace; color:var(--gold); font-size:15px; display:block; margin-bottom:4px;}
+.lc-step p{margin:0; font-size:14.5px; color:var(--muted); max-width:640px;}
+
+footer{text-align:center; padding:60px 20px; color:var(--muted); font-family:'IBM Plex Mono', monospace; font-size:13px;}
+
+@media(max-width:640px){.stage{padding:50px 18px 60px;}}
+</style>
+</head>
+<body>
+<div class="blueprint-bg"></div>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="eyebrow">Android Jetpack · UI Architecture</div>
+  <h1>كل شيء عن <span>Fragment</span> والـ Navigation</h1>
+  <p class="sub">مرجع كامل لدورة حياة الـ Fragment، والتواصل بينها، ومكتبة Navigation Component من الألف إلى الياء.</p>
+
+  <div class="routemap">
+    <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+      <path class="path" d="M80,110 C160,60 220,60 300,110" />
+      <path class="path" d="M300,110 C380,160 440,160 520,110" />
+      <path class="path" d="M300,110 C340,40 400,30 460,60" />
+      <circle class="node active" cx="80" cy="110" r="30"/>
+      <circle class="node" cx="300" cy="110" r="30"/>
+      <circle class="node" cx="520" cy="110" r="30"/>
+      <circle class="node" cx="460" cy="60" r="22"/>
+      <text x="55" y="115" class="label gold">Home</text>
+      <text x="278" y="115" class="label gold">Details</text>
+      <text x="495" y="115" class="label">Checkout</text>
+      <text x="432" y="65" class="label">Dialog</text>
+      <text x="60" y="160" class="label">NavController.navigate()</text>
+    </svg>
+  </div>
+</section>
+
+<div class="wrap">
+  <nav class="toc">
+    <h2>خريطة المرجع</h2>
+    <ol>
+      <li><a href="#intro">مقدمة: لماذا Fragment ولماذا Navigation Component</a></li>
+      <li><a href="#lifecycle">دورة حياة الـ Fragment بالتفصيل</a></li>
+      <li><a href="#create">إنشاء Fragment و ViewBinding</a></li>
+      <li><a href="#communication">التواصل بين Fragments</a></li>
+      <li><a href="#fm">FragmentManager والـ Transactions اليدوية</a></li>
+      <li><a href="#navcomp">Navigation Component: الأساسيات</a></li>
+      <li><a href="#safeargs">Safe Args — تمرير البيانات بأمان</a></li>
+      <li><a href="#nested">Nested Graphs و Bottom Navigation</a></li>
+      <li><a href="#deeplinks">Deep Links</a></li>
+      <li><a href="#transitions">الانتقالات والـ Shared Elements</a></li>
+      <li><a href="#dialogs">DialogFragment مع Navigation</a></li>
+      <li><a href="#pitfalls">أخطاء شائعة وأفضل الممارسات</a></li>
+    </ol>
+  </nav>
+</div>
+
+<!-- ===================== 1. INTRO ===================== -->
+<section class="stage" id="intro">
+  <div class="wrap">
+    <div class="stage-tag">01</div>
+    <h2>لماذا <em>Fragment</em> ولماذا <em>Navigation</em>؟</h2>
+    <p class="lead">Fragment هو وحدة UI قابلة لإعادة الاستخدام ولها دورة حياة خاصة بها، تعيش داخل Activity مضيفة. Navigation Component هو الطبقة التي تدير التنقل بين هذه الأجزاء بشكل معياري وآمن.</p>
+
+    <h3>المشكلة قبل Navigation Component</h3>
+    <p>التعامل اليدوي مع <code>FragmentManager</code> و <code>FragmentTransaction</code> يعني إدارة الـ back stack يدويًا، تمرير بيانات عبر Bundle بدون فحص نوع، وتكرار كود معالجة الأخطاء في كل مكان.</p>
+
+    <div class="anno-grid">
+      <div class="anno-card"><code class="tag">مصدر واحد للحقيقة</code><p>Navigation Graph (ملف XML) يمثّل كل شاشات التطبيق ومساراتها في مكان واحد مرئي.</p></div>
+      <div class="anno-card"><code class="tag">Back stack تلقائي</code><p>NavController يدير الـ back stack نيابة عنك، متوافقًا مع زر الرجوع في النظام.</p></div>
+      <div class="anno-card"><code class="tag">Safe Args</code><p>توليد كود آمن النوع لتمرير البيانات بين الوجهات، بدل Bundle خام.</p></div>
+      <div class="anno-card"><code class="tag">تكامل مع Jetpack</code><p>يعمل بسلاسة مع ViewModel، Hilt، BottomNavigationView، و Drawer.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 2. LIFECYCLE ===================== -->
+<section class="stage" id="lifecycle">
+  <div class="wrap">
+    <div class="stage-tag">02</div>
+    <h2>دورة حياة <em>Fragment</em></h2>
+    <p class="lead">دورة حياة Fragment أكثر تعقيدًا من Activity لأنها مرتبطة بدورتين متوازيتين: دورة حياة الـ Fragment نفسه، ودورة حياة الـ View الخاص به.</p>
+
+    <div class="lifecycle">
+      <div class="lc-step"><span class="name">onAttach()</span><p>يُستدعى عند ربط الـ Fragment بالـ Context المضيف. أول نقطة وصول لـ Context.</p></div>
+      <div class="lc-step"><span class="name">onCreate()</span><p>تهيئة المكونات غير المرتبطة بالـ View — مثل ViewModel أو استرجاع Arguments.</p></div>
+      <div class="lc-step"><span class="name">onCreateView()</span><p>تضخيم (inflate) الـ layout وإرجاع الـ View الجذري. لا تُنفّذ منطق UI هنا بعد.</p></div>
+      <div class="lc-step"><span class="name">onViewCreated()</span><p>الـ View أصبح جاهزًا بالكامل — المكان الصحيح لإعداد الـ Listeners والمراقبة (observe).</p></div>
+      <div class="lc-step"><span class="name">onStart() / onResume()</span><p>الـ Fragment مرئي وتفاعلي، متزامن مع دورة حياة الـ Activity المضيفة.</p></div>
+      <div class="lc-step"><span class="name">onPause() / onStop()</span><p>الـ Fragment يفقد التفاعل أو الظهور — وقت مناسب لحفظ الحالة المؤقتة.</p></div>
+      <div class="lc-step"><span class="name">onDestroyView()</span><p>الـ View يُدمَّر لكن الـ Fragment instance نفسه قد يبقى حيًا (خصوصًا في back stack). يجب تحرير الـ Binding هنا لتفادي تسرّب الذاكرة.</p></div>
+      <div class="lc-step"><span class="name">onDestroy() / onDetach()</span><p>تدمير الـ Fragment بالكامل وفصله عن الـ Context المضيف.</p></div>
+    </div>
+
+    <div class="callout warn">
+      <span class="label">أهم فرق يجب فهمه</span>
+      <p>دورة حياة الـ <strong>View</strong> (<code>getViewLifecycleOwner()</code>) أقصر من دورة حياة الـ <strong>Fragment</strong> نفسه. عند وضع Fragment في back stack، الـ View يُدمَّر بينما الـ Fragment instance يبقى موجودًا في الذاكرة.</p>
+    </div>
+
+    <pre data-lang="kotlin"><code><span class="kw">override fun</span> <span class="fn">onViewCreated</span>(view: <span class="tp">View</span>, savedInstanceState: <span class="tp">Bundle</span>?) {
+    <span class="kw">super</span>.<span class="fn">onViewCreated</span>(view, savedInstanceState)
+
+    <span class="cm">// استخدم viewLifecycleOwner وليس this عند المراقبة داخل الـ Fragment</span>
+    viewModel.uiState.observe(viewLifecycleOwner) { state -&gt;
+        binding.title.text = state.title
+    }
+}</code></pre>
+  </div>
+</section>
+
+<!-- ===================== 3. CREATE ===================== -->
+<section class="stage" id="create">
+  <div class="wrap">
+    <div class="stage-tag">03</div>
+    <h2>إنشاء Fragment و <em>ViewBinding</em></h2>
+
+    <pre data-lang="kotlin"><code><span class="kw">class</span> <span class="tp">HomeFragment</span> : <span class="tp">Fragment</span>(<span class="tp">R</span>.layout.fragment_home) {
+
+    <span class="kw">private var</span> _binding: <span class="tp">FragmentHomeBinding</span>? = <span class="kw">null</span>
+    <span class="kw">private val</span> binding <span class="kw">get</span>() = _binding!!
+
+    <span class="kw">private val</span> viewModel: <span class="tp">HomeViewModel</span> <span class="kw">by</span> viewModels()
+
+    <span class="kw">override fun</span> <span class="fn">onCreateView</span>(
+        inflater: <span class="tp">LayoutInflater</span>, container: <span class="tp">ViewGroup</span>?, savedInstanceState: <span class="tp">Bundle</span>?
+    ): <span class="tp">View</span> {
+        _binding = <span class="tp">FragmentHomeBinding</span>.<span class="fn">inflate</span>(inflater, container, <span class="kw">false</span>)
+        <span class="kw">return</span> binding.root
+    }
+
+    <span class="kw">override fun</span> <span class="fn">onViewCreated</span>(view: <span class="tp">View</span>, savedInstanceState: <span class="tp">Bundle</span>?) {
+        <span class="kw">super</span>.<span class="fn">onViewCreated</span>(view, savedInstanceState)
+        binding.startButton.setOnClickListener {
+            findNavController().<span class="fn">navigate</span>(<span class="tp">R</span>.id.action_home_to_details)
+        }
+    }
+
+    <span class="kw">override fun</span> <span class="fn">onDestroyView</span>() {
+        <span class="kw">super</span>.<span class="fn">onDestroyView</span>()
+        _binding = <span class="kw">null</span> <span class="cm">// تفادي تسرّب الذاكرة</span>
+    }
+}</code></pre>
+
+    <div class="callout tip">
+      <span class="label">نصيحة</span>
+      <p>استخدم <code>Fragment(R.layout.fragment_home)</code> constructor مباشرة بدلًا من inflate يدوي في <code>onCreateView</code> عند عدم الحاجة لـ ViewBinding — أبسط وأقل كودًا.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 4. COMMUNICATION ===================== -->
+<section class="stage" id="communication">
+  <div class="wrap">
+    <div class="stage-tag">04</div>
+    <h2>التواصل بين <em>Fragments</em></h2>
+    <p class="lead">التواصل المباشر بين Fragment وآخر (مراجع مباشرة) يخلق ترابطًا ضارًا. الطرق الصحيحة الحديثة:</p>
+
+    <h3>1. Shared ViewModel (بين Fragments في نفس الـ Activity)</h3>
+    <pre data-lang="kotlin"><code><span class="kw">class</span> <span class="tp">SharedViewModel</span> : <span class="tp">ViewModel</span>() {
+    <span class="kw">private val</span> _selectedItem = <span class="tp">MutableLiveData</span>&lt;<span class="tp">Item</span>&gt;()
+    <span class="kw">val</span> selectedItem: <span class="tp">LiveData</span>&lt;<span class="tp">Item</span>&gt; = _selectedItem
+
+    <span class="kw">fun</span> <span class="fn">select</span>(item: <span class="tp">Item</span>) { _selectedItem.value = item }
+}
+
+<span class="cm">// في كل Fragment</span>
+<span class="kw">private val</span> shared: <span class="tp">SharedViewModel</span> <span class="kw">by</span> activityViewModels()</code></pre>
+
+    <h3>2. Fragment Result API (للاستجابة لمرة واحدة، عبر back stack)</h3>
+    <pre data-lang="kotlin"><code><span class="cm">// الشاشة المستقبِلة تسجّل مستمعًا</span>
+setFragmentResultListener(<span class="st">"requestKey"</span>) { _, bundle -&gt;
+    <span class="kw">val</span> result = bundle.getString(<span class="st">"resultKey"</span>)
+}
+
+<span class="cm">// الشاشة المرسِلة (مثلًا BottomSheet) ترسل النتيجة قبل الرجوع</span>
+setFragmentResult(<span class="st">"requestKey"</span>, bundleOf(<span class="st">"resultKey"</span> <span class="kw">to</span> <span class="st">"value"</span>))</code></pre>
+
+    <table>
+      <tr><th>الطريقة</th><th>الاستخدام المناسب</th></tr>
+      <tr><td>Shared ViewModel</td><td>مشاركة حالة مستمرة بين شاشتين تعيشان في نفس نطاق الـ Activity/Nav Graph.</td></tr>
+      <tr><td>Fragment Result API</td><td>إرسال نتيجة واحدة عند الرجوع (مثل اختيار من BottomSheet أو Dialog).</td></tr>
+      <tr><td>Safe Args</td><td>تمرير بيانات أولية عند الانتقال إلى شاشة جديدة (forward navigation).</td></tr>
+    </table>
+
+    <div class="callout warn">
+      <span class="label">تجنّب</span>
+      <p>لا تستخدم <code>(parentFragment as? Listener)</code> أو استدعاء دوال مباشرة على Fragment آخر — هذا يكسر مبدأ الفصل بين المكونات ويصعّب إعادة الاستخدام والاختبار.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 5. FM ===================== -->
+<section class="stage" id="fm">
+  <div class="wrap">
+    <div class="stage-tag">05</div>
+    <h2><em>FragmentManager</em> والـ Transactions اليدوية</h2>
+    <p class="lead">قبل Navigation Component، كانت إدارة الشاشات تتم عبر FragmentManager مباشرة. فهمها ضروري لأنها الأساس الذي يعمل فوقه Navigation Component داخليًا، ولا تزال تُستخدم في حالات خاصة.</p>
+
+    <pre data-lang="kotlin"><code>supportFragmentManager.commit {
+    setReorderingAllowed(<span class="kw">true</span>)
+    replace(<span class="tp">R</span>.id.container, <span class="tp">DetailsFragment</span>())
+    addToBackStack(<span class="st">"details"</span>)
+}</code></pre>
+
+    <ul>
+      <li><strong>add / replace</strong>: إضافة Fragment جديد أو استبدال الموجود في الـ container.</li>
+      <li><strong>addToBackStack</strong>: يجعل العملية قابلة للتراجع عبر زر الرجوع.</li>
+      <li><strong>setReorderingAllowed(true)</strong>: يسمح بتحسين ترتيب تنفيذ العمليات المتزامنة (موصى به دائمًا).</li>
+    </ul>
+
+    <div class="callout">
+      <span class="label">متى تحتاجها رغم وجود Navigation؟</span>
+      <p>حالات خاصة مثل عرض Fragment داخل Fragment آخر بشكل ديناميكي بالكامل (child fragment manager)، أو مكتبات قديمة لا تدعم Navigation Component.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 6. NAVCOMP ===================== -->
+<section class="stage" id="navcomp">
+  <div class="wrap">
+    <div class="stage-tag">06</div>
+    <h2><em>Navigation Component</em>: الأساسيات</h2>
+    <p class="lead">ثلاثة عناصر أساسية: <strong>NavGraph</strong> (خريطة الشاشات)، <strong>NavHostFragment</strong> (الحاوية)، <strong>NavController</strong> (المتحكم في التنقل).</p>
+
+    <h3>Navigation Graph (XML)</h3>
+    <pre data-lang="xml"><code>&lt;navigation xmlns:android=<span class="st">"..."</span>
+    android:id=<span class="st">"@+id/nav_graph"</span>
+    app:startDestination=<span class="st">"@id/homeFragment"</span>&gt;
+
+    &lt;fragment
+        android:id=<span class="st">"@+id/homeFragment"</span>
+        android:name=<span class="st">".ui.HomeFragment"</span>
+        android:label=<span class="st">"Home"</span>&gt;
+        &lt;action
+            android:id=<span class="st">"@+id/action_home_to_details"</span>
+            app:destination=<span class="st">"@id/detailsFragment"</span> /&gt;
+    &lt;/fragment&gt;
+
+    &lt;fragment
+        android:id=<span class="st">"@+id/detailsFragment"</span>
+        android:name=<span class="st">".ui.DetailsFragment"</span>
+        android:label=<span class="st">"Details"</span>&gt;
+        &lt;argument
+            android:name=<span class="st">"itemId"</span>
+            app:argType=<span class="st">"long"</span> /&gt;
+    &lt;/fragment&gt;
+&lt;/navigation&gt;</code></pre>
+
+    <h3>الاستضافة في الـ Activity</h3>
+    <pre data-lang="xml"><code>&lt;androidx.fragment.app.FragmentContainerView
+    android:id=<span class="st">"@+id/nav_host"</span>
+    android:name=<span class="st">"androidx.navigation.fragment.NavHostFragment"</span>
+    app:navGraph=<span class="st">"@navigation/nav_graph"</span>
+    app:defaultNavHost=<span class="st">"true"</span>
+    android:layout_width=<span class="st">"match_parent"</span>
+    android:layout_height=<span class="st">"match_parent"</span> /&gt;</code></pre>
+
+    <h3>التنقل برمجيًا</h3>
+    <pre data-lang="kotlin"><code>findNavController().<span class="fn">navigate</span>(<span class="tp">R</span>.id.action_home_to_details)
+
+<span class="cm">// أو عبر الرجوع للخلف</span>
+findNavController().<span class="fn">popBackStack</span>()
+
+<span class="cm">// أو الرجوع لوجهة محددة مع مسح ما بعدها</span>
+findNavController().<span class="fn">popBackStack</span>(<span class="tp">R</span>.id.homeFragment, <span class="kw">false</span>)</code></pre>
+
+    <div class="callout tip">
+      <span class="label">أداة مهمة</span>
+      <p>استخدم <strong>Navigation Editor</strong> المرئي في Android Studio لبناء الـ graph ورؤية كل المسارات بصريًا بدل كتابة XML يدويًا بالكامل.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 7. SAFE ARGS ===================== -->
+<section class="stage" id="safeargs">
+  <div class="wrap">
+    <div class="stage-tag">07</div>
+    <h2><em>Safe Args</em> — تمرير البيانات بأمان</h2>
+    <p class="lead">Gradle plugin يولّد أصناف Kotlin آمنة النوع من تعريفات الـ <code>argument</code> في الـ Nav Graph، بدل التعامل مع Bundle خام.</p>
+
+    <pre data-lang="kotlin"><code><span class="an">plugins</span> {
+    id(<span class="st">"androidx.navigation.safeargs.kotlin"</span>)
+}</code></pre>
+
+    <pre data-lang="kotlin"><code><span class="cm">// الإرسال من HomeFragment</span>
+<span class="kw">val</span> action = <span class="tp">HomeFragmentDirections</span>.<span class="fn">actionHomeToDetails</span>(itemId = <span class="fn">42L</span>)
+findNavController().<span class="fn">navigate</span>(action)
+
+<span class="cm">// الاستقبال في DetailsFragment</span>
+<span class="kw">private val</span> args: <span class="tp">DetailsFragmentArgs</span> <span class="kw">by</span> navArgs()
+
+<span class="kw">override fun</span> <span class="fn">onViewCreated</span>(view: <span class="tp">View</span>, savedInstanceState: <span class="tp">Bundle</span>?) {
+    <span class="kw">val</span> id = args.itemId <span class="cm">// Long، بدون أي cast يدوي</span>
+}</code></pre>
+
+    <div class="callout">
+      <span class="label">لماذا هذا أفضل من Bundle مباشرة؟</span>
+      <p>أي خطأ في اسم المفتاح أو النوع يُكتشف وقت الترجمة (compile-time) بدلًا من انهيار التطبيق وقت التشغيل بسبب <code>ClassCastException</code> أو مفتاح مفقود.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 8. NESTED ===================== -->
+<section class="stage" id="nested">
+  <div class="wrap">
+    <div class="stage-tag">08</div>
+    <h2>Nested Graphs و <em>Bottom Navigation</em></h2>
+    <p class="lead">التطبيقات الكبيرة تُقسَّم إلى Nested Graphs — كل قسم رئيسي (مثل تبويب في BottomNavigationView) له graph مستقل بـ back stack خاص به.</p>
+
+    <pre data-lang="kotlin"><code>bottomNavigationView.setupWithNavController(navController)
+
+<span class="cm">// كل عنصر في BottomNavigationView.menu يجب أن يطابق</span>
+<span class="cm">// id لأحد الـ nested graphs في nav_graph.xml</span></code></pre>
+
+    <div class="callout tip">
+      <span class="label">Multiple Back Stacks</span>
+      <p>منذ Navigation 2.4، يدعم <code>setupWithNavController</code> الاحتفاظ بـ back stack منفصل لكل تبويب تلقائيًا — عند التبديل والعودة لتبويب سابق، تجد حالته كما تركتها.</p>
+    </div>
+
+    <h3>Include graph مستقل</h3>
+    <pre data-lang="xml"><code>&lt;include app:graph=<span class="st">"@navigation/profile_graph"</span> /&gt;</code></pre>
+  </div>
+</section>
+
+<!-- ===================== 9. DEEPLINKS ===================== -->
+<section class="stage" id="deeplinks">
+  <div class="wrap">
+    <div class="stage-tag">09</div>
+    <h2><em>Deep Links</em></h2>
+    <p class="lead">تسمح بفتح وجهة محددة داخل التطبيق مباشرة من رابط خارجي (إشعار، متصفح، تطبيق آخر).</p>
+
+    <pre data-lang="xml"><code>&lt;fragment android:id=<span class="st">"@+id/detailsFragment"</span> ...&gt;
+    &lt;deepLink app:uri=<span class="st">"myapp://details/{itemId}"</span> /&gt;
+&lt;/fragment&gt;</code></pre>
+
+    <pre data-lang="kotlin"><code><span class="cm">// إنشاء PendingIntent لإشعار يفتح الوجهة مباشرة</span>
+<span class="kw">val</span> pendingIntent = <span class="tp">NavDeepLinkBuilder</span>(context)
+    .setGraph(<span class="tp">R</span>.navigation.nav_graph)
+    .setDestination(<span class="tp">R</span>.id.detailsFragment)
+    .setArguments(bundleOf(<span class="st">"itemId"</span> <span class="kw">to</span> <span class="fn">42L</span>))
+    .createPendingIntent()</code></pre>
+
+    <div class="callout warn">
+      <span class="label">تذكّر</span>
+      <p>يجب تسجيل الـ <code>&lt;intent-filter&gt;</code> المناسب في AndroidManifest أيضًا (أو استخدام <code>&lt;nav-graph&gt;</code> tag) حتى يعرف النظام أن التطبيق يستجيب لهذا الرابط.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 10. TRANSITIONS ===================== -->
+<section class="stage" id="transitions">
+  <div class="wrap">
+    <div class="stage-tag">10</div>
+    <h2>الانتقالات و <em>Shared Elements</em></h2>
+
+    <pre data-lang="kotlin"><code><span class="kw">val</span> extras = <span class="tp">FragmentNavigatorExtras</span>(
+    imageView <span class="kw">to</span> <span class="st">"transitionName_image"</span>
+)
+findNavController().<span class="fn">navigate</span>(
+    <span class="tp">HomeFragmentDirections</span>.<span class="fn">actionHomeToDetails</span>(itemId),
+    extras
+)</code></pre>
+    <p>عنصر الـ View في الوجهة الهدف يجب أن يحمل نفس <code>android:transitionName</code> ليعمل الانتقال المشترك (Shared Element Transition) بسلاسة.</p>
+
+    <h3>Custom Animations عبر NavOptions</h3>
+    <pre data-lang="kotlin"><code><span class="kw">val</span> navOptions = <span class="tp">navOptions</span> {
+    anim {
+        enter = <span class="tp">R</span>.anim.slide_in_right
+        exit = <span class="tp">R</span>.anim.slide_out_left
+        popEnter = <span class="tp">R</span>.anim.slide_in_left
+        popExit = <span class="tp">R</span>.anim.slide_out_right
+    }
+}
+findNavController().<span class="fn">navigate</span>(<span class="tp">R</span>.id.action_home_to_details, <span class="kw">null</span>, navOptions)</code></pre>
+  </div>
+</section>
+
+<!-- ===================== 11. DIALOGS ===================== -->
+<section class="stage" id="dialogs">
+  <div class="wrap">
+    <div class="stage-tag">11</div>
+    <h2><em>DialogFragment</em> مع Navigation</h2>
+    <p class="lead">Navigation Component يدعم DialogFragment كوجهة مباشرة داخل الـ graph — يظهر كطبقة فوق الوجهة الحالية دون استبدالها.</p>
+
+    <pre data-lang="xml"><code>&lt;dialog
+    android:id=<span class="st">"@+id/confirmDeleteDialog"</span>
+    android:name=<span class="st">".ui.ConfirmDeleteDialogFragment"</span> /&gt;</code></pre>
+
+    <pre data-lang="kotlin"><code>findNavController().<span class="fn">navigate</span>(<span class="tp">R</span>.id.confirmDeleteDialog)
+
+<span class="cm">// الـ DialogFragment يرسل النتيجة قبل الإغلاق</span>
+setFragmentResult(<span class="st">"delete_confirmed"</span>, bundleOf())
+dismiss()</code></pre>
+  </div>
+</section>
+
+<!-- ===================== 12. PITFALLS ===================== -->
+<section class="stage" id="pitfalls">
+  <div class="wrap">
+    <div class="stage-tag">12</div>
+    <h2>أخطاء شائعة وأفضل الممارسات</h2>
+
+    <div class="callout warn">
+      <span class="label">خطأ 01</span>
+      <p>عدم تحرير الـ ViewBinding في <code>onDestroyView</code> — يسبب تسرّب ذاكرة لأن الـ View يبقى محتجزًا حتى بعد تدميره.</p>
+    </div>
+    <div class="callout warn">
+      <span class="label">خطأ 02</span>
+      <p>استخدام <code>this</code> بدل <code>viewLifecycleOwner</code> عند مراقبة LiveData/Flow داخل Fragment — قد يسبب استدعاءات على View مُدمَّر بالفعل.</p>
+    </div>
+    <div class="callout warn">
+      <span class="label">خطأ 03</span>
+      <p>التنقل المتكرر بنقرة سريعة مزدوجة (double navigation) يضيف نفس الوجهة مرتين للـ back stack — استخدم debounce أو <code>launchSingleTop</code>.</p>
+    </div>
+    <div class="callout warn">
+      <span class="label">خطأ 04</span>
+      <p>تمرير كائنات كبيرة أو غير قابلة للتسلسل عبر Safe Args بدل تمرير معرّف (ID) فقط وجلب البيانات من مصدر واحد للحقيقة (Repository/ViewModel).</p>
+    </div>
+    <div class="callout warn">
+      <span class="label">خطأ 05</span>
+      <p>نسيان <code>setReorderingAllowed(true)</code> عند استخدام FragmentManager يدويًا مع عمليات متزامنة، ما قد يسبب حالات غير متوقعة في ترتيب التنفيذ.</p>
+    </div>
+
+    <div class="callout tip">
+      <span class="label">قاعدة ذهبية</span>
+      <p>اجعل كل Fragment "غبيًا" قدر الإمكان — لا منطق أعمال بداخله، فقط عرض حالة قادمة من ViewModel والاستجابة لأحداث المستخدم. هذا يجعل الاختبار والصيانة أسهل بكثير.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  FRAGMENT · NAVIGATION COMPONENT · ANDROID JETPACK · مرجع تقني شامل
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,2213 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المرجع الشامل لأصعب أسئلة البرمجة كائنية التوجه وتحديات المقابلات المتقدمة في أندرويد</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Noto+Kufi+Arabic:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/kotlin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1a5276;
+            --secondary-color: #2e86c1;
+            --accent-color: #e67e22;
+            --danger-color: #c0392b;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-dark: #1e293b;
+            --text-primary: #2c3e50;
+            --text-secondary: #5d6d7e;
+            --text-light: #85929e;
+            --border-color: #d5dbdb;
+            --code-bg: #282c34;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+        .navbar {
+            position: fixed; top: 0; right: 0; left: 0;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 0.75rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar-brand {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-weight: 800; font-size: 1.1rem;
+            color: var(--primary-color); text-decoration: none;
+        }
+        .navbar-nav { display: flex; gap: 1.5rem; list-style: none; }
+        .navbar-nav a {
+            color: var(--text-secondary); text-decoration: none;
+            font-weight: 600; font-size: 0.9rem; transition: color 0.3s;
+        }
+        .navbar-nav a:hover { color: var(--secondary-color); }
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white; padding: 8rem 2rem 4rem; text-align: center;
+            position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute;
+            top: -50%; right: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px; opacity: 0.3;
+        }
+        .hero-content { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+        .hero h1 {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-size: 2.5rem; font-weight: 900;
+            margin-bottom: 1.5rem; line-height: 1.4;
+        }
+        .hero .subtitle { font-size: 1.2rem; opacity: 0.9; margin-bottom: 2rem; }
+        .hero-badges { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+        .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem; border-radius: 50px;
+            font-weight: 600; font-size: 0.85rem;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+        .toc {
+            background: var(--bg-secondary); border-radius: var(--radius-lg);
+            padding: 2rem; margin: 2rem 0;
+            box-shadow: var(--shadow-md); border: 1px solid var(--border-color);
+        }
+        .toc h2 {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            color: var(--primary-color); margin-bottom: 1.5rem; font-size: 1.5rem;
+        }
+        .toc-list { list-style: none; counter-reset: section; }
+        .toc-list li {
+            padding: 0.75rem 0; border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; gap: 1rem;
+        }
+        .toc-list li:last-child { border-bottom: none; }
+        .toc-list li::before {
+            counter-increment: section; content: counter(section);
+            background: var(--secondary-color); color: white;
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; flex-shrink: 0;
+        }
+        .toc-list a {
+            color: var(--text-primary); text-decoration: none;
+            font-weight: 600; transition: color 0.3s;
+        }
+        .toc-list a:hover { color: var(--secondary-color); }
+        .section {
+            background: var(--bg-secondary); border-radius: var(--radius-lg);
+            padding: 3rem 2rem; margin: 2rem 0;
+            box-shadow: var(--shadow-md); border: 1px solid var(--border-color);
+        }
+        .section-header {
+            margin-bottom: 2rem; padding-bottom: 1.5rem;
+            border-bottom: 3px solid var(--secondary-color);
+        }
+        .section-number {
+            display: inline-block; background: var(--secondary-color);
+            color: white; padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm); font-weight: 800;
+            font-size: 0.9rem; margin-bottom: 1rem;
+        }
+        .section h2 {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            color: var(--primary-color); font-size: 1.8rem; margin-bottom: 0.5rem;
+        }
+        .section h3 {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            color: var(--secondary-color); font-size: 1.4rem;
+            margin: 2rem 0 1rem; padding-right: 1rem;
+            border-right: 4px solid var(--accent-color);
+        }
+        .section h4 {
+            color: var(--text-primary); font-size: 1.2rem;
+            margin: 1.5rem 0 1rem; font-weight: 700;
+        }
+        .section p {
+            margin-bottom: 1.2rem; color: var(--text-secondary); font-size: 1.05rem;
+        }
+        .code-block {
+            background: var(--code-bg); border-radius: var(--radius-md);
+            margin: 1.5rem 0; overflow: hidden;
+            direction: ltr; text-align: left; box-shadow: var(--shadow-lg);
+        }
+        .code-header {
+            background: rgba(0,0,0,0.3); padding: 0.75rem 1rem;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .code-lang {
+            background: var(--accent-color); color: white;
+            padding: 0.25rem 0.75rem; border-radius: 4px;
+            font-size: 0.8rem; font-weight: 700;
+        }
+        .code-block pre { padding: 1.5rem; overflow-x: auto; margin: 0; }
+        .code-block code {
+            font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 0.9rem; line-height: 1.6;
+        }
+        .info-box {
+            border-radius: var(--radius-md); padding: 1.5rem;
+            margin: 1.5rem 0; border-right: 4px solid;
+        }
+        .info-box.warning { background: #fef9e7; border-color: var(--warning-color); }
+        .info-box.danger { background: #fdedec; border-color: var(--danger-color); }
+        .info-box.success { background: #e9f7ef; border-color: var(--success-color); }
+        .info-box.info { background: #ebf5fb; border-color: var(--secondary-color); }
+        .info-box-title {
+            font-weight: 800; margin-bottom: 0.75rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .info-box.warning .info-box-title { color: var(--warning-color); }
+        .info-box.danger .info-box-title { color: var(--danger-color); }
+        .info-box.success .info-box-title { color: var(--success-color); }
+        .info-box.info .info-box-title { color: var(--secondary-color); }
+        .interview-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid var(--border-color); border-radius: var(--radius-lg);
+            padding: 2rem; margin: 2rem 0; position: relative;
+        }
+        .interview-card::before {
+            content: 'سؤال مقابلة'; position: absolute;
+            top: -12px; right: 20px; background: var(--danger-color);
+            color: white; padding: 0.25rem 1rem; border-radius: 20px;
+            font-weight: 700; font-size: 0.85rem;
+        }
+        .interview-question {
+            font-size: 1.2rem; font-weight: 700;
+            color: var(--primary-color); margin-bottom: 1.5rem; margin-top: 0.5rem;
+        }
+        .comparison-table {
+            width: 100%; border-collapse: collapse; margin: 1.5rem 0;
+            background: white; border-radius: var(--radius-md);
+            overflow: hidden; box-shadow: var(--shadow-sm);
+        }
+        .comparison-table th {
+            background: var(--primary-color); color: white;
+            padding: 1rem; text-align: right; font-weight: 700;
+        }
+        .comparison-table td { padding: 1rem; border-bottom: 1px solid var(--border-color); }
+        .comparison-table tr:hover { background: #f8f9fa; }
+        .styled-list { list-style: none; padding: 0; }
+        .styled-list li {
+            padding: 0.75rem 1.5rem 0.75rem 0;
+            position: relative; margin-bottom: 0.5rem;
+        }
+        .styled-list li::before {
+            content: '▸'; position: absolute; right: 0;
+            color: var(--accent-color); font-weight: 700;
+        }
+        .analogy {
+            background: linear-gradient(135deg, #e8f6f3 0%, #d1f2eb 100%);
+            border: 2px dashed var(--success-color); border-radius: var(--radius-md);
+            padding: 1.5rem; margin: 1.5rem 0;
+        }
+        .analogy-title {
+            font-weight: 800; color: var(--success-color);
+            margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .memory-diagram {
+            background: var(--bg-dark); color: #abb2bf;
+            border-radius: var(--radius-md); padding: 1.5rem;
+            margin: 1.5rem 0; font-family: 'Fira Code', monospace;
+            font-size: 0.9rem; line-height: 1.8;
+            direction: ltr; text-align: left; overflow-x: auto;
+        }
+        .output-box {
+            background: #1e1e1e; color: #4ec9b0;
+            border-radius: var(--radius-md); padding: 1.5rem;
+            margin: 1.5rem 0; font-family: 'Fira Code', monospace;
+            direction: ltr; text-align: left; border: 1px solid #333;
+        }
+        .output-label { color: #ce9178; font-weight: 700; margin-bottom: 0.5rem; }
+        .steps { counter-reset: step; list-style: none; padding: 0; }
+        .steps li {
+            counter-increment: step;
+            padding: 1rem 1rem 1rem 3rem; margin-bottom: 1rem;
+            background: #f8f9fa; border-radius: var(--radius-md);
+            position: relative;
+        }
+        .steps li::before {
+            content: counter(step); position: absolute;
+            left: 1rem; top: 50%; transform: translateY(-50%);
+            background: var(--secondary-color); color: white;
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.85rem;
+        }
+        .footer {
+            background: var(--bg-dark); color: var(--text-light);
+            text-align: center; padding: 3rem 2rem; margin-top: 4rem;
+        }
+        .footer h3 {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            color: white; margin-bottom: 1rem;
+        }
+        .scroll-top {
+            position: fixed; bottom: 2rem; left: 2rem;
+            background: var(--secondary-color); color: white;
+            width: 50px; height: 50px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: var(--shadow-lg);
+            transition: transform 0.3s; z-index: 999;
+        }
+        .scroll-top:hover { transform: translateY(-5px); }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.6rem; }
+            .navbar-nav { display: none; }
+            .section { padding: 2rem 1rem; }
+        }
+        html { scroll-behavior: smooth; }
+        .highlight {
+            background: linear-gradient(120deg, #ffeaa7 0%, #ffeaa7 100%);
+            background-repeat: no-repeat; background-size: 100% 40%;
+            background-position: 0 88%; padding: 0 4px;
+        }
+        .key-concept {
+            background: var(--primary-color); color: white;
+            padding: 0.2rem 0.5rem; border-radius: 4px;
+            font-weight: 600; font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="#" class="navbar-brand">📚 المرجع الشامل للـ OOP المتقدم</a>
+        <ul class="navbar-nav">
+            <li><a href="#intro">المقدمة</a></li>
+            <li><a href="#inheritance">الوراثة المعقدة</a></li>
+            <li><a href="#polymorphism">تعدد الأشكال</a></li>
+            <li><a href="#solid">مبادئ SOLID</a></li>
+            <li><a href="#interview">أسئلة المقابلات</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1>المرجع الهندسي الشامل لأصعب أسئلة برمجة الكائنات وتحديات المقابلات المتقدمة في أندرويد</h1>
+            <p class="subtitle">دليلك الشامل لإتقان مفاهيم البرمجة كائنية التوجه المتقدمة والإجابة على أصعب الأسئلة الخادعة في مقابلات الشركات الأوروبية الكبرى</p>
+            <div class="hero-badges">
+                <span class="badge">🇩🇪 ألمانيا</span>
+                <span class="badge">🇪🇺 أوروبا</span>
+                <span class="badge">FAANG مستوى</span>
+                <span class="badge">Zalando · BMW · Delivery Hero</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="toc">
+            <h2>📋 فهرس المحتويات</h2>
+            <ol class="toc-list">
+                <li><a href="#intro">مقدمة استراتيجية: لماذا تعتمد الشركات الأوروبية على أسئلة الـ OOP الخادعة؟</a></li>
+                <li><a href="#inheritance">تحديات ومتاهات الوراثة المتقدمة ودورات التهيئة</a></li>
+                <li><a href="#polymorphism">الآليات الداخلية لتعدد الأشكال وجداول الطرق الافتراضية</a></li>
+                <li><a href="#solid">مبادئ التصميم الصلبة تحت الاختبار العملي</a></li>
+                <li><a href="#interview">بنك أصعب الأسئلة الخادعة في مقابلات الشركات الأوروبية</a></li>
+            </ol>
+        </div>
+
+        <section class="section" id="intro">
+            <div class="section-header">
+                <span class="section-number">القسم الأول</span>
+                <h2>مقدمة استراتيجية وتحليلية: لماذا تعتمد المقابلات التقنية في الشركات الكبرى على أسئلة الـ OOP الخادعة؟</h2>
+            </div>
+
+            <h3>🎯 الفلسفة وراء الأسئلة الخادعة في السوق الأوروبي</h3>
+            <p>
+                عندما تتقدم لوظيفة مطور أندرويد في شركة كبرى مثل <strong>Zalando</strong> في برلين، أو <strong>BMW</strong> في ميونخ، أو <strong>Delivery Hero</strong>، فإنك لا تجيب فقط على أسئلة تقنية، بل تخضع لاختبار فهمك العميق لآليات عمل اللغة من الداخل. هذه الشركات لا تبحث عن من يكتب الكود فحسب، بل عن من يفهم <span class="key-concept">Memory Model</span> و<span class="key-concept">Runtime Behavior</span> و<span class="key-concept">Design Trade-offs</span>.
+            </p>
+
+            <div class="info-box info">
+                <div class="info-box-title">💡 لماذا OOP تحديداً؟</div>
+                <p>لأن البرمجة كائنية التوجه هي اللبنة الأساسية التي تبنى عليها كل منصة أندرويد. فهمك العميق لها يعكس قدرتك على:</p>
+                <ul class="styled-list">
+                    <li>تجنب <strong>تسريبات الذاكرة</strong> في التطبيقات المعقدة</li>
+                    <li>تصميم أنظمة قابلة للاختبار والتوسع</li>
+                    <li>قراءة وفهم أكواد المكتبات الكبرى مثل Jetpack</li>
+                    <li>اتخاذ قرارات تصميمية سليمة تحت الضغط</li>
+                </ul>
+            </div>
+
+            <h3>🔍 كيف تختبر هذه الأسئلة الفهم العميق؟</h3>
+            <p>
+                تستخدم الشركات الأوروبية ما يُعرف بـ <span class="key-concept">Tricky Questions</span> لاختبار ثلاثة محاور رئيسية:
+            </p>
+
+            <div class="analogy">
+                <div class="analogy-title">🎭 تشبيه واقعي: امتحان رخصة القيادة الألمانية</div>
+                <p>كما أن امتحان القيادة في ألمانيا لا يختبر فقط قدرتك على التحرك بالسيارة، بل يختبر فهمك للقوانين في المواقف الحرجة (مثل الأولوية في التقاطعات غير المنظمة)، كذلك أسئلة الـ OOP تختبر سلوكك في المواقف الحرجة البرمجية.</p>
+            </div>
+
+            <h4>المحور الأول: فهم دورة حياة الكائن (Object Lifecycle Understanding)</h4>
+            <p>
+                عندما يسألك المقابل: "ماذا يحدث عندما تستدعي دالة افتراضية من داخل المشيد الأساسي؟"، فإنه لا يريد الإجابة السطحية. يريد أن يعرف هل تفهم أن:
+            </p>
+            <ul class="styled-list">
+                <li>الكائن لا يزال في حالة <strong>غير مكتملة</strong> أثناء تنفيذ المشيد</li>
+                <li>الـ <span class="key-concept">vtable</span> لم يكتمل بناؤه بعد</li>
+                <li>هذا يؤدي إلى سلوك غير متوقع قد يسبب أخطاء فادحة في الإنتاج</li>
+            </ul>
+
+            <h4>المحور الثاني: الوعي بتكاليف الأداء (Performance Awareness)</h4>
+            <p>
+                في عالم الأجهزة المحمولة، كل <strong>ملي ثانية</strong> تهم. فهمك لـ <span class="key-concept">Dynamic Dispatch</span> و<span class="key-concept">Method Overhead</span> يعكس وعيك بتأثير قرارات التصميم على أداء التطبيق.
+            </p>
+
+            <h4>المحور الثالث: القدرة على التصميم المعماري (Architectural Design Skills)</h4>
+            <p>
+                أسئلة مثل "كيف تمنع كسر <span class="key-concept">Encapsulation</span> عند تمرير كائنات قابلة للتعديل داخل كائنات غير قابلة للتعديل؟" تختبر قدرتك على التفكير في <strong>عقود الكائنات</strong> و<span class="key-concept">Immutability</span> و<span class="key-concept">Defensive Copying</span>.
+            </p>
+
+            <div class="info-box warning">
+                <div class="info-box-title">⚠️ تحذير مهم</div>
+                <p>في المقابلات الألمانية تحديداً، يُنظر بعين الريبة إلى الإجابات الحافية. المقابلون يقدرون <strong>الصراحة</strong> في الاعتراف بعدم المعرفة أكثر من التخمين. لكنهم يتوقعون أن تكون إجاباتك دقيقة ومدعومة بأمثلة كودية عندما تكون واثقاً.</p>
+            </div>
+        </section>
+
+        <section class="section" id="inheritance">
+            <div class="section-header">
+                <span class="section-number">القسم الثاني</span>
+                <h2>تحديات ومتاهات الوراثة المتقدمة ودورات التهيئة</h2>
+            </div>
+
+            <h3>🔧 الترتيب الدقيق للتهيئة في الهرميات المعقدة</h3>
+            <p>
+                تُعد مسألة <strong>ترتيب التهيئة</strong> في الهرميات الوراثية المتعددة المستويات من أكثر الأسئلة شيوعاً في المقابلات الأوروبية. لماذا؟ لأن فهمها يعكس إدراكك العميق لكيفية بناء الكائنات في الذاكرة.
+            </p>
+
+            <div class="analogy">
+                <div class="analogy-title">🏗️ تشبيه واقعي: بناء ناطحة سحاب</div>
+                <p>تخيل أنك تبني ناطحة سحاب. لا يمكنك أن تبدأ بالطابق العشرين قبل إكمال الأساسات. كذلك في البرمجة كائنية التوجه، لا يمكن إكمال تهيئة الكائن الفرعي قبل الانتهاء من تهيئة الكائن الأساسي. لكن التعقيد يكمن في <strong>الترتيب الدقيق</strong> داخل كل طبقة.</p>
+            </div>
+
+            <h4>القواعد الذهبية لترتيب التهيئة في جافا وكوتلن</h4>
+            <p>عند إنشاء كائن جديد، يتبع الـ JVM الترتيب التالي بدقة:</p>
+
+            <ol class="steps">
+                <li><strong>تحميل الصنف (Class Loading):</strong> يقوم <span class="key-concept">ClassLoader</span> بتحميل الصنف إلى الذاكرة إذا لم يكن محملاً من قبل</li>
+                <li><strong>تنفيذ الكتل الساكنة (Static Initializers):</strong> من الأعلى إلى الأسفل في شجرة الوراثة، بدءاً من <span class="key-concept">java.lang.Object</span></li>
+                <li><strong>تخصيص الذاكرة (Memory Allocation):</strong> يخصص الـ JVM مساحة في <span class="key-concept">Heap</span> للكائن</li>
+                <li><strong>التهيئة الافتراضية (Default Initialization):</strong> تهيئة الحقول بقيمها الافتراضية (صفر، null، false)</li>
+                <li><strong>تنفيذ كتل التهيئة (Instance Initializers):</strong> من الأعلى إلى الأسفل</li>
+                <li><strong>تنفيذ المشيد (Constructor):</strong> بدءاً من المشيد الأساسي ثم المتفرع</li>
+            </ol>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">Java</span>
+                </div>
+                <pre><code class="language-java">public class InitializationOrderDemo {
+
+    static class GrandParent {
+        static { System.out.println("GrandParent: Static Block"); }
+        { System.out.println("GrandParent: Instance Initializer"); }
+        public GrandParent() {
+            System.out.println("GrandParent: Constructor");
+        }
+    }
+
+    static class Parent extends GrandParent {
+        static { System.out.println("Parent: Static Block"); }
+        { System.out.println("Parent: Instance Initializer"); }
+        public Parent() {
+            System.out.println("Parent: Constructor");
+        }
+    }
+
+    static class Child extends Parent {
+        static { System.out.println("Child: Static Block"); }
+        { System.out.println("Child: Instance Initializer"); }
+        public Child() {
+            System.out.println("Child: Constructor");
+        }
+    }
+
+    public static void main(String[] args) {
+        new Child();
+    }
+}</code></pre>
+            </div>
+
+            <div class="output-box">
+                <div class="output-label">// Output</div>
+GrandParent: Static Block
+Parent: Static Block
+Child: Static Block
+GrandParent: Instance Initializer
+GrandParent: Constructor
+Parent: Instance Initializer
+Parent: Constructor
+Child: Instance Initializer
+Child: Constructor
+            </div>
+
+            <div class="info-box danger">
+                <div class="info-box-title">🚨 الفخ الخادع: الاستدعاء الافتراضي داخل المشيد</div>
+                <p>من أخطر الأنماط في البرمجة كائنية التوجه هو استدعاء دالة <span class="key-concept">overridable</span> داخل المشيد. لماذا؟ لأن الكائن الفرعي لم يُهيأ بعد!</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">Java</span>
+                </div>
+                <pre><code class="language-java">public class DangerousInitialization {
+
+    static class Parent {
+        public Parent() {
+            // ⚠️ خطير جداً! الكائن الفرعي لم يُبنَ بعد
+            initialize();
+        }
+
+        protected void initialize() {
+            System.out.println("Parent.initialize()");
+        }
+    }
+
+    static class Child extends Parent {
+        private final String criticalData = "Initialized";
+
+        public Child() {
+            // super() يُستدعى ضمنياً هنا
+            System.out.println("Child constructor: " + criticalData);
+        }
+
+        @Override
+        protected void initialize() {
+            // ❌ criticalData لا تزال null هنا!
+            System.out.println("Child.initialize(): " + criticalData);
+        }
+    }
+
+    public static void main(String[] args) {
+        new Child();
+    }
+}</code></pre>
+            </div>
+
+            <div class="output-box">
+                <div class="output-label">// Output المُحيّر</div>
+Child.initialize(): null
+Child constructor: Initialized
+            </div>
+
+            <p>
+                <strong>ما الذي حدث هنا؟</strong> عندما استدعى المشيد الأساسي <code>initialize()</code>، كان الـ <span class="key-concept">vtable</span> قد اكتمل ربطه بالفعل (لأن الـ JVM يحدد الأصناف الفعلية عند <span class="key-concept">new</span>)، لكن <strong>حقول</strong> الكائن الفرعي لم تُهيأ بعد. هذا يعني أن <code>criticalData</code> لا تزال تحمل قيمتها الافتراضية <code>null</code>!
+            </p>
+
+            <div class="memory-diagram">
+┌─────────────────────────────────────────────────────────────┐
+│                    Heap Memory Layout                       │
+├─────────────────────────────────────────────────────────────┤
+│  [1] new Child() invoked                                  │
+│  [2] Memory allocated for Child object                     │
+│  [3] Default initialization: criticalData = null           │
+│  [4] Parent() constructor starts                           │
+│  [5] Parent.initialize() called                            │
+│      └── vtable points to Child.initialize()               │
+│      └── BUT criticalData is still null!                   │
+│  [6] Parent constructor completes                          │
+│  [7] Instance initializer runs: criticalData = "Initialized"│
+│  [8] Child constructor body executes                       │
+└─────────────────────────────────────────────────────────────┘
+            </div>
+
+            <h3>⚔️ Method Hiding مقابل Method Overriding</h3>
+            <p>
+                يُعد التمييز بين <span class="key-concept">Method Hiding</span> و<span class="key-concept">Method Overriding</span> من أكثر نقاط الالتباس شيوعاً. الفرق ليس مجرد نظري، بل له تأثيرات عملية على الأداء والسلوك.
+            </p>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>الخاصية</th>
+                        <th>Method Overriding</th>
+                        <th>Method Hiding</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ينطبق على</td>
+                        <td>الدوال غير الساكنة (Instance Methods)</td>
+                        <td>الدوال الساكنة (Static Methods)</td>
+                    </tr>
+                    <tr>
+                        <td>آلية الربط (Binding)</td>
+                        <td>Late Binding (Dynamic Dispatch)</td>
+                        <td>Early Binding (Static Dispatch)</td>
+                    </tr>
+                    <tr>
+                        <td>يعتمد على</td>
+                        <td>النوع الفعلي للكائن (Runtime Type)</td>
+                        <td>نوع المرجع (Reference Type)</td>
+                    </tr>
+                    <tr>
+                        <td>يستخدم vtable</td>
+                        <td>نعم ✓</td>
+                        <td>لا ✗</td>
+                    </tr>
+                    <tr>
+                        <td>يمكن أن يكون final</td>
+                        <td>نعم (يمنع الـ Overriding)</td>
+                        <td>لا معنى له</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">Kotlin</span>
+                </div>
+                <pre><code class="language-kotlin">open class Parent {
+    open fun instanceMethod() = println("Parent instanceMethod")
+
+    companion object {
+        fun staticMethod() = println("Parent staticMethod")
+    }
+}
+
+class Child : Parent() {
+    override fun instanceMethod() = println("Child instanceMethod")
+
+    companion object {
+        fun staticMethod() = println("Child staticMethod") // Hiding, not overriding
+    }
+}
+
+fun main() {
+    val ref: Parent = Child()
+
+    ref.instanceMethod() // Output: Child instanceMethod (Late Binding)
+    Parent.staticMethod()  // Output: Parent staticMethod (Early Binding)
+
+    // ⚠️ Even if we call through Child reference:
+    Child.staticMethod()   // Output: Child staticMethod
+}</code></pre>
+            </div>
+
+            <h3>💎 معضلة الوراثة المتعددة (Diamond Problem)</h3>
+            <p>
+                في جافا وكوتلن، لا يُسمح بالوراثة المتعددة من أصناف (Multiple Class Inheritance)، لكن يُسمح بتنفيذ واجهات متعددة (Multiple Interface Implementation). ما الذي يحدث عندما تحتوي واجهتان على نفس الدالة الافتراضية؟
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">Java</span>
+                </div>
+                <pre><code class="language-java">interface Printer {
+    default void print() {
+        System.out.println("Printer: printing document");
+    }
+}
+
+interface Scanner {
+    default void print() {
+        System.out.println("Scanner: scanning output");
+    }
+}
+
+// ❌ Compilation Error: class MultiFunctionDevice inherits unrelated 
+// defaults for print() from types Printer and Scanner
+class MultiFunctionDevice implements Printer, Scanner {
+    // MUST override to resolve conflict
+    @Override
+    public void print() {
+        Printer.super.print(); // Explicitly choose Printer's implementation
+        // OR: Scanner.super.print();
+        // OR: provide completely new implementation
+    }
+}</code></pre>
+            </div>
+
+            <div class="info-box success">
+                <div class="info-box-title">✅ الحل في كوتلن</div>
+                <p>في كوتلن، يُعالج هذا الأمر بشكل أنيق عبر الكلمة المفتاحية <code>super&lt;InterfaceName&gt;</code>:</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">Kotlin</span>
+                </div>
+                <pre><code class="language-kotlin">interface Printer {
+    fun print() = println("Printer: printing")
+}
+
+interface Scanner {
+    fun print() = println("Scanner: scanning")
+}
+
+class MultiFunctionDevice : Printer, Scanner {
+    override fun print() {
+        super&lt;Printer&gt;.print()  // Explicitly call Printer's implementation
+        super&lt;Scanner&gt;.print()  // Explicitly call Scanner's implementation
+    }
+}</code></pre>
+            </div>
+
+            <h3>🧬 Generics و Type Erasure وتأثيرها على Method Signature</h3>
+            <p>
+                تُعد <span class="key-concept">Type Erasure</span> من أخفى المفاهيم في جافا. عندما تُترجم الشيفرة، يُحذف معلومات النوع العام (<span class="key-concept">Generic Type Information</span>) ويُستبدل بحدوده العليا (<span class="key-concept">Upper Bound</span>). هذا يخلق مواقف خادعة في الـ Method Overloading.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">Java</span>
+                </div>
+                <pre><code class="language-java">import java.util.*;
+
+public class TypeErasureTrap {
+
+    // After erasure: void process(List list)
+    public void process(List&lt;String&gt; strings) {
+        System.out.println("Processing Strings");
+    }
+
+    // After erasure: void process(List list)  
+    // ❌ COMPILATION ERROR: both methods have same erasure
+    // public void process(List&lt;Integer&gt; integers) {
+    //     System.out.println("Processing Integers");
+    // }
+
+    // ✅ Valid overload because raw types differ after erasure
+    public void process(Set&lt;String&gt; strings) {
+        System.out.println("Processing Set");
+    }
+
+    public static void main(String[] args) {
+        TypeErasureTrap trap = new TypeErasureTrap();
+
+        // ⚠️ Dangerous: Raw type bypasses generic safety
+        List rawList = new ArrayList&lt;Integer&gt;();
+        trap.process(rawList); // Compiles, but may cause ClassCastException at runtime
+    }
+}</code></pre>
+            </div>
+
+            <div class="info-box warning">
+                <div class="info-box-title">⚠️ الفخ في كوتلن</div>
+                <p>في كوتلن، يُحافظ على معلومات النوع العام في وقت التشغيل عبر <span class="key-concept">Reified Type Parameters</span> باستخدام الكلمة المفتاحية <code>reified</code> في الدوال المضمنة (Inline Functions):</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">Kotlin</span>
+                </div>
+                <pre><code class="language-kotlin">inline fun &lt;reified T&gt; isType(value: Any): Boolean {
+    return value is T  // ✅ Works because T is reified at compile time
+}
+
+// Usage
+val result = isType&lt;String&gt;(42)  // Returns false
+val result2 = isType&lt;String&gt;("hello")  // Returns true
+
+// Without reified, this would not be possible in generic functions
+// because type information is erased at runtime</code></pre>
+            </div>
+        </section>
+
+        <section class="section" id="polymorphism">
+            <div class="section-header">
+                <span class="section-number">القسم الثالث</span>
+                <h2>الآليات الداخلية لتعدد الأشكال وجداول الطرق الافتراضية</h2>
+            </div>
+
+            <h3>⚙️ كيف ينفذ الـ JVM جدول الطرق الافتراضية (vtable)</h3>
+            <p>
+                <span class="key-concept">vtable</span> (Virtual Method Table) هو الهيكل البيانات الذي يُمكّن الـ JVM من تحديد الدالة الصحيحة لاستدعائها في وقت التشغيل. فهمه العميق يُعد فارقاً بين المطور المتوسط والمطور الخبير.
+            </p>
+
+            <div class="analogy">
+                <div class="analogy-title">📞 تشبيه واقعي: دليل الهاتف الذكي</div>
+                <p>تخيل أن لديك دليل هاتف تقليدي (Early Binding) مقابل مساعد ذكي يتعرف على صوت المتصل ويحول المكالمة للشخص المناسب تلقائياً (Late Binding). الـ vtable هو ذلك "المساعد الذكي" داخل الـ JVM.</p>
+            </div>
+
+            <h4>بنية vtable في الذاكرة</h4>
+            <div class="memory-diagram">
+┌─────────────────────────────────────────────────────────────┐
+│                    vtable Structure                         │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Object Header (mark word + class pointer)                  │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │ Class Pointer ───────► Klass Structure in Metaspace │    │
+│  │                              │                      │    │
+│  │                              ▼                      │    │
+│  │  ┌─────────────────────────────────────────────┐    │    │
+│  │  │ vtable[]                                    │    │    │
+│  │  │ [0] toString()    ──► Object.toString()     │    │    │
+│  │  │ [1] hashCode()    ──► Object.hashCode()     │    │    │
+│  │  │ [2] equals()      ──► Object.equals()       │    │    │
+│  │  │ [3] finalize()    ──► Object.finalize()     │    │    │
+│  │  │ [4] clone()       ──► Object.clone()        │    │    │
+│  │  └─────────────────────────────────────────────┘    │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                                                             │
+│  Animal Class vtable:                                       │
+│  ┌─────────────────────────────────────────────┐            │
+│  │ [0] toString()    ──► Object.toString()     │            │
+│  │ [1] hashCode()    ──► Object.hashCode()     │            │
+│  │ [2] equals()      ──► Object.equals()       │            │
+│  │ [3] finalize()    ──► Object.finalize()     │            │
+│  │ [4] clone()       ──► Object.clone()        │            │
+│  │ [5] makeSound()   ──► Animal.makeSound()    │            │
+│  │ [6] move()        ──► Animal.move()         │            │
+│  └─────────────────────────────────────────────┘            │
+│                                                             │
+│  Dog Class vtable (inherits + overrides):                   │
+│  ┌─────────────────────────────────────────────┐            │
+│  │ [0] toString()    ──► Object.toString()     │            │
+│  │ [1] hashCode()    ──► Object.hashCode()     │            │
+│  │ [2] equals()      ──► Object.equals()       │            │
+│  │ [3] finalize()    ──► Object.finalize()     │            │
+│  │ [4] clone()       ──► Object.clone()        │            │
+│  │ [5] makeSound()   ──► Dog.makeSound()  ◄─── OVERRIDDEN  │
+│  │ [6] move()        ──► Animal.move()         │            │
+│  │ [7] fetch()       ──► Dog.fetch()           │            │
+│  └─────────────────────────────────────────────┘            │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+            </div>
+
+            <p>
+                عندما يُنشئ الـ JVM كائناً من صنف <code>Dog</code>، يقوم ببناء الـ vtable الخاص به بـ <strong>نسخ</strong> إدخالات vtable الصنف الأساسي <code>Animal</code>، ثم <strong>استبدال</strong> المؤشرات للدوال التي تم <span class="key-concept">Overriding</span> لها.
+            </p>
+
+            <h4>تكلفة Dynamic Dispatch</h4>
+            <div class="info-box info">
+                <div class="info-box-title">📊 التكلفة الزمنية</div>
+                <p>كل استدعاء دالة افتراضية يتطلب:</p>
+                <ol class="styled-list">
+                    <li><strong>قراءة مؤشر الصنف</strong> من كائن الهيدر (~1-2 clock cycles)</li>
+                    <li><strong>الوصول إلى vtable</strong> عبر مؤشر الصنف (~1-2 cycles)</li>
+                    <li><strong>قراءة مؤشر الدالة</strong> من vtable (~1-2 cycles)</li>
+                    <li><strong>القفز إلى الدالة</strong> (indirect jump)</li>
+                </ol>
+                <p>الإجمالي: <strong>~3-5 clock cycles</strong> إضافية مقارنة بالاستدعاء المباشر. في التطبيقات الأندرويدية التي تُعالج آلاف الأحداث في الثانية، يمكن أن يتراكم هذا.</p>
+            </div>
+
+            <h3>🎭 الفخاخ عند استخدام Polymorphism مع الحقول والدوال الساكنة</h3>
+            <p>
+                أكبر خطأ يقع فيه المطورون هو الاعتقاد بأن <span class="key-concept">Polymorphism</span> ينطبق على الحقول أو الدوال الساكنة. <strong>لا ينطبق!</strong>
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">Java</span>
+                </div>
+                <pre><code class="language-java">public class FieldHidingTrap {
+
+    static class Parent {
+        String name = "Parent";
+        static String staticName = "Parent Static";
+
+        void printName() {
+            System.out.println("Method: " + name);
+        }
+    }
+
+    static class Child extends Parent {
+        String name = "Child";           // Hides Parent.name, NOT overrides
+        static String staticName = "Child Static"; // Hides Parent.staticName
+
+        @Override
+        void printName() {
+            System.out.println("Method: " + name);
+        }
+    }
+
+    public static void main(String[] args) {
+        Parent p = new Child();
+
+        // ⚠️ Field access uses reference type (Early Binding)
+        System.out.println(p.name);           // "Parent" (surprising!)
+        System.out.println(p.staticName);     // "Parent Static"
+
+        // ✅ Method call uses actual type (Late Binding)
+        p.printName();                        // "Method: Child"
+
+        // Direct access through Child reference
+        Child c = new Child();
+        System.out.println(c.name);           // "Child"
+    }
+}</code></pre>
+            </div>
+
+            <div class="memory-diagram">
+┌─────────────────────────────────────────────────────────────┐
+│              Memory Layout: Parent p = new Child()          │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Stack                      Heap                            │
+│  ┌──────────┐              ┌──────────────────────────┐     │
+│  │ p (ref)  │─────────────►│ Child Object             │     │
+│  │  type:   │              │ ┌──────────────────────┐ │     │
+│  │ Parent   │              │ │ Parent.name =        │ │     │
+│  └──────────┘              │ │   "Parent"           │ │     │
+│                            │ │ Child.name =         │ │     │
+│                            │ │   "Child"            │ │     │
+│                            │ │ vtable pointer       │ │     │
+│                            │ └──────────────────────┘ │     │
+│                            └──────────────────────────┘     │
+│                                                             │
+│  p.name resolves to Parent.name at COMPILE TIME             │
+│  p.printName() resolves to Child.printName() at RUNTIME     │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+            </div>
+
+            <h3>🔧 الربط المبكر (Early Binding) مقابل الربط المتأخر (Late Binding)</h3>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>الخاصية</th>
+                        <th>Early Binding (Static Binding)</th>
+                        <th>Late Binding (Dynamic Binding)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>وقت الربط</td>
+                        <td>Compile Time</td>
+                        <td>Runtime</td>
+                    </tr>
+                    <tr>
+                        <td>ينطبق على</td>
+                        <td>Static Methods, Private Methods, Final Methods, Fields</td>
+                        <td>Virtual Methods (non-static, non-final, non-private)</td>
+                    </tr>
+                    <tr>
+                        <td>الأداء</td>
+                        <td>أسرع (direct call)</td>
+                        <td>أبطأ قليلاً (vtable lookup)</td>
+                    </tr>
+                    <tr>
+                        <td>المرونة</td>
+                        <td>ثابتة</td>
+                        <td>ديناميكية (Polymorphism)</td>
+                    </tr>
+                    <tr>
+                        <td>التحسين</td>
+                        <td>يمكن للـ JIT inline بسهولة</td>
+                        <td>يتطلب <span class="key-concept">Devirtualization</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box success">
+                <div class="info-box-title">🚀 تحسين JIT: Devirtualization</div>
+                <p>في JVMs الحديثة (HotSpot, ART في أندرويد)، يقوم الـ JIT Compiler بتحليل المسارات الساخنة (Hot Paths). إذا لاحظ أن دالة افتراضية تُستدعى دائماً على نفس الصنف، يقوم بـ <strong>Devirtualization</strong>: استبدال الاستدعاء الافتراضي باستدعاء مباشر، وحتى <strong>Inlining</strong> للدالة إذا كانت صغيرة.</p>
+            </div>
+        </section>
+
+        <section class="section" id="solid">
+            <div class="section-header">
+                <span class="section-number">القسم الرابع</span>
+                <h2>مبادئ التصميم الصلبة تحت الاختبار العملي</h2>
+            </div>
+
+            <h3>📐 مبدأ استبدال ليزكوف (Liskov Substitution Principle - LSP)</h3>
+            <p>
+                يُعد <span class="key-concept">Liskov Substitution Principle</span> من أصعب المبادئ فهماً وتطبيقاً. ينص على أنه يجب أن نتمكن من استبدال أي صنف فرعي بصنفه الأساسي دون تغيير سلوك البرنامج. لكن ما الذي يعنيه "تغيير السلوك" فعلياً؟
+            </p>
+
+            <div class="analogy">
+                <div class="analogy-title">🦅 تشبيه واقعي: مربع وطويل</div>
+                <p>في الهندسة، كل مربع هو مستطيل. لكن في البرمجة كائنية التوجه، إذا ورث صنف <code>Square</code> من <code>Rectangle</code> وغيّر سلوك <code>setWidth()</code> ليضبط الارتفاع أيضاً، فإنه ينتهك LSP. لماذا؟ لأن الكود الذي يتوقع أن <code>setWidth()</code> لا تؤثر على الارتفاع سيتعطل.</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">Kotlin</span>
+                </div>
+                <pre><code class="language-kotlin">// ❌ ANTI-PATTERN: Violates LSP
+open class Rectangle {
+    open var width: Int = 0
+    open var height: Int = 0
+
+    fun area(): Int = width * height
+}
+
+class Square : Rectangle() {
+    override var width: Int = 0
+        set(value) {
+            field = value
+            height = value  // Violates expectation!
+        }
+
+    override var height: Int = 0
+        set(value) {
+            field = value
+            width = value   // Violates expectation!
+        }
+}
+
+fun testRectangle(rectangle: Rectangle) {
+    rectangle.width = 5
+    rectangle.height = 10
+
+    // Client expects area = 50, but Square returns 100!
+    assert(rectangle.area() == 50) { "LSP Violation!" }
+}
+
+fun main() {
+    testRectangle(Rectangle())  // ✅ Passes
+    testRectangle(Square())     // ❌ Fails! LSP Violated
+}</code></pre>
+            </div>
+
+            <div class="info-box success">
+                <div class="info-box-title">✅ الحل: Favor Composition over Inheritance</div>
+                <p>بدلاً من الوراثة، نستخدم التركيب (Composition) مع واجهة مشتركة:</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">Kotlin</span>
+                </div>
+                <pre><code class="language-kotlin">// ✅ PROPER DESIGN: Composition over Inheritance
+interface Shape {
+    fun area(): Int
+}
+
+class Rectangle(private var width: Int, private var height: Int) : Shape {
+    override fun area(): Int = width * height
+}
+
+class Square(private var side: Int) : Shape {
+    override fun area(): Int = side * side
+}
+
+// Both can be used interchangeably through Shape interface
+fun printArea(shape: Shape) {
+    println("Area: ${shape.area()}")
+}</code></pre>
+            </div>
+
+            <h3>🔌 مبدأ فصل الواجهات (Interface Segregation Principle - ISP)</h3>
+            <p>
+                ينص هذا المبدأ على أنه لا يجب إجبار العميل على الاعتماد على دوال لا يستخدمها. في أندرويد، نرى انتهاكات هذا المبدأ بكثرة، خاصة عندما تكون الواجهات كبيرة وعامة.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">Kotlin</span>
+                </div>
+                <pre><code class="language-kotlin">// ❌ ANTI-PATTERN: Fat Interface
+interface Repository {
+    fun getById(id: String): Entity
+    fun getAll(): List&lt;Entity&gt;
+    fun save(entity: Entity)
+    fun delete(id: String)
+    fun syncWithRemote()
+    fun clearCache()
+    fun exportToCSV(): String
+    fun importFromCSV(csv: String)
+}
+
+// Simple read-only view model forced to implement everything
+class UserProfileViewModel : Repository {
+    override fun getById(id: String): Entity { /* ... */ }
+    override fun getAll(): List&lt;Entity&gt; { throw UnsupportedOperationException() }
+    override fun save(entity: Entity) { throw UnsupportedOperationException() }
+    override fun delete(id: String) { throw UnsupportedOperationException() }
+    override fun syncWithRemote() { throw UnsupportedOperationException() }
+    override fun clearCache() { throw UnsupportedOperationException() }
+    override fun exportToCSV(): String { throw UnsupportedOperationException() }
+    override fun importFromCSV(csv: String) { throw UnsupportedOperationException() }
+}</code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">Kotlin</span>
+                </div>
+                <pre><code class="language-kotlin">// ✅ PROPER DESIGN: Segregated Interfaces
+interface ReadableRepository {
+    fun getById(id: String): Entity
+    fun getAll(): List&lt;Entity&gt;
+}
+
+interface WritableRepository {
+    fun save(entity: Entity)
+    fun delete(id: String)
+}
+
+interface Syncable {
+    fun syncWithRemote()
+    fun clearCache()
+}
+
+interface Exportable {
+    fun exportToCSV(): String
+    fun importFromCSV(csv: String)
+}
+
+// ViewModel only depends on what it needs
+class UserProfileViewModel(
+    private val repository: ReadableRepository
+) {
+    fun loadUser(userId: String) {
+        val user = repository.getById(userId)
+        // ...
+    }
+}</code></pre>
+            </div>
+
+            <h3>🔄 مبدأ عكس التبعيات (Dependency Inversion Principle - DIP)</h3>
+            <p>
+                ينص على أن الوحدات العليا لا يجب أن تعتمد على الوحدات الدنيا. يجب أن تعتمد كلاهما على <strong>التجريدات</strong>. في أندرويد، يُعد هذا المبدأ حجر الزاوية في <span class="key-concept">Clean Architecture</span> و<span class="key-concept">MVVM</span>.
+            </p>
+
+            <div class="analogy">
+                <div class="analogy-title">🏠 تشبيه واقعي: نظام المنزل الذكي</div>
+                <p>في منزل ذكي، جهاز التحكم المركزي (ViewModel) لا يتحدث مباشرة مع كل مصباح (Repository). بدلاً من ذلك، يتحدث مع "بروتوكول" موحد (Interface). إذا استبدلت المصباح بآخر من شركة مختلفة، لا يحتاج التحكم المركزي لأي تعديل.</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">Kotlin</span>
+                </div>
+                <pre><code class="language-kotlin">// ✅ Dependency Inversion in Android (MVVM + Clean Architecture)
+
+// Domain Layer (High-level module)
+interface UserRepository {
+    suspend fun getUser(id: String): Result&lt;User&gt;
+    suspend fun saveUser(user: User): Result&lt;Unit&gt;
+}
+
+// Use Case depends on abstraction
+class GetUserUseCase(
+    private val userRepository: UserRepository  // Injected interface
+) {
+    suspend operator fun invoke(id: String): Result&lt;User&gt; {
+        return userRepository.getUser(id)
+    }
+}
+
+// Presentation Layer depends on Use Case (another abstraction)
+class UserProfileViewModel(
+    private val getUserUseCase: GetUserUseCase,
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel() {
+
+    private val _user = MutableLiveData&lt;User&gt;()
+    val user: LiveData&lt;User&gt; = _user
+
+    fun loadUser(userId: String) {
+        viewModelScope.launch {
+            getUserUseCase(userId)
+                .onSuccess { _user.value = it }
+                .onFailure { /* handle error */ }
+        }
+    }
+}
+
+// Data Layer (Low-level module) implements abstraction
+class UserRepositoryImpl(
+    private val remoteDataSource: UserRemoteDataSource,
+    private val localDataSource: UserLocalDataSource
+) : UserRepository {
+
+    override suspend fun getUser(id: String): Result&lt;User&gt; {
+        return try {
+            // Try local first, then remote
+            val user = localDataSource.getUser(id)
+                ?: remoteDataSource.fetchUser(id).also {
+                    localDataSource.saveUser(it)
+                }
+            Result.success(user)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun saveUser(user: User): Result&lt;Unit&gt; {
+        // Implementation
+        return Result.success(Unit)
+    }
+}</code></pre>
+            </div>
+
+            <h3>🏗️ إعادة هندسة الأكواد المترابطة بشدة (Tight Coupling Refactoring)</h3>
+            <p>
+                في المقابلات الأوروبية، يُطلب منك غالباً إعادة هيكلة كود مترابط (Refactor tightly coupled code). هذا يختبر فهمك العميق لـ <span class="key-concept">Separation of Concerns</span> و<span class="key-concept">Single Responsibility Principle</span>.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">Kotlin</span>
+                </div>
+                <pre><code class="language-kotlin">// ❌ BEFORE: God Object with tight coupling
+class OrderManager(
+    private val context: Context  // Direct Android dependency!
+) {
+    private val db = Room.databaseBuilder(
+        context, AppDatabase::class.java, "orders"
+    ).build()
+    private val api = Retrofit.Builder()
+        .baseUrl("https://api.example.com/")
+        .build()
+        .create(OrderApi::class.java)
+
+    fun placeOrder(order: Order) {
+        // Direct database access
+        db.orderDao().insert(order)
+
+        // Direct network call
+        api.createOrder(order)
+
+        // Direct notification
+        val notification = NotificationCompat.Builder(context, "orders")
+            .setContentTitle("Order Placed")
+            .build()
+        NotificationManagerCompat.from(context).notify(1, notification)
+
+        // Direct analytics
+        FirebaseAnalytics.getInstance(context)
+            .logEvent("order_placed", Bundle())
+    }
+}</code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">Kotlin</span>
+                </div>
+                <pre><code class="language-kotlin">// ✅ AFTER: Decoupled with Dependency Injection and abstractions
+
+// Domain abstractions
+interface OrderRepository {
+    suspend fun saveOrder(order: Order): Result&lt;Unit&gt;
+    suspend fun syncOrder(order: Order): Result&lt;Unit&gt;
+}
+
+interface NotificationService {
+    fun notifyOrderPlaced(order: Order)
+}
+
+interface AnalyticsTracker {
+    fun trackOrderPlaced(order: Order)
+}
+
+// Use case knows nothing about Android or networking
+class PlaceOrderUseCase(
+    private val orderRepository: OrderRepository,
+    private val notificationService: NotificationService,
+    private val analyticsTracker: AnalyticsTracker
+) {
+    suspend fun execute(order: Order): Result&lt;Unit&gt; {
+        return try {
+            orderRepository.saveOrder(order).getOrThrow()
+            orderRepository.syncOrder(order).getOrThrow()
+            notificationService.notifyOrderPlaced(order)
+            analyticsTracker.trackOrderPlaced(order)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+}
+
+// Clean ViewModel
+class OrderViewModel(
+    private val placeOrderUseCase: PlaceOrderUseCase
+) : ViewModel() {
+
+    fun placeOrder(order: Order) {
+        viewModelScope.launch {
+            placeOrderUseCase.execute(order)
+                .onSuccess { /* show success */ }
+                .onFailure { /* show error */ }
+        }
+    }
+}</code></pre>
+            </div>
+        </section>
+
+        <section class="section" id="interview">
+            <div class="section-header">
+                <span class="section-number">القسم الخامس</span>
+                <h2>بنك أصعب الأسئلة الخادعة والمواقف البرمجية في مقابلات الشركات الأوروبية</h2>
+            </div>
+
+            <h3>🎲 السؤال الأول: استدعاء دالة افتراضية من داخل المشيد الأساسي</h3>
+
+            <div class="interview-card">
+                <div class="interview-question">
+                    ما هو خرج الكود التالي بدقة؟ وما هي المشكلة التصميمية الخطيرة هنا؟
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Java</span>
+                    </div>
+                    <pre><code class="language-java">abstract class Animal {
+    protected String name;
+
+    public Animal(String name) {
+        this.name = name;
+        makeSound();  // ⚠️ Virtual method call in constructor!
+    }
+
+    abstract void makeSound();
+}
+
+class Dog extends Animal {
+    private final String breed = "Golden Retriever";
+
+    public Dog(String name) {
+        super(name);
+    }
+
+    @Override
+    void makeSound() {
+        System.out.println(name + " says: Woof!");
+        System.out.println("Breed: " + breed);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        new Dog("Buddy");
+    }
+}</code></pre>
+                </div>
+
+                <div class="output-box">
+                    <div class="output-label">// Output</div>
+Buddy says: Woof!
+Breed: null
+                </div>
+
+                <h4>🔬 التحليل العميق</h4>
+                <p><strong>لماذا <code>breed</code> = null؟</strong></p>
+                <ol class="steps">
+                    <li>يتم تخصيص الذاكرة لكائن <code>Dog</code> في الـ Heap</li>
+                    <li>جميع الحقول تُهيأ بقيمها الافتراضية (null, 0, false)</li>
+                    <li>يُستدعى مشيد <code>Animal</code> عبر <code>super(name)</code></li>
+                    <li>داخل مشيد <code>Animal</code>، يُستدعى <code>makeSound()</code></li>
+                    <li>الـ vtable يشير بالفعل إلى <code>Dog.makeSound()</code> (صحيح!)</li>
+                    <li>لكن <code>breed</code> لم تُهيأ بعد! لا تزال null</li>
+                    <li>بعد انتهاء <code>Animal()</code>، تُهيأ <code>breed = "Golden Retriever"</code></li>
+                    <li>ينتهي مشيد <code>Dog</code></li>
+                </ol>
+
+                <div class="info-box danger">
+                    <div class="info-box-title">🚨 الخطر في أندرويد</div>
+                    <p>في أندرويد، هذا النمط شائع في الأصناف المخصصة للـ Views. إذا استدعيت <code>invalidate()</code> أو <code>requestLayout()</code> من داخل المشيد، قد تتعطل التطبيق لأن الحقول المخصصة للرسم لم تُهيأ بعد!</p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                    </div>
+                    <pre><code class="language-kotlin">// ✅ SAFE PATTERN: Two-phase initialization
+abstract class Animal(name: String) {
+    protected val name: String = name
+
+    // NO virtual calls in constructor!
+
+    open fun onInitialized() {
+        // Safe to override - called AFTER full construction
+    }
+}
+
+class Dog(name: String) : Animal(name) {
+    private val breed = "Golden Retriever"
+
+    init {
+        onInitialized()  // Safe here - all fields initialized
+    }
+
+    override fun onInitialized() {
+        println("$name says: Woof!")
+        println("Breed: $breed")  // ✅ "Golden Retriever"
+    }
+}</code></pre>
+                </div>
+            </div>
+
+            <h3>🔒 السؤال الثاني: كسر التغليف في الكائنات غير القابلة للتعديل (Immutability)</h3>
+
+            <div class="interview-card">
+                <div class="interview-question">
+                    كيف تمنع كسر Encapsulation عند تمرير كائنات قابلة للتعديل (Mutables) داخل كائنات غير قابلة للتعديل (Immutables)؟
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Java</span>
+                    </div>
+                    <pre><code class="language-java">// ❌ BROKEN: Mutable state escapes
+public final class ImmutablePerson {
+    private final List&lt;String&gt; hobbies;
+    private final Date birthDate;  // Date is mutable!
+
+    public ImmutablePerson(List&lt;String&gt; hobbies, Date birthDate) {
+        this.hobbies = hobbies;        // ❌ Reference escape!
+        this.birthDate = birthDate;    // ❌ Date is mutable!
+    }
+
+    public List&lt;String&gt; getHobbies() {
+        return hobbies;  // ❌ Returns internal reference!
+    }
+
+    public Date getBirthDate() {
+        return birthDate;  // ❌ Returns mutable object!
+    }
+}
+
+// Attacker code:
+List&lt;String&gt; hobbies = new ArrayList&lt;&gt;(Arrays.asList("Reading"));
+ImmutablePerson person = new ImmutablePerson(hobbies, new Date());
+
+hobbies.add("Hacking");  // ✅ Modifies person's internal state!
+person.getHobbies().add("More Hacking");  // ✅ Also works!
+person.getBirthDate().setTime(0);  // ✅ Mutates "immutable" object!</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Java</span>
+                    </div>
+                    <pre><code class="language-java">// ✅ CORRECT: Defensive Copying
+public final class ImmutablePerson {
+    private final List&lt;String&gt; hobbies;
+    private final Date birthDate;
+
+    public ImmutablePerson(List&lt;String&gt; hobbies, Date birthDate) {
+        // Defensive copy in constructor
+        this.hobbies = new ArrayList&lt;&gt;(hobbies);
+        this.birthDate = new Date(birthDate.getTime());
+    }
+
+    public List&lt;String&gt; getHobbies() {
+        // Defensive copy on access
+        return new ArrayList&lt;&gt;(hobbies);
+    }
+
+    public Date getBirthDate() {
+        return new Date(birthDate.getTime());
+    }
+}</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                    </div>
+                    <pre><code class="language-kotlin">// ✅ KOTLIN: Use immutable collections and data classes
+import java.time.LocalDate  // Immutable date API
+
+data class ImmutablePerson(
+    val name: String,
+    val hobbies: List&lt;String&gt;,  // List is immutable by default in Kotlin
+    val birthDate: LocalDate     // LocalDate is immutable
+) {
+    // No need for defensive copying - Kotlin List is read-only
+    // But if you receive a MutableList from Java:
+    companion object {
+        fun fromMutableInput(
+            name: String,
+            mutableHobbies: MutableList&lt;String&gt;,
+            birthDate: LocalDate
+        ): ImmutablePerson {
+            return ImmutablePerson(
+                name = name,
+                hobbies = mutableHobbies.toList(),  // Defensive copy
+                birthDate = birthDate
+            )
+        }
+    }
+}</code></pre>
+                </div>
+
+                <div class="info-box info">
+                    <div class="info-box-title">📊 التكلفة الذاكرية للـ Defensive Copying</div>
+                    <p>كل نسخة دفاعية تستهلك:</p>
+                    <ul class="styled-list">
+                        <li><strong>ArrayList:</strong> O(n) زمن + O(n) ذاكرة</li>
+                        <li><strong>Date:</strong> O(1) زمن + 24 bytes</li>
+                    </ul>
+                    <p>في التطبيقات الأندرويدية ذات الأداء الحرج، استخدم <span class="key-concept">Immutable Collections</span> من مكتبات مثل Guava أو Kotlin's built-in read-only collections.</p>
+                </div>
+            </div>
+
+            <h3>🧠 السؤال الثالث: تسريب الذاكرة عبر Inner Classes غير الساكنة</h3>
+
+            <div class="interview-card">
+                <div class="interview-question">
+                    ما هو خطأ الكود التالي؟ وكيف يؤدي إلى Memory Leak في أندرويد؟
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Java</span>
+                    </div>
+                    <pre><code class="language-java">public class LeakyActivity extends AppCompatActivity {
+
+    private TextView textView;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        textView = findViewById(R.id.textView);
+
+        // ❌ MEMORY LEAK: Non-static inner class holds implicit
+        // reference to outer Activity
+        new DownloadTask().execute("https://api.example.com/data");
+    }
+
+    // ❌ Non-static inner class implicitly references LeakyActivity
+    private class DownloadTask extends AsyncTask&lt;String, Void, String&gt; {
+        @Override
+        protected String doInBackground(String... urls) {
+            // Simulates long-running download (5 seconds)
+            try { Thread.sleep(5000); } 
+            catch (InterruptedException e) { e.printStackTrace(); }
+            return "Downloaded: " + urls[0];
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            // Implicitly uses LeakyActivity.this.textView
+            textView.setText(result);
+        }
+    }
+}</code></pre>
+                </div>
+
+                <div class="memory-diagram">
+┌─────────────────────────────────────────────────────────────┐
+│              Memory Leak Visualization                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  GC Root: Thread Pool                                       │
+│       │                                                     │
+│       ▼                                                     │
+│  DownloadTask (AsyncTask)                                   │
+│       │                                                     │
+│       └── implicit $0 reference to LeakyActivity            │
+│               │                                             │
+│               ▼                                             │
+│       LeakyActivity (entire View hierarchy!)                │
+│               │                                             │
+│               ├── Window                                    │
+│               ├── DecorView                                 │
+│               ├── TextView                                  │
+│               └── Bitmap (possible large images)            │
+│                                                             │
+│  Even after user rotates screen / presses back:             │
+│  LeakyActivity CANNOT be garbage collected!                 │
+│  because DownloadTask still references it.                  │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+                </div>
+
+                <h4>🔬 التحليل العميق</h4>
+                <p>
+                    في جافا، كل <strong>Inner Class غير ساكنة</strong> (Non-static Inner Class) تحمل مرجعاً ضمنياً (<span class="key-concept">Implicit Reference</span>) للصنف الخارجي. هذا المرجع يُخزن في حقل مخفي يُسمى <code>this$0</code>. عندما يبقى الـ Inner Class حياً (مثل <code>AsyncTask</code> قيد التنفيذ)، يبقى الصنف الخارجي محتجزاً في الذاكرة.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                    </div>
+                    <pre><code class="language-kotlin">// ✅ SOLUTION 1: Static inner class with WeakReference
+class SafeActivity : AppCompatActivity() {
+
+    private lateinit var textView: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        textView = findViewById(R.id.textView)
+
+        // Pass WeakReference - allows GC when Activity destroyed
+        SafeDownloadTask(WeakReference(textView)).execute("url")
+    }
+
+    // ✅ Static class - no implicit reference to SafeActivity
+    private class SafeDownloadTask(
+        private val textViewRef: WeakReference&lt;TextView&gt;
+    ) : AsyncTask&lt;String, Void, String&gt;() {
+
+        override fun doInBackground(vararg urls: String): String {
+            // Long running operation...
+            return "Downloaded"
+        }
+
+        override fun onPostExecute(result: String) {
+            // ✅ Check if Activity still alive
+            textViewRef.get()?.let { textView -&gt;
+                textView.text = result
+            }
+        }
+    }
+}</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                    </div>
+                    <pre><code class="language-kotlin">// ✅ SOLUTION 2: Modern Android - ViewModel + Coroutines
+class ModernViewModel(
+    private val repository: DataRepository
+) : ViewModel() {
+
+    private val _data = MutableLiveData&lt;String&gt;()
+    val data: LiveData&lt;String&gt; = _data
+
+    fun loadData() {
+        viewModelScope.launch {
+            // Automatically cancelled when ViewModel cleared
+            val result = repository.fetchData()
+            _data.value = result
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        // Coroutines cancelled automatically
+    }
+}
+
+class ModernActivity : AppCompatActivity() {
+
+    private val viewModel: ModernViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        viewModel.data.observe(this) { result -&gt;
+            // Safe - Activity is alive
+            textView.text = result
+        }
+
+        viewModel.loadData()
+    }
+}</code></pre>
+                </div>
+            </div>
+
+            <h3>🎭 السؤال الرابع: الـ Initialization Order مع Anonymous Classes</h3>
+
+            <div class="interview-card">
+                <div class="interview-question">
+                    ما هو خرج الكود التالي؟ ولماذا؟
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Java</span>
+                    </div>
+                    <pre><code class="language-java">public class AnonymousInitTrap {
+
+    static class Base {
+        Base() {
+            System.out.println("Base constructor");
+            init();
+        }
+
+        void init() {
+            System.out.println("Base.init()");
+        }
+    }
+
+    public static void main(String[] args) {
+        Base obj = new Base() {
+            {
+                System.out.println("Anonymous instance initializer");
+            }
+
+            @Override
+            void init() {
+                System.out.println("Anonymous.init()");
+            }
+        };
+    }
+}</code></pre>
+                </div>
+
+                <div class="output-box">
+                    <div class="output-label">// Output</div>
+Base constructor
+Anonymous.init()
+Anonymous instance initializer
+                </div>
+
+                <h4>🔬 التحليل العميق</h4>
+                <ol class="steps">
+                    <li>يتم إنشاء صنف مجهول (Anonymous Class) يرث من <code>Base</code></li>
+                    <li>يُستدعى مشيد <code>Base</code> (المشيد الوحيد المتاح)</li>
+                    <li>داخل مشيد <code>Base</code>، يُستدعى <code>init()</code></li>
+                    <li>الـ vtable يشير إلى <code>Anonymous.init()</code> (صحيح!)</li>
+                    <li>بعد انتهاء مشيد <code>Base</code>، يُنفذ <strong>كتل التهيئة</strong> للصنف المجهول</li>
+                    <li>لا يوجد مشيد صريح للصنف المجهول، لذا ينتهي الأمر</li>
+                </ol>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ الفخ الخفي</div>
+                    <p>الصنف المجهول (Anonymous Class) هو في الواقع <strong>صنف داخلي غير ساكن</strong> (Non-static Inner Class). إذا كان داخل Activity، فإنه يحمل مرجعاً ضمنياً للـ Activity! هذا يعني أن أي <code>Runnable</code> أو <code>OnClickListener</code> مجهول يمكن أن يسبب <strong>تسريب ذاكرة</strong>.</p>
+                </div>
+            </div>
+
+            <h3>🔐 السؤال الخامس: Singleton Pattern و Thread Safety</h3>
+
+            <div class="interview-card">
+                <div class="interview-question">
+                    ما هي المشاكل في تطبيقات Singleton التالية؟ وما هو الأفضل في بيئة أندرويد متعددة المسارات؟
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Java</span>
+                    </div>
+                    <pre><code class="language-java">// ❌ BROKEN: Not thread-safe
+public class BrokenSingleton {
+    private static BrokenSingleton instance;
+
+    private BrokenSingleton() {}
+
+    public static BrokenSingleton getInstance() {
+        if (instance == null) {
+            instance = new BrokenSingleton();  // Race condition!
+        }
+        return instance;
+    }
+}</code></pre>
+                </div>
+
+                <div class="memory-diagram">
+┌─────────────────────────────────────────────────────────────┐
+│              Race Condition in Singleton                    │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Thread A                              Thread B             │
+│  ─────────                             ─────────            │
+│  if (instance == null) ✅                                               │
+│                                         if (instance == null) ✅        │
+│  instance = new BrokenSingleton()                             │
+│                                         instance = new BrokenSingleton()│
+│                                                             │
+│  Result: TWO instances created! Memory + state corruption   │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Java</span>
+                    </div>
+                    <pre><code class="language-java">// ✅ CORRECT: Bill Pugh Singleton (Best for Android)
+public class SafeSingleton {
+
+    private SafeSingleton() {}
+
+    // Static inner class - loaded only when referenced
+    private static class SingletonHolder {
+        private static final SafeSingleton INSTANCE = new SafeSingleton();
+    }
+
+    public static SafeSingleton getInstance() {
+        return SingletonHolder.INSTANCE;
+    }
+}</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                    </div>
+                    <pre><code class="language-kotlin">// ✅ KOTLIN: Object declaration (thread-safe by default)
+object NetworkManager {
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .build()
+
+    fun makeRequest(url: String): Response {
+        return client.newCall(Request.Builder().url(url).build()).execute()
+    }
+}
+
+// ✅ Or with dependency injection (preferred in modern Android)
+@Singleton
+class NetworkManager @Inject constructor(
+    private val client: OkHttpClient
+) {
+    suspend fun fetchData(url: String): String {
+        return withContext(Dispatchers.IO) {
+            client.newCall(Request.Builder().url(url).build())
+                .execute().body?.string() ?: ""
+        }
+    }
+}</code></pre>
+                </div>
+
+                <div class="info-box success">
+                    <div class="info-box-title">✅ لماذا Bill Pugh Singleton هو الأفضل؟</div>
+                    <p>يعتمد على خاصية الـ JVM في <strong>تحميل الأصناف الساكنة الداخلية عند أول استخدام</strong> (Lazy Initialization). هذا يضمن:</p>
+                    <ul class="styled-list">
+                        <li><strong>Thread Safety:</strong> بدون <code>synchronized</code> أو locks</li>
+                        <li><strong>Lazy Loading:</strong> لا يُنشأ إلا عند الحاجة</li>
+                        <li><strong>Performance:</strong> لا يوجد overhead بعد التهيئة</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>🎯 السؤال السادس: Double Checked Locking و volatile</h3>
+
+            <div class="interview-card">
+                <div class="interview-question">
+                    هل الكود التالي آمن للمسارات؟ وما هي وظيفة volatile؟
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Java</span>
+                    </div>
+                    <pre><code class="language-java">public class DoubleCheckedLocking {
+    private static volatile DoubleCheckedLocking instance;
+    private final Map&lt;String, User&gt; cache = new HashMap&lt;&gt;();
+
+    private DoubleCheckedLocking() {}
+
+    public static DoubleCheckedLocking getInstance() {
+        if (instance == null) {                    // First check (no lock)
+            synchronized (DoubleCheckedLocking.class) {
+                if (instance == null) {            // Second check (with lock)
+                    instance = new DoubleCheckedLocking();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public User getUser(String id) {
+        return cache.get(id);
+    }
+}</code></pre>
+                </div>
+
+                <h4>🔬 التحليل العميق</h4>
+                <p>
+                    بدون <code>volatile</code>، يمكن أن يحدث <strong>إعادة ترتيب التعليمات</strong> (Instruction Reordering) من قبل المعالج أو المترجم:
+                </p>
+
+                <div class="memory-diagram">
+┌─────────────────────────────────────────────────────────────┐
+│         Without volatile: Dangerous Reordering              │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Expected order:                                            │
+│  1. Allocate memory                                         │
+│  2. Initialize object (constructor)                         │
+│  3. Assign reference to instance                            │
+│                                                             │
+│  Possible actual order (without volatile):                  │
+│  1. Allocate memory                                         │
+│  2. Assign reference to instance  ◄── Thread B sees this!   │
+│  3. Initialize object (constructor)                         │
+│                                                             │
+│  Thread B might see:                                        │
+│  instance != null BUT constructor not run yet!              │
+│  → NullPointerException or corrupted state                  │
+│                                                             │
+│  volatile prevents reordering across the write barrier      │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+                </div>
+
+                <div class="info-box success">
+                    <div class="info-box-title">✅ الإجابة الصحيحة</div>
+                    <p>نعم، الكود <strong>آمن للمسارات</strong> بفضل <code>volatile</code>. لكن في أندرويد الحديث، يُفضل استخدام:</p>
+                    <ul class="styled-list">
+                        <li><strong>Kotlin <code>object</code>:</strong> للـ Singletons البسيطة</li>
+                        <li><strong>Hilt/Dagger:</strong> للـ Dependency Injection</li>
+                        <li><strong>Bill Pugh Singleton:</strong> للحالات التي تحتاج Lazy Initialization</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>🧬 السؤال السابع: Covariance و Contravariance في Generics</h3>
+
+            <div class="interview-card">
+                <div class="interview-question">
+                    لماذا لا يمكن إسناد List&lt;String&gt; إلى List&lt;Object&gt; في جافا؟ وكيف يُحل هذا في كوتلن؟
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Java</span>
+                    </div>
+                    <pre><code class="language-java">// ❌ COMPILATION ERROR: Incompatible types
+List&lt;String&gt; strings = new ArrayList&lt;&gt;();
+List&lt;Object&gt; objects = strings;  // Error!
+
+// Why? Consider this dangerous scenario:
+objects.add(123);  // If allowed, this would put Integer in List&lt;String&gt;!
+String s = strings.get(0);  // ClassCastException at runtime!</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                    </div>
+                    <pre><code class="language-kotlin">// ✅ KOTLIN: Declaration-site variance
+interface Producer&lt;out T&gt; {  // Covariant
+    fun produce(): T  // Can only produce T, not consume
+}
+
+interface Consumer&lt;in T&gt; {   // Contravariant
+    fun consume(item: T)  // Can only consume T, not produce
+}
+
+interface Storage&lt;T&gt; {       // Invariant
+    fun produce(): T
+    fun consume(item: T)
+}
+
+// Usage:
+val stringProducer: Producer&lt;String&gt; = StringProducer()
+val anyProducer: Producer&lt;Any&gt; = stringProducer  // ✅ OK: out T
+
+val anyConsumer: Consumer&lt;Any&gt; = AnyConsumer()
+val stringConsumer: Consumer&lt;String&gt; = anyConsumer  // ✅ OK: in T</code></pre>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>المفهوم</th>
+                            <th>Java Syntax</th>
+                            <th>Kotlin Syntax</th>
+                            <th>المعنى</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Covariance</td>
+                            <td><code>? extends T</code></td>
+                            <td><code>out T</code></td>
+                            <td>يمكن إسناد Producer&lt;Child&gt; إلى Producer&lt;Parent&gt;</td>
+                        </tr>
+                        <tr>
+                            <td>Contravariance</td>
+                            <td><code>? super T</code></td>
+                            <td><code>in T</code></td>
+                            <td>يمكن إسناد Consumer&lt;Parent&gt; إلى Consumer&lt;Child&gt;</td>
+                        </tr>
+                        <tr>
+                            <td>Invariance</td>
+                            <td><code>T</code></td>
+                            <td><code>T</code></td>
+                            <td>لا يمكن إسناد إلا لنفس النوع بالضبط</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="analogy">
+                    <div class="analogy-title">🐕 تشبيه واقعي: سلسلة الكلاب</div>
+                    <p>إذا كان <code>Animal</code> هو الصنف الأساسي و<code>Dog</code> هو الصنف الفرعي:</p>
+                    <ul class="styled-list">
+                        <li><strong>Covariance (out):</strong> يمكنك إسناد <code>List&lt;Dog&gt;</code> إلى <code>List&lt;? extends Animal&gt;</code> لأنك تستخرج حيوانات (قد تكون كلاباً)</li>
+                        <li><strong>Contravariance (in):</strong> يمكنك إسناد <code>List&lt;Animal&gt;</code> إلى <code>List&lt;? super Dog&gt;</code> لأنك تضيف كلاباً إلى قائمة حيوانات</li>
+                        <li><strong>Invariance:</strong> <code>List&lt;Dog&gt;</code> ليست <code>List&lt;Animal&gt;</code> لأنك قد تضيف قطة إلى قائمة حيوانات!</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>🎪 السؤال الثامن: equals() و hashCode() Contract</h3>
+
+            <div class="interview-card">
+                <div class="interview-question">
+                    ما هي العقدة (Contract) بين equals() و hashCode()؟ وما الذي يحدث عند كسرها في HashMap؟
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Java</span>
+                    </div>
+                    <pre><code class="language-java">// ❌ BROKEN: Violates equals/hashCode contract
+public class BrokenKey {
+    private final String id;
+    private String mutableData;
+
+    public BrokenKey(String id) { this.id = id; }
+    public void setMutableData(String data) { this.mutableData = data; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BrokenKey that = (BrokenKey) o;
+        return Objects.equals(id, that.id) &amp;&amp;
+               Objects.equals(mutableData, that.mutableData);  // ❌ Uses mutable field!
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, mutableData);  // ❌ Uses mutable field!
+    }
+}
+
+// Dangerous usage:
+Map&lt;BrokenKey, String&gt; map = new HashMap&lt;&gt;();
+BrokenKey key = new BrokenKey("123");
+key.setMutableData("initial");
+map.put(key, "value");
+
+key.setMutableData("changed");  // ❌ hashCode changes!
+// key is now in the WRONG bucket of HashMap!
+String value = map.get(key);  // Returns null! Key "lost" in HashMap</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                    </div>
+                    <pre><code class="language-kotlin">// ✅ CORRECT: Immutable data class (auto-generates proper equals/hashCode)
+data class SafeKey(
+    val id: String,           // val = immutable
+    val createdAt: Long       // val = immutable
+) {
+    // Kotlin data class automatically:
+    // 1. Uses only primary constructor properties in equals()
+    // 2. Uses same properties in hashCode()
+    // 3. Both are based on immutable fields only
+}
+
+// ✅ Or manual implementation for Java compatibility:
+class ManualKey private constructor(
+    private val id: String,
+    private val timestamp: Long
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ManualKey) return false
+        return id == other.id &amp;&amp; timestamp == other.timestamp
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + timestamp.hashCode()
+        return result
+    }
+
+    companion object {
+        fun create(id: String) = ManualKey(id, System.currentTimeMillis())
+    }
+}</code></pre>
+                </div>
+
+                <div class="info-box info">
+                    <div class="info-box-title">📐 العقدة (Contract)</div>
+                    <ol class="styled-list">
+                        <li><strong>Reflexive:</strong> <code>x.equals(x) == true</code></li>
+                        <li><strong>Symmetric:</strong> <code>x.equals(y) == y.equals(x)</code></li>
+                        <li><strong>Transitive:</strong> إذا <code>x.equals(y)</code> و<code>y.equals(z)</code> فـ <code>x.equals(z)</code></li>
+                        <li><strong>Consistent:</strong> النتيجة لا تتغير إذا لم يتغير الكائن</li>
+                        <li><strong>hashCode contract:</strong> إذا <code>x.equals(y)</code> فـ <code>x.hashCode() == y.hashCode()</code></li>
+                    </ol>
+                </div>
+            </div>
+
+            <h3>🏛️ السؤال التاسع: Decorator Pattern في أندرويد</h3>
+
+            <div class="interview-card">
+                <div class="interview-question">
+                    كيف تُطبق Decorator Pattern لإضافة وظائف (Logging, Caching, Encryption) لـ Repository بدون تعديل الكود الأصلي؟
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                    </div>
+                    <pre><code class="language-kotlin">// Core interface
+interface UserRepository {
+    suspend fun getUser(id: String): User
+    suspend fun saveUser(user: User)
+}
+
+// Base implementation
+class UserRepositoryImpl(
+    private val api: UserApi,
+    private val dao: UserDao
+) : UserRepository {
+    override suspend fun getUser(id: String): User {
+        return dao.getUser(id) ?: api.fetchUser(id).also { dao.insert(it) }
+    }
+
+    override suspend fun saveUser(user: User) {
+        dao.insert(user)
+        api.updateUser(user)
+    }
+}
+
+// ✅ DECORATOR: Logging
+class LoggingUserRepository(
+    private val delegate: UserRepository
+) : UserRepository {
+
+    override suspend fun getUser(id: String): User {
+        Log.d("Repository", "Getting user: $id")
+        val start = System.currentTimeMillis()
+        val user = delegate.getUser(id)
+        Log.d("Repository", "Got user in ${System.currentTimeMillis() - start}ms")
+        return user
+    }
+
+    override suspend fun saveUser(user: User) {
+        Log.d("Repository", "Saving user: ${user.id}")
+        delegate.saveUser(user)
+    }
+}
+
+// ✅ DECORATOR: Caching with TTL
+class CachingUserRepository(
+    private val delegate: UserRepository,
+    private val cache: LruCache&lt;String, Pair&lt;User, Long&gt;&gt;,
+    private val ttlMillis: Long = 60_000
+) : UserRepository {
+
+    override suspend fun getUser(id: String): User {
+        val cached = cache.get(id)
+        if (cached != null &amp;&amp; System.currentTimeMillis() - cached.second &lt; ttlMillis) {
+            return cached.first
+        }
+        val user = delegate.getUser(id)
+        cache.put(id, user to System.currentTimeMillis())
+        return user
+    }
+
+    override suspend fun saveUser(user: User) {
+        cache.remove(user.id)
+        delegate.saveUser(user)
+    }
+}
+
+// ✅ Composition: Stack decorators
+val repository = CachingUserRepository(
+    LoggingUserRepository(
+        UserRepositoryImpl(api, dao)
+    ),
+    LruCache(100)
+)</code></pre>
+                </div>
+
+                <div class="analogy">
+                    <div class="analogy-title">🧅 تشبيه واقعي: البصلة المتدرجة</div>
+                    <p>كل Decorator هو طبقة حول الطبقة الداخلية. كالبصلة، يمكنك إضافة طبقات (Logging, Caching, Encryption) حول النواة (Repository الأساسي) دون تعديل أي طبقة داخلية. هذا هو جوهر <span class="key-concept">Open/Closed Principle</span>.</p>
+                </div>
+            </div>
+
+            <h3>🎨 السؤال العاشر: Strategy Pattern مع Lambdas في كوتلن</h3>
+
+            <div class="interview-card">
+                <div class="interview-question">
+                    كيف تُبسط Strategy Pattern باستخدام Lambdas/Function Types في كوتلن؟ وما هي ميزة هذا النهج في أندرويد؟
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                    </div>
+                    <pre><code class="language-kotlin">// ❌ VERBOSE: Traditional Strategy Pattern with interfaces
+interface SortStrategy {
+    fun &lt;T : Comparable&lt;T&gt;&gt; sort(list: List&lt;T&gt;): List&lt;T&gt;
+}
+
+class QuickSort : SortStrategy {
+    override fun &lt;T : Comparable&lt;T&gt;&gt; sort(list: List&lt;T&gt;): List&lt;T&gt; {
+        // Implementation...
+        return list.sorted()
+    }
+}
+
+class MergeSort : SortStrategy {
+    override fun &lt;T : Comparable&lt;T&gt;&gt; sort(list: List&lt;T&gt;): List&lt;T&gt; {
+        // Implementation...
+        return list.sorted()
+    }
+}
+
+// ✅ ELEGANT: Function types as strategies
+typealias SortStrategy&lt;T&gt; = (List&lt;T&gt;) -&gt; List&lt;T&gt;
+
+class Sorter&lt;T : Comparable&lt;T&gt;&gt; {
+    fun sort(list: List&lt;T&gt;, strategy: SortStrategy&lt;T&gt;): List&lt;T&gt; {
+        return strategy(list)
+    }
+}
+
+// Usage with lambdas
+val sorter = Sorter&lt;Int&gt;()
+
+val quickSort: SortStrategy&lt;Int&gt; = { it.sorted() }
+val reverseSort: SortStrategy&lt;Int&gt; = { it.sortedDescending() }
+
+val sorted = sorter.sort(listOf(3, 1, 4), quickSort)
+val reversed = sorter.sort(listOf(3, 1, 4), reverseSort)
+
+// ✅ Even more elegant: Inline with SAM conversion
+fun &lt;T : Comparable&lt;T&gt;&gt; List&lt;T&gt;.customSort(
+    strategy: (List&lt;T&gt;) -&gt; List&lt;T&gt; = { it.sorted() }
+): List&lt;T&gt; = strategy(this)
+
+val result = listOf(3, 1, 4).customSort { it.shuffled() }</code></pre>
+                </div>
+
+                <div class="info-box success">
+                    <div class="info-box-title">🚀 الميزة في أندرويد</div>
+                    <p>في أندرويد، يمكن استخدام هذا النمط لـ <strong>Behavior Injection</strong>:</p>
+                    <ul class="styled-list">
+                        <li>تمرير استراتيجيات التحقق من الصحة (Validation)</li>
+                        <li>تمرير استراتيجيات تحويل البيانات (Mapping)</li>
+                        <li>تمرير استراتيجيات معالجة الأخطاء (Error Handling)</li>
+                    </ul>
+                    <p>هذا يُقلل من عدد الأصناف ويجعل الكود أكثر <strong>إيجازاً</strong> و<strong>قابلية للاختبار</strong>.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <h3>📚 المرجع الشامل للبرمجة كائنية التوجه المتقدمة</h3>
+        <p>تم إعداد هذا المرجع للمطورين العرب الساعين للتميز في سوق العمل الأوروبي</p>
+        <p style="margin-top: 1rem; opacity: 0.7;">© 2026 - مخصص للمقابلات التقنية في Zalando, BMW, Delivery Hero والشركات الأوروبية الكبرى</p>
+    </footer>
+
+    <div class="scroll-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        ↑
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            hljs.highlightAll();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2738 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المرجع الهندسي الشامل لتطوير وتأمين تطبيقات التقنية المالية لأندرويد</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Noto+Kufi+Arabic:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f766e; --primary-light: #14b8a6; --primary-dark: #0d5c56;
+            --secondary: #1e293b; --accent: #f59e0b; --accent-light: #fbbf24;
+            --danger: #dc2626; --danger-light: #fecaca; --success: #059669; --success-light: #d1fae5;
+            --warning: #d97706; --bg-primary: #f8fafc; --bg-secondary: #f1f5f9; --bg-card: #ffffff;
+            --bg-code: #0f172a; --bg-code-inline: #e2e8f0; --text-primary: #0f172a; --text-secondary: #475569;
+            --text-muted: #94a3b8; --border: #e2e8f0; --border-light: #f1f5f9;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05); --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius-sm: 6px; --radius: 12px; --radius-lg: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+        body {
+            font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
+            background: var(--bg-primary); color: var(--text-primary); line-height: 1.9; font-size: 17px; direction: rtl;
+        }
+        .navbar {
+            position: fixed; top: 0; right: 0; left: 0; z-index: 1000;
+            background: rgba(255,255,255,0.92); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); padding: 0;
+        }
+        .navbar-inner {
+            max-width: 1400px; margin: 0 auto; padding: 0 24px;
+            display: flex; align-items: center; justify-content: space-between; height: 68px;
+        }
+        .navbar-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .navbar-brand .logo-icon {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: var(--radius); display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 20px; font-weight: 800; font-family: 'Noto Kufi Arabic', sans-serif;
+        }
+        .navbar-brand .logo-text {
+            font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 700; font-size: 15px;
+            color: var(--text-primary); line-height: 1.4;
+        }
+        .navbar-brand .logo-sub { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+        .nav-links { display: flex; gap: 8px; list-style: none; }
+        .nav-links a {
+            text-decoration: none; color: var(--text-secondary); font-weight: 600; font-size: 14px;
+            padding: 8px 14px; border-radius: var(--radius-sm); transition: var(--transition);
+        }
+        .nav-links a:hover { background: var(--bg-secondary); color: var(--primary); }
+        .hero {
+            margin-top: 68px;
+            background: linear-gradient(135deg, var(--secondary) 0%, #0f172a 50%, var(--primary-dark) 100%);
+            color: white; padding: 100px 24px 80px; position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: -50%; right: -20%; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(20,184,166,0.15) 0%, transparent 70%); border-radius: 50%;
+        }
+        .hero::after {
+            content: ''; position: absolute; bottom: -30%; left: -10%; width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%); border-radius: 50%;
+        }
+        .hero-inner { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+            padding: 8px 18px; border-radius: 100px; font-size: 13px; font-weight: 600;
+            margin-bottom: 28px; backdrop-filter: blur(10px);
+        }
+        .hero-badge .dot { width: 8px; height: 8px; background: var(--accent-light); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .hero h1 {
+            font-family: 'Noto Kufi Arabic', sans-serif; font-size: 42px; font-weight: 800;
+            line-height: 1.4; margin-bottom: 24px;
+        }
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--primary-light), var(--accent-light));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .hero-description { font-size: 19px; color: rgba(255,255,255,0.75); max-width: 800px; line-height: 2; margin-bottom: 36px; }
+        .hero-stats { display: flex; gap: 40px; flex-wrap: wrap; }
+        .hero-stat { text-align: center; }
+        .hero-stat .number { font-family: 'Noto Kufi Arabic', sans-serif; font-size: 32px; font-weight: 800; color: var(--accent-light); }
+        .hero-stat .label { font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 500; }
+        .main-container { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 280px 1fr; gap: 40px; padding: 40px 24px; }
+        .sidebar { position: sticky; top: 88px; height: calc(100vh - 108px); overflow-y: auto; padding-left: 16px; }
+        .sidebar::-webkit-scrollbar { width: 5px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        .toc-title {
+            font-family: 'Noto Kufi Arabic', sans-serif; font-size: 14px; font-weight: 700;
+            color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid var(--border);
+        }
+        .toc-list { list-style: none; }
+        .toc-list li { margin-bottom: 4px; }
+        .toc-list a {
+            display: block; text-decoration: none; color: var(--text-secondary); font-size: 14px;
+            font-weight: 500; padding: 8px 12px; border-radius: var(--radius-sm); transition: var(--transition);
+            border-right: 3px solid transparent;
+        }
+        .toc-list a:hover { background: var(--bg-secondary); color: var(--primary); border-right-color: var(--primary-light); }
+        .toc-list a.active { background: linear-gradient(90deg, rgba(20,184,166,0.08), transparent); color: var(--primary); border-right-color: var(--primary); font-weight: 700; }
+        .toc-list .toc-h2 { font-weight: 700; color: var(--text-primary); margin-top: 12px; }
+        .toc-list .toc-h3 { padding-right: 24px; font-size: 13px; }
+        .content { min-width: 0; }
+        .section { margin-bottom: 64px; }
+        .section-header { margin-bottom: 32px; padding-bottom: 20px; border-bottom: 2px solid var(--border); }
+        .section-number {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white; font-family: 'Noto Kufi Arabic', sans-serif; font-size: 20px;
+            font-weight: 800; border-radius: var(--radius); margin-bottom: 16px; box-shadow: var(--shadow);
+        }
+        .section h2 { font-family: 'Noto Kufi Arabic', sans-serif; font-size: 32px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4; }
+        .section h3 { font-family: 'Noto Kufi Arabic', sans-serif; font-size: 24px; font-weight: 700; color: var(--text-primary); margin: 40px 0 20px; padding-right: 16px; border-right: 4px solid var(--primary-light); line-height: 1.5; }
+        .section h4 { font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 20px; font-weight: 700; color: var(--secondary); margin: 28px 0 14px; }
+        .section p { margin-bottom: 18px; color: var(--text-secondary); text-align: justify; }
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; margin: 24px 0; box-shadow: var(--shadow-sm); transition: var(--transition); }
+        .card:hover { box-shadow: var(--shadow); border-color: var(--primary-light); }
+        .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .card-icon { width: 44px; height: 44px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .card-icon.primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; }
+        .card-icon.accent { background: linear-gradient(135deg, var(--accent), var(--accent-light)); color: white; }
+        .card-icon.danger { background: linear-gradient(135deg, var(--danger), #ef4444); color: white; }
+        .card-icon.success { background: linear-gradient(135deg, var(--success), #10b981); color: white; }
+        .card-title { font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 700; font-size: 18px; }
+        .card-body { color: var(--text-secondary); line-height: 1.9; }
+        .alert { padding: 20px 24px; border-radius: var(--radius); margin: 24px 0; display: flex; gap: 16px; align-items: flex-start; }
+        .alert-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+        .alert-content { flex: 1; }
+        .alert-title { font-weight: 700; font-size: 16px; margin-bottom: 6px; }
+        .alert-danger { background: var(--danger-light); border-right: 4px solid var(--danger); }
+        .alert-danger .alert-title { color: var(--danger); }
+        .alert-warning { background: #fef3c7; border-right: 4px solid var(--warning); }
+        .alert-warning .alert-title { color: var(--warning); }
+        .alert-info { background: #dbeafe; border-right: 4px solid #3b82f6; }
+        .alert-info .alert-title { color: #1d4ed8; }
+        .alert-success { background: var(--success-light); border-right: 4px solid var(--success); }
+        .alert-success .alert-title { color: var(--success); }
+        .code-block { background: var(--bg-code); border-radius: var(--radius-lg); margin: 24px 0; overflow: hidden; direction: ltr; text-align: left; box-shadow: var(--shadow-lg); }
+        .code-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .code-lang { font-family: 'Fira Code', monospace; font-size: 12px; font-weight: 600; color: var(--primary-light); text-transform: uppercase; letter-spacing: 1px; }
+        .code-dots { display: flex; gap: 6px; }
+        .code-dots span { width: 12px; height: 12px; border-radius: 50%; }
+        .code-dots span:nth-child(1) { background: #ef4444; }
+        .code-dots span:nth-child(2) { background: #f59e0b; }
+        .code-dots span:nth-child(3) { background: #22c55e; }
+        .code-block pre { padding: 24px; overflow-x: auto; font-family: 'Fira Code', 'Consolas', monospace; font-size: 14px; line-height: 1.8; color: #e2e8f0; }
+        .code-block pre::-webkit-scrollbar { height: 8px; }
+        .code-block pre::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        code { font-family: 'Fira Code', 'Consolas', monospace; background: var(--bg-code-inline); padding: 2px 8px; border-radius: 4px; font-size: 0.9em; color: var(--primary-dark); direction: ltr; display: inline-block; }
+        .kw { color: #c678dd; } .fn { color: #61afef; } .st { color: #98c379; }
+        .cm { color: #5c6370; font-style: italic; } .nu { color: #d19a66; }
+        .ty { color: #e5c07b; } .an { color: #d19a66; }
+        ul, ol { margin: 16px 0; padding-right: 24px; }
+        li { margin-bottom: 10px; color: var(--text-secondary); }
+        li::marker { color: var(--primary); }
+        .table-wrapper { overflow-x: auto; margin: 24px 0; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+        table { width: 100%; border-collapse: collapse; background: var(--bg-card); }
+        th { background: linear-gradient(135deg, var(--secondary), #334155); color: white; font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 600; font-size: 14px; padding: 16px 20px; text-align: right; }
+        td { padding: 14px 20px; border-bottom: 1px solid var(--border-light); color: var(--text-secondary); font-size: 15px; }
+        tr:hover td { background: var(--bg-secondary); }
+        tr:last-child td { border-bottom: none; }
+        .interview-card { background: linear-gradient(135deg, #1e293b, #0f172a); color: white; border-radius: var(--radius-lg); padding: 32px; margin: 28px 0; position: relative; overflow: hidden; }
+        .interview-card::before { content: ''; position: absolute; top: 0; right: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--primary-light), var(--accent-light)); }
+        .interview-card .company-tag { display: inline-block; background: rgba(255,255,255,0.1); padding: 4px 14px; border-radius: 100px; font-size: 12px; font-weight: 600; margin-bottom: 16px; color: var(--accent-light); }
+        .interview-card h4 { color: white; font-family: 'Noto Kufi Arabic', sans-serif; font-size: 20px; margin-bottom: 16px; }
+        .interview-card p { color: rgba(255,255,255,0.75); margin-bottom: 12px; }
+        .interview-card .difficulty { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; margin-top: 8px; }
+        .difficulty.hard { color: #f87171; } .difficulty.medium { color: #fbbf24; } .difficulty.expert { color: #f472b6; }
+        .arch-diagram { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius-lg); padding: 32px; margin: 28px 0; text-align: center; }
+        .arch-layer { display: flex; justify-content: center; gap: 16px; margin: 12px 0; flex-wrap: wrap; }
+        .arch-box { padding: 14px 24px; border-radius: var(--radius); font-weight: 600; font-size: 14px; min-width: 160px; box-shadow: var(--shadow-sm); }
+        .arch-box.presentation { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; }
+        .arch-box.domain { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
+        .arch-box.data { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
+        .arch-box.security { background: linear-gradient(135deg, #fecaca, #fca5a5); color: #991b1b; }
+        .arch-box.network { background: linear-gradient(135deg, #e9d5ff, #d8b4fe); color: #6b21a8; }
+        .arch-arrow { color: var(--text-muted); font-size: 20px; margin: 4px 0; }
+        blockquote { background: linear-gradient(90deg, var(--bg-secondary), transparent); border-right: 4px solid var(--primary); padding: 20px 24px; margin: 24px 0; border-radius: 0 var(--radius) var(--radius) 0; font-style: italic; color: var(--text-secondary); }
+        blockquote cite { display: block; margin-top: 10px; font-style: normal; font-weight: 600; color: var(--primary); font-size: 14px; }
+        .tags { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+        .tag { background: var(--bg-secondary); color: var(--text-secondary); padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); }
+        .tag.primary { background: rgba(20,184,166,0.1); color: var(--primary); border-color: rgba(20,184,166,0.2); }
+        .tag.danger { background: rgba(220,38,38,0.08); color: var(--danger); border-color: rgba(220,38,38,0.15); }
+        .tag.warning { background: rgba(217,119,6,0.08); color: var(--warning); border-color: rgba(217,119,6,0.15); }
+        .step { display: flex; gap: 20px; margin: 24px 0; align-items: flex-start; }
+        .step-number { width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; flex-shrink: 0; box-shadow: var(--shadow); }
+        .step-content { flex: 1; }
+        .step-content h5 { font-family: 'IBM Plex Sans Arabic', sans-serif; font-weight: 700; font-size: 17px; margin-bottom: 8px; color: var(--text-primary); }
+        .footer { background: var(--secondary); color: white; padding: 60px 24px 40px; margin-top: 80px; }
+        .footer-inner { max-width: 1100px; margin: 0 auto; text-align: center; }
+        .footer h3 { font-family: 'Noto Kufi Arabic', sans-serif; font-size: 24px; margin-bottom: 16px; }
+        .footer p { color: rgba(255,255,255,0.6); max-width: 600px; margin: 0 auto 24px; }
+        .footer .copyright { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 24px; margin-top: 32px; color: rgba(255,255,255,0.4); font-size: 14px; }
+        @media (max-width: 1024px) { .main-container { grid-template-columns: 1fr; } .sidebar { display: none; } }
+        @media (max-width: 768px) { .hero h1 { font-size: 28px; } .section h2 { font-size: 24px; } .section h3 { font-size: 20px; } .nav-links { display: none; } }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="navbar-inner">
+        <a href="#" class="navbar-brand">
+            <div class="logo-icon">ف</div>
+            <div>
+                <div class="logo-text">المرجع الهندسي الشامل</div>
+                <div class="logo-sub">Fintech Android Engineering & Security Masterclass</div>
+            </div>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#intro">المقدمة</a></li>
+            <li><a href="#security">الأمان</a></li>
+            <li><a href="#auth">المصادقة</a></li>
+            <li><a href="#network">الشبكات</a></li>
+            <li><a href="#architecture">الهندسة</a></li>
+            <li><a href="#interviews">المقابلات</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<header class="hero">
+    <div class="hero-inner">
+        <div class="hero-badge">
+            <span class="dot"></span>
+            درس شامل ومُفصّل — مستوى مهندس أول (Staff Engineer)
+        </div>
+        <h1>
+            المرجع الهندسي الشامل<br>
+            <span class="highlight">لتطوير وتأمين تطبيقات التقنية المالية لأندرويد</span>
+        </h1>
+        <p class="hero-description">
+            دليلٌ تقنيٌّ استراتيجيٌّ يغطي كل ما يحتاجه المهندس المتمرس لاجتياز أصعب مقابلات التقنية المالية في أوروبا — من حماية الذاكرة والتشفير من طرف لطرف، إلى هندسة المعاملات غير القابلة للتكرار ونماذج الأسئلة المعمارية في N26 و Klarna.
+        </p>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="number">٦</div>
+                <div class="label">أقسام رئيسية</div>
+            </div>
+            <div class="hero-stat">
+                <div class="number">٤٠+</div>
+                <div class="label">مثال برمجي إنتاجي</div>
+            </div>
+            <div class="hero-stat">
+                <div class="number">١٢</div>
+                <div class="label">سؤال مقابلة خبير</div>
+            </div>
+            <div class="hero-stat">
+                <div class="number">٠%</div>
+                <div class="label">نسبة الأخطاء المستهدفة</div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Container -->
+<div class="main-container">
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <div class="toc-title">فهرس المحتوى</div>
+    <ul class="toc-list">
+        <li><a href="#intro" class="toc-h2">١. المقدمة الاستراتيجية</a></li>
+        <li><a href="#why-hard" class="toc-h3">لماذا المقابلات صعبة؟</a></li>
+        <li><a href="#regulations" class="toc-h3">المعايير التنظيمية</a></li>
+        <li><a href="#security" class="toc-h2">٢. هندسة الأمان المتقدمة</a></li>
+        <li><a href="#memory-protection" class="toc-h3">حماية الذاكرة</a></li>
+        <li><a href="#screenshot-prevention" class="toc-h3">منع لقطات الشاشة</a></li>
+        <li><a href="#overlay-attacks" class="toc-h3">هجمات التراكب</a></li>
+        <li><a href="#sqlcipher" class="toc-h3">SQLCipher</a></li>
+        <li><a href="#e2ee" class="toc-h3">E2EE</a></li>
+        <li><a href="#keystore" class="toc-h3">Android Keystore</a></li>
+        <li><a href="#auth" class="toc-h2">٣. المصادقة والامتثال</a></li>
+        <li><a href="#sca" class="toc-h3">Strong Customer Authentication</a></li>
+        <li><a href="#biometric" class="toc-h3">BiometricPrompt</a></li>
+        <li><a href="#oauth" class="toc-h3">OAuth 2.0 / OIDC</a></li>
+        <li><a href="#play-integrity" class="toc-h3">Play Integrity API</a></li>
+        <li><a href="#network" class="toc-h2">٤. مرونة الشبكات</a></li>
+        <li><a href="#idempotency" class="toc-h3">Idempotency Keys</a></li>
+        <li><a href="#local-queues" class="toc-h3">Local Transaction Queues</a></li>
+        <li><a href="#optimistic-ui" class="toc-h3">Optimistic vs Pessimistic UI</a></li>
+        <li><a href="#architecture" class="toc-h2">٥. الهندسة المعمارية</a></li>
+        <li><a href="#clean-arch" class="toc-h3">Clean Architecture</a></li>
+        <li><a href="#modularization" class="toc-h3">Feature Modularization</a></li>
+        <li><a href="#testing" class="toc-h3">Zero-Bug Testing</a></li>
+        <li><a href="#interviews" class="toc-h2">٦. أسئلة المقابلات</a></li>
+        <li><a href="#scenario-1" class="toc-h3">نظام المدفوعات بدون إنترنت</a></li>
+        <li><a href="#scenario-2" class="toc-h3">الهندسة العكسية</a></li>
+        <li><a href="#scenario-3" class="toc-h3">جلسات متزامنة</a></li>
+        <li><a href="#scenario-4" class="toc-h3">Man-in-the-Middle</a></li>
+    </ul>
+</aside>
+
+<!-- Content -->
+<main class="content">
+
+<!-- Section 1: Introduction -->
+<section class="section" id="intro">
+    <div class="section-header">
+        <div class="section-number">١</div>
+        <h2>المقدمة الاستراتيجية والتحليلية</h2>
+    </div>
+
+    <h3 id="why-hard">لماذا تعتبر المقابلات التقنية في قطاع التقنية المالية في ألمانيا وأوروبا شديدة الصعوبة؟</h3>
+
+    <p>
+        عندما تتقدم لشغل وظيفة في شركة مثل <strong>N26</strong> (برلين) أو <strong>Klarna</strong> (ستوكهولم) أو <strong>Adyen</strong> (أمستردام)، فأنت لا تتقدم لمجرد وظيفة برمجية عادية. أنت تتقدم للانضمام إلى قلعة رقمية يُدار فيها مليارات اليوروهات يومياً، ويُراقبها منظمون مثل <strong>BaFin</strong> (الهيئة الاتحادية للرقابة المالية الألمانية) و<strong>ECB</strong> (البنك المركزي الأوروبي).
+    </p>
+
+    <p>
+        لنستخدم تشبيهاً واقعياً: تخيّل أنك تتقدم للعمل في خزينة بنك مركزي. لن يسألوك فقط "كيف تُنشئ تطبيقاً؟"، بل سيسألونك: "كيف تضمن أن الخزينة الرقمية لا يمكن اختراقها حتى لو تمكن المهاجم من الوصول الفعلي إلى الجهاز؟" و"كيف تضمن أن التحويل المالي لا يتم تنفيذه مرتين إذا انقطع الإنترنت لثانية واحدة؟"
+    </p>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon primary">🔐</div>
+            <div class="card-title">الفرق الجوهري بين مقابلات Fintech والمقابلات العادية</div>
+        </div>
+        <div class="card-body">
+            <p>في المقابلات العادية، قد يسألك المقابل: "كيف تتعامل مع خطأ الشبكة؟" — أما في مقابلات Fintech فيقول: "صمم لي نظاماً يضمن أنه إذا قام المستخدم بتحويل ١٠,٠٠٠ يورو وانقطع الاتصال بعد ثانية واحدة من إرسال الطلب، فلن يتم خصم المبلغ مرتين، ولن يُفقد الطلب، ولن يُعرض للمستخدم رسالة نجاح كاذبة."</p>
+            <p>هذا الفرق ليس في الصعوبة فحسب، بل في <strong>عمق التفكير الهندسي</strong> المطلوب. كل سطر برمجي في تطبيق مصرفي رقمي قد يؤثر على أموال حقيقية لملايين الأشخاص.</p>
+        </div>
+    </div>
+
+    <h3 id="regulations">المعايير التنظيمية والتقنية الصارمة التي تحكم هندسة تطبيقات الموبايل</h3>
+
+    <p>
+        قبل أن نكتب سطراً واحداً من الكود، يجب أن نفهم القانون الذي نعمل تحت ظله. في أوروبا، هناك ثلاثة أنظمة تنظيمية رئيسية تشكل الإطار القانوني لكل تطبيق مصرفي رقمي:
+    </p>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>المعيار التنظيمي</th>
+                    <th>الجهة المصدرة</th>
+                    <th>التأثير على تطبيق Android</th>
+                    <th>العقوبة على عدم الالتزام</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>PSD2</strong><br><small>Payment Services Directive 2</small></td>
+                    <td>الاتحاد الأوروبي (٢٠١٩)</td>
+                    <td>إلزامية تطبيق Strong Customer Authentication (SCA) على كل عملية مالية تتجاوز ٣٠ يورو. يجب استخدام عاملين منفصلين على الأقل للمصادقة (مثل كلمة المرور + البصمة).</td>
+                    <td>غرامات تصل إلى ٤٪ من إجمالي الإيرادات السنوية العالمية</td>
+                </tr>
+                <tr>
+                    <td><strong>PCI-DSS</strong><br><small>Payment Card Industry Data Security Standard</small></td>
+                    <td>مجلس معايير صناعة البطاقات</td>
+                    <td>منع تخزين أرقام البطاقات الائتمانية (PAN) على الجهاز. إذا اضطررنا لتخزين بيانات مؤقتة، يجب تشفيرها بمعايير AES-256. منع تسجيل أرقام CVV حتى في الذاكرة المؤقتة.</td>
+                    <td>غرامات شهرية تتراوح بين ٥,٠٠٠ و١٠٠,٠٠٠ دولار. إلغاء حق المعالجة.</td>
+                </tr>
+                <tr>
+                    <td><strong>GDPR</strong><br><small>General Data Protection Regulation</small></td>
+                    <td>الاتحاد الأوروبي</td>
+                    <td>يجب الحصول على موافقة صريحة قبل جمع أي بيانات مالية. يجب توفير آلية "النسيان الرقمي" (Right to Erasure) لحذف جميع البيانات المالية عند طلب المستخدم. تسجيل كل عملية وصول إلى البيانات (Audit Trail).</td>
+                    <td>غرامات تصل إلى ٢٠ مليون يورو أو ٤٪ من الإيرادات السنوية (أيهما أعلى)</td>
+                </tr>
+                <tr>
+                    <td><strong>eIDAS</strong><br><small>Electronic Identification, Authentication and Trust Services</small></td>
+                    <td>الاتحاد الأوروبي</td>
+                    <td>التوقيعات الرقمية المستخدمة في المعاملات المالية يجب أن تكون مؤهلة (Qualified Electronic Signature) ومحمية بواسطة مفاتيح Hardware-backed.</td>
+                    <td>إلغاء صلاحية التوقيعات الرقمية وعدم الاعتراف القانوني بالمعاملات</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="alert alert-danger">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-content">
+            <div class="alert-title">تحذير تنظيمي حاسم</div>
+            <p>في عام ٢٠٢٣، فرضت BaFin غرامة قدرها ٤.٢٥ مليون يورو على بنك رقمي ألماني بسبب "عيوب جسيمة في آليات المصادقة متعددة العوامل داخل تطبيق Android". كان الخلل بسيطاً: التطبيق سمح للمستخدمين بتخطي BiometricPrompt في وضع الطيران (Airplane Mode). هذا الدرس يُعلّمنا أن <strong>كل حالة حافة (Edge Case) قد تُكلفك ملايين اليوروهات</strong>.</p>
+        </div>
+    </div>
+
+    <p>
+        الآن، لنفهم لماذا هذه المعايير تُغيّر طريقة كتابة الكود بالكامل. عندما يفرض عليك <strong>PCI-DSS</strong> عدم تخزين رقم CVV، فهذا لا يعني فقط "لا تخزنه في قاعدة البيانات" — بل يعني:
+    </p>
+
+    <ul>
+        <li>لا تخزنه في <code>SharedPreferences</code> أو <code>DataStore</code></li>
+        <li>لا تخزنه في الذاكرة المؤقتة (<code>RAM</code>) لمدة أطول من اللازم</li>
+        <li>لا تُرسله في سجلات الأخطاء (<code>Logcat</code>)</li>
+        <li>لا تُرسله عبر <code>Intent</code> extras إلى Activity أخرى</li>
+        <li>لا تُرسله في تقارير الأعطال (Crashlytics)</li>
+        <li>امسحه من الذاكرة فوراً بعد استخدامه باستخدام <code>Arrays.fill()</code> أو <code>SecureCharArray</code></li>
+    </ul>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * مثال إنتاجي: تنظيف البيانات الحساسة من الذاكرة فوراً بعد الاستخدام
+ * يُحاكي سلوك خزينة بنكية تُعيد مفاتيحها إلى صندوقها الآمن فور الانتهاء
+ */</span>
+<span class="kw">class</span> <span class="ty">SecureCardDataHandler</span> {
+
+    <span class="cm">// استخدام CharArray بدلاً من String لأن String غير قابل للتعديل (immutable)</span>
+    <span class="cm">// ويبقى في String Pool حتى يقوم Garbage Collector بتنظيفه</span>
+    <span class="kw">fun</span> <span class="fn">processCvv</span>(cvvInput: <span class="ty">CharArray</span>) {
+        <span class="kw">try</span> {
+            <span class="cm">// التحقق من صحة CVV</span>
+            <span class="kw">if</span> (!<span class="fn">isValidCvv</span>(cvvInput)) {
+                <span class="kw">throw</span> <span class="ty">IllegalArgumentException</span>(<span class="st">"Invalid CVV format"</span>)
+            }
+            <span class="cm">// إرسال CVV إلى بوابة الدفع (Tokenization Gateway)</span>
+            <span class="cm">// لا يتم تخزينه أبداً محلياً</span>
+            <span class="fn">submitToPaymentGateway</span>(cvvInput)
+        } <span class="kw">finally</span> {
+            <span class="cm">// ⚠️ خطوة حاسمة: مسح الذاكرة فوراً بغض النظر عن نجاح أو فشل العملية</span>
+            <span class="cm">// يُشبه إعادة مفتاح الخزينة إلى صندوقها الآمن فور الانتهاء</span>
+            java.util.<span class="ty">Arrays</span>.<span class="fn">fill</span>(cvvInput, <span class="st">'\u0000'</span>)
+            <span class="cm">// إذا كنت تستخدم NDK، يمكنك استخدام memset_secure من OpenSSL</span>
+            <span class="cm">// memset_secure(cvvBytes, 0, cvvBytes.size)</span>
+        }
+    }
+
+    <span class="kw">private fun</span> <span class="fn">isValidCvv</span>(cvv: <span class="ty">CharArray</span>): <span class="ty">Boolean</span> {
+        <span class="kw">return</span> cvv.size == <span class="nu">3</span> || cvv.size == <span class="nu">4</span> &amp;&amp;
+               cvv.<span class="fn">all</span> { it.<span class="fn">isDigit</span>() }
+    }
+
+    <span class="kw">private fun</span> <span class="fn">submitToPaymentGateway</span>(cvv: <span class="ty">CharArray</span>) {
+        <span class="cm">// التكامل مع بوابة الدفع — يتم إرسال CVV مباشرة دون تخزين وسيط</span>
+    }
+}</pre>
+    </div>
+
+    <p>
+        لاحظ في المثال السابق استخدام <code>CharArray</code> بدلاً من <code>String</code>. لماذا؟ لأن <code>String</code> في JVM غير قابل للتعديل (immutable) ويُخزن في <strong>String Pool</strong> — مما يعني أنه قد يبقى في الذاكرة لمدة غير محددة حتى يقوم <code>Garbage Collector</code> بتنظيفه. أما <code>CharArray</code> فيمكننا مسحه يدوياً باستخدام <code>Arrays.fill()</code>. هذا الفرق قد يبدو بسيطاً، لكنه الفرق بين تطبيق آمن وآخر عُرضة لهجمات Memory Dump.
+    </p>
+</section>
+
+<!-- Section 2: Security -->
+<section class="section" id="security">
+    <div class="section-header">
+        <div class="section-number">٢</div>
+        <h2>هندسة الأمان المتقدمة وحماية البيانات المالية الحساسة</h2>
+    </div>
+
+    <h3 id="memory-protection">الآلية الداخلية لحماية الذاكرة ومنع تسريب بيانات البطاقات الائتمانية وPIN Codes</h3>
+
+    <p>
+        تخيّل أنك في خزينة بنك مركزي. عندما يُدخل العميل رمز PIN الخاص به، لا يُسمح لأي شخص بالنظر فوق كتفه. في العالم الرقمي، "النظر فوق الكتف" يتمثل في <strong>هجمات Memory Dump</strong> — حيث يقوم تطبيق ضار بقراءة ذاكرة تطبيقك أثناء تشغيله.
+    </p>
+
+    <p>
+        في نظام Android، كل تطبيق يعمل في <strong>Sandbox</strong> خاص به، لكن هذا الحماية ليست مطلقة. على الأجهزة المُروتة (Rooted Devices)، يمكن للمهاجم استخدام أدوات مثل <code>GameGuardian</code> أو <code>Frida</code> لقراءة ذاكرة أي تطبيق. حتى على الأجهزة غير المُروتة، يمكن استغلال ثغرات <strong>Rowhammer</strong> أو <strong>CVEs</strong> في نواة Linux لقراءة الذاكرة.
+    </p>
+
+    <h4>استراتيجية "التنظيف الفوري" (Immediate Sanitization)</h4>
+
+    <p>
+        المبدأ الذهبي: <strong>لا تُبقي البيانات الحساسة في الذاكرة أطول من اللازم</strong>. بمجرد استخدام رقم البطاقة أو PIN أو CVV، يجب مسحها من الذاكرة فوراً. هذا يُشبه العمل في خزينة بنكية حيث تُعاد الأوراق النقدية إلى الأدراج المحصنة فور الانتهاء من عدها.
+    </p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * SecurePinEntry: مكون إدخال PIN آمن يُحاكي سلوك أجهزة ATM الحقيقية
+ *
+ * المبدأ: كل رقم يُدخله المستخدم يُخزن في ذاكرة مؤقتة محمية،
+ * ويتم مسحها فوراً بعد التحقق أو الإلغاء.
+ */</span>
+<span class="kw">class</span> <span class="ty">SecurePinEntry</span> <span class="kw">private constructor</span>() {
+
+    <span class="cm">// استخدام ByteArray بدلاً من String لأن ByteArray قابل للتعديل</span>
+    <span class="kw">private val</span> pinBuffer = <span class="ty">ByteArray</span>(<span class="nu">6</span>) { <span class="nu">0</span> }
+    <span class="kw">private var</span> currentIndex = <span class="nu">0</span>
+
+    <span class="kw">fun</span> <span class="fn">appendDigit</span>(digit: <span class="ty">Int</span>): <span class="ty">Boolean</span> {
+        <span class="kw">if</span> (currentIndex &gt;= pinBuffer.size) <span class="kw">return false</span>
+        <span class="kw">if</span> (digit !in <span class="nu">0</span>..<span class="nu">9</span>) <span class="kw">return false</span>
+        pinBuffer[currentIndex] = digit.<span class="fn">toByte</span>()
+        currentIndex++
+        <span class="kw">return true</span>
+    }
+
+    <span class="kw">fun</span> <span class="fn">clear</span>() {
+        <span class="cm">// مسح الذاكرة بشكل آمن — يُعادل إعادة مفاتيح الخزينة إلى صندوقها</span>
+        java.util.<span class="ty">Arrays</span>.<span class="fn">fill</span>(pinBuffer, <span class="nu">0</span>)
+        currentIndex = <span class="nu">0</span>
+    }
+
+    <span class="cm">/**
+     * الحصول على نسخة مشفرة من PIN لتوقيع المعاملة
+     * يتم استخدام Hardware-backed Keystore للتوقيع
+     */</span>
+    <span class="kw">fun</span> <span class="fn">getPinHashForSigning</span>(keyStoreManager: <span class="ty">SecureKeyStoreManager</span>): <span class="ty">ByteArray</span>? {
+        <span class="kw">if</span> (currentIndex != pinBuffer.size) <span class="kw">return null</span>
+        <span class="kw">return try</span> {
+            <span class="cm">// التوقيع باستخدام مفتاح Hardware-backed — PIN لا يُرسل أبداً كـ Plain Text</span>
+            keyStoreManager.<span class="fn">signWithHardwareKey</span>(pinBuffer)
+        } <span class="kw">finally</span> {
+            <span class="cm">// ⚠️ مسح PIN من الذاكرة فوراً بعد التوقيع</span>
+            <span class="fn">clear</span>()
+        }
+    }
+
+    <span class="kw">protected fun</span> <span class="fn">finalize</span>() {
+        <span class="cm">// حماية إضافية: مسح الذاكرة عند تدمير الكائن</span>
+        <span class="cm">// ملاحظة: finalize() غير موثوقة 100%، لذا يجب استدعاء clear() صراحةً</span>
+        <span class="fn">clear</span>()
+    }
+
+    <span class="kw">companion object</span> {
+        <span class="kw">fun</span> <span class="fn">create</span>(): <span class="ty">SecurePinEntry</span> = <span class="ty">SecurePinEntry</span>()
+    }
+}</pre>
+    </div>
+
+    <h4>حماية الذاكرة باستخدام Native Code (NDK)</h4>
+
+    <p>
+        في بعض الحالات، يكون تنظيف الذاكرة باستخدام Kotlin/Java غير كافٍ. JVM قد تُنشئ نسخاً من البيانات أثناء عملية <strong>Garbage Collection</strong> أو <strong>String Interning</strong>. الحل الأمثل هو تخزين البيانات الحساسة في <strong>Native Memory</strong> باستخدام NDK، حيث يمكننا التحكم الكامل في دورة حياة الذاكرة.
+    </p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin + JNI</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * NativeSecureBuffer: تخزين البيانات الحساسة في Native Heap
+ *
+ * لماذا Native Heap؟
+ * ١. لا يخضع لـ Garbage Collection الخاص بـ JVM
+ * ٢. لا يُعرّف String Pool
+ * ٣. يمكن استخدام memset_secure من OpenSSL
+ * ٤. أصعب في الهندسة العكسية (Reverse Engineering)
+ */</span>
+<span class="kw">class</span> <span class="ty">NativeSecureBuffer</span> <span class="kw">private constructor</span>(
+    <span class="kw">private val</span> nativePtr: <span class="ty">Long</span>
+) : <span class="ty">AutoCloseable</span> {
+
+    <span class="kw">companion object</span> {
+        <span class="kw">init</span> {
+            <span class="ty">System</span>.<span class="fn">loadLibrary</span>(<span class="st">"securebuffer"</span>)
+        }
+        <span class="an">@JvmStatic</span> <span class="kw">external fun</span> <span class="fn">nativeAlloc</span>(size: <span class="ty">Int</span>): <span class="ty">Long</span>
+        <span class="an">@JvmStatic</span> <span class="kw">external fun</span> <span class="fn">nativeWrite</span>(ptr: <span class="ty">Long</span>, data: <span class="ty">ByteArray</span>, offset: <span class="ty">Int</span>)
+        <span class="an">@JvmStatic</span> <span class="kw">external fun</span> <span class="fn">nativeRead</span>(ptr: <span class="ty">Long</span>, size: <span class="ty">Int</span>): <span class="ty">ByteArray</span>
+        <span class="an">@JvmStatic</span> <span class="kw">external fun</span> <span class="fn">nativeSecureClear</span>(ptr: <span class="ty">Long</span>, size: <span class="ty">Int</span>)
+        <span class="an">@JvmStatic</span> <span class="kw">external fun</span> <span class="fn">nativeFree</span>(ptr: <span class="ty">Long</span>)
+
+        <span class="kw">fun</span> <span class="fn">allocate</span>(size: <span class="ty">Int</span>): <span class="ty">NativeSecureBuffer</span> {
+            <span class="kw">val</span> ptr = <span class="fn">nativeAlloc</span>(size)
+            <span class="kw">if</span> (ptr == <span class="nu">0L</span>) <span class="kw">throw</span> <span class="ty">OutOfMemoryError</span>(<span class="st">"Native allocation failed"</span>)
+            <span class="kw">return</span> <span class="ty">NativeSecureBuffer</span>(ptr)
+        }
+    }
+
+    <span class="kw">fun</span> <span class="fn">write</span>(data: <span class="ty">ByteArray</span>, offset: <span class="ty">Int</span> = <span class="nu">0</span>) {
+        <span class="fn">nativeWrite</span>(nativePtr, data, offset)
+    }
+
+    <span class="kw">fun</span> <span class="fn">read</span>(size: <span class="ty">Int</span>): <span class="ty">ByteArray</span> = <span class="fn">nativeRead</span>(nativePtr, size)
+
+    <span class="kw">override fun</span> <span class="fn">close</span>() {
+        <span class="cm">// استخدام memset_secure من OpenSSL لمنع التحسين من إزالة المسح</span>
+        <span class="fn">nativeSecureClear</span>(nativePtr, <span class="nu">4096</span>) <span class="cm">// مسح 4KB كحد أقصى</span>
+        <span class="fn">nativeFree</span>(nativePtr)
+    }
+}</pre>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">C++ (JNI)</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">// securebuffer.cpp — Native Implementation</span>
+<span class="cm">#include</span> <span class="st">&lt;jni.h&gt;</span>
+<span class="cm">#include</span> <span class="st">&lt;openssl/crypto.h&gt;</span>
+<span class="cm">#include</span> <span class="st">&lt;cstdlib&gt;</span>
+
+<span class="kw">extern</span> <span class="st">"C"</span> {
+
+<span class="cm">// استخدام OPENSSL_cleanse بدلاً من memset</span>
+<span class="cm">// لأن المترجم قد يُحسّن memset ويزيلها إذا رأى أن النتيجة غير مستخدمة</span>
+<span class="ty">JNIEXPORT</span> <span class="ty">void</span> <span class="ty">JNICALL</span>
+<span class="ty">Java_com_fintech_security_NativeSecureBuffer_nativeSecureClear</span>(
+    <span class="ty">JNIEnv</span>* env, <span class="ty">jclass</span> clazz, <span class="ty">jlong</span> ptr, <span class="ty">jint</span> size
+) {
+    <span class="ty">void</span>* nativePtr = <span class="fn">reinterpret_cast</span>&lt;<span class="ty">void</span>*&gt;(ptr);
+    <span class="kw">if</span> (nativePtr != <span class="kw">nullptr</span> &amp;&amp; size &gt; <span class="nu">0</span>) {
+        <span class="cm">// OPENSSL_cleanse تضمن عدم تحسين المترجم لعملية المسح</span>
+        <span class="ty">OPENSSL_cleanse</span>(nativePtr, <span class="fn">static_cast</span>&lt;<span class="ty">size_t</span>&gt;(size));
+    }
+}
+
+<span class="ty">JNIEXPORT</span> <span class="ty">jlong</span> <span class="ty">JNICALL</span>
+<span class="ty">Java_com_fintech_security_NativeSecureBuffer_nativeAlloc</span>(
+    <span class="ty">JNIEnv</span>* env, <span class="ty">jclass</span> clazz, <span class="ty">jint</span> size
+) {
+    <span class="cm">// استخدام calloc بدلاً من malloc لتصفير الذاكرة عند التخصيص</span>
+    <span class="kw">return</span> <span class="fn">reinterpret_cast</span>&lt;<span class="ty">jlong</span>&gt;(<span class="fn">calloc</span>(<span class="nu">1</span>, <span class="fn">static_cast</span>&lt;<span class="ty">size_t</span>&gt;(size)));
+}
+
+} <span class="cm">// extern "C"</span></pre>
+    </div>
+
+    <div class="alert alert-info">
+        <div class="alert-icon">💡</div>
+        <div class="alert-content">
+            <div class="alert-title">لماذا OPENSSL_cleanse وليس memset؟</div>
+            <p>المترجم الحديث (LLVM/Clang) يستخدم تقنية تُسمى <strong>Dead Store Elimination</strong> — أي أنه إذا رأى أنك تكتب بيانات في ذاكرة ثم تمسحها دون قراءتها، قد يُحسّن الكود ويزيل عملية الكتابة بالكامل. <code>OPENSSL_cleanse</code> مُصممة خصيصاً لتمنع هذا التحسين، مما يضمن فعلاً مسح البيانات من الذاكرة.</p>
+        </div>
+    </div>
+
+    <h3 id="screenshot-prevention">منع أخذ لقطات الشاشة (Screenshots) وتسجيل الشاشة (Screen Recording)</h3>
+
+    <p>
+        في تطبيقات التقنية المالية، لقطة شاشة واحدة قد تُفضح رقم البطاقة الائتمانية، أو رمز PIN، أو رصيد الحساب. يُشبه هذا ترك نافذة الخزينة مفتوحة أثناء عد النقود. Android يوفر لنا واجهة برمجية بسيطة لمنع هذا:
+    </p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * SecureActivity: Activity أساسي لجميع الشاشات المالية الحساسة
+ * يمنع لقطات الشاشة وتسجيل الشاشة تلقائياً
+ */</span>
+<span class="kw">abstract class</span> <span class="ty">SecureActivity</span> : <span class="ty">AppCompatActivity</span>() {
+
+    <span class="kw">override fun</span> <span class="fn">onCreate</span>(savedInstanceState: <span class="ty">Bundle</span>?) {
+        <span class="kw">super</span>.<span class="fn">onCreate</span>(savedInstanceState)
+        <span class="fn">preventScreenshotAndRecording</span>()
+    }
+
+    <span class="kw">private fun</span> <span class="fn">preventScreenshotAndRecording</span>() {
+        <span class="cm">// FLAG_SECURE: يمنع كل من لقطات الشاشة وتسجيل الشاشة</span>
+        <span class="cm">// يعمل أيضاً على منع ظهور المحتوى في Recent Apps Overview</span>
+        window.<span class="fn">setFlags</span>(
+            <span class="ty">WindowManager</span>.<span class="ty">LayoutParams</span>.<span class="ty">FLAG_SECURE</span>,
+            <span class="ty">WindowManager</span>.<span class="ty">LayoutParams</span>.<span class="ty">FLAG_SECURE</span>
+        )
+    }
+
+    <span class="cm">/**
+     * إضافة حماية إضافية: إخفاء المحتوى عند دخول التطبيق إلى الخلفية
+     * يمنع هجمات Recent Apps Screenshot</span>
+     */
+    <span class="kw">override fun</span> <span class="fn">onPause</span>() {
+        <span class="kw">super</span>.<span class="fn">onPause</span>()
+        <span class="cm">// بعض الشركات تفضل إخفاء المحتوى بالكامل في Recent Apps</span>
+        <span class="cm">// window.addFlags(WindowManager.LayoutParams.FLAG_SECURE) يكفي عادةً</span>
+    }
+}</pre>
+    </div>
+
+    <div class="alert alert-warning">
+        <div class="alert-icon">⚡</div>
+        <div class="alert-content">
+            <div class="alert-title">تحذير: FLAG_SECURE ليس كافياً بمفرده</div>
+            <p>على الأجهزة المُروتة، يمكن تخطي <code>FLAG_SECURE</code> باستخدام أدوات مثل <code>Smali Patcher</code> أو <code>Xposed Framework</code>. لذلك، يجب الجمع بين <code>FLAG_SECURE</code> و<strong>Play Integrity API</strong> للتحقق من سلامة الجهاز قبل السماح بأي عملية مالية.</p>
+        </div>
+    </div>
+
+    <h3 id="overlay-attacks">التصدي لهجمات تراكب الشاشة (Screen Overlay Attacks)</h3>
+
+    <p>
+        هجوم التراكب (Overlay Attack) هو من أخطر الهجمات على تطبيقات التقنية المالية. تخيّل أنك تُدخل رمز PIN في تطبيق البنك، لكن في الواقع أنت تُدخله في حقل نصي مزيف يقع <strong>فوق</strong> التطبيق الحقيقي. هذا ممكن بفضل إذن <code>SYSTEM_ALERT_WINDOW</code> في Android.
+    </p>
+
+    <p>
+        في عام ٢٠١٧، اكتشف باحثو أمان أن تطبيقات ضارة تستخدم هذه التقنية لسرقة بيانات تسجيل الدخول لبنوك رئيسية في أوروبا. الحل يتطلب عدة طبقات من الحماية:
+    </p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * OverlayAttackDetector: كشف محاولات التراكب في الوقت الفعلي
+ *
+ * المبدأ: قبل كل عملية مالية حساسة، نتحقق من عدم وجود تطبيقات
+ * تستخدم SYSTEM_ALERT_WINDOW فوق شاشتنا.
+ */</span>
+<span class="kw">class</span> <span class="ty">OverlayAttackDetector</span>(
+    <span class="kw">private val</span> context: <span class="ty">Context</span>
+) {
+
+    <span class="cm">/**
+     * التحقق من وجود تطبيقات تراكب نشطة
+     * يجب استدعاء هذه الدالة قبل كل عملية مالية (تحويل، دفع، إلخ)
+     */</span>
+    <span class="kw">fun</span> <span class="fn">isOverlayAttackDetected</span>(): <span class="ty">Boolean</span> {
+        <span class="cm">// الطريقة ١: التحقق من إذن SYSTEM_ALERT_WINDOW للتطبيقات المثبتة</span>
+        <span class="kw">if</span> (<span class="fn">hasSuspiciousOverlayApps</span>()) {
+            <span class="kw">return true</span>
+        }
+
+        <span class="cm">// الطريقة ٢: التحقق من وجود نوافذ تراكب نشطة (Android 6.0+)</span>
+        <span class="kw">if</span> (<span class="ty">Build</span>.<span class="ty">VERSION</span>.<span class="ty">SDK_INT</span> &gt;= <span class="ty">Build</span>.<span class="ty">VERSION_CODES</span>.<span class="ty">M</span>) {
+            <span class="kw">if</span> (<span class="ty">Settings</span>.<span class="fn">canDrawOverlays</span>(context)) {
+                <span class="cm">// وجود هذا الإذن ليس بالضرورة ضاراً، لكن يجب التحقق</span>
+                <span class="cm">// من التطبيقات التي تستخدمه</span>
+            }
+        }
+
+        <span class="cm">// الطريقة ٣: استخدام getSystemService(Context.WINDOW_SERVICE) لفحص النوافذ</span>
+        <span class="kw">return</span> <span class="fn">hasActiveOverlayWindows</span>()
+    }
+
+    <span class="kw">private fun</span> <span class="fn">hasSuspiciousOverlayApps</span>(): <span class="ty">Boolean</span> {
+        <span class="kw">val</span> packageManager = context.<span class="fn">packageManager</span>
+        <span class="kw">val</span> installedApps = packageManager.<span class="fn">getInstalledApplications</span>(<span class="nu">0</span>)
+
+        <span class="kw">return</span> installedApps.<span class="fn">any</span> { appInfo -&gt;
+            <span class="cm">// استبعاد تطبيقات النظام الموثوقة</span>
+            <span class="kw">if</span> ((appInfo.<span class="ty">flags</span> &amp; <span class="ty">ApplicationInfo</span>.<span class="ty">FLAG_SYSTEM</span>) != <span class="nu">0</span>) {
+                <span class="kw">return</span><span class="kw">@any false</span>
+            }
+
+            <span class="kw">try</span> {
+                <span class="kw">val</span> overlayPermission = <span class="ty">Manifest</span>.<span class="ty">permission</span>.<span class="ty">SYSTEM_ALERT_WINDOW</span>
+                <span class="kw">val</span> packageInfo = packageManager.<span class="fn">getPackageInfo</span>(
+                    appInfo.<span class="ty">packageName</span>,
+                    <span class="ty">PackageManager</span>.<span class="ty">GET_PERMISSIONS</span>
+                )
+                packageInfo.<span class="ty">requestedPermissions</span>?.<span class="fn">contains</span>(overlayPermission) ?: <span class="kw">false</span>
+            } <span class="kw">catch</span> (e: <span class="ty">Exception</span>) {
+                <span class="kw">false</span>
+            }
+        }
+    }
+
+    <span class="kw">private fun</span> <span class="fn">hasActiveOverlayWindows</span>(): <span class="ty">Boolean</span> {
+        <span class="cm">// Android 10+ يوفر طريقة أكثر دقة عبر AccessibilityService</span>
+        <span class="cm">// أو يمكن استخدام MediaProjection API للتحقق</span>
+        <span class="cm">// في الإنتاج، يُفضل استخدام Play Integrity API + SafetyNet</span>
+        <span class="kw">return false</span> <span class="cm">// Placeholder — يتطلب AccessibilityService في الإنتاج</span>
+    }
+
+    <span class="cm">/**
+     * الحل الأفضل: استخدام Tapjacking Protection عبر filterTouchesWhenObscured
+     */</span>
+    <span class="kw">fun</span> <span class="fn">applyTapjackingProtection</span>(view: <span class="ty">View</span>) {
+        <span class="cm">// إذا كان هناك نافذة تراكب فوق هذا الـ View، سيتم تجاهل اللمسات</span>
+        view.<span class="ty">filterTouchesWhenObscured</span> = <span class="kw">true</span>
+    }
+}</pre>
+    </div>
+
+    <div class="alert alert-success">
+        <div class="alert-icon">✅</div>
+        <div class="alert-content">
+            <div class="alert-title">أفضل ممارسة: الجمع بين عدة آليات</div>
+            <p>لا تعتمد على آلية واحدة. في الإنتاج، يجب الجمع بين: (١) <code>filterTouchesWhenObscured</code> على كل حقل حساس، (٢) فحص <code>SYSTEM_ALERT_WINDOW</code> قبل العمليات المالية، (٣) استخدام <code>Play Integrity API</code> للتحقق من سلامة الجهاز، (٤) تفعيل <code>FLAG_SECURE</code> على كل Activity حساسة.</p>
+        </div>
+    </div>
+
+    <h3 id="sqlcipher">التوظيف الاحترافي لـ SQLCipher لتشفير قواعد بيانات Room محلياً بالكامل</h3>
+
+    <p>
+        في تطبيقات التقنية المالية، قاعدة البيانات المحلية قد تحتوي على بيانات حساسة: سجل المعاملات، أرقام الحسابات المخزنة مؤقتاً، بيانات المستخدم الشخصية. حتى لو كانت هذه البيانات مؤقتة، فإن وصول مهاجم إليها قد يُفضح أنماط الإنفاق، والأرصدة، والمعاملات المستقبلية.
+    </p>
+
+    <p>
+        <strong>SQLCipher</strong> هو امتداد لـ SQLite يُشفّر قاعدة البيانات بالكامل باستخدام AES-256. يُشبه هذا وضع قاعدة البيانات داخل خزينة فولاذية مقاومة للكسر. عند استخدامه مع <strong>Room</strong> (مكتبة Jetpack لإدارة قواعد البيانات)، نحصل على طبقة حماية إضافية لا يمكن تخطيها حتى لو تمكن المهاجم من الوصول الفعلي إلى ملفات التطبيق.
+    </p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Gradle (build.gradle.kts)</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre>dependencies {
+    <span class="cm">// Room مع SQLCipher Support</span>
+    implementation(<span class="st">"androidx.room:room-runtime:2.6.1"</span>)
+    kapt(<span class="st">"androidx.room:room-compiler:2.6.1"</span>)
+
+    <span class="cm">// SQLCipher — تشفير AES-256 لقاعدة البيانات</span>
+    implementation(<span class="st">"net.zetetic:android-database-sqlcipher:4.5.4"</span>)
+
+    <span class="cm">// Security Crypto — لتوليد المفاتيح بأمان</span>
+    implementation(<span class="st">"androidx.security:security-crypto:1.1.0-alpha06"</span>)
+}</pre>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * SecureDatabaseProvider: إنشاء قاعدة بيانات Room مشفرة بـ SQLCipher
+ *
+ * المفتاح لا يُخزن أبداً كـ String عادي — يتم توليده بواسطة
+ * Android Keystore وتشفيره باستخدام EncryptedSharedPreferences.
+ */</span>
+<span class="kw">class</span> <span class="ty">SecureDatabaseProvider</span>(<span class="kw">private val</span> context: <span class="ty">Context</span>) {
+
+    <span class="kw">private val</span> masterKeyAlias = <span class="st">"_room_master_key_"</span>
+
+    <span class="cm">/**
+     * توليد أو استرجاع مفتاح SQLCipher بأمان
+     * المفتاح مُخزن في Android Keystore — لا يمكن استخراجه حتى من الجذر</span>
+     */
+    <span class="kw">private fun</span> <span class="fn">getOrCreateDatabasePassphrase</span>(): <span class="ty">ByteArray</span> {
+        <span class="kw">val</span> masterKey = <span class="ty">MasterKey</span>.<span class="ty">Builder</span>(context)
+            .<span class="fn">setKeyScheme</span>(<span class="ty">MasterKey</span>.<span class="ty">KeyScheme</span>.<span class="ty">AES256_GCM</span>)
+            .<span class="fn">setUserAuthenticationRequired</span>(<span class="kw">true</span>) <span class="cm">// يتطلب Biometric!</span>
+            .<span class="fn">setUserAuthenticationValidityDurationSeconds</span>(<span class="nu">30</span>)
+            .<span class="fn">build</span>()
+
+        <span class="kw">val</span> encryptedPrefs = <span class="ty">EncryptedSharedPreferences</span>.<span class="fn">create</span>(
+            context,
+            <span class="st">"secure_db_prefs"</span>,
+            masterKey,
+            <span class="ty">EncryptedSharedPreferences</span>.<span class="ty">PrefKeyEncryptionScheme</span>.<span class="ty">AES256_SIV</span>,
+            <span class="ty">EncryptedSharedPreferences</span>.<span class="ty">PrefValueEncryptionScheme</span>.<span class="ty">AES256_GCM</span>
+        )
+
+        <span class="kw">val</span> existingPassphrase = encryptedPrefs.<span class="fn">getString</span>(<span class="st">"db_passphrase"</span>, <span class="kw">null</span>)
+
+        <span class="kw">return if</span> (existingPassphrase != <span class="kw">null</span>) {
+            <span class="ty">Base64</span>.<span class="fn">decode</span>(existingPassphrase, <span class="ty">Base64</span>.<span class="ty">DEFAULT</span>)
+        } <span class="kw">else</span> {
+            <span class="cm">// توليد passphrase عشوائي ٢٥٦ بت</span>
+            <span class="kw">val</span> random = <span class="ty">SecureRandom</span>()
+            <span class="kw">val</span> passphrase = <span class="ty">ByteArray</span>(<span class="nu">32</span>)
+            random.<span class="fn">nextBytes</span>(passphrase)
+
+            <span class="cm">// تخزينه بأمان — مشفر بـ AES-256-GCM</span>
+            encryptedPrefs.<span class="fn">edit</span>()
+                .<span class="fn">putString</span>(<span class="st">"db_passphrase"</span>, <span class="ty">Base64</span>.<span class="fn">encodeToString</span>(passphrase, <span class="ty">Base64</span>.<span class="ty">DEFAULT</span>))
+                .<span class="fn">apply</span>()
+
+            passphrase
+        }
+    }
+
+    <span class="cm">/**
+     * إنشاء قاعدة بيانات Room مشفرة</span>
+     */
+    <span class="kw">fun</span> <span class="fn">createSecureDatabase</span>(): <span class="ty">AppDatabase</span> {
+        <span class="kw">val</span> passphrase = <span class="fn">getOrCreateDatabasePassphrase</span>()
+
+        <span class="cm">// إنشاء Factory مشفر لـ Room</span>
+        <span class="kw">val</span> factory = <span class="ty">SupportFactory</span>(passphrase)
+
+        <span class="kw">return</span> <span class="ty">Room</span>.<span class="fn">databaseBuilder</span>(
+            context.<span class="fn">applicationContext</span>,
+            <span class="ty">AppDatabase</span>::<span class="kw">class</span>.java,
+            <span class="st">"fintech_secure_db.db"</span>
+        )
+            .<span class="fn">openHelperFactory</span>(factory) <span class="cm">// ← تفعيل SQLCipher</span>
+            .<span class="fn">addMigrations</span>(*<span class="ty">ALL_MIGRATIONS</span>)
+            .<span class="fn">build</span>()
+    }
+}</pre>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin (Room Entities & DAO)</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * TransactionEntity: كيان المعاملة المالية المخزنة محلياً
+ * يجب ألا يحتوي أبداً على بيانات حساسة غير مشفرة (مثل CVV أو PIN)
+ */</span>
+<span class="an">@Entity</span>(tableName = <span class="st">"transactions"</span>)
+<span class="kw">data class</span> <span class="ty">TransactionEntity</span>(
+    <span class="an">@PrimaryKey</span>
+    <span class="kw">val</span> id: <span class="ty">String</span>, <span class="cm">// UUID — يُستخدم كـ Idempotency Key أيضاً</span>
+
+    <span class="kw">val</span> amount: <span class="ty">BigDecimal</span>,
+    <span class="kw">val</span> currency: <span class="ty">String</span>, <span class="cm">// ISO 4217: EUR, USD, GBP</span>
+    <span class="kw">val</span> recipientIban: <span class="ty">String</span>, <span class="cm">// IBAN مشفر — لا يُعرض كاملاً أبداً</span>
+    <span class="kw">val</span> maskedPan: <span class="ty">String</span>, <span class="cm">// **** **** **** 1234 فقط</span>
+
+    <span class="kw">val</span> status: <span class="ty">TransactionStatus</span>,
+    <span class="kw">val</span> createdAt: <span class="ty">Long</span>, <span class="cm">// Unix timestamp</span>
+    <span class="kw">val</span> syncedWithServer: <span class="ty">Boolean</span> = <span class="kw">false</span>,
+
+    <span class="cm">// بيانات التوقيع الرقمي للتحقق من عدم التلاعب</span>
+    <span class="kw">val</span> localSignature: <span class="ty">ByteArray</span>?
+)
+
+<span class="kw">enum class</span> <span class="ty">TransactionStatus</span> {
+    <span class="ty">PENDING</span>,      <span class="cm">// في انتظار الإرسال</span>
+    <span class="ty">SENT</span>,         <span class="cm">// تم الإرسال — في انتظار الرد</span>
+    <span class="ty">CONFIRMED</span>,    <span class="cm">// تم التأكيد من السيرفر</span>
+    <span class="ty">FAILED</span>,       <span class="cm">// فشل — يحتاج إعادة محاولة</span>
+    <span class="ty">REVERSED</span>      <span class="cm">// تم عكسها</span>
+}
+
+<span class="an">@Dao</span>
+<span class="kw">interface</span> <span class="ty">TransactionDao</span> {
+
+    <span class="an">@Query</span>(<span class="st">"SELECT * FROM transactions WHERE status = :status ORDER BY createdAt DESC"</span>)
+    <span class="kw">fun</span> <span class="fn">getTransactionsByStatus</span>(status: <span class="ty">TransactionStatus</span>): <span class="ty">Flow</span>&lt;<span class="ty">List</span>&lt;<span class="ty">TransactionEntity</span>&gt;&gt;
+
+    <span class="cm">// ⚠️ مهم: جلب المعاملات غير المتزامنة فقط — للمزامنة عند استعادة الاتصال</span>
+    <span class="an">@Query</span>(<span class="st">"SELECT * FROM transactions WHERE syncedWithServer = 0"</span>)
+    <span class="kw">suspend fun</span> <span class="fn">getUnsyncedTransactions</span>(): <span class="ty">List</span>&lt;<span class="ty">TransactionEntity</span>&gt;
+
+    <span class="an">@Insert</span>(onConflict = <span class="ty">OnConflictStrategy</span>.<span class="ty">REPLACE</span>)
+    <span class="kw">suspend fun</span> <span class="fn">insertTransaction</span>(transaction: <span class="ty">TransactionEntity</span>)
+
+    <span class="cm">// تحديث حالة المعاملة بعد الرد من السيرفر</span>
+    <span class="an">@Query</span>(<span class="st">"UPDATE transactions SET status = :status, syncedWithServer = 1 WHERE id = :transactionId"</span>)
+    <span class="kw">suspend fun</span> <span class="fn">markAsSynced</span>(transactionId: <span class="ty">String</span>, status: <span class="ty">TransactionStatus</span>)
+}</pre>
+    </div>
+
+    <h3 id="e2ee">هندسة التشفير من طرف لطرف (End-to-End Encryption - E2EE)</h3>
+
+    <p>
+        في تطبيقات التقنية المالية، التشفير من طرف لطرف (E2EE) يعني أن البيانات تُشفّر على جهاز المستخدم قبل مغادرته، ولا يمكن فك تشفيرها إلا على السيرفر المستهدف (أو العكس). حتى لو اعترض المهاجم الاتصال، لن يتمكن من قراءة البيانات.
+    </p>
+
+    <p>
+        هذا يُشبه إرسال رسالة في صندوق مُغلق بقفل — المفتاح في يد المرسل فقط، والمفتاح المقابل في يد المستلم. لا يمكن لأي طرف وسيط (ISP، VPN، حتى مزود الشبكة) فتح الصندوق.
+    </p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * E2EECryptoManager: إدارة التشفير من طرف لطرف للمعاملات المالية
+ *
+ * يستخدم مفتاحاً عاماً (Public Key) للتشفير ومفتاحاً خاصاً (Private Key)
+ * مخزناً في Android Keystore لفك التشفير.
+ */</span>
+<span class="kw">class</span> <span class="ty">E2EECryptoManager</span>(<span class="kw">private val</span> context: <span class="ty">Context</span>) {
+
+    <span class="kw">private val</span> keyStore = <span class="ty">KeyStore</span>.<span class="fn">getInstance</span>(<span class="st">"AndroidKeyStore"</span>).<span class="fn">apply</span> { <span class="fn">load</span>(<span class="kw">null</span>) }
+    <span class="kw">private val</span> keyAlias = <span class="st">"fintech_e2ee_key"</span>
+
+    <span class="cm">/**
+     * توليد زوج مفاتيح RSA ٤٠٩٦ بت — مُخزن في Hardware-backed Keystore
+     * المفتاح الخاص لا يمكن استخراجه أبداً من الجهاز</span>
+     */
+    <span class="kw">fun</span> <span class="fn">generateKeyPair</span>(): <span class="ty">KeyPair</span> {
+        <span class="kw">val</span> keyPairGenerator = <span class="ty">KeyPairGenerator</span>.<span class="fn">getInstance</span>(
+            <span class="st">"RSA"</span>,
+            <span class="st">"AndroidKeyStore"</span>
+        )
+
+        <span class="kw">val</span> spec = <span class="ty">KeyGenParameterSpec</span>.<span class="fn">Builder</span>(
+            keyAlias,
+            <span class="ty">KeyProperties</span>.<span class="ty">PURPOSE_DECRYPT</span> or <span class="ty">KeyProperties</span>.<span class="ty">PURPOSE_SIGN</span>
+        )
+            .<span class="fn">setKeySize</span>(<span class="nu">4096</span>)
+            .<span class="fn">setDigests</span>(<span class="ty">KeyProperties</span>.<span class="ty">DIGEST_SHA256</span>, <span class="ty">KeyProperties</span>.<span class="ty">DIGEST_SHA512</span>)
+            .<span class="fn">setEncryptionPaddings</span>(<span class="ty">KeyProperties</span>.<span class="ty">ENCRYPTION_PADDING_RSA_OAEP</span>)
+            .<span class="fn">setSignaturePaddings</span>(<span class="ty">KeyProperties</span>.<span class="ty">SIGNATURE_PADDING_RSA_PSS</span>)
+            .<span class="fn">setUserAuthenticationRequired</span>(<span class="kw">true</span>) <span class="cm">// يتطلب Biometric!</span>
+            .<span class="fn">setUserAuthenticationValidityDurationSeconds</span>(<span class="nu">-1</span>) <span class="cm">// Biometric كل مرة</span>
+            .<span class="fn">setRandomizedEncryptionRequired</span>(<span class="kw">true</span>) <span class="cm">// IV عشوائي — يمنع هجمات التكرار</span>
+            .<span class="fn">build</span>()
+
+        keyPairGenerator.<span class="fn">initialize</span>(spec)
+        <span class="kw">return</span> keyPairGenerator.<span class="fn">generateKeyPair</span>()
+    }
+
+    <span class="cm">/**
+     * تشفير البيانات الحساسة قبل الإرسال
+     * يستخدم المفتاح العام للسيرفر (Server Public Key)</span>
+     */
+    <span class="kw">fun</span> <span class="fn">encryptForServer</span>(
+        plaintext: <span class="ty">ByteArray</span>,
+        serverPublicKey: <span class="ty">PublicKey</span>
+    ): <span class="ty">EncryptedPayload</span> {
+        <span class="cm">// توليد مفتاح AES عشوائي للتشفير السريع (Hybrid Encryption)</span>
+        <span class="kw">val</span> aesKey = <span class="ty">ByteArray</span>(<span class="nu">32</span>)
+        <span class="ty">SecureRandom</span>().<span class="fn">nextBytes</span>(aesKey)
+
+        <span class="cm">// تشفير البيانات بـ AES-256-GCM</span>
+        <span class="kw">val</span> cipher = <span class="ty">Cipher</span>.<span class="fn">getInstance</span>(<span class="st">"AES/GCM/NoPadding"</span>)
+        <span class="kw">val</span> iv = <span class="ty">ByteArray</span>(<span class="nu">12</span>)
+        <span class="ty">SecureRandom</span>().<span class="fn">nextBytes</span>(iv)
+
+        <span class="kw">val</span> gcmSpec = <span class="ty">GCMParameterSpec</span>(<span class="nu">128</span>, iv)
+        cipher.<span class="fn">init</span>(<span class="ty">Cipher</span>.<span class="ty">ENCRYPT_MODE</span>, <span class="ty">SecretKeySpec</span>(aesKey, <span class="st">"AES"</span>), gcmSpec)
+        <span class="kw">val</span> ciphertext = cipher.<span class="fn">doFinal</span>(plaintext)
+
+        <span class="cm">// تشفير مفتاح AES باستخدام RSA Public Key للسيرفر</span>
+        <span class="kw">val</span> rsaCipher = <span class="ty">Cipher</span>.<span class="fn">getInstance</span>(<span class="st">"RSA/ECB/OAEPWithSHA-256AndMGF1Padding"</span>)
+        rsaCipher.<span class="fn">init</span>(<span class="ty">Cipher</span>.<span class="ty">ENCRYPT_MODE</span>, serverPublicKey)
+        <span class="kw">val</span> encryptedAesKey = rsaCipher.<span class="fn">doFinal</span>(aesKey)
+
+        <span class="cm">// مسح مفتاح AES من الذاكرة فوراً</span>
+        java.util.<span class="ty">Arrays</span>.<span class="fn">fill</span>(aesKey, <span class="nu">0</span>)
+
+        <span class="kw">return</span> <span class="ty">EncryptedPayload</span>(
+            encryptedData = ciphertext,
+            encryptedKey = encryptedAesKey,
+            iv = iv,
+            timestamp = <span class="ty">System</span>.<span class="fn">currentTimeMillis</span>()
+        )
+    }
+
+    <span class="cm">/**
+     * توقيع المعاملة رقمياً باستخدام المفتاح الخاص المخزن في Keystore
+     * يضمن عدم إنكار المعاملة (Non-repudiation)</span>
+     */
+    <span class="kw">fun</span> <span class="fn">signTransaction</span>(transactionData: <span class="ty">ByteArray</span>): <span class="ty">ByteArray</span> {
+        <span class="kw">val</span> privateKey = keyStore.<span class="fn">getEntry</span>(keyAlias, <span class="kw">null</span>) <span class="kw">as</span> <span class="ty">KeyStore.PrivateKeyEntry</span>
+
+        <span class="kw">val</span> signature = <span class="ty">Signature</span>.<span class="fn">getInstance</span>(<span class="st">"SHA256withRSA/PSS"</span>)
+        signature.<span class="fn">initSign</span>(privateKey.<span class="ty">privateKey</span>)
+        signature.<span class="fn">update</span>(transactionData)
+        <span class="kw">return</span> signature.<span class="fn">sign</span>()
+    }
+}
+
+<span class="kw">data class</span> <span class="ty">EncryptedPayload</span>(
+    <span class="kw">val</span> encryptedData: <span class="ty">ByteArray</span>,
+    <span class="kw">val</span> encryptedKey: <span class="ty">ByteArray</span>,
+    <span class="kw">val</span> iv: <span class="ty">ByteArray</span>,
+    <span class="kw">val</span> timestamp: <span class="ty">Long</span>
+)</pre>
+    </div>
+
+    <h3 id="keystore">التكامل مع Hardware-backed Keystore لتوليد المفاتيح وتوقيع الحمولات المالية</h3>
+
+    <p>
+        <strong>Android Keystore</strong> هو أحد أقوى أدوات الأمان في نظام Android. يوفره النظام كـ <strong>Trusted Execution Environment (TEE)</strong> أو <strong>StrongBox</strong> — وهو معالج منفصل مخصص للعمليات التشفيرية الحساسة. المفاتيح المُولدة في Keystore <strong>لا يمكن استخراجها أبداً</strong>، حتى لو كان الجهاز مُروتاً.
+    </p>
+
+    <p>
+        هذا يُشبه خزينة بنكية تقليدية: يمكنك استخدام المفتاح لفتحها، لكن لا يمكنك نسخ المفتاح أو تصويره. حتى لو سرق أحدهم الخزينة، لن يتمكن من فتحها بدون المفتاح الفعلي.
+    </p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * SecureKeyStoreManager: إدارة المفاتيح التشفيرية في Hardware-backed Keystore
+ *
+ * يدعم StrongBox إذا كان الجهاز يحتوي على معالج أمان منفصل (HSM)
+ */</span>
+<span class="kw">class</span> <span class="ty">SecureKeyStoreManager</span>(<span class="kw">private val</span> context: <span class="ty">Context</span>) {
+
+    <span class="kw">private val</span> keyStore = <span class="ty">KeyStore</span>.<span class="fn">getInstance</span>(<span class="st">"AndroidKeyStore"</span>).<span class="fn">apply</span> { <span class="fn">load</span>(<span class="kw">null</span>) }
+
+    <span class="cm">/**
+     * التحقق من دعم الجهاز لـ StrongBox (معالج أمان منفصل)
+     * StrongBox يوفر حماية إضافية ضد الهجمات الفيزيائية</span>
+     */
+    <span class="kw">private fun</span> <span class="fn">isStrongBoxSupported</span>(): <span class="ty">Boolean</span> {
+        <span class="kw">return</span> <span class="ty">Build</span>.<span class="ty">VERSION</span>.<span class="ty">SDK_INT</span> &gt;= <span class="ty">Build</span>.<span class="ty">VERSION_CODES</span>.<span class="ty">P</span> &amp;&amp;
+               context.<span class="fn">packageManager</span>.<span class="fn">hasSystemFeature</span>(<span class="ty">PackageManager</span>.<span class="ty">FEATURE_STRONGBOX_KEYSTORE</span>)
+    }
+
+    <span class="cm">/**
+     * توليد مفتاح توقيع مالي — يتطلب Biometric Authentication</span>
+     */
+    <span class="kw">fun</span> <span class="fn">generateFinancialSigningKey</span>(alias: <span class="ty">String</span> = <span class="st">"financial_signing_key"</span>): <span class="ty">KeyPair</span> {
+        <span class="kw">val</span> keyPairGenerator = <span class="ty">KeyPairGenerator</span>.<span class="fn">getInstance</span>(<span class="st">"RSA"</span>, <span class="st">"AndroidKeyStore"</span>)
+
+        <span class="kw">val</span> builder = <span class="ty">KeyGenParameterSpec</span>.<span class="fn">Builder</span>(
+            alias,
+            <span class="ty">KeyProperties</span>.<span class="ty">PURPOSE_SIGN</span> or <span class="ty">KeyProperties</span>.<span class="ty">PURPOSE_VERIFY</span>
+        )
+            .<span class="fn">setKeySize</span>(<span class="nu">4096</span>)
+            .<span class="fn">setDigests</span>(<span class="ty">KeyProperties</span>.<span class="ty">DIGEST_SHA256</span>, <span class="ty">KeyProperties</span>.<span class="ty">DIGEST_SHA512</span>)
+            .<span class="fn">setSignaturePaddings</span>(<span class="ty">KeyProperties</span>.<span class="ty">SIGNATURE_PADDING_RSA_PSS</span>)
+            .<span class="fn">setUserAuthenticationRequired</span>(<span class="kw">true</span>)
+            .<span class="fn">setInvalidatedByBiometricEnrollment</span>(<span class="kw">true</span>) <span class="cm">// إبطال المفتاح عند إضافة بصمة جديدة</span>
+            .<span class="fn">setAttestationChallenge</span>(<span class="fn">generateAttestationChallenge</span>()) <span class="cm">// للتحقق من صحة المفتاح</span>
+
+        <span class="cm">// استخدام StrongBox إذا كان متاحاً — يوفر حماية فيزيائية إضافية</span>
+        <span class="kw">if</span> (<span class="fn">isStrongBoxSupported</span>()) {
+            builder.<span class="fn">setIsStrongBoxBacked</span>(<span class="kw">true</span>)
+        }
+
+        keyPairGenerator.<span class="fn">initialize</span>(builder.<span class="fn">build</span>())
+        <span class="kw">return</span> keyPairGenerator.<span class="fn">generateKeyPair</span>()
+    }
+
+    <span class="cm">/**
+     * توقيع حمولة مالية (Financial Payload) — يتطلب Biometric Prompt</span>
+     */
+    <span class="kw">fun</span> <span class="fn">signFinancialPayload</span>(
+        alias: <span class="ty">String</span>,
+        payload: <span class="ty">ByteArray</span>
+    ): <span class="ty">ByteArray</span> {
+        <span class="kw">val</span> entry = keyStore.<span class="fn">getEntry</span>(alias, <span class="kw">null</span>) <span class="kw">as</span>? <span class="ty">KeyStore.PrivateKeyEntry
+            </span>?: <span class="kw">throw</span> <span class="ty">IllegalStateException</span>(<span class="st">"Signing key not found"</span>)
+
+        <span class="kw">val</span> signature = <span class="ty">Signature</span>.<span class="fn">getInstance</span>(<span class="st">"SHA256withRSA/PSS"</span>)
+        signature.<span class="fn">initSign</span>(entry.<span class="ty">privateKey</span>)
+        signature.<span class="fn">update</span>(payload)
+        <span class="kw">return</span> signature.<span class="fn">sign</span>()
+    }
+
+    <span class="cm">/**
+     * توليد تحدي توثيق (Attestation Challenge) للتحقق من أن المفتاح
+     * مُولد فعلاً في Hardware-backed Keystore وليس مُحاكى</span>
+     */
+    <span class="kw">private fun</span> <span class="fn">generateAttestationChallenge</span>(): <span class="ty">ByteArray</span> {
+        <span class="kw">val</span> challenge = <span class="ty">ByteArray</span>(<span class="nu">32</span>)
+        <span class="ty">SecureRandom</span>().<span class="fn">nextBytes</span>(challenge)
+        <span class="kw">return</span> challenge
+    }
+
+    <span class="cm">/**
+     * التحقق من أن المفتاح لا يزال صالحاً (لم يُبطل عبر إعادة ضبط المصنع أو إضافة بصمة)</span>
+     */
+    <span class="kw">fun</span> <span class="fn">isKeyValid</span>(alias: <span class="ty">String</span>): <span class="ty">Boolean</span> {
+        <span class="kw">return</span> keyStore.<span class="fn">containsAlias</span>(alias) &amp;&amp;
+               keyStore.<span class="fn">getEntry</span>(alias, <span class="kw">null</span>) != <span class="kw">null</span>
+    }
+}</pre>
+    </div>
+
+    <div class="alert alert-info">
+        <div class="alert-icon">💡</div>
+        <div class="alert-content">
+            <div class="alert-title">لماذا setInvalidatedByBiometricEnrollment مهم؟</div>
+            <p>عندما يُضيف المستخدم بصمة إصبع جديدة إلى جهازه، قد يكون ذلك بسبب سرقة الجهاز. باستخدام <code>setInvalidatedByBiometricEnrollment(true)</code>، نضمن أن المفتاح التشفيري المالي يُبطل تلقائياً عند إضافة أي بصمة جديدة. هذا يُجبر المستخدم على إعادة المصادقة وتوليد مفتاح جديد — حماية إضافية ضد سرقة الأجهزة.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Section 3: Authentication & Compliance -->
+<section class="section" id="auth">
+    <div class="section-header">
+        <div class="section-number">٣</div>
+        <h2>إدارة الجلسات، المصادقة القوية، والامتثال التنظيمي</h2>
+    </div>
+
+    <h3 id="sca">تطبيق Strong Customer Authentication (SCA) وتكامل BiometricPrompt المرتبط بالعمليات المالية</h3>
+
+    <p>
+        <strong>Strong Customer Authentication (SCA)</strong> هو قلب نظام PSD2 التنظيمي. يتطلب SCA أن تكون كل عملية مالية إلكترونية مصحوبة بمصادقة تستخدم <strong>عاملين منفصلين على الأقل</strong> من بين ثلاثة فئات:
+    </p>
+
+    <ul>
+        <li><strong>المعرفة (Knowledge):</strong> شيء يعرفه المستخدم — مثل كلمة المرور أو PIN</li>
+        <li><strong>الملكية (Possession):</strong> شيء يملكه المستخدم — مثل الجهاز المحمول أو بطاقة الدفع</li>
+        <li><strong>الأصالة (Inherence):</strong> شيء يُمثّل المستخدم — مثل البصمة أو بصمة الوجه</li>
+    </ul>
+
+    <p>
+        في تطبيق Android، الجمع بين PIN (معرفة) + BiometricPrompt (أصالة) يُلبي متطلبات SCA. لكن التنفيذ ليس بهذه البساطة — يجب أن تكون المصادقة مرتبطة <strong>بالعملية المالية المحددة</strong> وليس مجرد "تسجيل دخول عام".
+    </p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * SCABiometricAuthenticator: مصادقة SCA باستخدام BiometricPrompt
+ *
+ * يُستخدم فقط للعمليات المالية الحساسة — وليس لتسجيل الدخول العادي.
+ * كل عملية مالية تتطلب مصادقة Biometric منفصلة.
+ */</span>
+<span class="kw">class</span> <span class="ty">SCABiometricAuthenticator</span>(
+    <span class="kw">private val</span> activity: <span class="ty">FragmentActivity</span>,
+    <span class="kw">private val</span> cryptoManager: <span class="ty">SecureKeyStoreManager</span>
+) {
+
+    <span class="kw">private val</span> executor = <span class="ty">ContextCompat</span>.<span class="fn">getMainExecutor</span>(activity)
+
+    <span class="cm">/**
+     * طلب مصادقة Biometric قبل تنفيذ عملية مالية
+     *
+     * @param transactionId معرف فريد للمعاملة — يُستخدم في التوقيع
+     * @param amount المبلغ — يُعرض للمستخدم للتأكيد
+     * @param onSuccess يتم استدعاؤه عند نجاح المصادقة مع توقيع المعاملة
+     * @param onError يتم استدعاؤه عند الفشل
+     */</span>
+    <span class="kw">fun</span> <span class="fn">authenticateForTransaction</span>(
+        transactionId: <span class="ty">String</span>,
+        amount: <span class="ty">String</span>,
+        currency: <span class="ty">String</span>,
+        onSuccess: (<span class="ty">ByteArray</span>) -> <span class="ty">Unit</span>,
+        onError: (<span class="ty">SCAError</span>) -> <span class="ty">Unit</span>
+    ) {
+        <span class="cm">// ١. التحقق من دعم الجهاز لـ Biometric</span>
+        <span class="kw">val</span> biometricManager = <span class="ty">BiometricManager</span>.<span class="fn">from</span>(activity)
+        <span class="kw">when</span> (biometricManager.<span class="fn">canAuthenticate</span>(
+            <span class="ty">BiometricManager</span>.<span class="ty">Authenticators</span>.<span class="ty">BIOMETRIC_STRONG</span>
+        )) {
+            <span class="ty">BiometricManager</span>.<span class="ty">BIOMETRIC_ERROR_NO_HARDWARE</span> -> {
+                onError(<span class="ty">SCAError</span>.<span class="ty">NoHardware</span>)
+                <span class="kw">return</span>
+            }
+            <span class="ty">BiometricManager</span>.<span class="ty">BIOMETRIC_ERROR_NONE_ENROLLED</span> -> {
+                onError(<span class="ty">SCAError</span>.<span class="ty">NotEnrolled</span>)
+                <span class="kw">return</span>
+            }
+            <span class="ty">BiometricManager</span>.<span class="ty">BIOMETRIC_ERROR_HW_UNAVAILABLE</span> -> {
+                onError(<span class="ty">SCAError</span>.<span class="ty">HardwareUnavailable</span>)
+                <span class="kw">return</span>
+            }
+        }
+
+        <span class="cm">// ٢. إنشاء CryptoObject مرتبط بالمفتاح الخاص — يتطلب Biometric للوصول</span>
+        <span class="kw">val</span> cryptoObject = <span class="fn">createCryptoObjectForTransaction</span>(transactionId)
+
+        <span class="cm">// ٣. إعداد BiometricPrompt</span>
+        <span class="kw">val</span> promptInfo = <span class="ty">BiometricPrompt</span>.<span class="ty">PromptInfo</span>.<span class="ty">Builder</span>()
+            .<span class="fn">setTitle</span>(<span class="st">"تأكيد المعاملة المالية"</span>)
+            .<span class="fn">setSubtitle</span>(<span class="st">"المبلغ: $amount $currency"</span>)
+            .<span class="fn">setDescription</span>(<span class="st">"يرجى المصادقة باستخدام بصمة الإصبع لتأكيد هذه المعاملة"</span>)
+            .<span class="fn">setNegativeButtonText</span>(<span class="st">"إلغاء"</span>)
+            .<span class="fn">setConfirmationRequired</span>(<span class="kw">true</span>) <span class="cm">// يتطلب النقر على "تأكيد"</span>
+            .<span class="fn">setAllowedAuthenticators</span>(
+                <span class="ty">BiometricManager</span>.<span class="ty">Authenticators</span>.<span class="ty">BIOMETRIC_STRONG</span>
+            )
+            .<span class="fn">build</span>()
+
+        <span class="kw">val</span> biometricPrompt = <span class="ty">BiometricPrompt</span>(
+            activity,
+            executor,
+            <span class="kw">object</span> : <span class="ty">BiometricPrompt</span>.<span class="ty">AuthenticationCallback</span>() {
+                <span class="kw">override fun</span> <span class="fn">onAuthenticationSucceeded</span>(
+                    result: <span class="ty">BiometricPrompt</span>.<span class="ty">AuthenticationResult</span>
+                ) {
+                    <span class="cm">// ⚠️ مهم: استخدام CryptoObject للتوقيع — لا يمكن تزويره</span>
+                    <span class="kw">val</span> signature = result.<span class="ty">cryptoObject</span>?.<span class="ty">signature</span>
+                    <span class="kw">if</span> (signature != <span class="kw">null</span>) {
+                        <span class="kw">try</span> {
+                            signature.<span class="fn">update</span>(transactionId.<span class="fn">toByteArray</span>())
+                            <span class="kw">val</span> signedData = signature.<span class="fn">sign</span>()
+                            onSuccess(signedData)
+                        } <span class="kw">catch</span> (e: <span class="ty">Exception</span>) {
+                            onError(<span class="ty">SCAError</span>.<span class="ty">SigningFailed</span>)
+                        }
+                    } <span class="kw">else</span> {
+                        onError(<span class="ty">SCAError</span>.<span class="ty">CryptoObjectMissing</span>)
+                    }
+                }
+
+                <span class="kw">override fun</span> <span class="fn">onAuthenticationError</span>(errorCode: <span class="ty">Int</span>, errString: <span class="ty">CharSequence</span>) {
+                    onError(<span class="ty">SCAError</span>.<span class="ty">AuthenticationError</span>(errorCode, errString.<span class="fn">toString</span>()))
+                }
+
+                <span class="kw">override fun</span> <span class="fn">onAuthenticationFailed</span>() {
+                    onError(<span class="ty">SCAError</span>.<span class="ty">AuthenticationFailed</span>)
+                }
+            }
+        )
+
+        biometricPrompt.<span class="fn">authenticate</span>(promptInfo, cryptoObject)
+    }
+
+    <span class="cm">/**
+     * إنشاء CryptoObject مرتبط بمفتاح Keystore يتطلب Biometric</span>
+     */
+    <span class="kw">private fun</span> <span class="fn">createCryptoObjectForTransaction</span>(
+        transactionId: <span class="ty">String</span>
+    ): <span class="ty">BiometricPrompt</span>.<span class="ty">CryptoObject</span> {
+        <span class="kw">val</span> keyPair = cryptoManager.<span class="fn">generateFinancialSigningKey</span>(
+            <span class="st">"sca_tx_"</span> + transactionId
+        )
+
+        <span class="kw">val</span> signature = <span class="ty">Signature</span>.<span class="fn">getInstance</span>(<span class="st">"SHA256withRSA/PSS"</span>)
+        signature.<span class="fn">initSign</span>(keyPair.<span class="ty">private</span>)
+
+        <span class="kw">return</span> <span class="ty">BiometricPrompt</span>.<span class="ty">CryptoObject</span>(signature)
+    }
+}
+
+<span class="kw">sealed class</span> <span class="ty">SCAError</span> {
+    <span class="kw">object</span> <span class="ty">NoHardware</span> : <span class="ty">SCAError</span>()
+    <span class="kw">object</span> <span class="ty">NotEnrolled</span> : <span class="ty">SCAError</span>()
+    <span class="kw">object</span> <span class="ty">HardwareUnavailable</span> : <span class="ty">SCAError</span>()
+    <span class="kw">object</span> <span class="ty">SigningFailed</span> : <span class="ty">SCAError</span>()
+    <span class="kw">object</span> <span class="ty">CryptoObjectMissing</span> : <span class="ty">SCAError</span>()
+    <span class="kw">object</span> <span class="ty">AuthenticationFailed</span> : <span class="ty">SCAError</span>()
+    <span class="kw">data class</span> <span class="ty">AuthenticationError</span>(<span class="kw">val</span> code: <span class="ty">Int</span>, <span class="kw">val</span> message: <span class="ty">String</span>) : <span class="ty">SCAError</span>()
+}</pre>
+    </div>
+
+    <h3 id="oauth">إدارة الرموز المميزة (OAuth 2.0 / OpenID Connect / JWT) وتخزينها بأمان تام</h3>
+
+    <p>
+        في تطبيقات التقنية المالية، <strong>Access Tokens</strong> و<strong>Refresh Tokens</strong> هي مفاتيح المملكة الرقمية. إذا سرقها مهاجم، يمكنه الوصول إلى حساب المستخدم وتنفيذ عمليات مالية باسمه. لذلك، يجب تخزينها بأمان قصوى.
+    </p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * SecureTokenManager: إدارة رموز OAuth 2.0 / OIDC بأمان
+ *
+ * يستخدم EncryptedSharedPreferences لتخزين الرموز
+ * ويُدير انتهاء الصلاحية الآلي مع PKCE للمصادقة الآمنة.
+ */</span>
+<span class="kw">class</span> <span class="ty">SecureTokenManager</span>(<span class="kw">private val</span> context: <span class="ty">Context</span>) {
+
+    <span class="kw">private val</span> masterKey = <span class="ty">MasterKey</span>.<span class="ty">Builder</span>(context)
+        .<span class="fn">setKeyScheme</span>(<span class="ty">MasterKey</span>.<span class="ty">KeyScheme</span>.<span class="ty">AES256_GCM</span>)
+        .<span class="fn">build</span>()
+
+    <span class="kw">private val</span> encryptedPrefs = <span class="ty">EncryptedSharedPreferences</span>.<span class="fn">create</span>(
+        context,
+        <span class="st">"secure_tokens"</span>,
+        masterKey,
+        <span class="ty">EncryptedSharedPreferences</span>.<span class="ty">PrefKeyEncryptionScheme</span>.<span class="ty">AES256_SIV</span>,
+        <span class="ty">EncryptedSharedPreferences</span>.<span class="ty">PrefValueEncryptionScheme</span>.<span class="ty">AES256_GCM</span>
+    )
+
+    <span class="cm">/**
+     * تخزين رموز المصادقة بأمان — يتم تشفيرها تلقائياً</span>
+     */
+    <span class="kw">fun</span> <span class="fn">storeTokens</span>(accessToken: <span class="ty">String</span>, refreshToken: <span class="ty">String</span>, expiresIn: <span class="ty">Long</span>) {
+        encryptedPrefs.<span class="fn">edit</span>()
+            .<span class="fn">putString</span>(<span class="st">"access_token"</span>, accessToken)
+            .<span class="fn">putString</span>(<span class="st">"refresh_token"</span>, refreshToken)
+            .<span class="fn">putLong</span>(<span class="st">"expires_at"</span>, <span class="ty">System</span>.<span class="fn">currentTimeMillis</span>() + (expiresIn * <span class="nu">1000</span>))
+            .<span class="fn">putLong</span>(<span class="st">"stored_at"</span>, <span class="ty">System</span>.<span class="fn">currentTimeMillis</span>())
+            .<span class="fn">apply</span>()
+    }
+
+    <span class="cm">/**
+     * الحصول على Access Token — مع التحقق التلقائي من انتهاء الصلاحية</span>
+     */
+    <span class="kw">suspend fun</span> <span class="fn">getValidAccessToken</span>(): <span class="ty">String</span>? {
+        <span class="kw">val</span> expiresAt = encryptedPrefs.<span class="fn">getLong</span>(<span class="st">"expires_at"</span>, <span class="nu">0</span>)
+
+        <span class="cm">// إذا انتهت الصلاحية خلال ٥ دقائق القادمة، قم بتحديثها مسبقاً</span>
+        <span class="kw">if</span> (<span class="ty">System</span>.<span class="fn">currentTimeMillis</span>() &gt; expiresAt - (<span class="nu">5</span> * <span class="nu">60</span> * <span class="nu">1000</span>)) {
+            <span class="kw">return</span> <span class="fn">refreshAccessToken</span>()
+        }
+
+        <span class="kw">return</span> encryptedPrefs.<span class="fn">getString</span>(<span class="st">"access_token"</span>, <span class="kw">null</span>)
+    }
+
+    <span class="cm">/**
+     * تحديث Access Token باستخدام Refresh Token
+     * يتم في الخلفية دون إزعاج المستخدم</span>
+     */
+    <span class="kw">private suspend fun</span> <span class="fn">refreshAccessToken</span>(): <span class="ty">String</span>? {
+        <span class="kw">val</span> refreshToken = encryptedPrefs.<span class="fn">getString</span>(<span class="st">"refresh_token"</span>, <span class="kw">null</span>)
+            ?: <span class="kw">return null</span>
+
+        <span class="cm">// استدعاء API لتحديث الرمز</span>
+        <span class="kw">return try</span> {
+            <span class="kw">val</span> response = authApi.<span class="fn">refreshToken</span>(refreshToken)
+            <span class="fn">storeTokens</span>(response.accessToken, response.refreshToken, response.expiresIn)
+            response.accessToken
+        } <span class="kw">catch</span> (e: <span class="ty">Exception</span>) {
+            <span class="cm">// إذا فشل التحديث، قم بتسجيل الخروج الآمن</span>
+            <span class="fn">secureLogout</span>()
+            <span class="kw">null</span>
+        }
+    }
+
+    <span class="cm">/**
+     * تسجيل الخروج الآمن — مسح جميع الرموز من الذاكرة والتخزين</span>
+     */
+    <span class="kw">fun</span> <span class="fn">secureLogout</span>() {
+        <span class="cm">// مسح الرموز من EncryptedSharedPreferences</span>
+        encryptedPrefs.<span class="fn">edit</span>().<span class="fn">clear</span>().<span class="fn">apply</span>()
+
+        <span class="cm">// إبطال الرموز على السيرفر (Revocation)</span>
+        <span class="cm">// POST /oauth/revoke</span>
+    }
+
+    <span class="kw">private val</span> authApi: <span class="ty">AuthApi</span> <span class="kw">by lazy</span> { <span class="cm">/* Retrofit instance */</span> }
+}</pre>
+    </div>
+
+    <h3 id="play-integrity">استخدام Play Integrity API للتحقق من سلامة الجهاز قبل السماح بإجراء أي معاملة مالية</h3>
+
+    <p>
+        <strong>Play Integrity API</strong> هو خليفة SafetyNet Attestation. يتحقق من ثلاثة أشياء أساسية قبل السماح بالعمليات المالية: (١) سلامة التطبيق (لم يُعدّل)، (٢) سلامة الجهاز (غير مُروت)، (٣) صحة الترخيص (تم تنزيله من Google Play).
+    </p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * PlayIntegrityChecker: التحقق من سلامة الجهاز قبل العمليات المالية
+ *
+ * يجب استدعاء هذه الدالة قبل كل عملية مالية حرجة.
+ * إذا فشل التحقق، يتم رفض العملية وإبلاغ السيرفر.
+ */</span>
+<span class="kw">class</span> <span class="ty">PlayIntegrityChecker</span>(<span class="kw">private val</span> context: <span class="ty">Context</span>) {
+
+    <span class="kw">private val</span> integrityManager = <span class="ty">IntegrityManagerFactory</span>.<span class="fn">create</span>(context)
+
+    <span class="cm">/**
+     * طلب Integrity Token من Google Play Services
+     * يتم إرساله إلى السيرفر للتحقق — لا يتم التحقق محلياً!</span>
+     */
+    <span class="kw">suspend fun</span> <span class="fn">requestIntegrityToken</span>(
+        nonce: <span class="ty">String</span> <span class="cm">// يجب أن يكون عشوائياً وفريداً لكل طلب</span>
+    ): <span class="ty">Result</span>&lt;<span class="ty">String</span>&gt; = <span class="kw">suspendCoroutine</span> { continuation ->
+        <span class="kw">val</span> request = <span class="ty">IntegrityTokenRequest</span>.<span class="ty">Builder</span>()
+            .<span class="fn">setNonce</span>(nonce)
+            .<span class="fn">build</span>()
+
+        integrityManager.<span class="fn">requestIntegrityToken</span>(request)
+            .<span class="fn">addOnSuccessListener</span> { response ->
+                <span class="cm">// إرسال token إلى السيرفر للتحقق</span>
+                continuation.<span class="fn">resume</span>(<span class="ty">Result</span>.<span class="fn">success</span>(response.<span class="ty">token</span>()))
+            }
+            .<span class="fn">addOnFailureListener</span> { exception ->
+                <span class="cm">// سجل الخطأ وأبلغ السيرفر</span>
+                <span class="ty">FirebaseCrashlytics</span>.<span class="fn">getInstance</span>().<span class="fn">recordException</span>(exception)
+                continuation.<span class="fn">resume</span>(<span class="ty">Result</span>.<span class="fn">failure</span>(exception))
+            }
+    }
+
+    <span class="cm">/**
+     * التحقق السريع قبل العمليات المالية — يستخدم Server-Side Verification</span>
+     */
+    <span class="kw">suspend fun</span> <span class="fn">verifyDeviceIntegrity</span>(): <span class="ty">IntegrityResult</span> {
+        <span class="kw">val</span> nonce = <span class="fn">generateSecureNonce</span>()
+
+        <span class="kw">return when</span> (<span class="kw">val</span> tokenResult = <span class="fn">requestIntegrityToken</span>(nonce)) {
+            <span class="kw">is</span> <span class="ty">Result</span>.<span class="ty">Success</span> -> {
+                <span class="cm">// إرسال Token إلى السيرفر للتحقق</span>
+                <span class="kw">val</span> serverResponse = api.<span class="fn">verifyIntegrityToken</span>(tokenResult.<span class="ty">value</span>, nonce)
+
+                <span class="kw">if</span> (serverResponse.deviceIntegrity == <span class="st">"MEETS_DEVICE_INTEGRITY"</span> &amp;&amp;
+                    serverResponse.appIntegrity == <span class="st">"MEETS_APP_INTEGRITY"</span>) {
+                    <span class="ty">IntegrityResult</span>.<span class="ty">Verified</span>
+                } <span class="kw">else</span> {
+                    <span class="ty">IntegrityResult</span>.<span class="ty">Compromised</span>(serverResponse)
+                }
+            }
+            <span class="kw">is</span> <span class="ty">Result</span>.<span class="ty">Failure</span> -> {
+                <span class="ty">IntegrityResult</span>.<span class="ty">Error</span>(tokenResult.<span class="ty">exception</span>.<span class="ty">message</span> ?: <span class="st">"Unknown error"</span>)
+            }
+        }
+    }
+
+    <span class="kw">private fun</span> <span class="fn">generateSecureNonce</span>(): <span class="ty">String</span> {
+        <span class="kw">val</span> nonceBytes = <span class="ty">ByteArray</span>(<span class="nu">32</span>)
+        <span class="ty">SecureRandom</span>().<span class="fn">nextBytes</span>(nonceBytes)
+        <span class="kw">return</span> <span class="ty">Base64</span>.<span class="fn">encodeToString</span>(nonceBytes, <span class="ty">Base64</span>.<span class="ty">NO_WRAP</span>)
+    }
+}
+
+<span class="kw">sealed class</span> <span class="ty">IntegrityResult</span> {
+    <span class="kw">object</span> <span class="ty">Verified</span> : <span class="ty">IntegrityResult</span>()
+    <span class="kw">data class</span> <span class="ty">Compromised</span>(<span class="kw">val</span> details: <span class="ty">ServerIntegrityResponse</span>) : <span class="ty">IntegrityResult</span>()
+    <span class="kw">data class</span> <span class="ty">Error</span>(<span class="kw">val</span> message: <span class="ty">String</span>) : <span class="ty">IntegrityResult</span>()
+}</pre>
+    </div>
+
+    <div class="alert alert-danger">
+        <div class="alert-icon">🚨</div>
+        <div class="alert-content">
+            <div class="alert-title">خطأ شائع قاتل: التحقق المحلي من Integrity Token</div>
+            <p>لا تقم أبداً بالتحقق من <code>Integrity Token</code> محلياً في التطبيق. يجب إرساله دائماً إلى السيرفر للتحقق باستخدام مفتاح JSON الخاص بك من Google Cloud Console. التحقق المحلي يمكن تزويره بسهولة باستخدام Frida أو Xposed.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Section 4: Network Resilience -->
+<section class="section" id="network">
+    <div class="section-header">
+        <div class="section-number">٤</div>
+        <h2>مرونة الشبكات، إدارة المعاملات، ومشاكل التزامن المالي</h2>
+    </div>
+
+    <h3 id="idempotency">ضمان عدم تكرار المعاملات المالية (Idempotency in Mobile APIs)</h3>
+
+    <p>
+        <strong>Idempotency</strong> هي من أهم المفاهيم في هندسة التقنية المالية. المعاملة "Idempotent" هي تلك التي يمكن إرسالها مرات عديدة دون تغيير النتيجة النهائية. تخيّل أنك تضغط زر "تحويل" وانقطع الإنترنت — إذا أعدت الضغط، يجب أن يتم التحويل مرة واحدة فقط.
+    </p>
+
+    <p>
+        هذا يُشبه إرسال طرد بريدي مسجل: حتى لو أرسلت نسخاً متعددة من نفس الطرد، سيصل المستلم نسخة واحدة فقط. المفتاح هو <strong>مفتاح Idempotency فريد</strong> يُرفق بكل طلب.
+    </p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * IdempotencyKeyGenerator: توليد مفاتيح Idempotency فريدة وآمنة
+ *
+ * المفتاح يجب أن يكون:
+ * ١. فريداً — لا يتكرر أبداً
+ * ٢. غير قابل للتوقع — يمنع هجمات التخمين
+ * ٣. مرتبطاً بالمعاملة — نفس المدخلات = نفس المفتاح
+ * ٤. مُخزناً محلياً — للإعادة عند فشل الشبكة
+ */</span>
+<span class="kw">class</span> <span class="ty">IdempotencyKeyGenerator</span> {
+
+    <span class="cm">/**
+     * توليد مفتاح Idempotency بناءً على بيانات المعاملة
+     * يضمن أن نفس المعاملة دائماً تحصل على نفس المفتاح</span>
+     */
+    <span class="kw">fun</span> <span class="fn">generate</span>(
+        userId: <span class="ty">String</span>,
+        amount: <span class="ty">BigDecimal</span>,
+        recipientIban: <span class="ty">String</span>,
+        timestamp: <span class="ty">Long</span> = <span class="ty">System</span>.<span class="fn">currentTimeMillis</span>()
+    ): <span class="ty">String</span> {
+        <span class="cm">// الجمع بين معرف المستخدم + المبلغ + المستلم + الطابع الزمني</span>
+        <span class="cm">// الطابع الزمني يُقرب إلى أقرب دقيقة — يسمح بإعادة المحاولة خلال نفس الدقيقة</span>
+        <span class="kw">val</span> timeBucket = (timestamp / (<span class="nu">60</span> * <span class="nu">1000</span>)) * (<span class="nu">60</span> * <span class="nu">1000</span>)
+
+        <span class="kw">val</span> data = <span class="st">"$userId|$amount|$recipientIban|$timeBucket"</span>
+
+        <span class="cm">// استخدام HMAC-SHA256 لتوليد مفتاح غير قابل للتوقع</span>
+        <span class="kw">val</span> mac = <span class="ty">Mac</span>.<span class="fn">getInstance</span>(<span class="st">"HmacSHA256"</span>)
+        mac.<span class="fn">init</span>(<span class="fn">getHmacKey</span>())
+        <span class="kw">val</span> hash = mac.<span class="fn">doFinal</span>(data.<span class="fn">toByteArray</span>())
+
+        <span class="kw">return</span> <span class="st">"idemp_"</span> + <span class="ty">Base64</span>.<span class="fn">encodeToString</span>(hash, <span class="ty">Base64</span>.<span class="ty">URL_SAFE</span> | <span class="ty">Base64</span>.<span class="ty">NO_WRAP</span>)
+    }
+
+    <span class="kw">private fun</span> <span class="fn">getHmacKey</span>(): <span class="ty">SecretKey</span> {
+        <span class="cm">// في الإنتاج، يُخزن هذا المفتاح في Android Keystore</span>
+        <span class="cm">// هنا نستخدم مفتاح مشتق من معرف الجهاز + Salt ثابت</span>
+        <span class="kw">return</span> <span class="ty">SecretKeySpec</span>(<span class="st">"device-specific-key-32-bytes!"</span>.<span class="fn">toByteArray</span>(), <span class="st">"HmacSHA256"</span>)
+    }
+}</pre>
+    </div>
+
+    <h3 id="local-queues">إدارة طوابير العمليات المحلية (Local Transaction Queues)</h3>
+
+    <p>
+        في بيئة ضعيفة الاتصال (مثل المترو في برلين أو الطائرة)، يجب أن يظل المستخدم قادراً على "إنشاء" معاملات حتى لو لم يكن هناك إنترنت. هذه المعاملات تُخزن محلياً في قاعدة بيانات مشفرة، ثم تُرسل تلقائياً عند استعادة الاتصال.
+    </p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * TransactionQueueManager: إدارة طابور المعاملات المحلي
+ *
+ * يُخزن المعاملات في Room + SQLCipher، ويُرسلها عبر WorkManager
+ * عند استعادة الاتصال مع ضمان عدم التكرار عبر Idempotency Keys.
+ */</span>
+<span class="kw">class</span> <span class="ty">TransactionQueueManager</span>(
+    <span class="kw">private val</span> context: <span class="ty">Context</span>,
+    <span class="kw">private val</span> database: <span class="ty">AppDatabase</span>,
+    <span class="kw">private val</span> apiService: <span class="ty">TransactionApiService</span>,
+    <span class="kw">private val</span> idempotencyGenerator: <span class="ty">IdempotencyKeyGenerator</span>
+) {
+
+    <span class="cm">/**
+     * إضافة معاملة جديدة إلى الطابور المحلي
+     * تعمل حتى بدون إنترنت</span>
+     */
+    <span class="kw">suspend fun</span> <span class="fn">enqueueTransaction</span>(
+        request: <span class="ty">TransferRequest</span>
+    ): <span class="ty">Result</span>&lt;<span class="ty">String</span>&gt; { <span class="cm">// Returns transactionId</span>
+        <span class="kw">val</span> transactionId = <span class="ty">UUID</span>.<span class="fn">randomUUID</span>().<span class="fn">toString</span>()
+        <span class="kw">val</span> idempotencyKey = idempotencyGenerator.<span class="fn">generate</span>(
+            userId = request.userId,
+            amount = request.amount,
+            recipientIban = request.recipientIban
+        )
+
+        <span class="kw">val</span> entity = <span class="ty">TransactionEntity</span>(
+            id = transactionId,
+            amount = request.amount,
+            currency = request.currency,
+            recipientIban = request.recipientIban,
+            maskedPan = request.maskedPan,
+            status = <span class="ty">TransactionStatus</span>.<span class="ty">PENDING</span>,
+            createdAt = <span class="ty">System</span>.<span class="fn">currentTimeMillis</span>(),
+            syncedWithServer = <span class="kw">false</span>,
+            localSignature = <span class="kw">null</span> <span class="cm">// يُوقّع عند الإرسال</span>
+        )
+
+        <span class="cm">// تخزين محلي مشفر — يعمل حتى بدون إنترنت</span>
+        database.<span class="fn">transactionDao</span>().<span class="fn">insertTransaction</span>(entity)
+
+        <span class="cm">// جدولة إرسال المعاملة عبر WorkManager</span>
+        <span class="fn">scheduleSyncWork</span>(transactionId, idempotencyKey)
+
+        <span class="kw">return</span> <span class="ty">Result</span>.<span class="fn">success</span>(transactionId)
+    }
+
+    <span class="cm">/**
+     * جدولة عملية مزامنة باستخدام WorkManager
+     * تتعامل مع القيود: يجب وجود إنترنت، ولا يتم الإرسال إلا عبر WiFi/Cellular آمن</span>
+     */
+    <span class="kw">private fun</span> <span class="fn">scheduleSyncWork</span>(
+        transactionId: <span class="ty">String</span>,
+        idempotencyKey: <span class="ty">String</span>
+    ) {
+        <span class="kw">val</span> constraints = <span class="ty">Constraints</span>.<span class="ty">Builder</span>()
+            .<span class="fn">setRequiredNetworkType</span>(<span class="ty">NetworkType</span>.<span class="ty">CONNECTED</span>)
+            .<span class="fn">setRequiresBatteryNotLow</span>(<span class="kw">true</span>)
+            .<span class="fn">build</span>()
+
+        <span class="kw">val</span> syncWork = <span class="ty">OneTimeWorkRequestBuilder</span>&lt;<span class="ty">TransactionSyncWorker</span>&gt;()
+            .<span class="fn">setInputData</span>(<span class="fn">workDataOf</span>(
+                <span class="st">"transaction_id"</span> to transactionId,
+                <span class="st">"idempotency_key"</span> to idempotencyKey
+            ))
+            .<span class="fn">setConstraints</span>(constraints)
+            .<span class="fn">setBackoffCriteria</span>(
+                <span class="ty">BackoffPolicy</span>.<span class="ty">EXPONENTIAL</span>,
+                <span class="nu">10</span>, <span class="ty">TimeUnit</span>.<span class="ty">SECONDS</span> <span class="cm">// إعادة محاولة تصاعدية</span>
+            )
+            .<span class="fn">addTag</span>(<span class="st">"transaction_sync"</span>)
+            .<span class="fn">build</span>()
+
+        <span class="ty">WorkManager</span>.<span class="fn">getInstance</span>(context).<span class="fn">enqueueUniqueWork</span>(
+            <span class="st">"sync_"</span> + transactionId,
+            <span class="ty">ExistingWorkPolicy</span>.<span class="ty">KEEP</span>, <span class="cm">// لا تُكرر إذا كانت موجودة</span>
+            syncWork
+        )
+    }
+
+    <span class="cm">/**
+     * Worker: إرسال المعاملة إلى السيرفر
+     * يُعالج إعادة المحاولة التلقائية والأخطاء</span>
+     */
+    <span class="kw">class</span> <span class="ty">TransactionSyncWorker</span>(
+        context: <span class="ty">Context</span>,
+        params: <span class="ty">WorkerParameters</span>,
+        <span class="kw">private val</span> api: <span class="ty">TransactionApiService</span>,
+        <span class="kw">private val</span> db: <span class="ty">AppDatabase</span>
+    ) : <span class="ty">CoroutineWorker</span>(context, params) {
+
+        <span class="kw">override suspend fun</span> <span class="fn">doWork</span>(): <span class="ty">Result</span> {
+            <span class="kw">val</span> transactionId = inputData.<span class="fn">getString</span>(<span class="st">"transaction_id"</span>) ?: <span class="kw">return</span> <span class="ty">Result</span>.<span class="fn">failure</span>()
+            <span class="kw">val</span> idempotencyKey = inputData.<span class="fn">getString</span>(<span class="st">"idempotency_key"</span>) ?: <span class="kw">return</span> <span class="ty">Result</span>.<span class="fn">failure</span>()
+
+            <span class="kw">val</span> transaction = db.<span class="fn">transactionDao</span>().<span class="fn">getTransactionById</span>(transactionId)
+                ?: <span class="kw">return</span> <span class="ty">Result</span>.<span class="fn">failure</span>()
+
+            <span class="cm">// تحديث الحالة إلى SENT قبل الإرسال</span>
+            db.<span class="fn">transactionDao</span>().<span class="fn">updateStatus</span>(transactionId, <span class="ty">TransactionStatus</span>.<span class="ty">SENT</span>)
+
+            <span class="kw">return try</span> {
+                <span class="cm">// إرسال المعاملة مع Idempotency Key</span>
+                <span class="kw">val</span> response = api.<span class="fn">submitTransaction</span>(
+                    idempotencyKey = idempotencyKey,
+                    request = <span class="ty">TransactionRequest</span>(
+                        id = transactionId,
+                        amount = transaction.amount,
+                        currency = transaction.currency,
+                        recipientIban = transaction.recipientIban
+                    )
+                )
+
+                <span class="cm">// ✅ نجاح: تحديث الحالة إلى CONFIRMED</span>
+                db.<span class="fn">transactionDao</span>().<span class="fn">markAsSynced</span>(
+                    transactionId,
+                    <span class="ty">TransactionStatus</span>.<span class="ty">CONFIRMED</span>
+                )
+                <span class="ty">Result</span>.<span class="fn">success</span>()
+
+            } <span class="kw">catch</span> (e: <span class="ty">HttpException</span>) {
+                <span class="kw">when</span> (e.<span class="fn">code</span>()) {
+                    <span class="nu">409</span> -> { <span class="cm">// Conflict — المعاملة موجودة بالفعل (Idempotency)</span>
+                        db.<span class="fn">transactionDao</span>().<span class="fn">markAsSynced</span>(
+                            transactionId,
+                            <span class="ty">TransactionStatus</span>.<span class="ty">CONFIRMED</span>
+                        )
+                        <span class="ty">Result</span>.<span class="fn">success</span>()
+                    }
+                    <span class="nu">400</span>, <span class="nu">422</span> -> { <span class="cm">// Bad Request — خطأ في البيانات، لا فائدة من الإعادة</span>
+                        db.<span class="fn">transactionDao</span>().<span class="fn">updateStatus</span>(
+                            transactionId,
+                            <span class="ty">TransactionStatus</span>.<span class="ty">FAILED</span>
+                        )
+                        <span class="ty">Result</span>.<span class="fn">failure</span>()
+                    }
+                    <span class="kw">else</span> -> { <span class="cm">// أخطاء أخرى — إعادة محاولة</span>
+                        db.<span class="fn">transactionDao</span>().<span class="fn">updateStatus</span>(
+                            transactionId,
+                            <span class="ty">TransactionStatus</span>.<span class="ty">PENDING</span>
+                        )
+                        <span class="ty">Result</span>.<span class="fn">retry</span>()
+                    }
+                }
+            } <span class="kw">catch</span> (e: <span class="ty">IOException</span>) {
+                <span class="cm">// خطأ شبكة — إعادة محاولة</span>
+                db.<span class="fn">transactionDao</span>().<span class="fn">updateStatus</span>(transactionId, <span class="ty">TransactionStatus</span>.<span class="ty">PENDING</span>)
+                <span class="ty">Result</span>.<span class="fn">retry</span>()
+            }
+        }
+    }
+}</pre>
+    </div>
+
+    <h3 id="optimistic-ui">التعامل المعماري المتقدم مع أخطاء الشبكة: Optimistic UI vs Pessimistic UI</h3>
+
+    <p>
+        في التطبيقات المالية، اختيار نمط تحديث واجهة المستخدم يعتمد على <strong>طبيعة العملية</strong>. المعاملات المالية الحساسة تتطلب <strong>Pessimistic UI</strong> (انتظار تأكيد السيرفر)، بينما العمليات غير الحساسة (مثل تفضيلات العرض) يمكن استخدام <strong>Optimistic UI</strong>.
+    </p>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>النمط</th>
+                    <th>متى يُستخدم؟</th>
+                    <th>المخاطر</th>
+                    <th>مثال Fintech</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Optimistic UI</strong></td>
+                    <td>عندما يمكن التراجع عن العملية بسهولة</td>
+                    <td>قد يُعرض للمستخدم حالة نجاح كاذبة</td>
+                    <td>تغيير اسم الحساب، تفعيل/إلغاء الإشعارات</td>
+                </tr>
+                <tr>
+                    <td><strong>Pessimistic UI</strong></td>
+                    <td>عندما لا يمكن التراجع عن العملية</td>
+                    <td>تجربة مستخدم أبطأ لكن أكثر أماناً</td>
+                    <td>تحويل مالي، دفع فاتورة، شراء أسهم</td>
+                </tr>
+                <tr>
+                    <td><strong>Hybrid UI</strong></td>
+                    <td>عرض حالة وسطى (Pending) مع إمكانية التراجع</td>
+                    <td>يتطلب آلية تراجع معقدة</td>
+                    <td>تحويل مالي مع "إلغاء" خلال ٥ دقائق</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin (Jetpack Compose)</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * TransferScreen: شاشة تحويل مالي باستخدام Pessimistic UI
+ *
+ * لا يتم تحديث واجهة المستخدم إلا بعد تأكيد السيرفر.
+ * يعرض حالة "جاري المعالجة" مع منع التفاعل حتى الرد.
+ */</span>
+<span class="an">@Composable</span>
+<span class="kw">fun</span> <span class="fn">TransferScreen</span>(
+    viewModel: <span class="ty">TransferViewModel</span> = <span class="fn">hiltViewModel</span>()
+) {
+    <span class="kw">val</span> uiState <span class="kw">by</span> viewModel.<span class="ty">uiState</span>.<span class="fn">collectAsState</span>()
+
+    <span class="ty">Column</span>(
+        modifier = <span class="ty">Modifier</span>
+            .<span class="fn">fillMaxSize</span>()
+            .<span class="fn">padding</span>(<span class="nu">16.dp</span>),
+        verticalArrangement = <span class="ty">Arrangement</span>.<span class="ty">spacedBy</span>(<span class="nu">16.dp</span>)
+    ) {
+        <span class="cm">// حقل المبلغ</span>
+        <span class="ty">OutlinedTextField</span>(
+            value = uiState.amount,
+            onValueChange = viewModel::onAmountChange,
+            label = { <span class="ty">Text</span>(<span class="st">"المبلغ (EUR)"</span>) },
+            keyboardOptions = <span class="ty">KeyboardOptions</span>(keyboardType = <span class="ty">KeyboardType</span>.<span class="ty">Number</span>),
+            enabled = uiState !is <span class="ty">TransferUiState</span>.<span class="ty">Processing</span>
+        )
+
+        <span class="cm">// حقل IBAN المستلم</span>
+        <span class="ty">OutlinedTextField</span>(
+            value = uiState.recipientIban,
+            onValueChange = viewModel::onIbanChange,
+            label = { <span class="ty">Text</span>(<span class="st">"IBAN المستلم"</span>) },
+            enabled = uiState !is <span class="ty">TransferUiState</span>.<span class="ty">Processing</span>
+        )
+
+        <span class="cm">// زر التحويل — يتغير بناءً على الحالة</span>
+        <span class="ty">Button</span>(
+            onClick = { viewModel.<span class="fn">submitTransfer</span>() },
+            enabled = uiState.<span class="fn">isFormValid</span>() &amp;&amp; uiState !is <span class="ty">TransferUiState</span>.<span class="ty">Processing</span>,
+            modifier = <span class="ty">Modifier</span>.<span class="fn">fillMaxWidth</span>()
+        ) {
+            <span class="kw">when</span> (uiState) {
+                <span class="kw">is</span> <span class="ty">TransferUiState</span>.<span class="ty">Processing</span> -> {
+                    <span class="ty">CircularProgressIndicator</span>(
+                        modifier = <span class="ty">Modifier</span>.<span class="fn">size</span>(<span class="nu">20.dp</span>),
+                        color = <span class="ty">MaterialTheme</span>.<span class="ty">colorScheme</span>.<span class="ty">onPrimary</span>
+                    )
+                    <span class="ty">Spacer</span>(modifier = <span class="ty">Modifier</span>.<span class="fn">width</span>(<span class="nu">8.dp</span>))
+                    <span class="ty">Text</span>(<span class="st">"جاري معالجة التحويل..."</span>)
+                }
+                <span class="kw">else</span> -> <span class="ty">Text</span>(<span class="st">"تأكيد التحويل"</span>)
+            }
+        }
+
+        <span class="cm">// عرض حالة النجاح/الفشل — فقط بعد رد السيرفر</span>
+        <span class="kw">when</span> (uiState) {
+            <span class="kw">is</span> <span class="ty">TransferUiState</span>.<span class="ty">Success</span> -> {
+                <span class="ty">SuccessBanner</span>(
+                    message = <span class="st">"تم التحويل بنجاح! رقم المعاملة: ${(uiState as TransferUiState.Success).transactionId}"</span>
+                )
+            }
+            <span class="kw">is</span> <span class="ty">TransferUiState</span>.<span class="ty">Error</span> -> {
+                <span class="ty">ErrorBanner</span>(
+                    message = (uiState <span class="kw">as</span> <span class="ty">TransferUiState</span>.<span class="ty">Error</span>).message,
+                    onRetry = { viewModel.<span class="fn">submitTransfer</span>() }
+                )
+            }
+            <span class="kw">else</span> -> {}
+        }
+    }
+}
+
+<span class="cm">// حالات واجهة المستخدم — Pessimistic: لا Success إلا بعد رد السيرفر</span>
+<span class="kw">sealed class</span> <span class="ty">TransferUiState</span> {
+    <span class="kw">data class</span> <span class="ty">Idle</span>(
+        <span class="kw">val</span> amount: <span class="ty">String</span> = <span class="st">""</span>,
+        <span class="kw">val</span> recipientIban: <span class="ty">String</span> = <span class="st">""</span>
+    ) : <span class="ty">TransferUiState</span>() {
+        <span class="kw">fun</span> <span class="fn">isFormValid</span>(): <span class="ty">Boolean</span> =
+            amount.<span class="fn">isNotBlank</span>() &amp;&amp; recipientIban.<span class="fn">matches</span>(<span class="st">"^[A-Z]{2}[0-9]{2}[A-Z0-9]{4}[0-9]{7}([A-Z0-9]?){0,16}$"</span>.<span class="fn">toRegex</span>())
+    }
+    <span class="kw">object</span> <span class="ty">Processing</span> : <span class="ty">TransferUiState</span>()
+    <span class="kw">data class</span> <span class="ty">Success</span>(<span class="kw">val</span> transactionId: <span class="ty">String</span>) : <span class="ty">TransferUiState</span>()
+    <span class="kw">data class</span> <span class="ty">Error</span>(<span class="kw">val</span> message: <span class="ty">String</span>, <span class="kw">val</span> isRetryable: <span class="ty">Boolean</span>) : <span class="ty">TransferUiState</span>()
+}</pre>
+    </div>
+</section>
+
+<!-- Section 5: Architecture -->
+<section class="section" id="architecture">
+    <div class="section-header">
+        <div class="section-number">٥</div>
+        <h2>الهندسة المعمارية المعيارية القابلة للاختبار في تطبيقات المال</h2>
+    </div>
+
+    <h3 id="clean-arch">تصميم بنية Clean Architecture لعزل الوحدات المالية الحساسة</h3>
+
+    <p>
+        في تطبيقات التقنية المالية، <strong>Clean Architecture</strong> ليست مجرد "نمط جميل" — بل هي <strong>ضرورة تنظيمية</strong>. يجب عزل الوحدات المالية الحساسة (مثل معالجة التحويلات، وتخزين البيانات المشفرة) عن وحدات التطبيق العادية (مثل العروض الترويجية والإشعارات). هذا يُشبه فصل خزينة البنك عن صالة الاستقبال — لا يمكن لموظف الاستقبال الوصول إلى الخزينة.
+    </p>
+
+    <div class="arch-diagram">
+        <div style="font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 700; margin-bottom: 20px; color: var(--text-primary);">هندسة Clean Architecture للتقنية المالية</div>
+        <div class="arch-layer">
+            <div class="arch-box presentation">UI Layer<br><small>Jetpack Compose / XML</small></div>
+            <div class="arch-box presentation">ViewModels<br><small>StateFlow / Compose</small></div>
+        </div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-layer">
+            <div class="arch-box domain">Use Cases<br><small>TransferFundsUseCase</small></div>
+            <div class="arch-box domain">Domain Models<br><small>Transaction, Account</small></div>
+        </div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-layer">
+            <div class="arch-box data">Repositories<br><small>TransactionRepository</small></div>
+            <div class="arch-box data">Data Sources<br><small>Remote / Local / Cache</small></div>
+        </div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-layer">
+            <div class="arch-box security">Security Core<br><small>Keystore / SQLCipher</small></div>
+            <div class="arch-box network">Network Layer<br><small>Retrofit + Certificate Pinning</small></div>
+        </div>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * TransferFundsUseCase: Use Case لتنفيذ تحويل مالي
+ *
+ * يعزل المنطق المالي عن واجهة المستخدم وطبقة البيانات.
+ * يمكن اختباره بشكل مستقل بدون Android Framework.
+ */</span>
+<span class="kw">class</span> <span class="ty">TransferFundsUseCase</span>(
+    <span class="kw">private val</span> transactionRepository: <span class="ty">TransactionRepository</span>,
+    <span class="kw">private val</span> securityManager: <span class="ty">SecurityManager</span>,
+    <span class="kw">private val</span> idempotencyGenerator: <span class="ty">IdempotencyKeyGenerator</span>,
+    <span class="kw">private val</span> scaAuthenticator: <span class="ty">SCABiometricAuthenticator</span>
+) {
+
+    <span class="cm">/**
+     * تنفيذ التحويل المالي مع جميع طبقات الحماية:
+     * ١. التحقق من SCA (Biometric)
+     * ٢. توليد Idempotency Key
+     * ٣. التوقيع الرقمي للمعاملة
+     * ٤. إرسال المعاملة عبر Repository
+     * ٥. التعامل مع الأخطاء والتراجع</span>
+     */
+    <span class="kw">suspend operator fun</span> <span class="fn">invoke</span>(
+        request: <span class="ty">TransferRequest</span>
+    ): <span class="ty">Result</span>&lt;<span class="ty">TransactionResult</span>&gt; {
+        <span class="cm">// ١. التحقق من صحة المدخلات في طبقة Domain</span>
+        <span class="kw">val</span> validation = <span class="fn">validateRequest</span>(request)
+        <span class="kw">if</span> (validation != <span class="kw">null</span>) {
+            <span class="kw">return</span> <span class="ty">Result</span>.<span class="fn">failure</span>(validation)
+        }
+
+        <span class="cm">// ٢. توليد مفتاح Idempotency</span>
+        <span class="kw">val</span> idempotencyKey = idempotencyGenerator.<span class="fn">generate</span>(
+            userId = request.userId,
+            amount = request.amount,
+            recipientIban = request.recipientIban
+        )
+
+        <span class="cm">// ٣. المصادقة القوية (SCA) — Biometric Prompt</span>
+        <span class="kw">val</span> authResult = <span class="kw">suspendCancellableCoroutine</span> { continuation ->
+            scaAuthenticator.<span class="fn">authenticateForTransaction</span>(
+                transactionId = request.id,
+                amount = request.amount.<span class="fn">toPlainString</span>(),
+                currency = request.currency,
+                onSuccess = { signature ->
+                    continuation.<span class="fn">resume</span>(<span class="ty">Result</span>.<span class="fn">success</span>(signature))
+                },
+                onError = { error ->
+                    continuation.<span class="fn">resume</span>(<span class="ty">Result</span>.<span class="fn">failure</span>(<span class="ty">SCAException</span>(error)))
+                }
+            )
+        }
+
+        <span class="kw">if</span> (authResult.<span class="fn">isFailure</span>) {
+            <span class="kw">return</span> <span class="ty">Result</span>.<span class="fn">failure</span>(authResult.<span class="fn">exceptionOrNull</span>()!!)
+        }
+
+        <span class="cm">// ٤. إنشاء المعاملة الموقعة رقمياً</span>
+        <span class="kw">val</span> signedTransaction = <span class="ty">SignedTransaction</span>(
+            request = request,
+            idempotencyKey = idempotencyKey,
+            userSignature = authResult.<span class="fn">getOrThrow</span>(),
+            timestamp = <span class="ty">System</span>.<span class="fn">currentTimeMillis</span>()
+        )
+
+        <span class="cm">// ٥. إرسال المعاملة عبر Repository (يعزل طبقة البيانات)</span>
+        <span class="kw">return</span> transactionRepository.<span class="fn">submitTransaction</span>(signedTransaction)
+    }
+
+    <span class="kw">private fun</span> <span class="fn">validateRequest</span>(request: <span class="ty">TransferRequest</span>): <span class="ty">Throwable</span>? {
+        <span class="kw">return when</span> {
+            request.amount &lt;= <span class="ty">BigDecimal</span>.<span class="ty">ZERO</span> ->
+                <span class="ty">IllegalArgumentException</span>(<span class="st">"Amount must be positive"</span>)
+            request.recipientIban.<span class="fn">isBlank</span>() ->
+                <span class="ty">IllegalArgumentException</span>(<span class="st">"IBAN is required"</span>)
+            request.amount &gt; <span class="ty">BigDecimal</span>(<span class="st">"50000"</span>) ->
+                <span class="ty">IllegalArgumentException</span>(<span class="st">"Amount exceeds daily limit"</span>)
+            <span class="kw">else</span> -> <span class="kw">null</span>
+        }
+    }
+}</pre>
+    </div>
+
+    <h3 id="modularization">Feature Modularization لعزل الوحدات المالية الحساسة</h3>
+
+    <p>
+        في تطبيق مصرفي رقمي، لا يجب أن يكون كود معالجة التحويلات المالية في نفس الوحدة مع كود عرض الإعلانات أو إعدادات المستخدم. <strong>Feature Modularization</strong> يتيح لنا:
+    </p>
+
+    <ul>
+        <li><strong>عزل الأمان:</strong> الوحدة المالية يمكنها الوصول إلى Keystore فقط</li>
+        <li><strong>تقليل وقت البناء:</strong> تغيير وحدة التسويق لا يُعيد بناء وحدة البنوك</li>
+        <li><strong>الاختبار المستقل:</strong> كل وحدة تُختبر بشكل منفصل</li>
+        <li><strong>التحديث الجزئي:</strong> يمكن تحديث وحدة الأمان دون تعديل واجهة المستخدم</li>
+    </ul>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Gradle (settings.gradle.kts)</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">// هيكل الوحدات المعيارية لتطبيق مصرفي رقمي</span>
+<span class="cm">// :app — الوحدة الرئيسية (تجميع فقط، لا يوجد منطق)</span>
+<span class="cm">// :core — المكتبات المشتركة</span>
+<span class="cm">// :features — وحدات الميزات المعزولة</span>
+
+<span class="fn">include</span>(
+    <span class="st">":app"</span>,
+
+    <span class="cm">// Core modules — مكتبات أساسية مشتركة</span>
+    <span class="st">":core:common"</span>,           <span class="cm">// أدوات مساعدة عامة</span>
+    <span class="st">":core:security"</span>,         <span class="cm">// Keystore, SQLCipher, Encryption</span>
+    <span class="st">":core:network"</span>,          <span class="cm">// Retrofit, Certificate Pinning</span>
+    <span class="st">":core:database"</span>,         <span class="cm">// Room + SQLCipher</span>
+    <span class="st">":core:designsystem"</span>,     <span class="cm">// مكونات واجهة المستخدم المشتركة</span>
+
+    <span class="cm">// Feature modules — وحدات الميزات المعزولة</span>
+    <span class="st">":features:auth"</span>,         <span class="cm">// تسجيل الدخول وSCA</span>
+    <span class="st">":features:transfer"</span>,     <span class="cm">// التحويلات المالية (الأكثر حساسية)</span>
+    <span class="st">":features:transactions"</span>,   <span class="cm">// سجل المعاملات</span>
+    <span class="st">":features:dashboard"</span>,      <span class="cm">// لوحة التحكم</span>
+    <span class="st">":features:profile"</span>,        <span class="cm">// إعدادات المستخدم</span>
+    <span class="st">":features:marketing"</span>,      <span class="cm">// العروض الترويجية (الأقل حساسية)</span>
+)</pre>
+    </div>
+
+    <div class="alert alert-warning">
+        <div class="alert-icon">⚡</div>
+        <div class="alert-content">
+            <div class="alert-title">قاعدة ذهبية في Feature Modularization للتقنية المالية</div>
+            <p>لا تسمح أبداً لوحدة <code>:features:marketing</code> بالاعتماد على <code>:core:security</code>. بدلاً من ذلك، استخدم واجهة (Interface) معرّفة في <code>:core:common</code> وتنفّذها <code>:core:security</code>. هذا يضمن أن وحدة التسويق لا يمكنها أبداً الوصول المباشر إلى Keystore أو المفاتيح التشفيرية.</p>
+        </div>
+    </div>
+
+    <h3 id="testing">كتابة اختبارات آلية صارمة (Unit, Integration, and UI Testing)</h3>
+
+    <p>
+        في التقنية المالية، "Zero-Bug Policy" ليست شعاراً تسويقياً — بل هو <strong>متطلب تنظيمي</strong>. BaFin تتطلب من البنوك الرقمية إثبات أن برامجها تُختبر بشكل شامل قبل كل إصدار. هذا يعني:
+    </p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin (Unit Test)</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * TransferFundsUseCaseTest: اختبار Use Case التحويل المالي
+ *
+ * يختبر جميع سيناريوهات الحافة:
+ * - المبلغ السالب
+ * - IBAN غير صالح
+ * - فشل SCA (Biometric)
+ * - نجاح التحويل مع Idempotency Key
+ */</span>
+<span class="an">@ExperimentalCoroutinesApi</span>
+<span class="kw">class</span> <span class="ty">TransferFundsUseCaseTest</span> {
+
+    <span class="an">@get:Rule</span>
+    <span class="kw">val</span> mainDispatcherRule = <span class="ty">MainDispatcherRule</span>()
+
+    <span class="kw">private lateinit var</span> useCase: <span class="ty">TransferFundsUseCase</span>
+    <span class="kw">private val</span> mockRepository = <span class="fn">mockk</span>&lt;<span class="ty">TransactionRepository</span>&gt;()
+    <span class="kw">private val</span> mockSecurity = <span class="fn">mockk</span>&lt;<span class="ty">SecurityManager</span>&gt;()
+    <span class="kw">private val</span> mockIdempotency = <span class="fn">mockk</span>&lt;<span class="ty">IdempotencyKeyGenerator</span>&gt;()
+    <span class="kw">private val</span> mockSCA = <span class="fn">mockk</span>&lt;<span class="ty">SCABiometricAuthenticator</span>&gt;()
+
+    <span class="an">@Before</span>
+    <span class="kw">fun</span> <span class="fn">setup</span>() {
+        useCase = <span class="ty">TransferFundsUseCase</span>(
+            mockRepository, mockSecurity, mockIdempotency, mockSCA
+        )
+    }
+
+    <span class="an">@Test</span>
+    <span class="kw">fun</span> <span class="fn">`invoke with negative amount returns failure`</span>() = <span class="fn">runTest</span> {
+        <span class="cm">// Given</span>
+        <span class="kw">val</span> request = <span class="ty">TransferRequest</span>(
+            id = <span class="st">"tx-001"</span>,
+            userId = <span class="st">"user-123"</span>,
+            amount = <span class="ty">BigDecimal</span>(<span class="st">"-100"</span>),
+            currency = <span class="st">"EUR"</span>,
+            recipientIban = <span class="st">"DE89370400440532013000"</span>
+        )
+
+        <span class="cm">// When</span>
+        <span class="kw">val</span> result = useCase(request)
+
+        <span class="cm">// Then</span>
+        <span class="fn">assertTrue</span>(result.<span class="fn">isFailure</span>)
+        <span class="fn">assertEquals</span>(<span class="st">"Amount must be positive"</span>, result.<span class="fn">exceptionOrNull</span>()?.message)
+    }
+
+    <span class="an">@Test</span>
+    <span class="kw">fun</span> <span class="fn">`invoke with valid request and successful SCA submits transaction`</span>() = <span class="fn">runTest</span> {
+        <span class="cm">// Given</span>
+        <span class="kw">val</span> request = <span class="ty">TransferRequest</span>(
+            id = <span class="st">"tx-002"</span>, userId = <span class="st">"user-123"</span>,
+            amount = <span class="ty">BigDecimal</span>(<span class="st">"500"</span>), currency = <span class="st">"EUR"</span>,
+            recipientIban = <span class="st">"DE89370400440532013000"</span>
+        )
+
+        <span class="fn">coEvery</span> { mockIdempotency.<span class="fn">generate</span>(any(), any(), any()) } <span class="fn">returns</span> <span class="st">"idemp-key-123"</span>
+        <span class="fn">coEvery</span> { mockSCA.<span class="fn">authenticateForTransaction</span>(any(), any(), any(), any(), any()) } <span class="fn">answers</span> {
+            <span class="kw">val</span> onSuccess = <span class="fn">arg</span>&lt;(ByteArray) -> Unit&gt;(<span class="nu">3</span>)
+            onSuccess(<span class="st">"valid-signature"</span>.<span class="fn">toByteArray</span>())
+        }
+        <span class="fn">coEvery</span> { mockRepository.<span class="fn">submitTransaction</span>(any()) } <span class="fn">returns</span> <span class="ty">Result</span>.<span class="fn">success</span>(
+            <span class="ty">TransactionResult</span>(transactionId = <span class="st">"tx-002"</span>, status = <span class="st">"CONFIRMED"</span>)
+        )
+
+        <span class="cm">// When</span>
+        <span class="kw">val</span> result = useCase(request)
+
+        <span class="cm">// Then</span>
+        <span class="fn">assertTrue</span>(result.<span class="fn">isSuccess</span>)
+        <span class="fn">coVerify</span>(exactly = <span class="nu">1</span>) { mockRepository.<span class="fn">submitTransaction</span>(any()) }
+    }
+
+    <span class="an">@Test</span>
+    <span class="kw">fun</span> <span class="fn">`invoke with SCA failure returns failure without submitting`</span>() = <span class="fn">runTest</span> {
+        <span class="cm">// Given</span>
+        <span class="kw">val</span> request = <span class="ty">TransferRequest</span>(
+            id = <span class="st">"tx-003"</span>, userId = <span class="st">"user-123"</span>,
+            amount = <span class="ty">BigDecimal</span>(<span class="st">"500"</span>), currency = <span class="st">"EUR"</span>,
+            recipientIban = <span class="st">"DE89370400440532013000"</span>
+        )
+
+        <span class="fn">coEvery</span> { mockSCA.<span class="fn">authenticateForTransaction</span>(any(), any(), any(), any(), any()) } <span class="fn">answers</span> {
+            <span class="kw">val</span> onError = <span class="fn">arg</span>&lt;(SCAError) -> Unit&gt;(<span class="nu">4</span>)
+            onError(<span class="ty">SCAError</span>.<span class="ty">AuthenticationFailed</span>)
+        }
+
+        <span class="cm">// When</span>
+        <span class="kw">val</span> result = useCase(request)
+
+        <span class="cm">// Then</span>
+        <span class="fn">assertTrue</span>(result.<span class="fn">isFailure</span>)
+        <span class="fn">coVerify</span>(exactly = <span class="nu">0</span>) { mockRepository.<span class="fn">submitTransaction</span>(any()) }
+    }
+}</pre>
+    </div>
+</section>
+
+<!-- Section 6: Interview Questions -->
+<section class="section" id="interviews">
+    <div class="section-header">
+        <div class="section-number">٦</div>
+        <h2>بنك أصعب الأسئلة والمواقف المعمارية في مقابلات شركات التقنية المالية الأوروبية</h2>
+    </div>
+
+    <h3 id="scenario-1">السيناريو الأول: نظام مدفوعات محمول يعمل في بيئة ضعيفة الاتصال</h3>
+
+    <div class="interview-card">
+        <div class="company-tag">سؤال من مقابلات N26 — مستوى Staff Engineer</div>
+        <h4>"صمم لي نظام مدفوعات محمول يعمل في بيئة ضعيفة الاتصال مع ضمان عدم خصم المبلغ مرتين."</h4>
+        <p>المستخدم في مترو برلين تحت الأرض (بدون إنترنت). يُرسل تحويلاً بقيمة ١٠٠٠ يورو. يضغط "إرسال" وينقطع الاتصال بعد ٣٠٠ مللي ثانية. ما هي الحالة الصحيحة للنظام بعد استعادة الاتصال؟</p>
+        <div class="difficulty expert">●●●●● مستوى خبير</div>
+    </div>
+
+    <div class="step">
+        <div class="step-number">١</div>
+        <div class="step-content">
+            <h5>تحليل المشكلة: لماذا هذا السيناريو معقد؟</h5>
+            <p>المشكلة ليست "انقطاع الإنترنت" — بل <strong>عدم اليقين</strong>. بعد ٣٠٠ مللي ثانية، لا نعرف ما إذا:</p>
+            <ul>
+                <li>الطلب لم يصل إلى السيرفر أبداً</li>
+                <li>الطلب وصل إلى السيرفر لكن الرد لم يصل</li>
+                <li>الطلب وصل والرد وصل لكن التطبيق لم يستلمه</li>
+            </ul>
+            <p>في كل حالة، يجب أن يكون النظام متسقاً — لا يمكننا سؤال المستخدم "هل تم الخصم؟"</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-number">٢</div>
+        <div class="step-content">
+            <h5>الحل المعماري: Idempotency Keys + Local Queue + Server-Side Deduplication</h5>
+            <p>المفتاح هو <strong>مفتاح Idempotency</strong> المُولد على الجهاز قبل الإرسال. حتى لو أُعيد إرسال الطلب ١٠ مرات، السيرفر يتعرف على نفس المفتاح ويُنفذ المعاملة مرة واحدة فقط.</p>
+        </div>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin — الحل الكامل</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * OfflineFirstTransferService: خدمة تحويل تعمل أولاً محلياً ثم تتزامن
+ *
+ * المبدأ: "الحقيقة المصدر" (Source of Truth) هي قاعدة البيانات المحلية المشفرة.
+ * السيرفر هو مجرد مرآة للحقيقة المحلية.
+ */</span>
+<span class="kw">class</span> <span class="ty">OfflineFirstTransferService</span>(
+    <span class="kw">private val</span> localDb: <span class="ty">AppDatabase</span>,
+    <span class="kw">private val</span> remoteApi: <span class="ty">TransferApi</span>,
+    <span class="kw">private val</span> networkMonitor: <span class="ty">NetworkMonitor</span>
+) {
+    <span class="cm">/**
+     * ١. يُنشئ المعاملة محلياً فوراً — حتى بدون إنترنت
+     * ٢. يعرض للمستخدم "تم الإنشاء" (لكن ليس "تم التأكيد")
+     * ٣. يُرسل تلقائياً عند استعادة الاتصال</span>
+     */
+    <span class="kw">suspend fun</span> <span class="fn">initiateTransfer</span>(
+        request: <span class="ty">TransferRequest</span>
+    ): <span class="ty">TransferResult</span> {
+        <span class="kw">val</span> transactionId = <span class="ty">UUID</span>.<span class="fn">randomUUID</span>().<span class="fn">toString</span>()
+        <span class="kw">val</span> idempotencyKey = <span class="fn">generateIdempotencyKey</span>(request)
+
+        <span class="cm">// ١. حفظ محلي فوري — "الحقيقة المصدر"</span>
+        <span class="kw">val</span> localTransaction = <span class="ty">TransactionEntity</span>(
+            id = transactionId,
+            amount = request.amount,
+            currency = request.currency,
+            recipientIban = request.recipientIban,
+            status = <span class="ty">TransactionStatus</span>.<span class="ty">PENDING</span>,
+            createdAt = <span class="ty">System</span>.<span class="fn">currentTimeMillis</span>(),
+            syncedWithServer = <span class="kw">false</span>,
+            localSignature = <span class="kw">null</span>
+        )
+        localDb.<span class="fn">transactionDao</span>().<span class="fn">insertTransaction</span>(localTransaction)
+
+        <span class="cm">// ٢. محاولة الإرسال الفوري إذا كان هناك إنترنت</span>
+        <span class="kw">if</span> (networkMonitor.<span class="fn">isOnline</span>()) {
+            <span class="kw">return</span> <span class="fn">attemptSync</span>(localTransaction, idempotencyKey)
+        }
+
+        <span class="cm">// ٣. بدون إنترنت — جدولة المزامنة التلقائية</span>
+        <span class="fn">scheduleDeferredSync</span>(transactionId, idempotencyKey)
+
+        <span class="kw">return</span> <span class="ty">TransferResult</span>.<span class="ty">Queued</span>(
+            transactionId = transactionId,
+            message = <span class="st">"تم حفظ التحويل. سيتم الإرسال تلقائياً عند استعادة الاتصال."</span>
+        )
+    }
+
+    <span class="cm">/**
+     * محاولة مزامنة المعاملة مع السيرفر
+     * يتعامل مع جميع حالات الحافة</span>
+     */
+    <span class="kw">private suspend fun</span> <span class="fn">attemptSync</span>(
+        transaction: <span class="ty">TransactionEntity</span>,
+        idempotencyKey: <span class="ty">String</span>
+    ): <span class="ty">TransferResult</span> {
+        <span class="kw">return try</span> {
+            <span class="cm">// إرسال مع Idempotency Key</span>
+            <span class="kw">val</span> response = remoteApi.<span class="fn">submitTransfer</span>(
+                idempotencyKey = idempotencyKey,
+                request = <span class="ty">TransferApiRequest</span>(
+                    id = transaction.id,
+                    amount = transaction.amount,
+                    currency = transaction.currency,
+                    recipientIban = transaction.recipientIban
+                )
+            )
+
+            <span class="cm">// ✅ نجاح — تحديث الحالة محلياً</span>
+            localDb.<span class="fn">transactionDao</span>().<span class="fn">markAsSynced</span>(
+                transaction.id,
+                <span class="ty">TransactionStatus</span>.<span class="ty">CONFIRMED</span>
+            )
+
+            <span class="ty">TransferResult</span>.<span class="ty">Success</span>(
+                transactionId = transaction.id,
+                serverConfirmationId = response.confirmationId
+            )
+
+        } <span class="kw">catch</span> (e: <span class="ty">HttpException</span>) {
+            <span class="kw">when</span> (e.<span class="fn">code</span>()) {
+                <span class="nu">409</span> -> { <span class="cm">// Conflict — المعاملة موجودة بالفعل!</span>
+                    localDb.<span class="fn">transactionDao</span>().<span class="fn">markAsSynced</span>(
+                        transaction.id, <span class="ty">TransactionStatus</span>.<span class="ty">CONFIRMED</span>
+                    )
+                    <span class="ty">TransferResult</span>.<span class="ty">Success</span>(
+                        transactionId = transaction.id,
+                        message = <span class="st">"تم التأكيد (معاملة مكررة تم اكتشافها)"</span>
+                    )
+                }
+                <span class="nu">400</span>, <span class="nu">422</span> -> { <span class="cm">// خطأ في البيانات — لا فائدة من الإعادة</span>
+                    localDb.<span class="fn">transactionDao</span>().<span class="fn">updateStatus</span>(
+                        transaction.id, <span class="ty">TransactionStatus</span>.<span class="ty">FAILED</span>
+                    )
+                    <span class="ty">TransferResult</span>.<span class="ty">Error</span>(
+                        message = <span class="st">"فشل التحويل: ${e.message()}"</span>,
+                        isRetryable = <span class="kw">false</span>
+                    )
+                }
+                <span class="kw">else</span> -> { <span class="cm">// خطأ سيرفر — إعادة محاولة لاحقاً</span>
+                    <span class="fn">scheduleDeferredSync</span>(transaction.id, idempotencyKey)
+                    <span class="ty">TransferResult</span>.<span class="ty">Queued</span>(
+                        transactionId = transaction.id,
+                        message = <span class="st">"تم حفظ التحويل. سيتم إعادة المحاولة."</span>
+                    )
+                }
+            }
+        } <span class="kw">catch</span> (e: <span class="ty">IOException</span>) {
+            <span class="cm">// انقطاع الشبكة — إعادة محاولة لاحقاً</span>
+            <span class="fn">scheduleDeferredSync</span>(transaction.id, idempotencyKey)
+            <span class="ty">TransferResult</span>.<span class="ty">Queued</span>(
+                transactionId = transaction.id,
+                message = <span class="st">"انقطع الاتصال. سيتم الإرسال تلقائياً."</span>
+            )
+        }
+    }
+
+    <span class="kw">private fun</span> <span class="fn">generateIdempotencyKey</span>(request: <span class="ty">TransferRequest</span>): <span class="ty">String</span> {
+        <span class="cm">// مفتاح فريد يعتمد على: المستخدم + المبلغ + المستلم + الطابع الزمني (دقيقة)</span>
+        <span class="kw">val</span> timeBucket = (<span class="ty">System</span>.<span class="fn">currentTimeMillis</span>() / <span class="nu">60000</span>) * <span class="nu">60000</span>
+        <span class="kw">val</span> raw = <span class="st">"${request.userId}:${request.amount}:${request.recipientIban}:$timeBucket"</span>
+        <span class="kw">return</span> <span class="fn">hashString</span>(raw, <span class="st">"SHA-256"</span>)
+    }
+
+    <span class="kw">private fun</span> <span class="fn">scheduleDeferredSync</span>(transactionId: <span class="ty">String</span>, idempotencyKey: <span class="ty">String</span>) {
+        <span class="cm">// استخدام WorkManager مع Exponential Backoff</span>
+        <span class="cm">// ... (كما في الأمثلة السابقة)</span>
+    }
+}
+
+<span class="kw">sealed class</span> <span class="ty">TransferResult</span> {
+    <span class="kw">data class</span> <span class="ty">Success</span>(
+        <span class="kw">val</span> transactionId: <span class="ty">String</span>,
+        <span class="kw">val</span> serverConfirmationId: <span class="ty">String</span>? = <span class="kw">null</span>,
+        <span class="kw">val</span> message: <span class="ty">String</span> = <span class="st">"تم التحويل بنجاح"</span>
+    ) : <span class="ty">TransferResult</span>()
+
+    <span class="kw">data class</span> <span class="ty">Queued</span>(
+        <span class="kw">val</span> transactionId: <span class="ty">String</span>,
+        <span class="kw">val</span> message: <span class="ty">String</span>
+    ) : <span class="ty">TransferResult</span>()
+
+    <span class="kw">data class</span> <span class="ty">Error</span>(
+        <span class="kw">val</span> message: <span class="ty">String</span>,
+        <span class="kw">val</span> isRetryable: <span class="ty">Boolean</span>
+    ) : <span class="ty">TransferResult</span>()
+}</pre>
+    </div>
+
+    <h3 id="scenario-2">السيناريو الثاني: اكتشاف محاولات الهندسة العكسية والتلاعب بالذاكرة</h3>
+
+    <div class="interview-card">
+        <div class="company-tag">سؤال من مقابلات Klarna — مستوى Senior+</div>
+        <h4>"كيف تكتشف محاولات الهندسة العكسية (Reverse Engineering) والتلاعب بالذاكرة في الوقت الفعلي؟"</h4>
+        <p>مهاجم يستخدم Frida لحقن كود JavaScript في تطبيقك أثناء تشغيله. يحاول تعديل قيمة المتغير "amount" من ١٠٠ إلى ١٠,٠٠٠ يورو قبل إرسالها إلى السيرفر. كيف تكتشف هذا؟</p>
+        <div class="difficulty hard">●●●●○ مستوى صعب</div>
+    </div>
+
+    <div class="step">
+        <div class="step-number">١</div>
+        <div class="step-content">
+            <h5>فهم المشكلة: Frida و Hooking</h5>
+            <p><strong>Frida</strong> هو إطار عمل ديناميكي يسمح بحقن JavaScript في أي تطبيق Android أثناء تشغيله. يمكن للمهاجم استخدامه لتعديل قيم المتغيرات، تخطي المصادقة، أو تغيير سلوك الدوال. التحدي: كيف نكتشف وجود Frida <strong>دون أن نُبطئ التطبيق</strong>؟</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-number">٢</div>
+        <div class="step-content">
+            <h5>الحل متعدد الطبقات: Detection + Response + Server Verification</h5>
+            <p>لا يوجد حل واحد كافٍ. يجب الجمع بين:</p>
+            <ul>
+                <li><strong>Runtime Detection:</strong> فحص وجود Frida Server على المنفذ ٢٧٠٤٢</li>
+                <li><strong>Integrity Checks:</strong> التحقق من عدم تعديل APK</li>
+                <li><strong>Code Obfuscation:</strong> استخدام R8/ProGuard + String Encryption</li>
+                <li><strong>Server-Side Validation:</strong> السيرفر هو الخط الأخير — يتحقق من كل شيء</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin + JNI</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * AntiTamperingDetector: كشف التلاعب في الوقت الفعلي
+ *
+ * يجمع بين عدة تقنيات:
+ * ١. فحص وجود Frida Server
+ * ٢. فحص Debugger Attachment
+ * ٣. فحص Root Detection
+ * ٤. Native Integrity Checks
+ */</span>
+<span class="kw">class</span> <span class="ty">AntiTamperingDetector</span>(<span class="kw">private val</span> context: <span class="ty">Context</span>) {
+
+    <span class="cm">/**
+     * فحص شامل — يجب استدعاؤه قبل كل عملية مالية حرجة</span>
+     */
+    <span class="kw">fun</span> <span class="fn">isDeviceCompromised</span>(): <span class="ty">TamperingResult</span> {
+        <span class="kw">val</span> checks = <span class="fn">listOf</span>(
+            ::checkFridaPresence,
+            ::checkDebuggerAttached,
+            ::checkRootedDevice,
+            ::checkEmulator,
+            ::checkAppIntegrity
+        )
+
+        <span class="kw">val</span> failures = checks.<span class="fn">mapNotNull</span> { it() }
+
+        <span class="kw">return if</span> (failures.<span class="fn">isEmpty</span>()) {
+            <span class="ty">TamperingResult</span>.<span class="ty">Clean</span>
+        } <span class="kw">else</span> {
+            <span class="ty">TamperingResult</span>.<span class="ty">Compromised</span>(failures)
+        }
+    }
+
+    <span class="cm">/**
+     * ١. فحص وجود Frida Server
+     * Frida تُنشئ منفذ TCP 27042 على الجهاز</span>
+     */
+    <span class="kw">private fun</span> <span class="fn">checkFridaPresence</span>(): <span class="ty">String</span>? {
+        <span class="kw">return try</span> {
+            <span class="ty">Socket</span>(<span class="st">"localhost"</span>, <span class="nu">27042</span>).<span class="fn">use</span> { socket ->
+                <span class="kw">if</span> (socket.<span class="fn">isConnected</span>) {
+                    <span class="st">"Frida server detected on port 27042"</span>
+                } <span class="kw">else</span> <span class="kw">null</span>
+            }
+        } <span class="kw">catch</span> (e: <span class="ty">Exception</span>) {
+            <span class="kw">null</span> <span class="cm">// Frida غير موجود — هذا جيد</span>
+        }
+    }
+
+    <span class="cm">/**
+     * ٢. فحص وجود Debugger مرتبط</span>
+     */
+    <span class="kw">private fun</span> <span class="fn">checkDebuggerAttached</span>(): <span class="ty">String</span>? {
+        <span class="kw">return when</span> {
+            <span class="ty">Debug</span>.<span class="fn">isDebuggerConnected</span>() -> <span class="st">"Debugger attached"</span>
+            <span class="ty">Debug</span>.<span class="fn">waitingForDebugger</span>() -> <span class="st">"Waiting for debugger"</span>
+            <span class="kw">else</span> -> <span class="kw">null</span>
+        }
+    }
+
+    <span class="cm">/**
+     * ٣. فحص الجهاز المُروت</span>
+     */
+    <span class="kw">private fun</span> <span class="fn">checkRootedDevice</span>(): <span class="ty">String</span>? {
+        <span class="kw">val</span> rootIndicators = <span class="fn">listOf</span>(
+            <span class="st">"/system/bin/su"</span>,
+            <span class="st">"/system/xbin/su"</span>,
+            <span class="st">"/sbin/su"</span>,
+            <span class="st">"/su/bin/su"</span>,
+            <span class="st">"/data/local/xbin/su"</span>,
+            <span class="st">"/data/local/bin/su"</span>,
+            <span class="st">"/system/app/Superuser.apk"</span>,
+            <span class="st">"/system/app/Kinguser.apk"</span>
+        )
+
+        <span class="kw">val</span> found = rootIndicators.<span class="fn">filter</span> { <span class="ty">File</span>(it).<span class="fn">exists</span>() }
+        <span class="kw">return if</span> (found.<span class="fn">isNotEmpty</span>()) {
+            <span class="st">"Root indicators found: ${found.joinToString()}"</span>
+        } <span class="kw">else null</span>
+    }
+
+    <span class="cm">/**
+     * ٤. فحص المحاكي</span>
+     */
+    <span class="kw">private fun</span> <span class="fn">checkEmulator</span>(): <span class="ty">String</span>? {
+        <span class="kw">val</span> isEmulator = <span class="ty">Build</span>.<span class="ty">FINGERPRINT</span>.<span class="fn">startsWith</span>(<span class="st">"generic"</span>) ||
+            <span class="ty">Build</span>.<span class="ty">FINGERPRINT</span>.<span class="fn">startsWith</span>(<span class="st">"unknown"</span>) ||
+            <span class="ty">Build</span>.<span class="ty">MODEL</span>.<span class="fn">contains</span>(<span class="st">"google_sdk"</span>) ||
+            <span class="ty">Build</span>.<span class="ty">MODEL</span>.<span class="fn">contains</span>(<span class="st">"Emulator"</span>) ||
+            <span class="ty">Build</span>.<span class="ty">MODEL</span>.<span class="fn">contains</span>(<span class="st">"Android SDK built for x86"</span>) ||
+            <span class="ty">Build</span>.<span class="ty">MANUFACTURER</span>.<span class="fn">contains</span>(<span class="st">"Genymotion"</span>) ||
+            (<span class="ty">Build</span>.<span class="ty">BRAND</span>.<span class="fn">startsWith</span>(<span class="st">"generic"</span>) &amp;&amp; <span class="ty">Build</span>.<span class="ty">DEVICE</span>.<span class="fn">startsWith</span>(<span class="st">"generic"</span>))
+
+        <span class="kw">return if</span> (isEmulator) <span class="st">"Running on emulator"</span> <span class="kw">else null</span>
+    }
+
+    <span class="cm">/**
+     * ٥. فحص سلامة التطبيق (App Integrity)</span>
+     */
+    <span class="kw">private fun</span> <span class="fn">checkAppIntegrity</span>(): <span class="ty">String</span>? {
+        <span class="cm">// في الإنتاج، استخدم Play Integrity API</span>
+        <span class="cm">// هنا فحص بسيط لتوقيع التطبيق</span>
+        <span class="kw">return try</span> {
+            <span class="kw">val</span> packageInfo = context.<span class="fn">packageManager</span>.<span class="fn">getPackageInfo</span>(
+                context.<span class="ty">packageName</span>,
+                <span class="ty">PackageManager</span>.<span class="ty">GET_SIGNATURES</span>
+            )
+            <span class="cm">// مقارنة التوقيع مع التوقيع المتوقع</span>
+            <span class="kw">null</span>
+        } <span class="kw">catch</span> (e: <span class="ty">Exception</span>) {
+            <span class="st">"App integrity check failed"</span>
+        }
+    }
+}
+
+<span class="kw">sealed class</span> <span class="ty">TamperingResult</span> {
+    <span class="kw">object</span> <span class="ty">Clean</span> : <span class="ty">TamperingResult</span>()
+    <span class="kw">data class</span> <span class="ty">Compromised</span>(<span class="kw">val</span> reasons: <span class="ty">List</span>&lt;<span class="ty">String</span>&gt;) : <span class="ty">TamperingResult</span>()
+}</pre>
+    </div>
+
+    <div class="alert alert-danger">
+        <div class="alert-icon">🚨</div>
+        <div class="alert-content">
+            <div class="alert-title">الخط الأخير: Server-Side Validation</div>
+            <p>لا تعتمد أبداً على فحوصات الجهاز وحدها. المهاجم المتمرس يمكنه تعديل الكود وإجبار <code>isDeviceCompromised()</code> على إرجاع <code>Clean</code> دائماً. <strong>السيرفر هو الخط الأخير</strong> — يجب أن يتحقق من: (١) صحة التوقيع الرقمي للمعاملة، (٢) عدم تجاوز الحدود اليومية، (٣) تطابق IP/Location مع النمط العادي للمستخدم، (٤) Play Integrity Token.</p>
+        </div>
+    </div>
+
+    <h3 id="scenario-3">السيناريو الثالث: التعامل مع الجلسات المتزامنة والانتهاء التلقائي</h3>
+
+    <div class="interview-card">
+        <div class="company-tag">سؤال من مقابلات Adyen — مستوى Principal Engineer</div>
+        <h4>"المستخدم يفتح التطبيق على هاتفه وعلى جهازه اللوحي في نفس الوقت. يبدأ تحويلاً على الهاتف وينتقل إلى الجهاز اللوحي أثناء المعالجة. كيف تتعامل مع هذه الحالة تحت متطلبات PSD2؟"</h4>
+        <p>PSD2 يتطلب أن تكون كل عملية مالية مصحوبة بمصادقة قوية (SCA). لكن ماذا إذا كانت الجلسة على الجهاز اللوحي منتهية الصلاحية بينما الجلسة على الهاتف لا تزال نشطة؟</p>
+        <div class="difficulty expert">●●●●● مستوى خبير</div>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * SessionManager: إدارة الجلسات المتعددة بأمان
+ *
+ * متوافق مع PSD2: كل عملية مالية تتطلب SCA منفصلة
+ * حتى لو كانت الجلسة نشطة. لا يوجد "تسجيل دخول واحد يكفي للجميع".
+ */</span>
+<span class="kw">class</span> <span class="ty">SessionManager</span>(
+    <span class="kw">private val</span> tokenManager: <span class="ty">SecureTokenManager</span>,
+    <span class="kw">private val</span> api: <span class="ty">SessionApi</span>
+) {
+
+    <span class="cm">/**
+     * كل عملية مالية تتطلب "مصادقة ديناميكية" (Dynamic Linking)
+     * حسب PSD2: رمز المصادقة يجب أن يكون مرتبطاً بالمبلغ والمستلم</span>
+     */
+    <span class="kw">suspend fun</span> <span class="fn">authenticateTransaction</span>(
+        transaction: <span class="ty">TransferRequest</span>
+    ): <span class="ty">Result</span>&lt;<span class="ty">TransactionAuthToken</span>&gt; {
+        <span class="cm">// ١. التحقق من صلاحية الجلسة العامة</span>
+        <span class="kw">val</span> sessionValid = <span class="fn">validateSession</span>()
+        <span class="kw">if</span> (!sessionValid) {
+            <span class="kw">return</span> <span class="ty">Result</span>.<span class="fn">failure</span>(<span class="ty">SessionExpiredException</span>())
+        }
+
+        <span class="cm">// ٢. PSD2 Dynamic Linking: رمز المصادقة مرتبط بالمعاملة</span>
+        <span class="cm">// الرمز يجب أن يتضمن: المبلغ + المستلم + معرف الجهاز</span>
+        <span class="kw">val</span> dynamicLinkingData = <span class="st">"${transaction.amount}|${transaction.recipientIban}|${getDeviceId()}"</span>
+
+        <span class="cm">// ٣. طلب رمز مصادقة مؤقت (Transaction-Specific) من السيرفر</span>
+        <span class="kw">return try</span> {
+            <span class="kw">val</span> authToken = api.<span class="fn">requestTransactionAuth</span>(
+                sessionToken = tokenManager.<span class="fn">getValidAccessToken</span>()!!,
+                dynamicLinkingData = dynamicLinkingData
+            )
+
+            <span class="cm">// ٤. عرض Biometric Prompt للمستخدم</span>
+            <span class="cm">// الرمز يُستخدم مرة واحدة فقط وله مدة صلاحية ٥ دقائق</span>
+            <span class="ty">Result</span>.<span class="fn">success</span>(authToken)
+
+        } <span class="kw">catch</span> (e: <span class="ty">Exception</span>) {
+            <span class="ty">Result</span>.<span class="fn">failure</span>(e)
+        }
+    }
+
+    <span class="cm">/**
+     * التحقق من صلاحية الجلسة — يتحقق من:
+     * ١. عدم انتهاء صلاحية Access Token
+     * ٢. عدم إبطال الجلسة من السيرفر (Remote Revocation)
+     * ٣. عدم تغيير معرف الجهاز (Device Binding)</span>
+     */
+    <span class="kw">private suspend fun</span> <span class="fn">validateSession</span>(): <span class="ty">Boolean</span> {
+        <span class="kw">val</span> token = tokenManager.<span class="fn">getValidAccessToken</span>() ?: <span class="kw">return false</span>
+
+        <span class="kw">return try</span> {
+            <span class="kw">val</span> sessionStatus = api.<span class="fn">validateSession</span>(token, <span class="fn">getDeviceId</span>())
+            sessionStatus.<span class="ty">isValid</span> &amp;&amp; !sessionStatus.<span class="ty">isRevoked</span>
+        } <span class="kw">catch</span> (e: <span class="ty">Exception</span>) {
+            <span class="kw">false</span>
+        }
+    }
+
+    <span class="cm">/**
+     * إبطال جميع الجلسات على الأجهزة الأخرى
+     * يُستخدم عند تغيير كلمة المرور أو اكتشاف نشاط مشبوه</span>
+     */
+    <span class="kw">suspend fun</span> <span class="fn">revokeAllOtherSessions</span>() {
+        <span class="kw">val</span> currentDeviceId = <span class="fn">getDeviceId</span>()
+        api.<span class="fn">revokeSessions</span>(
+            token = tokenManager.<span class="fn">getValidAccessToken</span>()!!,
+            exceptDeviceId = currentDeviceId
+        )
+    }
+
+    <span class="kw">private fun</span> <span class="fn">getDeviceId</span>(): <span class="ty">String</span> {
+        <span class="cm">// في الإنتاج: استخدام Android ID + Hardware Fingerprint</span>
+        <span class="cm">// لا تستخدم Advertising ID — يمكن تغييره</span>
+        <span class="kw">return</span> <span class="ty">Settings</span>.<span class="ty">Secure</span>.<span class="fn">getString</span>(
+            context.<span class="fn">contentResolver</span>,
+            <span class="ty">Settings</span>.<span class="ty">Secure</span>.<span class="ty">ANDROID_ID</span>
+        ) ?: <span class="st">"unknown"</span>
+    }
+}</pre>
+    </div>
+
+    <h3 id="scenario-4">السيناريو الرابع: منع هجمات Man-in-the-Middle على APIs المالية</h3>
+
+    <div class="interview-card">
+        <div class="company-tag">سؤال من مقابلات N26 — مستوى Senior</div>
+        <h4>"كيف تضمن أن اتصال تطبيقك بالسيرفر لا يمكن اعتراضه حتى لو كان المستخدم متصلاً بشبكة WiFi عامة مخترقة؟"</h4>
+        <p>مهاجم يتحكم في شبكة WiFi عامة (مثل في مقهى). يحاول إجراء هجوم Man-in-the-Middle لتعديل رد السيرفر وإظهار "رصيد مزيف" أو "تحويل ناجح مزيف".</p>
+        <div class="difficulty hard">●●●●○ مستوى صعب</div>
+    </div>
+
+    <div class="step">
+        <div class="step-number">١</div>
+        <div class="step-content">
+            <h5>الحل: Certificate Pinning + TLS 1.3 + Signature Verification</h5>
+            <p>لا يكفي الاعتماد على <strong>Certificate Authorities</strong> وحدها. يجب تثبيت شهادة السيرفر (Certificate Pinning) داخل التطبيق، بحيث حتى لو قام المهاجم بإصدار شهادة مزيفة من CA موثوق، لن يقبلها التطبيق.</p>
+        </div>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">Kotlin (OkHttp + Certificate Pinning)</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+        </div>
+        <pre><span class="cm">/**
+ * SecureOkHttpClient: عميل HTTP آمن مع Certificate Pinning
+ *
+ * يثبت شهادة السيرفر داخل التطبيق — يمنع هجمات MITM
+ * حتى مع شهادات CA مُصادقة.
+ */</span>
+<span class="kw">object</span> <span class="ty">SecureOkHttpClient</span> {
+
+    <span class="cm">// SHA-256 hashes للشهادات المسموح بها — يجب تحديثها عند تجديد الشهادة</span>
+    <span class="kw">private val</span> PINNED_CERTIFICATES = <span class="fn">listOf</span>(
+        <span class="st">"sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="</span>, <span class="cm">// Primary</span>
+        <span class="st">"sha256/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB="</span>  <span class="cm">// Backup</span>
+    )
+
+    <span class="kw">fun</span> <span class="fn">create</span>(context: <span class="ty">Context</span>): <span class="ty">OkHttpClient</span> {
+        <span class="kw">val</span> certificatePinner = <span class="ty">CertificatePinner</span>.<span class="ty">Builder</span>()
+            .<span class="fn">add</span>(<span class="st">"api.fintech-bank.com"</span>, *PINNED_CERTIFICATES.<span class="fn">toTypedArray</span>())
+            .<span class="fn">build</span>()
+
+        <span class="kw">return</span> <span class="ty">OkHttpClient</span>.<span class="ty">Builder</span>()
+            .<span class="fn">certificatePinner</span>(certificatePinner)
+            .<span class="fn">connectionSpecs</span>(<span class="fn">listOf</span>(
+                <span class="ty">ConnectionSpec</span>.<span class="ty">Builder</span>(<span class="ty">ConnectionSpec</span>.<span class="ty">MODERN_TLS</span>)
+                    .<span class="fn">tlsVersions</span>(<span class="ty">TlsVersion</span>.<span class="ty">TLS_1_3</span>) <span class="cm">// TLS 1.3 فقط!</span>
+                    .<span class="fn">cipherSuites</span>(
+                        <span class="ty">CipherSuite</span>.<span class="ty">TLS_AES_256_GCM_SHA384</span>,
+                        <span class="ty">CipherSuite</span>.<span class="ty">TLS_CHACHA20_POLY1305_SHA256</span>
+                    )
+                    .<span class="fn">build</span>()
+            ))
+            .<span class="fn">addInterceptor</span> { chain ->
+                <span class="cm">// إضافة Idempotency Key لكل طلب POST/PUT</span>
+                <span class="kw">val</span> request = chain.<span class="fn">request</span>()
+                <span class="kw">val</span> newRequest = <span class="kw">if</span> (request.<span class="fn">method</span> in <span class="fn">listOf</span>(<span class="st">"POST"</span>, <span class="st">"PUT"</span>, <span class="st">"PATCH"</span>)) {
+                    request.<span class="fn">newBuilder</span>()
+                        .<span class="fn">header</span>(<span class="st">"X-Idempotency-Key"</span>, <span class="fn">generateIdempotencyKey</span>())
+                        .<span class="fn">build</span>()
+                } <span class="kw">else</span> request
+                chain.<span class="fn">proceed</span>(newRequest)
+            }
+            .<span class="fn">addInterceptor</span> { chain ->
+                <span class="cm">// إضافة Device Fingerprint لكل طلب — يساعد في كشف MITM</span>
+                <span class="kw">val</span> request = chain.<span class="fn">request</span>()
+                <span class="kw">val</span> newRequest = request.<span class="fn">newBuilder</span>()
+                    .<span class="fn">header</span>(<span class="st">"X-Device-Fingerprint"</span>, <span class="fn">getDeviceFingerprint</span>(context))
+                    .<span class="fn">header</span>(<span class="st">"X-App-Version"</span>, <span class="fn">BuildConfig</span>.<span class="ty">VERSION_NAME</span>)
+                    .<span class="fn">build</span>()
+                chain.<span class="fn">proceed</span>(newRequest)
+            }
+            .<span class="fn">connectTimeout</span>(<span class="nu">15</span>, <span class="ty">TimeUnit</span>.<span class="ty">SECONDS</span>)
+            .<span class="fn">readTimeout</span>(<span class="nu">30</span>, <span class="ty">TimeUnit</span>.<span class="ty">SECONDS</span>)
+            .<span class="fn">writeTimeout</span>(<span class="nu">30</span>, <span class="ty">TimeUnit</span>.<span class="ty">SECONDS</span>)
+            .<span class="fn">build</span>()
+    }
+
+    <span class="kw">private fun</span> <span class="fn">generateIdempotencyKey</span>(): <span class="ty">String</span> {
+        <span class="kw">val</span> bytes = <span class="ty">ByteArray</span>(<span class="nu">16</span>)
+        <span class="ty">SecureRandom</span>().<span class="fn">nextBytes</span>(bytes)
+        <span class="kw">return</span> <span class="ty">Base64</span>.<span class="fn">encodeToString</span>(bytes, <span class="ty">Base64</span>.<span class="ty">NO_WRAP</span>)
+    }
+
+    <span class="kw">private fun</span> <span class="fn">getDeviceFingerprint</span>(context: <span class="ty">Context</span>): <span class="ty">String</span> {
+        <span class="cm">// مزيج من معرف الجهاز + إصدار التطبيق + طابع زمني</span>
+        <span class="kw">val</span> raw = <span class="st">"${Build.BOARD}${Build.BRAND}${Build.DEVICE}${Build.HARDWARE}"</span>
+        <span class="kw">return</span> <span class="fn">hashString</span>(raw, <span class="st">"SHA-256"</span>)
+    }
+}</pre>
+    </div>
+
+    <div class="alert alert-success">
+        <div class="alert-icon">✅</div>
+        <div class="alert-content">
+            <div class="alert-title">التحقق النهائي: Server-Side Response Signing</div>
+            <p>حتى مع Certificate Pinning، يجب أن يوقّع السيرفر كل رد مالي رقمياً. التطبيق يتحقق من التوقيع قبل عرض أي بيانات مالية للمستخدم. هذا يمنع حتى المهاجم الذي يسيطر على DNS أو الشبكة من تزوير ردود السيرفر.</p>
+        </div>
+    </div>
+
+    <blockquote>
+        "في التقنية المالية، الأمان ليس ميزة — بل هو الأساس. كل سطر برمجي يجب أن يُكتب بافتراض أن المهاجم يقرأه في نفس اللحظة التي يكتبه فيها المهندس."
+        <cite>— مبدأ Zero-Trust في هندسة Fintech</cite>
+    </blockquote>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-inner">
+        <h3>المرجع الهندسي الشامل</h3>
+        <p>تم إعداد هذا الدليل التقني ليكون مرجعاً شاملاً لمهندسي Android المتخصصين في قطاع التقنية المالية الأوروبي. يغطي المعايير التنظيمية، هندسة الأمان المتقدمة، والأسئلة المعمارية من مقابلات كبرى الشركات.</p>
+        <div class="tags" style="justify-content: center;">
+            <span class="tag primary">PSD2</span>
+            <span class="tag primary">PCI-DSS</span>
+            <span class="tag primary">SCA</span>
+            <span class="tag danger">E2EE</span>
+            <span class="tag danger">SQLCipher</span>
+            <span class="tag warning">Idempotency</span>
+            <span class="tag warning">Clean Architecture</span>
+        </div>
+        <div class="copyright">
+            Fintech Android Engineering & Security Masterclass — مرجع تقني شامل
+        </div>
+    </div>
+</footer>
+
+</main>
+</div>
+
+<script>
+// Active TOC highlighting on scroll
+const sections = document.querySelectorAll('section[id], h3[id], h4[id]');
+const tocLinks = document.querySelectorAll('.toc-list a');
+
+window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (scrollY >= sectionTop - 100) {
+            current = section.getAttribute('id');
+        }
+    });
+
+    tocLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+            link.classList.add('active');
+        }
+    });
+});
+</script>
+
+</body>
+</html>

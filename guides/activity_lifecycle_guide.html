@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity Lifecycle — المرجع الشامل وأسئلة المقابلات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1419;
+  --surface:#161c24;
+  --surface-2:#1c2430;
+  --wall:#2a3444;
+  --gold:#d4a35a;
+  --coral:#e08e79;
+  --blue:#5b8fa8;
+  --text:#e8e6e1;
+  --muted:#8b93a1;
+  --danger:#c96f5c;
+  --good:#7fae8e;
+  --code-bg:#0b0f14;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--text); font-family:'IBM Plex Sans Arabic', sans-serif; line-height:1.9; font-size:16px;}
+::selection{background:var(--coral); color:#0f1419;}
+
+.blueprint-bg{
+  position:fixed; inset:0; z-index:-1; opacity:.05;
+  background-image: repeating-conic-gradient(var(--coral) 0% 1%, transparent 0% 2%);
+  background-size:60px 60px;
+}
+
+/* ============ Hero ============ */
+.hero{
+  min-height:92vh; display:flex; flex-direction:column; justify-content:center; align-items:center;
+  text-align:center; padding:40px 20px; position:relative; border-bottom:1px solid var(--wall);
+}
+.hero .eyebrow{font-family:'IBM Plex Mono', monospace; color:var(--coral); letter-spacing:4px; font-size:13px; margin-bottom:24px; text-transform:uppercase;}
+.hero h1{font-family:'Space Grotesk', sans-serif; font-size:clamp(36px,7.5vw,76px); font-weight:700; color:var(--text); line-height:1.1; margin-bottom:20px;}
+.hero h1 span{color:var(--gold);}
+.hero p.sub{color:var(--muted); font-size:19px; max-width:660px; margin-bottom:36px;}
+
+.lccircle{width:min(420px,80vw); margin-top:10px;}
+.lccircle svg{width:100%; height:auto; display:block;}
+.lccircle .ring{fill:none; stroke:var(--wall); stroke-width:2;}
+.lccircle .node{fill:var(--surface-2); stroke:var(--wall); stroke-width:2;}
+.lccircle .node.active{stroke:var(--gold); stroke-width:2.5;}
+.lccircle .arrow{stroke:var(--coral); stroke-width:1.6; fill:none; marker-end:url(#arrowhead);}
+.lccircle text{font-family:'IBM Plex Mono', monospace; font-size:11.5px; fill:var(--muted);}
+.lccircle text.gold{fill:var(--gold);}
+
+/* ============ Layout ============ */
+.wrap{max-width:920px; margin:0 auto; padding:0 24px;}
+.toc{background:var(--surface); border:1px solid var(--wall); border-radius:4px; padding:32px; margin:60px auto;}
+.toc h2{font-family:'Space Grotesk', sans-serif; color:var(--coral); font-size:14px; letter-spacing:3px; text-transform:uppercase; margin-bottom:20px;}
+.toc ol{list-style:none; counter-reset:toc;}
+.toc li{counter-increment:toc; padding:10px 0; border-bottom:1px dashed var(--wall); display:flex; align-items:baseline; gap:14px;}
+.toc li:last-child{border-bottom:none;}
+.toc li::before{content:counter(toc, decimal-leading-zero); font-family:'IBM Plex Mono', monospace; color:var(--blue); font-size:13px; min-width:28px;}
+.toc a{color:var(--text); text-decoration:none; font-weight:500;}
+.toc a:hover{color:var(--gold);}
+
+/* ============ Sections ============ */
+.stage{position:relative; margin:0 auto 0; padding:70px 24px 80px; border-bottom:2px solid var(--wall);}
+.stage::before{content:''; position:absolute; top:0; right:0; bottom:0; width:6px; background:linear-gradient(var(--coral), transparent 80%); opacity:.5;}
+.stage-tag{font-family:'IBM Plex Mono', monospace; color:var(--blue); font-size:12px; letter-spacing:3px; text-transform:uppercase; margin-bottom:14px;}
+.stage h2{font-family:'Space Grotesk', sans-serif; font-size:clamp(26px,4vw,40px); color:var(--text); margin-bottom:8px;}
+.stage h2 em{color:var(--gold); font-style:normal;}
+.stage .lead{color:var(--muted); font-size:18px; max-width:720px; margin-bottom:40px;}
+.stage h3{font-family:'Space Grotesk', sans-serif; font-size:22px; color:var(--coral); margin:36px 0 14px;}
+.stage p{max-width:760px; margin-bottom:16px; color:#d3d1cc;}
+.stage ul, .stage ol{margin:0 0 20px 0; padding-right:22px; max-width:760px;}
+.stage li{margin-bottom:10px; color:#d3d1cc;}
+.stage li strong{color:var(--text);}
+
+/* ============ Code ============ */
+pre{background:var(--code-bg); border:1px solid var(--wall); border-radius:6px; padding:20px 22px; overflow-x:auto; margin:18px 0 26px; direction:ltr; text-align:left; position:relative;}
+pre::before{content:attr(data-lang); position:absolute; top:8px; left:16px; font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--muted); letter-spacing:2px; text-transform:uppercase;}
+code{font-family:'IBM Plex Mono', monospace; font-size:14px; color:#c9d4de; line-height:1.7;}
+pre code{display:block; padding-top:14px;}
+.kw{color:#c586c0;} .tp{color:#4ec9b0;} .an{color:var(--gold);} .st{color:#ce9178;} .cm{color:#6a9955;} .fn{color:#dcdcaa;}
+
+/* ============ Callouts ============ */
+.callout{border-radius:6px; padding:18px 22px; margin:22px 0 28px; max-width:760px; border-inline-start:4px solid var(--blue); background:var(--surface-2);}
+.callout.tip{border-inline-start-color:var(--good);}
+.callout.warn{border-inline-start-color:var(--danger);}
+.callout .label{font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--blue); margin-bottom:6px; display:block;}
+.callout.tip .label{color:var(--good);}
+.callout.warn .label{color:var(--danger);}
+.callout p{margin:0; max-width:none; color:#d3d1cc;}
+
+/* ============ Table ============ */
+table{width:100%; max-width:800px; border-collapse:collapse; margin:20px 0 30px; font-size:15px;}
+th, td{padding:12px 16px; text-align:right; border-bottom:1px solid var(--wall);}
+th{font-family:'IBM Plex Mono', monospace; color:var(--coral); font-size:12px; letter-spacing:1px; text-transform:uppercase; border-bottom:2px solid var(--coral);}
+td{color:#d3d1cc;}
+tr:hover td{background:var(--surface);}
+
+/* ============ Lifecycle timeline ============ */
+.lifecycle{max-width:800px; margin:24px 0 34px; display:flex; flex-direction:column; gap:0; border-inline-start:2px solid var(--wall);}
+.lc-step{position:relative; padding:14px 0 14px 0; padding-inline-start:28px;}
+.lc-step::before{content:''; position:absolute; right:-7px; top:20px; width:12px; height:12px; border-radius:50%; background:var(--bg); border:2px solid var(--coral);}
+.lc-step .name{font-family:'IBM Plex Mono', monospace; color:var(--gold); font-size:15px; display:block; margin-bottom:4px;}
+.lc-step p{margin:0; font-size:14.5px; color:var(--muted); max-width:640px;}
+
+/* ============ Interview Q&A ============ */
+.qa-group-title{
+  font-family:'IBM Plex Mono', monospace; color:var(--blue); font-size:13px;
+  letter-spacing:2px; text-transform:uppercase; margin:44px 0 16px;
+}
+details.qa{
+  background:var(--surface); border:1px solid var(--wall); border-radius:6px;
+  margin-bottom:12px; max-width:800px; overflow:hidden;
+}
+details.qa summary{
+  cursor:pointer; padding:18px 22px; font-weight:600; color:var(--text);
+  list-style:none; display:flex; gap:14px; align-items:flex-start; font-size:15.5px;
+}
+details.qa summary::-webkit-details-marker{display:none;}
+details.qa summary::before{
+  content:'?'; font-family:'Space Grotesk', sans-serif; color:var(--bg); background:var(--gold);
+  min-width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:700; flex-shrink:0;
+}
+details.qa[open] summary::before{content:'−'; background:var(--coral);}
+details.qa .qa-body{
+  padding:0 22px 22px 22px; padding-inline-start:60px; color:#d3d1cc; font-size:15px;
+}
+details.qa .qa-body p{max-width:none; margin-bottom:12px;}
+details.qa .qa-body pre{margin:12px 0;}
+details.qa .difficulty{
+  font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:1px;
+  padding:3px 9px; border-radius:20px; margin-inline-start:auto; flex-shrink:0; white-space:nowrap;
+}
+.difficulty.hard{background:rgba(201,111,92,.15); color:var(--danger); border:1px solid var(--danger);}
+.difficulty.tricky{background:rgba(212,163,90,.15); color:var(--gold); border:1px solid var(--gold);}
+
+footer{text-align:center; padding:60px 20px; color:var(--muted); font-family:'IBM Plex Mono', monospace; font-size:13px;}
+
+@media(max-width:640px){
+  .stage{padding:50px 18px 60px;}
+  details.qa .qa-body{padding-inline-start:22px;}
+}
+</style>
+</head>
+<body>
+<div class="blueprint-bg"></div>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="eyebrow">Android Framework · Activity</div>
+  <h1>دورة حياة <span>Activity</span></h1>
+  <p class="sub">كل حالة، كل انتقال، وكل سؤال مقابلة صعب يمكن أن يُسأل عن Activity Lifecycle — في مرجع واحد.</p>
+
+  <div class="lccircle">
+    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#e08e79"/>
+        </marker>
+      </defs>
+      <circle class="ring" cx="200" cy="200" r="150"/>
+      <circle class="node active" cx="200" cy="50" r="34"/>
+      <circle class="node" cx="330" cy="130" r="30"/>
+      <circle class="node" cx="330" cy="270" r="30"/>
+      <circle class="node" cx="200" cy="350" r="30"/>
+      <circle class="node" cx="70" cy="270" r="30"/>
+      <circle class="node" cx="70" cy="130" r="30"/>
+      <path class="arrow" d="M228,62 A150,150 0 0,1 315,105"/>
+      <path class="arrow" d="M340,158 A150,150 0 0,1 340,242"/>
+      <path class="arrow" d="M315,295 A150,150 0 0,1 228,338"/>
+      <path class="arrow" d="M172,338 A150,150 0 0,1 85,295"/>
+      <path class="arrow" d="M60,242 A150,150 0 0,1 60,158"/>
+      <path class="arrow" d="M85,105 A150,150 0 0,1 172,62"/>
+      <text x="200" y="45" text-anchor="middle" class="gold">onCreate</text>
+      <text x="200" y="58" text-anchor="middle">Created</text>
+      <text x="330" y="125" text-anchor="middle">onStart</text>
+      <text x="330" y="138" text-anchor="middle">Started</text>
+      <text x="330" y="265" text-anchor="middle">onResume</text>
+      <text x="330" y="278" text-anchor="middle">Resumed</text>
+      <text x="200" y="345" text-anchor="middle">onPause</text>
+      <text x="200" y="358" text-anchor="middle">Paused</text>
+      <text x="70" y="265" text-anchor="middle">onStop</text>
+      <text x="70" y="278" text-anchor="middle">Stopped</text>
+      <text x="70" y="125" text-anchor="middle">onDestroy</text>
+      <text x="70" y="138" text-anchor="middle">Destroyed</text>
+    </svg>
+  </div>
+</section>
+
+<div class="wrap">
+  <nav class="toc">
+    <h2>خريطة المرجع</h2>
+    <ol>
+      <li><a href="#intro">مقدمة: ما هي دورة حياة Activity ولماذا تهم</a></li>
+      <li><a href="#states">الحالات السبع بالتفصيل الكامل</a></li>
+      <li><a href="#config">Configuration Changes وإعادة الإنشاء</a></li>
+      <li><a href="#saveState">onSaveInstanceState مقابل ViewModel</a></li>
+      <li><a href="#taskstack">Tasks و Back Stack و launchMode</a></li>
+      <li><a href="#newintent">onNewIntent و singleTop/singleTask</a></li>
+      <li><a href="#processdeath">Process Death مقابل الإغلاق العادي</a></li>
+      <li><a href="#scenarios">جدول سيناريوهات: أي الدوال تُستدعى ومتى</a></li>
+      <li><a href="#interview">أسئلة المقابلات الصعبة (مع الإجابات)</a></li>
+    </ol>
+  </nav>
+</div>
+
+<!-- ===================== 1. INTRO ===================== -->
+<section class="stage" id="intro">
+  <div class="wrap">
+    <div class="stage-tag">01</div>
+    <h2>لماذا تُعتبر دورة الحياة <em>الأهم</em> في مقابلات Android؟</h2>
+    <p class="lead">لأن النظام هو من يقرر متى تُنشأ الـ Activity ومتى تُدمَّر — ليس المطور. فهم هذه الدورة يحدد إن كان تطبيقك يفقد بيانات المستخدم، يتسرب في الذاكرة، أو ينهار عند تدوير الشاشة.</p>
+    <p>Activity Lifecycle هو نظام حالات (state machine) تديره الـ <code>ActivityThread</code> استجابةً لأحداث النظام: فتح تطبيق آخر، تدوير الشاشة، الضغط على Home، نفاد الذاكرة، أو رجوع المستخدم.</p>
+
+    <div class="callout">
+      <span class="label">المبدأ الأساسي</span>
+      <p>الـ Activity لا "تتحكم" في متى تُدمَّر — هي فقط تستجيب. أي كود يفترض أن onDestroy() ستُستدعى دائمًا (لتنظيف موارد حرجة مثلًا) هو افتراض خاطئ؛ النظام قد يقتل العملية بأكملها دون استدعاء أي دالة.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 2. STATES ===================== -->
+<section class="stage" id="states">
+  <div class="wrap">
+    <div class="stage-tag">02</div>
+    <h2>الحالات السبع <em>بالتفصيل</em></h2>
+
+    <div class="lifecycle">
+      <div class="lc-step"><span class="name">onCreate(savedInstanceState: Bundle?)</span><p>تُستدعى مرة واحدة عند إنشاء الـ Activity. هنا: inflate الـ layout، تهيئة ViewModel، استرجاع الحالة المحفوظة من Bundle. الـ Activity ليست مرئية بعد.</p></div>
+      <div class="lc-step"><span class="name">onStart()</span><p>الـ Activity أصبحت مرئية للمستخدم لكن لم تحصل على التفاعل (focus) بعد. مناسبة لبدء تحديثات UI الخفيفة.</p></div>
+      <div class="lc-step"><span class="name">onResume()</span><p>الـ Activity في المقدمة بالكامل وتستقبل تفاعل المستخدم. مناسبة لبدء الكاميرا، المستشعرات (sensors)، أو أي مورد يحتاج تفاعلًا مباشرًا.</p></div>
+      <div class="lc-step"><span class="name">onPause()</span><p>تُستدعى عندما تفقد الـ Activity الـ focus جزئيًا (مثلًا حوار شفاف يظهر فوقها، أو Activity أخرى في وضع multi-window). يجب أن تكون سريعة جدًا — النظام ينتظرها لإكمال الانتقال.</p></div>
+      <div class="lc-step"><span class="name">onStop()</span><p>الـ Activity لم تعد مرئية بالكامل. مناسبة لإيقاف عمليات مكلفة (تحديثات موقع، مزامنة). قد يليها onDestroy() أو onRestart() حسب سلوك المستخدم.</p></div>
+      <div class="lc-step"><span class="name">onRestart()</span><p>تُستدعى فقط عندما يعود المستخدم لـ Activity متوقفة (stopped) قبل تدميرها — تُستدعى قبل onStart() مباشرة.</p></div>
+      <div class="lc-step"><span class="name">onDestroy()</span><p>الاستدعاء الأخير قبل زوال الـ Activity — إما بسبب finish() أو تدوير الشاشة أو تدمير النظام لها. تنظيف الموارد النهائي (إن استُدعيت أصلًا).</p></div>
+    </div>
+
+    <h3>الحالات المُشتقة (Derived States)</h3>
+    <table>
+      <tr><th>الحالة</th><th>الوصف</th></tr>
+      <tr><td>Foreground (Resumed)</td><td>مرئية وتستقبل التفاعل. أولوية قتل منخفضة جدًا من النظام.</td></tr>
+      <tr><td>Visible (Started/Paused)</td><td>مرئية جزئيًا أو كليًا لكن دون تفاعل كامل. أولوية قتل متوسطة.</td></tr>
+      <tr><td>Background (Stopped)</td><td>غير مرئية إطلاقًا. أول مرشح للقتل عند نقص الذاكرة.</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== 3. CONFIG ===================== -->
+<section class="stage" id="config">
+  <div class="wrap">
+    <div class="stage-tag">03</div>
+    <h2><em>Configuration Changes</em> وإعادة الإنشاء</h2>
+    <p class="lead">تدوير الشاشة، تغيير اللغة، أو وضع تقسيم الشاشة (multi-window) تُعتبر جميعها "تغييرات تهيئة" — والسلوك الافتراضي للنظام هو تدمير الـ Activity بالكامل وإعادة إنشائها من الصفر.</p>
+
+    <pre data-lang="kotlin"><code><span class="cm">// السلسلة الكاملة عند تدوير الشاشة:</span>
+<span class="cm">// onPause() → onStop() → onSaveInstanceState() → onDestroy()</span>
+<span class="cm">// ثم: onCreate() → onStart() → onRestoreInstanceState() → onResume()</span></code></pre>
+
+    <h3>لماذا هذا السلوك موجود أصلًا؟</h3>
+    <p>لأن موارد مختلفة (layout-land، layout قيم مختلفة للغات) قد تحتاج تحميلًا كاملًا مختلفًا بناءً على التهيئة الجديدة — إعادة الإنشاء تضمن تحميل الموارد الصحيحة تلقائيًا.</p>
+
+    <h3>التحكم اليدوي (نادرًا ما يُنصح به)</h3>
+    <pre data-lang="xml"><code>&lt;activity
+    android:name=<span class="st">".MainActivity"</span>
+    android:configChanges=<span class="st">"orientation|screenSize|keyboardHidden"</span> /&gt;</code></pre>
+    <div class="callout warn">
+      <span class="label">تحذير</span>
+      <p>استخدام <code>android:configChanges</code> يمنع النظام من إعادة إنشاء الـ Activity، لكنه يعني عليك تحديث الموارد يدويًا عبر <code>onConfigurationChanged()</code>. غالبية الفرق تتجنب هذا وتعتمد على ViewModel بدلًا منه.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 4. SAVESTATE ===================== -->
+<section class="stage" id="saveState">
+  <div class="wrap">
+    <div class="stage-tag">04</div>
+    <h2><em>onSaveInstanceState</em> مقابل <em>ViewModel</em></h2>
+    <p class="lead">أداتان مختلفتان تمامًا لمشكلتين مختلفتين، وخلطهما من أكثر أخطاء المقابلات شيوعًا.</p>
+
+    <table>
+      <tr><th>المعيار</th><th>onSaveInstanceState (Bundle)</th><th>ViewModel</th></tr>
+      <tr><td>ينجو من تدوير الشاشة؟</td><td>نعم</td><td>نعم</td></tr>
+      <tr><td>ينجو من قتل النظام للعملية (process death)؟</td><td>نعم</td><td>لا (إلا مع SavedStateHandle)</td></tr>
+      <tr><td>ينجو من الضغط على زر الرجوع (finish)؟</td><td>لا</td><td>لا</td></tr>
+      <tr><td>حجم البيانات المناسب</td><td>صغير جدًا (كيلوبايتات) — يُسلسَل عبر Binder</td><td>أي حجم — يبقى في الذاكرة كـ object</td></tr>
+      <tr><td>الغرض</td><td>حفظ حالة UI بسيطة (نص مكتوب، موضع تمرير)</td><td>الاحتفاظ بحالة الشاشة ومنطق الأعمال عبر إعادة الإنشاء</td></tr>
+    </table>
+
+    <pre data-lang="kotlin"><code><span class="kw">override fun</span> <span class="fn">onSaveInstanceState</span>(outState: <span class="tp">Bundle</span>) {
+    <span class="kw">super</span>.<span class="fn">onSaveInstanceState</span>(outState)
+    outState.putString(<span class="st">"query"</span>, currentQuery)
+}
+
+<span class="kw">override fun</span> <span class="fn">onCreate</span>(savedInstanceState: <span class="tp">Bundle</span>?) {
+    <span class="kw">super</span>.<span class="fn">onCreate</span>(savedInstanceState)
+    <span class="kw">val</span> restoredQuery = savedInstanceState?.getString(<span class="st">"query"</span>)
+}</code></pre>
+
+    <div class="callout tip">
+      <span class="label">الحل الحديث الموصى به</span>
+      <p><code>SavedStateHandle</code> داخل ViewModel يدمج الميزتين: يعيش عبر تدوير الشاشة (كـ ViewModel عادي) وينجو أيضًا من process death (لأنه مبني فوق onSaveInstanceState داخليًا).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 5. TASKSTACK ===================== -->
+<section class="stage" id="taskstack">
+  <div class="wrap">
+    <div class="stage-tag">05</div>
+    <h2>Tasks و Back Stack و <em>launchMode</em></h2>
+    <p class="lead">الـ Task هو مجموعة Activities مرتّبة كـ stack. launchMode يحدد كيف تُضاف Activity جديدة لهذا الـ stack.</p>
+
+    <table>
+      <tr><th>launchMode</th><th>السلوك</th></tr>
+      <tr><td>standard</td><td>الافتراضي. كل استدعاء لـ startActivity ينشئ instance جديدة دائمًا، حتى لو كانت موجودة أصلًا.</td></tr>
+      <tr><td>singleTop</td><td>إن كانت الـ Activity الهدف بالفعل في أعلى الـ stack، يُعاد استخدام نفس الـ instance عبر onNewIntent() بدل إنشاء واحدة جديدة.</td></tr>
+      <tr><td>singleTask</td><td>instance واحدة فقط في الـ task بالكامل. إن كانت موجودة في مكان ما بالـ stack، تُزال كل الـ Activities فوقها ويُعاد استخدامها.</td></tr>
+      <tr><td>singleInstance</td><td>مثل singleTask، لكن الـ Activity تعيش في task منفصل تمامًا لا تشاركه أي Activity أخرى.</td></tr>
+    </table>
+
+    <div class="callout">
+      <span class="label">مثال شائع في المقابلات</span>
+      <p>شاشة تسجيل الدخول (Login) غالبًا تُستخدم بـ singleTask مع flags مثل <code>FLAG_ACTIVITY_CLEAR_TASK</code> عند تسجيل الخروج، لمنع المستخدم من الرجوع لشاشات محمية عبر زر الرجوع.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 6. NEWINTENT ===================== -->
+<section class="stage" id="newintent">
+  <div class="wrap">
+    <div class="stage-tag">06</div>
+    <h2><em>onNewIntent</em> ولماذا يُنسى غالبًا</h2>
+    <p class="lead">عند إعادة استخدام instance موجودة (singleTop/singleTask)، لا تُستدعى onCreate() مجددًا — بل onNewIntent() فقط، وهذا فخ شائع في المقابلات.</p>
+
+    <pre data-lang="kotlin"><code><span class="kw">override fun</span> <span class="fn">onNewIntent</span>(intent: <span class="tp">Intent</span>) {
+    <span class="kw">super</span>.<span class="fn">onNewIntent</span>(intent)
+    <span class="cm">// يجب تحديث الـ intent المخزن يدويًا</span>
+    setIntent(intent)
+    handleDeepLink(intent)
+}</code></pre>
+
+    <div class="callout warn">
+      <span class="label">خطأ شائع</span>
+      <p>الاعتماد فقط على <code>intent</code> الأصلي (المُمرَّر لـ onCreate) دون تحديثه في onNewIntent() يجعل التطبيق يتعامل مع بيانات قديمة عند deep link ثانٍ لنفس الـ Activity.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 7. PROCESS DEATH ===================== -->
+<section class="stage" id="processdeath">
+  <div class="wrap">
+    <div class="stage-tag">07</div>
+    <h2><em>Process Death</em> مقابل الإغلاق العادي</h2>
+    <p class="lead">أهم فرق يخلط فيه أغلب المرشحين في المقابلات المتقدمة.</p>
+
+    <table>
+      <tr><th>السيناريو</th><th>ما الذي يحدث</th></tr>
+      <tr><td>الضغط على زر الرجوع (finish)</td><td>onPause → onStop → onDestroy. الـ Activity تُزال من الـ back stack نهائيًا. isFinishing() = true.</td></tr>
+      <tr><td>الضغط على Home</td><td>onPause → onStop فقط. الـ Activity تبقى في الذاكرة (instance حي) بانتظار العودة.</td></tr>
+      <tr><td>تدوير الشاشة</td><td>onPause → onStop → onSaveInstanceState → onDestroy → إعادة إنشاء كاملة فورية.</td></tr>
+      <tr><td>Process Death (نظام يقتل العملية في الخلفية)</td><td>لا تُستدعى أي دالة على الإطلاق! العملية تُقتل مباشرة. عند العودة: onCreate يُستدعى مع Bundle محفوظ مسبقًا (إن وُجد).</td></tr>
+    </table>
+
+    <div class="callout tip">
+      <span class="label">كيف تختبرها فعليًا</span>
+      <p>عبر Developer Options → "Don't keep activities"، أو أمر <code>adb shell am kill &lt;package&gt;</code> بعد وضع التطبيق في الخلفية — هذا يحاكي process death الحقيقي وليس مجرد onStop.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 8. SCENARIOS TABLE ===================== -->
+<section class="stage" id="scenarios">
+  <div class="wrap">
+    <div class="stage-tag">08</div>
+    <h2>جدول <em>السيناريوهات</em> السريع</h2>
+    <table>
+      <tr><th>الحدث</th><th>الدوال المُستدعاة بالترتيب</th></tr>
+      <tr><td>فتح Activity لأول مرة</td><td>onCreate → onStart → onResume</td></tr>
+      <tr><td>فتح Activity أخرى فوقها (شفافة/حوار)</td><td>onPause فقط</td></tr>
+      <tr><td>فتح Activity أخرى كاملة فوقها</td><td>onPause → onStop</td></tr>
+      <tr><td>الرجوع من Activity ثانية</td><td>onRestart → onStart → onResume</td></tr>
+      <tr><td>الضغط على الرجوع (إنهاء)</td><td>onPause → onStop → onDestroy</td></tr>
+      <tr><td>تدوير الشاشة</td><td>onPause → onStop → onDestroy → onCreate → onStart → onResume</td></tr>
+      <tr><td>نفاد الذاكرة والتطبيق في الخلفية</td><td>(لا شيء — قتل مباشر للعملية)</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== 9. INTERVIEW Q&A ===================== -->
+<section class="stage" id="interview">
+  <div class="wrap">
+    <div class="stage-tag">09 · القسم الأهم</div>
+    <h2>أسئلة المقابلات <em>الصعبة</em></h2>
+    <p class="lead">أسئلة حقيقية تُطرح في مقابلات Android للمستويات المتوسطة والمتقدمة، مرتّبة حسب الموضوع، مع إجابات مفصّلة يمكنك البناء عليها بأسلوبك الخاص.</p>
+
+    <div class="qa-group-title">مجموعة أ — الأساسيات العميقة</div>
+
+    <details class="qa">
+      <summary>هل يمكن أن تُستدعى onPause() بدون أن يليها onStop()؟ اشرح متى ولماذا.<span class="difficulty hard">صعب</span></summary>
+      <div class="qa-body">
+        <p>نعم. إذا ظهرت فوق الـ Activity الحالية نافذة حوار (Dialog) أو Activity شفافة لا تغطي الشاشة بالكامل، تُستدعى onPause() فقط لأن الـ Activity الأصلية ما زالت مرئية جزئيًا — لكنها فقدت الـ focus. onStop() لا تُستدعى إلا عندما تصبح الـ Activity غير مرئية بالكامل.</p>
+      </div>
+    </details>
+
+    <details class="qa">
+      <summary>ما الفرق بين isFinishing() و isDestroyed()؟ ولماذا نحتاج لفحصهما قبل عمليات معينة؟<span class="difficulty tricky">دقيق</span></summary>
+      <div class="qa-body">
+        <p><code>isFinishing()</code> تصبح true بمجرد استدعاء finish() أو حدوث إنهاء طبيعي — حتى قبل onDestroy(). أما <code>isDestroyed()</code> فتصبح true فقط بعد اكتمال onDestroy() فعليًا.</p>
+        <p>الفحص مهم قبل عمليات async (مثل عرض Dialog بعد استجابة شبكة متأخرة) لتفادي <code>WindowManager.BadTokenException</code> عند محاولة عرض UI على Activity في طريقها للزوال.</p>
+      </div>
+    </details>
+
+    <details class="qa">
+      <summary>لماذا onPause() يجب أن تكون سريعة جدًا؟ ماذا يحدث إن أبطأتها؟<span class="difficulty hard">صعب</span></summary>
+      <div class="qa-body">
+        <p>لأن النظام لا يسمح للـ Activity الجديدة (التي ستظهر فوقها) بالانتقال إلى onResume() حتى تنتهي onPause() للـ Activity الحالية بالكامل. أي عملية بطيئة (I/O متزامن، حسابات ثقيلة) هنا تجمّد الانتقال البصري بالكامل وقد تسبب ANR.</p>
+      </div>
+    </details>
+
+    <div class="qa-group-title">مجموعة ب — Configuration Changes وViewModel</div>
+
+    <details class="qa">
+      <summary>ViewModel ينجو من تدوير الشاشة — كيف تقنيًا، وما الآلية الداخلية؟<span class="difficulty hard">صعب</span></summary>
+      <div class="qa-body">
+        <p>عند تدمير Activity بسبب تغيير تهيئة (وليس finish حقيقي)، يحتفظ النظام بـ <code>NonConfigurationInstances</code> الذي يحمل مرجع ViewModelStore. الـ Activity الجديدة (بعد إعادة الإنشاء) تسترجع نفس ViewModelStore بدل إنشاء واحد جديد — لذا نفس instances الـ ViewModel تبقى حية دون إعادة تهيئة.</p>
+        <p>الفرق الجوهري: هذا يعمل فقط عبر <code>onRetainNonConfigurationInstance()</code> الداخلي، وهو مختلف تمامًا عن process death حيث يُفقد كل شيء في الذاكرة.</p>
+      </div>
+    </details>
+
+    <details class="qa">
+      <summary>لديك تحميل صورة كبيرة (Bitmap) قيد التنفيذ عند تدوير الشاشة. أين يجب أن يعيش هذا الكود، ولماذا وضعه في Activity مباشرة خطأ؟<span class="difficulty hard">صعب</span></summary>
+      <div class="qa-body">
+        <p>يجب أن يعيش في ViewModel (عبر viewModelScope) وليس في Activity. لأن الـ Activity تُدمَّر فعليًا عند التدوير، فأي coroutine أو callback مرتبط بها مباشرة سيُلغى أو يُشير إلى context ميت (memory leak إن لم يُلغَ). ViewModel ينجو من التدوير، فتستمر العملية دون انقطاع ودون تكرارها من جديد.</p>
+      </div>
+    </details>
+
+    <details class="qa">
+      <summary>ما هو Diamond Problem في LiveData عند التدوير السريع المتكرر (rapid rotation)؟<span class="difficulty tricky">دقيق</span></summary>
+      <div class="qa-body">
+        <p>عند تدوير الشاشة بسرعة عدة مرات متتالية، قد تُنشأ عدة Activities/observers بينما القديمة لم تُنظَّف بعد بالكامل، ما قد يؤدي لاستدعاء observer قديم على View مُدمَّر. الحل: استخدام <code>viewLifecycleOwner</code> بدل <code>this</code> عند المراقبة داخل Fragment، والتأكد من أن الـ observer يُزال تلقائيًا مع ربطه بـ LifecycleOwner الصحيح بدل إدارته يدويًا.</p>
+      </div>
+    </details>
+
+    <div class="qa-group-title">مجموعة ج — Tasks و Back Stack</div>
+
+    <details class="qa">
+      <summary>الفرق بين FLAG_ACTIVITY_CLEAR_TOP و FLAG_ACTIVITY_CLEAR_TASK — ومتى تستخدم كل واحد؟<span class="difficulty hard">صعب</span></summary>
+      <div class="qa-body">
+        <p><code>CLEAR_TOP</code>: إن كانت الـ Activity الهدف موجودة في الـ stack، تُزال كل الـ Activities الموجودة فوقها فقط، وتُعاد نفس instance (عبر onNewIntent).</p>
+        <p><code>CLEAR_TASK</code>: أقوى بكثير — يمسح الـ task بالكامل ويبدأ الـ Activity الهدف كجذر جديد تمامًا للـ stack. يُستخدم غالبًا مع تسجيل الخروج لمنع أي رجوع لشاشات محمية.</p>
+      </div>
+    </details>
+
+    <details class="qa">
+      <summary>لديك singleTask Activity، وفتحتها من تطبيق آخر بينما كانت بالفعل تعمل في الخلفية ضمن task خاص بها. ماذا يحدث لدورة الحياة بالتفصيل؟<span class="difficulty hard">صعب</span></summary>
+      <div class="qa-body">
+        <p>النظام يجلب الـ task بالكامل (الذي يحتوي على هذه الـ Activity) إلى المقدمة بدل إنشاء instance جديدة. يحدث: onNewIntent() ثم onRestart() → onStart() → onResume() على نفس instance القديمة. لا يُستدعى onCreate() إطلاقًا لأن الـ instance لم تُدمَّر أصلًا — فقط كانت في الخلفية.</p>
+      </div>
+    </details>
+
+    <div class="qa-group-title">مجموعة د — Process Death والذاكرة</div>
+
+    <details class="qa">
+      <summary>كيف تفرّق فعليًا بين "Activity في stopped state" و"process تم قتلها بالكامل" عمليًا في الكود؟<span class="difficulty tricky">دقيق</span></summary>
+      <div class="qa-body">
+        <p>لا توجد طريقة مباشرة للتمييز من داخل onCreate نفسها — كلا الحالتين تنتهيان بنفس المسار الظاهري (onCreate مع أو بدون savedInstanceState). لكن الفرق العملي: في الحالة الأولى كل الكائنات في الذاكرة (Application class, singletons, statics) بقيت كما هي. في الحالة الثانية، Application.onCreate() يُستدعى من جديد بالكامل — فحص متغير static تم تعيينه في onCreate الخاص بالـ Application هو أحد الطرق العملية لتتبع ذلك أثناء debugging.</p>
+      </div>
+    </details>
+
+    <details class="qa">
+      <summary>لماذا لا يُعتبر onDestroy() مكانًا موثوقًا لتنظيف موارد حرجة (مثل إغلاق اتصال قاعدة بيانات أو رفع بيانات analytics مهمة)؟<span class="difficulty hard">صعب</span></summary>
+      <div class="qa-body">
+        <p>لأن النظام قد يقتل العملية مباشرة (Process Death) دون استدعاء أي دورة حياة على الإطلاق، خصوصًا تحت ضغط ذاكرة عالٍ أو عند وضع "Don't keep activities". أي عملية حرجة يجب أن تُنفَّذ بشكل استباقي (مثل WorkManager لعمليات مضمونة التنفيذ) بدل الاعتماد على onDestroy كنقطة تنظيف مضمونة.</p>
+      </div>
+    </details>
+
+    <details class="qa">
+      <summary>ما دور ActivityManager وoom_adj في تحديد أي Activity/عملية تُقتل أولًا عند نقص الذاكرة؟<span class="difficulty tricky">دقيق</span></summary>
+      <div class="qa-body">
+        <p>يمنح النظام كل عملية "oom_adj score" بناءً على أهميتها الحالية: العمليات في المقدمة (foreground) تحصل على أدنى قيمة (أولوية قتل شبه معدومة)، بينما العمليات في الخلفية التي لا تملك أي مكون نشط (لا Service، لا Activity مرئية) تحصل على أعلى قيمة وتكون أول مرشح للقتل عند الحاجة لتحرير ذاكرة لتطبيقات أخرى.</p>
+      </div>
+    </details>
+
+    <div class="qa-group-title">مجموعة هـ — أسئلة سيناريو تطبيقية</div>
+
+    <details class="qa">
+      <summary>مستخدم يملأ فورمًا طويلًا، ثم يستقبل مكالمة هاتفية (تطبيق آخر يظهر فوق تطبيقك)، ثم يعود. ما الاستراتيجية الصحيحة لضمان عدم فقدان بياناته؟<span class="difficulty hard">صعب</span></summary>
+      <div class="qa-body">
+        <p>الاعتماد فقط على onSaveInstanceState محفوف بالمخاطر إن كانت البيانات كبيرة (حدود حجم Bundle عبر Binder محدودة، عادة أقل من 1MB إجمالًا لكل الـ transaction). الحل الأصح: تخزين حالة الفورم في ViewModel مع SavedStateHandle بشكل مستمر أثناء الكتابة (debounced)، بحيث تنجو من كل من تدوير الشاشة وProcess Death دون الاعتماد الكامل على لحظة onPause/onStop فقط.</p>
+      </div>
+    </details>
+
+    <details class="qa">
+      <summary>لماذا يُنصح بعدم بدء عمليات طويلة (مثل رفع ملف) داخل onResume() مباشرة في كل مرة؟<span class="difficulty tricky">دقيق</span></summary>
+      <div class="qa-body">
+        <p>onResume() تُستدعى في كل مرة تعود فيها الـ Activity للمقدمة — ليس فقط عند الإنشاء الأول. بدء عملية رفع ملف هناك مباشرة (دون فحص إن كانت جارية بالفعل) يعني تكرارها في كل انتقال بسيط (مثل فتح إشعار والعودة)، ما يهدر بيانات المستخدم وموارد الخادم. الحل: تتبع الحالة في ViewModel والتحقق قبل البدء، أو استخدام WorkManager للعمليات الطويلة غير المرتبطة مباشرة بدورة حياة الشاشة.</p>
+      </div>
+    </details>
+
+    <details class="qa">
+      <summary>Activity A تفتح Activity B لأخذ نتيجة (Activity Result API). صف بالتفصيل كل استدعاءات دورة الحياة على A وB من لحظة الفتح حتى العودة بالنتيجة.<span class="difficulty hard">صعب</span></summary>
+      <div class="qa-body">
+        <p>عند فتح B: A.onPause() → B.onCreate() → B.onStart() → B.onResume() → (بعد اكتمال انتقال B) A.onStop().</p>
+        <p>عند إغلاق B وإرجاع نتيجة: B.onPause() → A.onRestart() → A.onStart() → A.onResume() (وهنا يصل الـ callback المسجّل عبر registerForActivityResult) → B.onStop() → B.onDestroy().</p>
+        <p>الملاحظة المهمة: نتيجة الـ callback تصل بعد onResume في A، وليس فورًا — لذلك لا يجب الاعتماد على ترتيب تنفيذ فوري متزامن مع دورة الحياة.</p>
+      </div>
+    </details>
+
+    <details class="qa">
+      <summary>كيف تختبر يدويًا أن تطبيقك يتعافى بشكل صحيح من Process Death، بدون انتظار حدوثها عشوائيًا؟<span class="difficulty tricky">دقيق</span></summary>
+      <div class="qa-body">
+        <p>عبر تفعيل "Don't keep activities" في خيارات المطور، والتي تجعل النظام يدمّر كل Activity بمجرد مغادرتها (onStop مباشرة onDestroy) — هذا يحاكي أسوأ سيناريو ممكن لضغط الذاكرة، ويكشف بسرعة أي بيانات لا تُحفظ بشكل صحيح عبر SavedStateHandle أو onSaveInstanceState.</p>
+      </div>
+    </details>
+
+    <div class="callout tip">
+      <span class="label">نصيحة أخيرة للمقابلة</span>
+      <p>أفضل إجابة على أي سؤال دورة حياة ليست حفظ الترتيب فقط — بل شرح <em>لماذا</em> يوجد هذا الترتيب، وما المشكلة الهندسية التي يحلها. هذا ما يفرّق بين إجابة حفظ وإجابة فهم حقيقي.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  ACTIVITY LIFECYCLE · ANDROID FRAMEWORK · مرجع تقني وأسئلة مقابلات
+</footer>
+
+</body>
+</html>

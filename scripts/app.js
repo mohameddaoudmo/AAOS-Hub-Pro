@@ -1,14 +1,42 @@
 const guides = [
+    // Android Core
+    { id: 'act-life', title: 'Activity Lifecycle Masterclass', desc: 'دورة حياة الأكتيفيتي والحالات المتعددة وأسئلة المقابلات.', icon: '📱', path: 'activity_lifecycle_guide.html' },
+    { id: 'components', title: 'Core Components Masterclass', desc: 'مكونات أندرويد الأساسية Architectural Masterclass.', icon: '🧱', path: 'android_components_masterclass.html' },
+    { id: 'life-master', title: 'Android Lifecycle Masterclass', desc: 'إدارة State وViewModel والمحافظة على البيانات.', icon: '🔄', path: 'android_lifecycle_masterclass.html' },
+    { id: 'sec-master', title: 'Android Security Masterclass', desc: 'أمان أندرويد — الثغرات والتشفير والتأمين.', icon: '🛡️', path: 'android_security_masterclass.html' },
+    { id: 'fintech-master', title: 'Fintech Android Masterclass', desc: 'المرجع الهندسي الشامل لبناء وتأمين تطبيقات البنوك والدفع الإلكتروني.', icon: '🏦', path: 'fintech_android_masterclass.html' },
+    { id: 'fintech-sec', title: 'Fintech Android Security Guide', desc: 'حماية وتأمين تطبيقات البنوك والدفع الإلكتروني.', icon: '💳', path: 'fintech_android_security_guide.html' },
+    { id: 'kmp-cmp', title: 'KMP & CMP Interview Guide', desc: 'دليل المقابلات لـ Kotlin & Compose Multiplatform.', icon: '🚀', path: 'kmp_cmp_interview_guide.html' },
+    { id: 'kt-coll', title: 'Kotlin Collections & Sequences', desc: 'Collections vs Sequences في كوتلن لتحسين الأداء.', icon: '📦', path: 'kotlin_collections_sequence_guide.html' },
+    { id: 'pagination', title: 'Modern Pagination Guide', desc: 'معمارية التصفح والتحميل اللانهائي العصري.', icon: '📄', path: 'pagination_guide.html' },
+    { id: 'frag-nav', title: 'Fragment & Navigation Guide', desc: 'إدارة الفراجمينت والتنقل الشامل مع Navigation Component.', icon: '🧩', path: 'fragment_navigation_guide.html' },
+    { id: 'detekt-cicd', title: 'CI/CD with Git & Detekt', desc: 'أتمتة جودة الكود والتفتيش الساكن Detekt.', icon: '⚙️', path: 'cicd_git_detekt_android.html' },
+    { id: 'oop-master', title: 'OOP & Design Patterns Masterclass', desc: 'البرمجة الكائنية المتقدمة وأنماط التصميم لأندرويد.', icon: '💎', path: 'oop_masterclass.html' },
+    { id: 'oop-chal', title: 'OOP Interview Challenges', desc: 'أصعب أسئلة البرمجة كائنية التوجه وتحديات المقابلات.', icon: '🎯', path: 'oop_interview_challenges.html' },
+    { id: 'rn-sheet', title: 'React Native Interview Sheet', desc: 'دليل المقابلات المعماري لـ React Native.', icon: '⚛️', path: 'react_native_interview_sheet.html' },
+
+    // AAOS Automotive
     { id: 'vhal', title: 'دليل VHAL الشامل', desc: 'كل ما تحتاجه لفهم وتحسين طبقة تجريد أجهزة السيارة.', icon: '🚗', path: 'vhal-guide-arabic.html' },
     { id: 'compose', title: 'Compose for Automotive', desc: 'بناء واجهات مستخدم حديثة وسلسة لأنظمة السيارات.', icon: '⚛️', path: 'compose_for_automotive_guide.html' },
-    { id: 'cicd', title: 'Android CI/CD', desc: 'أتمتة عمليات البناء والاختبار والنشر لتطبيقات السيارات.', icon: '🚀', path: 'android-cicd-guide.html' },
+    { id: 'cicd', title: 'Android CI/CD for AAOS', desc: 'أتمتة عمليات البناء والاختبار والنشر لتطبيقات السيارات.', icon: '🚀', path: 'android-cicd-guide.html' },
     { id: 'ota', title: 'OTA Updates & A/B', desc: 'فهم تحديثات النظام الهوائية وإدارة تقسيم القرص الصلب.', icon: '📲', path: 'android-ota-updates-guide.html' },
     { id: 'media', title: 'Android Media Session', desc: 'إدارة الوسائط والتحكم فيها في بيئة السيارة.', icon: '🎵', path: 'android_media_vehicle_guide.html' },
     { id: 'ipc', title: 'IPC & Binder & AIDL', desc: 'التواصل المتطور بين العمليات في نظام أندرويد.', icon: '📡', path: 'ipc-binder-aidl-guide.html' },
     { id: 'connectivity', title: 'Connectivity Stack', desc: 'البلوتوث، الواي فاي، وتكامل Android Auto.', icon: '📶', path: 'connectivity-bt-wifi-androidauto.html' },
     { id: 'build', title: 'Android Build System', desc: 'أسرار نظام بناء أندرويد من الصفر.', icon: '🛠️', path: 'android-build-guide.html' },
     { id: 'canbus', title: 'CAN Bus & VHAL', desc: 'ربط نظام أندرويد بناقل البيانات الحقيقي للسيارة.', icon: '🔌', path: 'can_bus_vhal_guide.html' },
-    { id: 'career', title: 'Professional Hub', desc: 'نصائح وموارد لتطوير مسارك المهني في السيارات.', icon: '💼', path: 'career-hub.html' }
+    { id: 'carui', title: 'CarUI Library Deep Dive', desc: 'مكتبة CarUI لإنشاء واجهات القيادة ذات الأمان العالي.', icon: '🖥️', path: 'caruilib_driving_deep_dive.html' },
+    { id: 'aaos-deep', title: 'AAOS Deep Dive', desc: 'الغوص العميق في معمارية Android Automotive OS.', icon: '🤖', path: 'aaos_deep_arabic.html' },
+    { id: 'selinux', title: 'SELinux for Automotive', desc: 'إدارة أمان النظام والصلاحيات في أندرويد السيارات.', icon: '🛡️', path: 'selinux-guide.html' },
+    { id: 'career', title: 'Professional Hub', desc: 'نصائح وموارد لتطوير مسارك المهني في السيارات.', icon: '💼', path: 'career-hub.html' },
+    { id: 'ndk', title: 'دليل NDK & JNI الشامل', desc: 'احتراف البرمجة بلغة C++ والتواصل عبر JNI.', icon: '⚡', path: 'ndk_jni_guide.html' },
+    { id: 'adb', title: 'دليل ADB الشامل', desc: 'أوامر وتشخيص ADB الشامل من A إلى Z.', icon: '📟', path: 'adb_guide.html' },
+
+    // Problem Solving
+    { id: 'dsa', title: 'DSA Mastery Guide', desc: 'الدليل الشامل للـ Data Structures & Algorithms.', icon: '🧠', path: 'dsa_guide.html' },
+    { id: 'linkedlist', title: 'Linked Lists Deep Dive', desc: 'شرح وتطبيقات القوائم المترابطة بلغة C++.', icon: '🔗', path: 'linked_lists_guide.html' },
+    { id: 'hashmaps', title: 'HashMaps & Sets Guide', desc: 'احتراف الجداول التجميعية وتطبيقات O(1).', icon: '🗺️', path: 'hashmaps_sets_guide.html' },
+    { id: 'dsahub', title: 'DSA Dashboard Hub', desc: 'لوحة تفاعلية لمتابعة تعلم الخوارزميات.', icon: '📊', path: 'dsa_dashboard.html' }
 ];
 
 const elements = {

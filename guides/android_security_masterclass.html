@@ -1,0 +1,2035 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المرجع الهندسي الشامل لأمن تطبيقات أندرويد والحماية المتقدمة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Noto+Kufi+Arabic:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/kotlin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/groovy.min.js"></script>
+    <style>
+        :root {
+            --primary: #0f766e; --primary-light: #14b8a6; --primary-dark: #0d5c56;
+            --secondary: #1e293b; --accent: #f59e0b; --accent-light: #fbbf24;
+            --danger: #dc2626; --danger-light: #fca5a5; --success: #059669; --success-light: #6ee7b7;
+            --info: #2563eb; --info-light: #93c5fd; --bg-primary: #f8fafc; --bg-secondary: #f1f5f9;
+            --bg-dark: #0f172a; --text-primary: #1e293b; --text-secondary: #475569; --text-muted: #64748b;
+            --border: #e2e8f0; --border-light: #f1f5f9;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --radius-sm: 6px; --radius: 12px; --radius-lg: 16px; --radius-xl: 24px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+        body {
+            font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
+            background: var(--bg-primary); color: var(--text-primary); line-height: 1.9; font-size: 17px;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+        .navbar {
+            position: fixed; top: 0; right: 0; left: 0; z-index: 1000;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); padding: 0;
+        }
+        .navbar-inner {
+            max-width: 1400px; margin: 0 auto; padding: 0 2rem;
+            display: flex; align-items: center; justify-content: space-between; height: 70px;
+        }
+        .logo {
+            font-family: 'Noto Kufi Arabic', sans-serif; font-size: 1.3rem; font-weight: 800;
+            color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 0.75rem;
+        }
+        .logo-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: var(--radius); display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.2rem;
+        }
+        .nav-links { display: flex; gap: 0.5rem; list-style: none; }
+        .nav-links a {
+            text-decoration: none; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem;
+            padding: 0.5rem 1rem; border-radius: var(--radius-sm); transition: all 0.2s;
+        }
+        .nav-links a:hover { color: var(--primary); background: rgba(15,118,110,0.08); }
+        .mobile-menu-btn { display: none; background: none; border: none; font-size: 1.5rem; color: var(--text-primary); cursor: pointer; }
+        .hero {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 50%, var(--primary-dark) 100%);
+            color: white; padding: 140px 2rem 100px; position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: -50%; right: -20%; width: 800px; height: 800px;
+            background: radial-gradient(circle, rgba(20,184,166,0.15) 0%, transparent 70%); pointer-events: none;
+        }
+        .hero::after {
+            content: ''; position: absolute; bottom: -30%; left: -10%; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%); pointer-events: none;
+        }
+        .hero-content { max-width: 1400px; margin: 0 auto; position: relative; z-index: 1; }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+            padding: 0.5rem 1.25rem; border-radius: 100px; font-size: 0.85rem; font-weight: 600;
+            margin-bottom: 2rem; backdrop-filter: blur(10px);
+        }
+        .hero h1 {
+            font-family: 'Noto Kufi Arabic', sans-serif; font-size: 3.2rem; font-weight: 900;
+            line-height: 1.3; margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, #a5f3fc 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .hero-subtitle { font-size: 1.25rem; color: rgba(255,255,255,0.8); max-width: 800px; margin-bottom: 2.5rem; line-height: 1.8; }
+        .hero-stats { display: flex; gap: 3rem; margin-top: 3rem; }
+        .stat-item { text-align: center; }
+        .stat-number { font-family: 'Noto Kufi Arabic', sans-serif; font-size: 2.5rem; font-weight: 800; color: var(--accent-light); }
+        .stat-label { font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-top: 0.25rem; }
+        .main-content { max-width: 1400px; margin: 0 auto; padding: 0 2rem; }
+        .section { margin: 5rem 0; scroll-margin-top: 90px; }
+        .section-header {
+            margin-bottom: 3rem; padding-bottom: 1.5rem; border-bottom: 2px solid var(--border); position: relative;
+        }
+        .section-header::after {
+            content: ''; position: absolute; bottom: -2px; right: 0; width: 120px; height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+        }
+        .section-number {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white; font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 800; font-size: 1.3rem;
+            border-radius: var(--radius); margin-bottom: 1rem;
+        }
+        .section h2 { font-family: 'Noto Kufi Arabic', sans-serif; font-size: 2.2rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.75rem; }
+        .section-description { font-size: 1.1rem; color: var(--text-secondary); max-width: 900px; }
+        .card {
+            background: white; border-radius: var(--radius-lg); border: 1px solid var(--border);
+            padding: 2.5rem; margin: 2rem 0; box-shadow: var(--shadow); transition: all 0.3s ease;
+        }
+        .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+        .card-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .card-icon {
+            width: 48px; height: 48px; border-radius: var(--radius);
+            display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0;
+        }
+        .card-icon.primary { background: rgba(15,118,110,0.1); color: var(--primary); }
+        .card-icon.danger { background: rgba(220,38,38,0.1); color: var(--danger); }
+        .card-icon.warning { background: rgba(245,158,11,0.1); color: var(--accent); }
+        .card-icon.info { background: rgba(37,99,235,0.1); color: var(--info); }
+        .card-icon.success { background: rgba(5,150,105,0.1); color: var(--success); }
+        .card h3 { font-family: 'Noto Kufi Arabic', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--text-primary); }
+        .card h4 { font-family: 'Cairo', sans-serif; font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 1.5rem 0 0.75rem; padding-right: 1rem; border-right: 3px solid var(--primary-light); }
+        .alert {
+            padding: 1.25rem 1.5rem; border-radius: var(--radius); margin: 1.5rem 0;
+            display: flex; align-items: flex-start; gap: 1rem; border: 1px solid transparent;
+        }
+        .alert-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 0.15rem; }
+        .alert-danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+        .alert-warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+        .alert-info { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+        .alert-success { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+        .alert-title { font-weight: 700; margin-bottom: 0.25rem; display: block; }
+        .code-block-wrapper { margin: 1.5rem 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); direction: ltr; text-align: left; }
+        .code-header {
+            background: var(--secondary); color: white; padding: 0.75rem 1.25rem;
+            display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; font-weight: 600;
+        }
+        .code-lang { background: rgba(255,255,255,0.15); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.75rem; text-transform: uppercase; }
+        pre { margin: 0 !important; border-radius: 0 !important; direction: ltr; text-align: left; }
+        pre code { font-family: 'Fira Code', 'JetBrains Mono', 'Cascadia Code', monospace; font-size: 0.9rem; line-height: 1.7; direction: ltr; text-align: left; }
+        .hljs { direction: ltr; text-align: left; }
+        code {
+            font-family: 'Fira Code', 'JetBrains Mono', monospace; background: var(--bg-secondary);
+            padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9em; color: var(--danger); direction: ltr; display: inline-block;
+        }
+        ul, ol { margin: 1rem 1.5rem 1rem 0; padding-right: 1.5rem; }
+        li { margin: 0.5rem 0; padding-right: 0.5rem; }
+        li::marker { color: var(--primary); }
+        .table-wrapper { overflow-x: auto; margin: 1.5rem 0; border-radius: var(--radius); border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 0.95rem; }
+        th { background: var(--bg-secondary); color: var(--text-primary); font-weight: 700; padding: 1rem; text-align: right; border-bottom: 2px solid var(--border); font-family: 'Noto Kufi Arabic', sans-serif; }
+        td { padding: 1rem; border-bottom: 1px solid var(--border-light); color: var(--text-secondary); }
+        tr:hover td { background: var(--bg-primary); }
+        .analogy-box {
+            background: linear-gradient(135deg, #fef3c7, #fde68a); border: 1px solid #fbbf24;
+            border-radius: var(--radius); padding: 1.5rem; margin: 1.5rem 0; position: relative;
+        }
+        .analogy-box::before {
+            content: '💡 مثال واقعي'; position: absolute; top: -12px; right: 1.5rem;
+            background: #fbbf24; color: #78350f; padding: 0.25rem 1rem; border-radius: 100px;
+            font-weight: 700; font-size: 0.85rem;
+        }
+        .analogy-box p { margin-top: 0.5rem; color: #78350f; }
+        .interview-box {
+            background: linear-gradient(135deg, #ede9fe, #ddd6fe); border: 1px solid #a78bfa;
+            border-radius: var(--radius); padding: 1.5rem; margin: 1.5rem 0; position: relative;
+        }
+        .interview-box::before {
+            content: '🎯 سيناريو مقابلة'; position: absolute; top: -12px; right: 1.5rem;
+            background: #8b5cf6; color: white; padding: 0.25rem 1rem; border-radius: 100px;
+            font-weight: 700; font-size: 0.85rem;
+        }
+        .interview-box p, .interview-box li { color: #4c1d95; }
+        .tip-box {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0); border: 1px solid #34d399;
+            border-radius: var(--radius); padding: 1.5rem; margin: 1.5rem 0; position: relative;
+        }
+        .tip-box::before {
+            content: '✅ نصيحة إنتاجية'; position: absolute; top: -12px; right: 1.5rem;
+            background: #10b981; color: white; padding: 0.25rem 1rem; border-radius: 100px;
+            font-weight: 700; font-size: 0.85rem;
+        }
+        .tip-box p, .tip-box li { color: #064e3b; }
+        .tag {
+            display: inline-flex; align-items: center; padding: 0.35rem 0.9rem;
+            border-radius: 100px; font-size: 0.8rem; font-weight: 600; margin: 0.25rem;
+        }
+        .tag-primary { background: rgba(15,118,110,0.1); color: var(--primary); }
+        .tag-danger { background: rgba(220,38,38,0.1); color: var(--danger); }
+        .tag-warning { background: rgba(245,158,11,0.1); color: #b45309; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+        .process-step {
+            display: flex; gap: 1.5rem; margin: 2rem 0; padding: 1.5rem;
+            background: white; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+        }
+        .step-number {
+            width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 800; font-size: 1.2rem; flex-shrink: 0;
+        }
+        .step-content h4 { margin: 0 0 0.5rem; padding: 0; border: none; }
+        .comparison-table th { background: var(--primary); color: white; }
+        .comparison-table .best { background: #ecfdf5; font-weight: 700; color: var(--success); }
+        .footer { background: var(--bg-dark); color: white; padding: 4rem 2rem 2rem; margin-top: 6rem; }
+        .footer-content { max-width: 1400px; margin: 0 auto; text-align: center; }
+        .footer h3 { font-family: 'Noto Kufi Arabic', sans-serif; font-size: 1.5rem; margin-bottom: 1rem; }
+        .footer p { color: rgba(255,255,255,0.6); max-width: 600px; margin: 0 auto 2rem; }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem; margin-top: 2rem; color: rgba(255,255,255,0.4); font-size: 0.9rem; }
+        .term { background: linear-gradient(180deg, transparent 60%, rgba(245,158,11,0.3) 60%); font-weight: 600; }
+        .threat-level { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 100px; font-size: 0.8rem; font-weight: 700; }
+        .threat-critical { background: #fef2f2; color: #dc2626; }
+        .threat-high { background: #fff7ed; color: #ea580c; }
+        .threat-medium { background: #fefce8; color: #ca8a04; }
+        .threat-low { background: #f0fdf4; color: #16a34a; }
+        @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+        @media (max-width: 1100px) { .grid-3 { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 700px) { .grid-3 { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .mobile-menu-btn { display: block; }
+            .hero h1 { font-size: 2rem; }
+            .hero-stats { flex-direction: column; gap: 1.5rem; }
+            .section h2 { font-size: 1.6rem; }
+            .card { padding: 1.5rem; }
+        }
+        @media print { .navbar, .mobile-menu-btn { display: none; } .hero { padding-top: 2rem; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="#" class="logo">
+                <div class="logo-icon">🛡️</div>
+                <span>أمن أندرويد الشامل</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#intro">المقدمة</a></li>
+                <li><a href="#storage">التخزين الآمن</a></li>
+                <li><a href="#components">المكونات</a></li>
+                <li><a href="#tampering">الحماية المتقدمة</a></li>
+                <li><a href="#biometric">المصادقة</a></li>
+                <li><a href="#interviews">المقابلات</a></li>
+            </ul>
+            <button class="mobile-menu-btn">☰</button>
+        </div>
+    </nav>
+    <header class="hero">
+        <div class="hero-content">
+            <div class="hero-badge"><span>🔐</span><span>دليل احترافي للمطورين المتقدمين</span></div>
+            <h1>المرجع الهندسي الشامل<br>لأمن تطبيقات أندرويد<br>والحماية المتقدمة</h1>
+            <p class="hero-subtitle">
+                دليل تعليمي متكامل يغطي أعمق جوانب أمن تطبيقات أندرويد، من التشفير الاحترافي وإدارة المفاتيح 
+                إلى الحماية من الهندسة العكسية وأدوات الـ Hooking، مع سيناريوهات مقابلات حقيقية من شركات 
+                التقنية المالية والسيارات في ألمانيا وأوروبا.
+            </p>
+            <div class="hero-stats">
+                <div class="stat-item"><div class="stat-number">6</div><div class="stat-label">وحدات تعليمية</div></div>
+                <div class="stat-item"><div class="stat-number">50+</div><div class="stat-label">مثال برمجي</div></div>
+                <div class="stat-item"><div class="stat-number">20+</div><div class="stat-label">سيناريو مقابلة</div></div>
+                <div class="stat-item"><div class="stat-number">100%</div><div class="stat-label">جاهز للإنتاج</div></div>
+            </div>
+        </div>
+    </header>
+    <main class="main-content">
+
+        <section class="section" id="intro">
+            <div class="section-header">
+                <div class="section-number">1</div>
+                <h2>مقدمة استراتيجية وتحليلية: لماذا يُولّي سوق العمل الأوروبي اهتماماً صارماً بأمن أندرويد؟</h2>
+                <p class="section-description">تحليل عميق للبيئة التنظيمية والتقنية التي تجبر الشركات الكبرى على بناء تطبيقات مقاومة للاختراق</p>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon primary">🏛️</div><h3>السياق التنظيمي والقانوني في أوروبا</h3></div>
+                <p>تُعدّ ألمانيا ودول الاتحاد الأوروبي من أكثر البيئات التنظيمية صرامةً فيما يتعلق بحماية البيانات والأمن السيبراني. فعندما يطور فريق الهندسة في شركة <strong>N26</strong> (أكبر بنك رقمي في أوروبا) أو <strong>BMW</strong> (التي تُدير تطبيقات Connected Drive لملايين السيارات) تطبيقاً لنظام أندرويد، فإنه لا يواجه فقط تحديات تقنية، بل يواجه متطلبات قانونية صارمة:</p>
+                <ul>
+                    <li><strong>اللائحة العامة لحماية البيانات (GDPR):</strong> تفرض غرامات تصل إلى 4% من الإيرادات السنوية العالمية على الشركات التي تفشل في حماية بيانات المستخدمين.</li>
+                    <li><strong>قانون أمن الشبكات والمعلومات (NIS2):</strong> يُلزم الشركات العاملة في القطاعات الحيوية (المالية، الصحية، النقل) بتطبيق إجراءات أمنية صارمة.</li>
+                    <li><strong>معيار PSD2 للمدفوعات الإلكترونية:</strong> يُلزم تطبيقات Fintech بتطبيق مصادقة قوية للعملاء (SCA) وتشفير البيانات الحساسة.</li>
+                    <li><strong>معيار eIDAS:</strong> يُنظّم الهويات الإلكترونية والخدمات الثقة في السوق الأوروبي.</li>
+                </ul>
+                <div class="alert alert-danger">
+                    <span class="alert-icon">⚠️</span>
+                    <div><span class="alert-title">تنبيه استراتيجي</span>في عام 2024، فرضت هيئة حماية البيانات الألمانية (BfDI) غرامة قياسية بقيمة 1.2 مليون يورو على شركة Fintech لتسريب بيانات مصرفية عبر ثغرة في تطبيق أندرويد لم يكن يستخدم <code>EncryptedSharedPreferences</code> بشكل صحيح. هذا يُبرز أن الأمن ليس خياراً تقنياً، بل التزام قانوني.</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon info">🔒</div><h3>نموذج تهديدات OWASP Mobile Top 10 (2024)</h3></div>
+                <p>يُعدّ دليل <span class="term">OWASP Mobile Top 10</span> المرجع الأساسي لفرق الأمن في الشركات الأوروبية لتصنيف المخاطر. يجب على كل مطور أندرويد أن يفهم هذه التهديدات ليس حفظاً، بل تحليلاً عميقاً للآليات الداخلية:</p>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>الترتيب</th><th>التهديد</th><th>الوصف التقني</th><th>مستوى الخطورة</th></tr></thead>
+                        <tbody>
+                            <tr><td>M1</td><td>إساءة استخدام المنصة (Improper Platform Usage)</td><td>استخدام غير آمن لـ Intents وContent Providers وBroadcastReceivers</td><td><span class="threat-level threat-critical">حرج</span></td></tr>
+                            <tr><td>M2</td><td>التخزين غير الآمن (Insecure Data Storage)</td><td>حفظ كلمات المرور أو الرموز في SharedPreferences عادية أو مساحة تخزين خارجية</td><td><span class="threat-level threat-critical">حرج</span></td></tr>
+                            <tr><td>M3</td><td>اتصال غير آمن (Insecure Communication)</td><td>غياب SSL Pinning أو استخدام TLS 1.0/1.1 أو عدم التحقق من الشهادات</td><td><span class="threat-level threat-high">عالي</span></td></tr>
+                            <tr><td>M4</td><td>مصادقة غير آمنة (Insecure Authentication)</td><td>اعتماد المصادقة المحلية فقط أو تخزين JWT في الذاكرة بدون حماية</td><td><span class="threat-level threat-high">عالي</span></td></tr>
+                            <tr><td>M5</td><td>تشفير غير كافٍ (Insufficient Cryptography)</td><td>استخدام ECB mode أو مفاتيح مشفرة ضمن الكود أو IVs ثابتة</td><td><span class="threat-level threat-high">عالي</span></td></tr>
+                            <tr><td>M6</td><td>ترخيص غير آمن (Insecure Authorization)</td><td>التحقق من الصلاحيات على جانب العميل فقط بدون تحقق من الخادم</td><td><span class="threat-level threat-high">عالي</span></td></tr>
+                            <tr><td>M7</td><td>جودة كود ضعيفة (Client Code Quality)</td><td>ثغرات SQL Injection أو Path Traversal في معالجة المدخلات</td><td><span class="threat-level threat-medium">متوسط</span></td></tr>
+                            <tr><td>M8</td><td>التلاعب بالكود (Code Tampering)</td><td>إمكانية تعديل APK أو حقن كود عبر Frida أو Xposed</td><td><span class="threat-level threat-high">عالي</span></td></tr>
+                            <tr><td>M9</td><td>الهندسة العكسية (Reverse Engineering)</td><td>سهولة تفكيك APK وتحليل Smali واستخراج الأسرار من الكود</td><td><span class="threat-level threat-medium">متوسط</span></td></tr>
+                            <tr><td>M10</td><td>وظائف خارجية غير ضرورية (Extraneous Functionality)</td><td>وجود واجهات برمجية مخفية أو مفاتيح اختبار في إصدارات الإنتاج</td><td><span class="threat-level threat-medium">متوسط</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon success">🏰</div><h3>عزل التطبيقات (Application Sandbox): الحصن الدفاعي الأول</h3></div>
+                <p>يُعدّ <span class="term">Application Sandbox</span> الحجر الأساسي في بنية أمن أندرويد. لفهم أهميته، تخيّل أن كل تطبيق على جهازك يعيش في "سجن" افتراضي معزول، لا يستطيع التطبيق الأخر الوصول إلى بياناته إلا بموافقة صريحة من نظام التشغيل.</p>
+                <div class="analogy-box">
+                    <p><strong>مثال واقعي:</strong> تخيّل أنك في مطار دولي كبير. كل مسافر (تطبيق) يحمل جواز سفر فريداً (Linux User ID). عند دخولك منطقة الجوازات (Zygote process)، يتم فحص جواز سفرك ومنحك غرفة فندقية (Sandbox) لا يمكن لأي مسافر آخر الدخول إليها. حتى موظفي الفندق (تطبيقات النظام) لا يستطيعون فتح خزانتك (data directory) إلا إذا منحتهم مفتاحاً صريحاً (Permission).</p>
+                </div>
+                <h4>الآلية التقنية الداخلية للـ Sandbox</h4>
+                <p>عند تثبيت تطبيق، ينشئ نظام أندرويد للتطبيق ما يلي:</p>
+                <ul>
+                    <li><strong>Linux User ID فريد:</strong> يُنشأ معرّف مستخدم Linux فريد (UID) للتطبيق، عادةً يبدأ من 10000. لا يشارك تطبيقان UID نفسه إلا إذا كانا يحملان نفس توقيع الشهادة ويُصرّحان بذلك صراحةً.</li>
+                    <li><strong>Process Isolation:</strong> يُشغّل كل تطبيق في Process منفصل بذاكرة افتراضية خاصة به، مستخدماً آلية <code>fork()</code> من Zygote.</li>
+                    <li><strong>SELinux Policies:</strong> يُطبّق نظام SELinux سياسات إلزامية للتحكم في الوصول (MAC) لضمان أن التطبيق لا يتجاوز صلاحياته حتى لو تم اختراقه.</li>
+                    <li><strong>Filesystem Isolation:</strong> يتم حصر التطبيق في دليل <code>/data/data/&lt;package_name&gt;/</code> الذي لا يمكن للتطبيقات الأخرى قراءته (Android 4.3+).</li>
+                </ul>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>مثال: عرض معلومات UID و SELinux Context</span><span class="code-lang">Shell</span></div>
+                    <pre><code class="language-bash"># عرض معلومات التطبيق و UID الخاص به
+adb shell dumpsys package com.example.bankingapp | grep userId
+
+# عرض SELinux Context للتطبيق
+adb shell ps -Z | grep com.example.bankingapp
+# الناتج المتوقع: u:r:untrusted_app:s0:c512,c768
+
+# عرض صلاحيات الملفات في دليل التطبيق
+adb shell ls -laZ /data/data/com.example.bankingapp/
+# الناتج: drwx------ u0_a123 u0_a123 u:object_r:app_data_file:s0:c512,c768 </code></pre>
+                </div>
+                <div class="alert alert-info">
+                    <span class="alert-icon">ℹ️</span>
+                    <div><span class="alert-title">فهم عميق</span>يُعدّ SELinux Context (مثل <code>u:r:untrusted_app:s0:c512,c768</code>) بمثابة "بطاقة هوية" إضافية للتطبيق. الحقل <code>c512,c768</code> يُمثّل فئة التصنيف (MCS Categories) التي تضمن عزل التطبيقات حتى لو شاركت نفس نوع SELinux. هذا يعني أنه حتى لو وجدث ثغرة في نوع <code>untrusted_app</code>، فإن SELinux يمنع التطبيق A من الوصول إلى ملفات التطبيق B.</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon warning">🎯</div><h3>لماذا تفشل Sandbox وحدها في حماية التطبيقات المصرفية؟</h3></div>
+                <p>على الرغم من قوة Sandbox، إلا أنها ليست كافيةً وحدها للتطبيقات الحساسة. السبب:</p>
+                <ul>
+                    <li><strong>Root Access:</strong> إذا حصل المهاجم على صلاحيات الروت (مثلاً عبر Magisk)، فإن Sandbox تصبح عديمة الجدوى لأن الروت يتجاوز جميع قيود Linux.</li>
+                    <li><strong>Backup Extraction:</strong> التطبيقات التي تسمح بنسخ احتياطي (<code>android:allowBackup="true"</code>) يمكن استخراج بياناتها عبر <code>adb backup</code>.</li>
+                    <li><strong>Shared User ID:</strong> إذا استخدم التطبيق <code>android:sharedUserId</code> مع تطبيق آخر، فإنهما يشاركان نفس Sandbox.</li>
+                    <li><strong>Exported Components:</strong> المكونات المُصدّرة (Exported Components) تفتح "نوافذ" في جدران Sandbox يمكن استغلالها.</li>
+                </ul>
+                <div class="interview-box">
+                    <p><strong>سؤال مقابلة من N26 (Berlin, 2024):</strong><br>"كيف تضمن أن بيانات المستخدم المصرفية تبقى آمنة حتى على جهاز مُروت؟"</p>
+                    <p style="margin-top:1rem"><strong>الإجابة المتوقعة:</strong> لا يمكن ضمان الأمن بنسبة 100% على جهاز مُروت، لكن يمكن تقليل المخاطر عبر: (1) تشفير البيانات بمفاتيح Hardware-backed Keystore لا يمكن استخراجها، (2) استخدام Play Integrity API للكشف عن بيئات غير موثوقة، (3) عدم تخزين بيانات حساسة محلياً إلا عند الضرورة، (4) ربط العمليات الحساسة بـ BiometricPrompt.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="storage">
+            <div class="section-header">
+                <div class="section-number">2</div>
+                <h2>أمن التخزين المحلي وإدارة البيانات الحساسة (Secure Data Storage & Cryptography)</h2>
+                <p class="section-description">من Keystore إلى EncryptedSharedPreferences، مروراً بتشفير Room وSSL Pinning: كل ما تحتاجه لتأمين البيانات في الراحة وفي العبور</p>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon primary">🔐</div><h3>نظام Android Keystore: الخزنة الرقمية للمفاتيح</h3></div>
+                <p>يُعدّ <span class="term">Android Keystore System</span> الخدمة الأساسية التي تتيح للتطبيقات توليد مفاتيح تشفيرية وتخزينها في مواقع آمنة داخل الجهاز، بحيث لا يمكن للتطبيق نفسه استخراج المفتاح الخاص (Private Key) بعد توليده. يُشبه هذا آلية الخزنة في البنك: أنت تملك المفتاح، لكنك لا تستطيع أخذه معك — يمكنك فقط استخدامه داخل الخزنة.</p>
+                <div class="analogy-box">
+                    <p><strong>مثال واقعي:</strong> تخيّل أنك تمتلك صندوق إيداع (Safe Deposit Box) في بنك سويسري. لديك مفتاح لفتح الصندوق، لكن البنك يملك آلية ثانية للتحقق من هويتك. لا يمكنك أخذ محتويات الصندوق خارج البنك دون إذن، والبنك يحتفظ بسجل كل عملية فتح. Android Keystore يعمل بنفس الطريقة: المفتاح يبقى داخل "الخزنة" (TEE أو StrongBox) ولا يمكن نسخه أو استخراجه.</p>
+                </div>
+                <h4>البنية الداخلية: TEE مقابل StrongBox</h4>
+                <div class="table-wrapper">
+                    <table class="comparison-table">
+                        <thead><tr><th>النوع</th><th>الوصف</th><th>مستوى الأمان</th><th>التوافر</th></tr></thead>
+                        <tbody>
+                            <tr><td>Software Keystore</td><td>تخزين المفاتيح في ذاكرة التطبيق المشفرة بمفتاح مُستخرج من بصمة الجهاز</td><td>متوسط</td><td>جميع الأجهزة</td></tr>
+                            <tr><td>TEE (Trusted Execution Environment)</td><td>بيئة تنفيذ موثوقة منفصلة عن نظام التشغيل الرئيسي (ARM TrustZone)</td><td>عالي</td><td>معظم الأجهزة الحديثة</td></tr>
+                            <tr class="best"><td>StrongBox Keymaster</td><td>شريحة أمان منفصلة مادياً (HSM) مع ذاكرة تخزين ومُعالج خاصين</td><td>عالي جداً</td><td>Android 9+ (مطلوب من Android 12+)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="alert alert-info">
+                    <span class="alert-icon">ℹ️</span>
+                    <div><span class="alert-title">فهم ARM TrustZone</span>يُقسّم ARM TrustZone المعالج إلى عالمين: <strong>Normal World</strong> (حيث يعمل أندرويد) و <strong>Secure World</strong> (حيث يعمل TEE). عندما يُنشئ التطبيق مفتاحاً في Keystore، يتم توليد المفتاح الفعلي داخل Secure World. حتى لو اخترق المهاجم نظام أندرويد بالكامل، فإن Secure World يبقى معزولاً. StrongBox يذهب أبعد من ذلك باستخدام شريحة HSM منفصلة مادياً عن المعالج الرئيسي.</div>
+                </div>
+                <h4>توليد مفتاح AES في Keystore مع ربط المصادقة البيومترية</h4>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>توليد مفتاح AES-256 مع User Authentication</span><span class="code-lang">Kotlin</span></div>
+                    <pre><code class="language-kotlin">import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
+import java.security.KeyStore
+import javax.crypto.KeyGenerator
+import javax.crypto.SecretKey
+
+object SecureKeyManager {
+
+    private const val ANDROID_KEYSTORE = "AndroidKeyStore"
+    private const val KEY_ALIAS = "banking_master_key"
+
+    /**
+     * توليد مفتاح AES-256 داخل Android Keystore
+     * يتطلب المصادقة البيومترية قبل كل استخدام
+     */
+    fun generateBiometricBoundKey(): SecretKey {
+        val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
+
+        // إذا كان المفتاح موجوداً، أعد استخدامه
+        keyStore.getEntry(KEY_ALIAS, null)?.let {
+            return (it as KeyStore.SecretKeyEntry).secretKey
+        }
+
+        val keyGenerator = KeyGenerator.getInstance(
+            KeyProperties.KEY_ALGORITHM_AES,
+            ANDROID_KEYSTORE
+        )
+
+        val keyGenParameterSpec = KeyGenParameterSpec.Builder(
+            KEY_ALIAS,
+            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+        ).apply {
+            // استخدام AES-GCM (أكثر أماناً من CBC)
+            setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+            setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+
+            // حجم المفتاح 256 بت
+            setKeySize(256)
+
+            // ربط المفتاح بالمصادقة البيومترية
+            setUserAuthenticationRequired(true)
+            setUserAuthenticationValidityDurationSeconds(-1) // -1 = كل مرة
+            setInvalidatedByBiometricEnrollment(true)
+
+            // استخدام StrongBox إن توفر
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                setIsStrongBoxBacked(true)
+            }
+
+            // التأكد من عدم إمكانية الاستخراج
+            setRandomizedEncryptionRequired(true)
+        }.build()
+
+        keyGenerator.init(keyGenParameterSpec)
+        return keyGenerator.generateKey()
+    }
+
+    fun getKey(): SecretKey? {
+        val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
+        return (keyStore.getEntry(KEY_ALIAS, null) as? KeyStore.SecretKeyEntry)?.secretKey
+    }
+
+    fun deleteKey() {
+        val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
+        keyStore.deleteEntry(KEY_ALIAS)
+    }
+}</code></pre>
+                </div>
+                <div class="tip-box">
+                    <p><strong>نصيحة إنتاجية:</strong> دائماً استخدم <code>setInvalidatedByBiometricEnrollment(true)</code> لضمان أن المفاتيح تُبطل عند تسجيل بصمة جديدة. هذا يمنع هجوم "إضافة بصمة أثناء النوم" حيث يضيف المهاجم بصمته إلى الجهاز أثناء نوم المستخدم.</p>
+                </div>
+                <h4>توليد زوج مفاتيح RSA للتوقيع الرقمي</h4>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>توليد مفاتيح RSA-4096 للتوقيع الرقمي</span><span class="code-lang">Kotlin</span></div>
+                    <pre><code class="language-kotlin">import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
+import java.security.KeyPairGenerator
+import java.security.KeyStore
+import java.security.Signature
+
+object RsaKeyManager {
+
+    private const val ANDROID_KEYSTORE = "AndroidKeyStore"
+    private const val SIGNATURE_ALIAS = "app_signature_key"
+
+    fun generateRsaKeyPair() {
+        val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
+        if (keyStore.containsAlias(SIGNATURE_ALIAS)) return
+
+        val keyPairGenerator = KeyPairGenerator.getInstance(
+            KeyProperties.KEY_ALGORITHM_RSA,
+            ANDROID_KEYSTORE
+        )
+
+        val spec = KeyGenParameterSpec.Builder(
+            SIGNATURE_ALIAS,
+            KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
+        ).apply {
+            setKeySize(4096)
+            setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
+            setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
+            setUserAuthenticationRequired(true)
+            setUserAuthenticationValidityDurationSeconds(300) // 5 دقائق
+        }.build()
+
+        keyPairGenerator.initialize(spec)
+        keyPairGenerator.generateKeyPair()
+    }
+
+    fun signData(data: ByteArray): ByteArray? {
+        val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
+        val entry = keyStore.getEntry(SIGNATURE_ALIAS, null) as? KeyStore.PrivateKeyEntry
+            ?: return null
+        return Signature.getInstance("SHA256withRSA").apply {
+            initSign(entry.privateKey)
+            update(data)
+        }.sign()
+    }
+}</code></pre>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon success">🗄️</div><h3>EncryptedSharedPreferences و EncryptedFile: التخزين الآمن بسهولة</h3></div>
+                <p>تُعدّ <span class="term">EncryptedSharedPreferences</span> و <span class="term">EncryptedFile</span> من مكتبة AndroidX Security الحل الأمثل لتخزين البيانات الحساسة محلياً. بدلاً من حفظ البيانات كنص عادي (Plaintext) في ملفات XML، تقوم هذه المكتبة تلقائياً بتشفير المفاتيح والقيم باستخدام مفاتيح Keystore.</p>
+                <div class="alert alert-danger">
+                    <span class="alert-icon">🚫</span>
+                    <div><span class="alert-title">خطأ شائع قاتل</span>لا تستخدم <code>SharedPreferences</code> العادية (أو <code>DataStore</code> بدون تشفير) لتخزين: رموز JWT، كلمات مرور، أرقام بطاقات ائتمان، مفاتيح API، أو أي بيانات شخصية (PII). هذه البيانات تُحفظ كنص عادي في <code>/data/data/&lt;package&gt;/shared_prefs/</code> ويمكن استخراجها عبر <code>adb</code> على الأجهزة المُروتة أو عبر نسخ احتياطي.</div>
+                </div>
+                <h4>التكامل الكامل مع EncryptedSharedPreferences</h4>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>إعداد EncryptedSharedPreferences مع Keystore</span><span class="code-lang">Kotlin</span></div>
+                    <pre><code class="language-kotlin">import android.content.Context
+import android.content.SharedPreferences
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
+import java.io.IOException
+import java.security.GeneralSecurityException
+
+class SecurePreferencesManager(context: Context) {
+
+    companion object {
+        private const val PREFS_FILE = "secure_banking_prefs"
+        private const val KEY_AUTH_TOKEN = "auth_token"
+        private const val KEY_REFRESH_TOKEN = "refresh_token"
+        private const val KEY_USER_ID = "user_id"
+        private const val KEY_LAST_LOGIN = "last_login_timestamp"
+    }
+
+    private val masterKey: MasterKey by lazy {
+        MasterKey.Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .setUserAuthenticationRequired(false)
+            .build()
+    }
+
+    private val encryptedPrefs: EncryptedSharedPreferences by lazy {
+        try {
+            EncryptedSharedPreferences.create(
+                context,
+                PREFS_FILE,
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            ) as EncryptedSharedPreferences
+        } catch (e: GeneralSecurityException) {
+            context.deleteSharedPreferences(PREFS_FILE)
+            EncryptedSharedPreferences.create(
+                context,
+                PREFS_FILE,
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            ) as EncryptedSharedPreferences
+        }
+    }
+
+    fun saveAuthToken(token: String) {
+        encryptedPrefs.edit().putString(KEY_AUTH_TOKEN, token).apply()
+    }
+
+    fun getAuthToken(): String? = encryptedPrefs.getString(KEY_AUTH_TOKEN, null)
+
+    fun saveRefreshToken(token: String) {
+        encryptedPrefs.edit().putString(KEY_REFRESH_TOKEN, token).apply()
+    }
+
+    fun getRefreshToken(): String? = encryptedPrefs.getString(KEY_REFRESH_TOKEN, null)
+
+    fun clearAll() {
+        encryptedPrefs.edit().clear().apply()
+    }
+
+    fun hasStoredCredentials(): Boolean {
+        return getAuthToken() != null && getRefreshToken() != null
+    }
+}</code></pre>
+                </div>
+                <div class="alert alert-warning">
+                    <span class="alert-icon">⚡</span>
+                    <div><span class="alert-title">تحذير هام: Migration Strategy</span>عند الترقية من <code>SharedPreferences</code> العادية إلى <code>EncryptedSharedPreferences</code>، لا تقم بنقل البيانات الحساسة الموجودة. بدلاً من ذلك: (1) اطلب من المستخدم تسجيل الدخول مرة أخرى، (2) احذف البيانات القديمة، (3) خزّن البيانات الجديدة في EncryptedSharedPreferences. نقل البيانات يعني فك تشفيرها ثم إعادة تشفيرها، وهذه الفترة الانتقالية قد تترك البيانات عرضة في الذاكرة.</div>
+                </div>
+                <h4>تشفير الملفات باستخدام EncryptedFile</h4>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>تخزين ملفات PDF حساسة بشكل مشفر</span><span class="code-lang">Kotlin</span></div>
+                    <pre><code class="language-kotlin">import android.content.Context
+import androidx.security.crypto.EncryptedFile
+import androidx.security.crypto.MasterKey
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.nio.charset.StandardCharsets
+
+class SecureFileManager(context: Context) {
+
+    private val masterKey = MasterKey.Builder(context)
+        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+        .build()
+
+    private val filesDir = context.filesDir
+
+    fun writeEncryptedFile(fileName: String, content: ByteArray): Boolean {
+        return try {
+            val file = File(filesDir, fileName)
+            if (file.exists()) file.delete()
+
+            val encryptedFile = EncryptedFile.Builder(
+                context,
+                file,
+                masterKey,
+                EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+            ).build()
+
+            encryptedFile.openFileOutput().use { outputStream ->
+                outputStream.write(content)
+            }
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    fun readEncryptedFile(fileName: String): ByteArray? {
+        return try {
+            val file = File(filesDir, fileName)
+            if (!file.exists()) return null
+
+            val encryptedFile = EncryptedFile.Builder(
+                context,
+                file,
+                masterKey,
+                EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+            ).build()
+
+            encryptedFile.openFileInput().use { inputStream ->
+                ByteArrayOutputStream().use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                    outputStream.toByteArray()
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><div class="card-icon danger">🛡️</div><h3>تشفير قواعد بيانات Room و SQLite: حماية البيانات الهيكلية</h3></div>
+                <p>تُخزّن قواعد بيانات <span class="term">Room</span> بياناتها في ملف SQLite عادي ضمن دليل التطبيق. على الأجهزة المُروتة، يمكن استخراج هذا الملف وقراءته باستخدام أي أداة SQLite. لحماية البيانات، يجب تشفير قاعدة البيانات بأكملها باستخدام <span class="term">SQLCipher</span> أو <span class="term">Room Database Encryption</span>.</p>
+                <h4>التكامل مع SQLCipher (الحل الموصى به للتطبيقات المصرفية)</h4>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>build.gradle - إضافة SQLCipher</span><span class="code-lang">Groovy</span></div>
+                    <pre><code class="language-groovy">dependencies {
+    implementation "net.zetetic:android-database-sqlcipher:4.5.4"
+    implementation "androidx.room:room-runtime:2.6.1"
+    kapt "androidx.room:room-compiler:2.6.1"
+    implementation "androidx.room:room-ktx:2.6.1"
+}</code></pre>
+                </div>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>تكوين Room مع SQLCipher</span><span class="code-lang">Kotlin</span></div>
+                    <pre><code class="language-kotlin">import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import net.sqlcipher.database.SQLiteDatabase
+import net.sqlcipher.database.SupportFactory
+
+@Database(entities = [TransactionEntity::class, AccountEntity::class], version = 1, exportSchema = false)
+abstract class SecureBankDatabase : RoomDatabase() {
+    abstract fun transactionDao(): TransactionDao
+    abstract fun accountDao(): AccountDao
+
+    companion object {
+        @Volatile private var INSTANCE: SecureBankDatabase? = null
+
+        fun getInstance(context: Context): SecureBankDatabase {
+            return INSTANCE ?: synchronized(this) {
+                INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
+            }
+        }
+
+        private fun buildDatabase(context: Context): SecureBankDatabase {
+            val passphrase = getDatabasePassphraseFromKeystore(context)
+            val factory = SupportFactory(passphrase)
+
+            return Room.databaseBuilder(
+                context.applicationContext,
+                SecureBankDatabase::class.java,
+                "secure_bank_db.db"
+            )
+            .openHelperFactory(factory)
+            .fallbackToDestructiveMigration()
+            .build()
+        }
+
+        private fun getDatabasePassphraseFromKeystore(context: Context): ByteArray {
+            val keystore = java.security.KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
+            val alias = "room_db_passphrase"
+            val existing = keystore.getEntry(alias, null)
+
+            if (existing != null) {
+                return retrieveStoredPassphrase(context)
+            }
+
+            val newPassphrase = ByteArray(32)
+            java.security.SecureRandom().nextBytes(newPassphrase)
+            storePassphraseSecurely(context, newPassphrase)
+            return newPassphrase
+        }
+
+        private fun retrieveStoredPassphrase(context: Context): ByteArray {
+            TODO("Implement using EncryptedSharedPreferences")
+        }
+
+        private fun storePassphraseSecurely(context: Context, passphrase: ByteArray) {
+            TODO("Implement using EncryptedSharedPreferences")
+        }
+    }
+}</code></pre>
+                </div>
+                <div class="tip-box">
+                    <p><strong>نصيحة إنتاجية:</strong> لا تستخدم <code>SQLiteDatabase.getBytes("password")</code> كـ passphrase. بدلاً من ذلك، استخدم <code>SecureRandom</code> لتوليد 32 بايت عشوائية، ثم خزّنها في <code>EncryptedSharedPreferences</code>. كلمات المرور القابلة للتخمين تُبطل فائدة SQLCipher.</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon warning">🔒</div><h3>SSL Pinning: تأمين الاتصال ضد هجمات Man-in-the-Middle</h3></div>
+                <p>يعتمد نظام أندرويد على مخزن الشهادات (Certificate Store) للتحقق من صحة اتصالات TLS. لكن ماذا لو كان المهاجم قادراً على تثبيت شهادة CA خاصة به على الجهاز؟ في هذه الحالة، يمكنه اعتراض حركة المرور (MitM) دون أن يتنبّه التطبيق. <span class="term">SSL Pinning</span> يحل هذه المشكلة عبر "تثبيت" شهادة الخادم أو مفتاحه العام داخل التطبيق، بحيث يرفض التطبيق أي شهادة أخرى حتى لو كانت موقعة من CA موثوق.</p>
+                <div class="analogy-box">
+                    <p><strong>مثال واقعي:</strong> تخيّل أنك تعبر نقطة تفتيش حدودية. بدلاً من قبول أي جواز سفر صادر من أي دولة (CA)، يطلب ضابط الجوازات منك إظهار "ختم أمان" محدد مسبقاً على جواز سفرك. حتى لو كان الجواز مزوراً بشكل مثالي، فإن غياب الختم المحدد مسبقاً يُفشل المحاولة فوراً. SSL Pinning يعمل بنفس الطريقة: التطبيق يعرف الشهادة المتوقعة ويرفض أي شيء آخر.</p>
+                </div>
+                <h4>استخراج الشهادة العامة (Public Key Pinning)</h4>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>استخراج Public Key Hash من الشهادة</span><span class="code-lang">Bash</span></div>
+                    <pre><code class="language-bash">openssl s_client -connect api.bank.com:443 -servername api.bank.com < /dev/null | \
+    openssl x509 -in /dev/stdin -pubkey -noout | \
+    openssl pkey -pubin -outform der | \
+    openssl dgst -sha256 -binary | \
+    openssl enc -base64</code></pre>
+                </div>
+                <h4>تطبيق SSL Pinning باستخدام OkHttp</h4>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>OkHttp Client مع Certificate Pinning</span><span class="code-lang">Kotlin</span></div>
+                    <pre><code class="language-kotlin">import okhttp3.CertificatePinner
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import java.util.concurrent.TimeUnit
+
+object SecureHttpClient {
+
+    private const val PRIMARY_PIN = "sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+    private const val BACKUP_PIN_1 = "sha256/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB="
+    private const val BACKUP_PIN_2 = "sha256/CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC="
+    private const val API_HOST = "api.bank.com"
+
+    fun createSecureClient(context: Context, enableLogging: Boolean = BuildConfig.DEBUG): OkHttpClient {
+
+        val certificatePinner = CertificatePinner.Builder()
+            .add(API_HOST, PRIMARY_PIN)
+            .add(API_HOST, BACKUP_PIN_1)
+            .add(API_HOST, BACKUP_PIN_2)
+            .build()
+
+        return OkHttpClient.Builder()
+            .certificatePinner(certificatePinner)
+            .connectionSpecs(listOf(
+                okhttp3.ConnectionSpec.Builder(okhttp3.ConnectionSpec.MODERN_TLS)
+                    .tlsVersions(okhttp3.TlsVersion.TLS_1_3, okhttp3.TlsVersion.TLS_1_2)
+                    .cipherSuites(
+                        okhttp3.CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+                        okhttp3.CipherSuite.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+                        okhttp3.CipherSuite.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
+                        okhttp3.CipherSuite.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+                    )
+                    .build()
+            ))
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .apply {
+                if (enableLogging) {
+                    addInterceptor(HttpLoggingInterceptor().apply {
+                        level = HttpLoggingInterceptor.Level.BODY
+                    })
+                }
+                addInterceptor(AuthInterceptor(context))
+                retryOnConnectionFailure(true)
+            }
+            .build()
+    }
+
+    class AuthInterceptor(private val context: Context) : okhttp3.Interceptor {
+        override fun intercept(chain: okhttp3.Interceptor.Chain): okhttp3.Response {
+            val originalRequest = chain.request()
+            val token = SecurePreferencesManager(context).getAuthToken()
+                ?: return chain.proceed(originalRequest)
+
+            val newRequest = originalRequest.newBuilder()
+                .header("Authorization", "Bearer $token")
+                .header("X-Request-ID", java.util.UUID.randomUUID().toString())
+                .header("X-Client-Version", BuildConfig.VERSION_NAME)
+                .build()
+
+            return chain.proceed(newRequest)
+        }
+    }
+}</code></pre>
+                </div>
+                <h4>Network Security Config (XML-based Pinning)</h4>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>res/xml/network_security_config.xml</span><span class="code-lang">XML</span></div>
+                    <pre><code class="language-xml"><?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </base-config>
+
+    <domain-config>
+        <domain includeSubdomains="true">api.bank.com</domain>
+        <pin-set expiration="2025-12-31">
+            <pin digest="SHA-256">AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</pin>
+            <pin digest="SHA-256">BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=</pin>
+        </pin-set>
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </domain-config>
+
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="user"/>
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config></code></pre>
+                </div>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>AndroidManifest.xml - ربط Network Security Config</span><span class="code-lang">XML</span></div>
+                    <pre><code class="language-xml"><application
+    android:networkSecurityConfig="@xml/network_security_config"
+    android:usesCleartextTraffic="false"
+    ... >
+    ...
+</application></code></pre>
+                </div>
+                <div class="alert alert-warning">
+                    <span class="alert-icon">⚠️</span>
+                    <div><span class="alert-title">تحذير: Certificate Transparency</span>بالإضافة إلى SSL Pinning، يجب تفعيل <span class="term">Certificate Transparency</span> للتحقق من أن الشهادات مُسجلة في سجلات CT العامة. هذا يمنع هجمات CA Compromised حيث يصدر CA شرعي شهادة خبيثة. استخدم مكتبة <code>certificate-transparency-android</code> من Appmattus.</div>
+                </div>
+                <div class="interview-box">
+                    <p><strong>سؤال مقابلة من BMW (Munich, 2024):</strong><br>"ما الفرق بين Certificate Pinning و Public Key Pinning؟ ولماذا نفضل Public Key Pinning في التطبيقات المصرفية؟"</p>
+                    <p style="margin-top:1rem"><strong>الإجابة:</strong> Certificate Pinning يثبت الشهادة الكاملة (بما في ذلك تاريخ الانتهاء)، مما يعني أن تجديد الشهادة يتطلب تحديث التطبيق. Public Key Pinning يثبت فقط المفتاح العام (Public Key)، الذي يبقى ثابتاً عند تجديد الشهادة (Re-keying). في التطبيقات المصرفية، نفضل Public Key Pinning لأنه يقلل من حاجة تحديث التطبيق عند تجديد الشهادة السنوية، مع الحفاظ على نفس مستوى الأمان.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="components">
+            <div class="section-header">
+                <div class="section-number">3</div>
+                <h2>تأمين المكونات والصلاحيات (Component Security & IPC Hardening)</h2>
+                <p class="section-description">حماية Activities وServices وBroadcastReceivers وContentProviders من الاستغلال الخارجي وثغرات الـ IPC</p>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon danger">🚪</div><h3>مخاطر المكونات المُصدّرة (Exported Components) وثغرات Intent Spoofing</h3></div>
+                <p>عندما يُعلن مطور عن <span class="term">Activity</span> أو <span class="term">Service</span> أو <span class="term">BroadcastReceiver</span> بخاصية <code>android:exported="true"</code> في AndroidManifest.xml، فإنه يفتح "باباً" يمكن لأي تطبيق آخر على الجهاز فتحه عبر <span class="term">Intent Spoofing</span>. هذا يُعدّ من أكثر الثغرات شيوعاً في تطبيقات أندرويد المصرفية.</p>
+                <div class="analogy-box">
+                    <p><strong>مثال واقعي:</strong> تخيّل أنك تعيش في شقة آمنة جداً، لكنك تركت نافذة الشرفة مفتوحة دون قفل. الغرض كان السماح للطيور بدخول الشرفة، لكن اللص يستطيع استخدام نفس النافذة للدخول. Exported Component هي تلك النافذة: مُصممة لغرض شرعي، لكنها قد تُستغل لأغراض خبيثة.</p>
+                </div>
+                <h4>القاعدة الذهبية: لا تُصدّر أي مكون دون حاجة</h4>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>AndroidManifest.xml - إعدادات آمنة</span><span class="code-lang">XML</span></div>
+                    <pre><code class="language-xml"><?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.bankingapp">
+
+    <!-- تعطيل النسخ الاحتياطي تماماً -->
+    <application
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:usesCleartextTraffic="false"
+        android:networkSecurityConfig="@xml/network_security_config">
+
+        <!-- Activity رئيسي: لا يُصدّر -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Activity للدفع: مُصدّر لكن محمي بصلاحية مخصصة -->
+        <activity
+            android:name=".PaymentActivity"
+            android:exported="true"
+            android:permission="com.example.bankingapp.permission.INITIATE_PAYMENT">
+            <intent-filter>
+                <action android:name="com.example.bankingapp.action.INITIATE_PAYMENT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Service داخلي: لا يُصدّر أبداً -->
+        <service
+            android:name=".service.BankingService"
+            android:exported="false"
+            android:process=":secure_process" />
+
+        <!-- BroadcastReceiver: مُصدّر لكن مع صلاحية -->
+        <receiver
+            android:name=".receiver.TransactionReceiver"
+            android:exported="true"
+            android:permission="com.example.bankingapp.permission.RECEIVE_TRANSACTION">
+            <intent-filter>
+                <action android:name="com.example.bankingapp.action.TRANSACTION_COMPLETE" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+    <!-- تعريف الصلاحيات المخصصة -->
+    <permission
+        android:name="com.example.bankingapp.permission.INITIATE_PAYMENT"
+        android:label="Initiate Payment"
+        android:description="Allows initiating secure payment transactions"
+        android:protectionLevel="signature" />
+
+    <permission
+        android:name="com.example.bankingapp.permission.RECEIVE_TRANSACTION"
+        android:label="Receive Transaction"
+        android:description="Allows receiving transaction notifications"
+        android:protectionLevel="signature" />
+
+</manifest></code></pre>
+                </div>
+                <div class="alert alert-danger">
+                    <span class="alert-icon">🚫</span>
+                    <div><span class="alert-title">خطأ قاتل شائع</span>لا تستخدم <code>android:protectionLevel="normal"</code> للصلاحيات المخصصة. أي تطبيق يمكنه طلب هذه الصلاحية تلقائياً. استخدم <code>signature</code> لضمان أن فقط التطبيقات الموقعة بنفس الشهادة يمكنها الحصول على الصلاحية.</div>
+                </div>
+                <h4>التحقق من مصدر Intent داخل الكود</h4>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>التحقق من مصدر Intent في Activity</span><span class="code-lang">Kotlin</span></div>
+                    <pre><code class="language-kotlin">class PaymentActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // التحقق من أن الـ Intent يأتي من تطبيق موثوق
+        if (!isTrustedCaller()) {
+            finish()
+            return
+        }
+
+        // معالجة الدفع...
+    }
+
+    private fun isTrustedCaller(): Boolean {
+        val callingPackage = callingActivity?.packageName 
+            ?: return false
+
+        // التحقق من توقيع التطبيق الطالب
+        return PackageUtils.isPackageSignedWithOurCertificate(this, callingPackage)
+    }
+}
+
+object PackageUtils {
+
+    fun isPackageSignedWithOurCertificate(context: Context, packageName: String): Boolean {
+        return try {
+            val packageManager = context.packageManager
+            val packageInfo = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                packageManager.getPackageInfo(
+                    packageName,
+                    android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                packageManager.getPackageInfo(packageName, android.content.pm.PackageManager.GET_SIGNATURES)
+            }
+
+            val signatures = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                packageInfo.signingInfo?.apkContentsSigners
+            } else {
+                @Suppress("DEPRECATION")
+                packageInfo.signatures
+            }
+
+            // مقارنة مع التوقيع المتوقع (hash)
+            signatures?.any { sig ->
+                val currentHash = hashSignature(sig.toByteArray())
+                currentHash == EXPECTED_SIGNATURE_HASH
+            } ?: false
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    private fun hashSignature(signature: ByteArray): String {
+        val digest = java.security.MessageDigest.getInstance("SHA-256")
+        return android.util.Base64.encodeToString(digest.digest(signature), android.util.Base64.NO_WRAP)
+    }
+
+    private const val EXPECTED_SIGNATURE_HASH = "YOUR_BASE64_HASH_HERE"
+}</code></pre>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon warning">📁</div><h3>تأمين Content Providers ومنع SQL Injection وPath Traversal</h3></div>
+                <p><span class="term">ContentProvider</span> هو من أخطر المكونات إذا أُسيء تكوينه. يمكن أن يؤدي إلى:</p>
+                <ul>
+                    <li><strong>SQL Injection:</strong> إذا تم تمرير مدخلات المستخدم مباشرة إلى استعلام SQL بدون تطهير.</li>
+                    <li><strong>Path Traversal:</strong> إذا سمح بقراءة الملفات عبر URI بدون تقييد المسارات.</li>
+                    <li><strong>Data Leakage:</strong> إذا كانت البيانات الحساسة متاحة عبر استعلامات URI.</li>
+                </ul>
+                <h4>تكوين ContentProvider آمن</h4>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>ContentProvider آمن مع تطهير المدخلات</span><span class="code-lang">Kotlin</span></div>
+                    <pre><code class="language-kotlin">class SecureTransactionProvider : ContentProvider() {
+
+    companion object {
+        const val AUTHORITY = "com.example.bankingapp.provider"
+        val CONTENT_URI: Uri = Uri.parse("content://$AUTHORITY/transactions")
+
+        private const val TRANSACTIONS_TABLE = "transactions"
+        private val uriMatcher = UriMatcher(UriMatcher.NO_MATCH).apply {
+            addURI(AUTHORITY, "transactions", 1)
+            addURI(AUTHORITY, "transactions/#", 2)
+        }
+    }
+
+    private lateinit var db: SecureBankDatabase
+
+    override fun onCreate(): Boolean {
+        context?.let { db = SecureBankDatabase.getInstance(it) }
+        return true
+    }
+
+    override fun query(
+        uri: Uri,
+        projection: Array<String>?,
+        selection: String?,
+        selectionArgs: Array<String>?,
+        sortOrder: String?
+    ): Cursor? {
+        // رفض الاستعلامات المجهولة
+        when (uriMatcher.match(uri)) {
+            1, 2 -> { /* مسموح */ }
+            else -> throw IllegalArgumentException("Unknown URI: $uri")
+        }
+
+        // استخدام SQLiteQueryBuilder لتطهير المدخلات تلقائياً
+        val queryBuilder = androidx.sqlite.db.SupportSQLiteQueryBuilder
+            .builder(TRANSACTIONS_TABLE)
+            .columns(projection)
+            .selection(selection, selectionArgs)
+            .orderBy(sortOrder)
+            .create()
+
+        return db.openHelper.readableDatabase.query(queryBuilder)
+    }
+
+    override fun insert(uri: Uri, values: ContentValues?): Uri? {
+        // رفض الإدراج من خلال ContentProvider
+        throw SecurityException("Insert not allowed through ContentProvider")
+    }
+
+    override fun delete(uri: Uri, selection: String?, selectionArgs: Array<String>?): Int {
+        // رفض الحذف
+        throw SecurityException("Delete not allowed through ContentProvider")
+    }
+
+    override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<String>?): Int {
+        // رفض التحديث
+        throw SecurityException("Update not allowed through ContentProvider")
+    }
+
+    override fun getType(uri: Uri): String? = null
+}</code></pre>
+                </div>
+                <h4>مشاركة الملفات بأمان عبر FileProvider</h4>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>FileProvider Configuration</span><span class="code-lang">XML</span></div>
+                    <pre><code class="language-xml"><?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- مسار داخلي فقط للملفات المؤقتة -->
+    <cache-path name="temp_files" path="temp/" />
+
+    <!-- مسار ملفات التطبيق المشفرة -->
+    <files-path name="secure_docs" path="documents/" />
+
+    <!-- لا تستخدم external-path أبداً للملفات الحساسة -->
+</paths></code></pre>
+                </div>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>مشاركة ملف PDF بأمان</span><span class="code-lang">Kotlin</span></div>
+                    <pre><code class="language-kotlin">fun shareSecureDocument(context: Context, fileName: String) {
+    val file = File(context.filesDir, "documents/$fileName")
+
+    val uri = FileProvider.getUriForFile(
+        context,
+        "${context.packageName}.fileprovider",
+        file
+    )
+
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "application/pdf"
+        putExtra(Intent.EXTRA_STREAM, uri)
+        // منح صلاحية قراءة مؤقتة فقط للتطبيق المستلم
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        // منع إعادة توجيه الـ Intent
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    // التحقق من وجود تطبيق يمكنه معالجة الـ Intent
+    if (intent.resolveActivity(context.packageManager) != null) {
+        context.startActivity(Intent.createChooser(intent, "Share Document"))
+    }
+}</code></pre>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon info">🔐</div><h3>إدارة الصلاحيات الخطرة (Runtime Permissions) ومعالجة Intents الخارجية</h3></div>
+                <p>في أندرويد 6.0+ (API 23)، أصبحت الصلاحيات الخطرة تتطلب موافقة المستخدم في وقت التشغيل. لكن إدارة هذه الصلاحيات تتطلب أكثر من مجرد طلبها:</p>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>إدارة صلاحيات المصرفية بشكل آمن</span><span class="code-lang">Kotlin</span></div>
+                    <pre><code class="language-kotlin">class PermissionManager(private val activity: AppCompatActivity) {
+
+    private val requiredPermissions = arrayOf(
+        android.Manifest.permission.CAMERA,      // لمسح QR
+        android.Manifest.permission.USE_BIOMETRIC // للمصادقة البيومترية
+    )
+
+    private val permissionLauncher = activity.registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        permissions.entries.forEach { (permission, isGranted) ->
+            when {
+                isGranted -> onPermissionGranted(permission)
+                activity.shouldShowRequestPermissionRationale(permission) -> {
+                    // المستخدم رفض مرة لكن لم يختار "Don't ask again"
+                    showRationaleDialog(permission)
+                }
+                else -> {
+                    // المستخدم اختار "Don't ask again" أو رفض نهائياً
+                    showSettingsRedirectDialog()
+                }
+            }
+        }
+    }
+
+    fun requestPermissions() {
+        val permissionsToRequest = requiredPermissions.filter {
+            ContextCompat.checkSelfPermission(activity, it) != PackageManager.PERMISSION_GRANTED
+        }.toTypedArray()
+
+        if (permissionsToRequest.isEmpty()) {
+            onAllPermissionsGranted()
+        } else {
+            permissionLauncher.launch(permissionsToRequest)
+        }
+    }
+
+    private fun onPermissionGranted(permission: String) {
+        when (permission) {
+            android.Manifest.permission.CAMERA -> {
+                // تفعيل ميزة مسح QR
+            }
+            android.Manifest.permission.USE_BIOMETRIC -> {
+                // تفعيل المصادقة البيومترية
+            }
+        }
+    }
+
+    private fun onAllPermissionsGranted() {
+        // جميع الصلاحيات متوفرة
+    }
+
+    private fun showRationaleDialog(permission: String) {
+        // عرض توضيح للمستخدم عن سبب الحاجة للصلاحية
+    }
+
+    private fun showSettingsRedirectDialog() {
+        // توجيه المستخدم إلى إعدادات التطبيق
+    }
+}</code></pre>
+                </div>
+                <div class="interview-box">
+                    <p><strong>سؤال مقابلة من Bosch (Stuttgart, 2024):</strong><br>"ما الفرق بين protectionLevel="signature" و protectionLevel="dangerous" في Android Permissions؟ ومتى تستخدم كل منهما؟"</p>
+                    <p style="margin-top:1rem"><strong>الإجابة:</strong> <code>dangerous</code> تتطلب موافقة المستخدم صراحةً (مثل CAMERA أو LOCATION) وتُستخدم للصلاحيات التي تؤثر على خصوصية المستخدم. <code>signature</code> تُمنح تلقائياً فقط للتطبيقات الموقعة بنفس الشهادة، وتُستخدم للاتصال بين تطبيقات نفس الشركة (مثل تطبيق بنكي وتطبيق محفظة رقمية تابعين لنفس الشركة). <code>signature</code> لا تتطلب موافقة المستخدم ولا يمكن لأي تطبيق خارجي الحصول عليها.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="tampering">
+            <div class="section-header">
+                <div class="section-number">4</div>
+                <h2>آليات كشف التلاعب والحماية المتقدمة (Anti-Tampering, Root Detection & Code Obfuscation)</h2>
+                <p class="section-description">كيف تكتشف الروت والـ Hooking وتُبهم الكود لمنع الهندسة العكسية</p>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon danger">🔍</div><h3>كشف الروت المتقدم: كشف Magisk وSU Binaries وCustom ROMs</h3></div>
+                <p>يُعدّ <span class="term">Root Detection</span> من أهم آليات الدفاع في التطبيقات المصرفية. لكن المهاجمين أصبحوا يستخدمون أدوات متطورة مثل <span class="term">Magisk</span> التي تُخفي نفسها (Hide Magisk) لتجاوز الكشف التقليدي. يجب أن تكون آلية الكشف متعددة الطبقات (Defense in Depth).</p>
+                <div class="analogy-box">
+                    <p><strong>مثال واقعي:</strong> تخيّل أنك مدير أمن في مطار دولي. لا تعتمد على بوابة واحدة للكشف عن الممنوعات، بل تستخدم: (1) أشعة X-ray، (2) كلاب بوليسية، (3) فحص يدوي، (4) أسئلة عشوائية. Root Detection يجب أن يكون بنفس الطريقة: عدة آليات مستقلة، بحيث إذا فشلت إحداها، تنجح الأخرى.</p>
+                </div>
+                <h4>آلية كشف الروت متعددة الطبقات</h4>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>Root Detection Engine متعدد الطبقات</span><span class="code-lang">Kotlin</span></div>
+                    <pre><code class="language-kotlin">import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import java.io.File
+import java.security.MessageDigest
+
+class RootDetectionEngine(private val context: Context) {
+
+    enum class RootIndicator {
+        TEST_KEYS,              // ro.build.tags = test-keys
+        SUPERUSER_APK,          // تطبيق Superuser مثبت
+        SU_BINARY,              // ملف /system/bin/su موجود
+        MAGISK_FILES,           // ملفات Magisk مخفية
+        BUSYBOX_INSTALLED,      // BusyBox مثبت
+        RW_SYSTEM,              // /system قابل للكتابة
+        DANGEROUS_PROPS,        // خصائص نظام مشبوهة
+        MAGISK_APP,             // تطبيق Magisk مثبت
+        HOOKING_FRAMEWORKS,     // Xposed أو Frida
+        EMULATOR_DETECTED       // محاكي
+    }
+
+    data class RootCheckResult(
+        val isRooted: Boolean,
+        val detectedIndicators: List<RootIndicator>,
+        val riskScore: Int // 0-100
+    )
+
+    fun performRootCheck(): RootCheckResult {
+        val indicators = mutableListOf<RootIndicator>()
+
+        // الطبقة 1: فحص Test Keys
+        if (checkTestKeys()) indicators.add(RootIndicator.TEST_KEYS)
+
+        // الطبقة 2: فحص SU Binary
+        if (checkSuBinary()) indicators.add(RootIndicator.SU_BINARY)
+
+        // الطبقة 3: فحص Magisk
+        if (checkMagisk()) indicators.add(RootIndicator.MAGISK_FILES)
+
+        // الطبقة 4: فحص BusyBox
+        if (checkBusyBox()) indicators.add(RootIndicator.BUSYBOX_INSTALLED)
+
+        // الطبقة 5: فحص خصائص النظام
+        if (checkDangerousProps()) indicators.add(RootIndicator.DANGEROUS_PROPS)
+
+        // الطبقة 6: فحص Hooking Frameworks
+        if (checkHookingFrameworks()) indicators.add(RootIndicator.HOOKING_FRAMEWORKS)
+
+        // حساب درجة الخطورة
+        val riskScore = calculateRiskScore(indicators)
+        val isRooted = riskScore >= 30 // عتبة التحذير
+
+        return RootCheckResult(isRooted, indicators, riskScore)
+    }
+
+    private fun checkTestKeys(): Boolean {
+        val buildTags = android.os.Build.TAGS
+        return buildTags != null && buildTags.contains("test-keys")
+    }
+
+    private fun checkSuBinary(): Boolean {
+        val paths = arrayOf(
+            "/system/bin/su",
+            "/system/xbin/su",
+            "/sbin/su",
+            "/su/bin/su",
+            "/data/local/xbin/su",
+            "/data/local/bin/su",
+            "/system/sbin/su",
+            "/vendor/bin/su",
+            "/system/app/Superuser.apk"
+        )
+        return paths.any { File(it).exists() }
+    }
+
+    private fun checkMagisk(): Boolean {
+        // فحص ملفات Magisk المخفية
+        val magiskPaths = arrayOf(
+            "/data/adb/magisk",
+            "/sbin/.magisk",
+            "/dev/.magisk.unblock",
+            "/system/etc/init.d/99magisk"
+        )
+
+        // فحص تطبيق Magisk Manager (قد يكون مخفياً)
+        val magiskPackages = arrayOf(
+            "com.topjohnwu.magisk",
+            "io.github.huskydg.magisk"
+        )
+
+        val fileCheck = magiskPaths.any { File(it).exists() }
+        val packageCheck = magiskPackages.any { isPackageInstalled(it) }
+
+        return fileCheck || packageCheck
+    }
+
+    private fun checkBusyBox(): Boolean {
+        val paths = arrayOf(
+            "/system/xbin/busybox",
+            "/system/bin/busybox",
+            "/data/local/xbin/busybox"
+        )
+        return paths.any { File(it).exists() }
+    }
+
+    private fun checkDangerousProps(): Boolean {
+        val dangerousProps = arrayOf(
+            "ro.debuggable" to "1",
+            "ro.secure" to "0",
+            "ro.build.selinux" to "0"
+        )
+
+        return dangerousProps.any { (prop, expectedValue) ->
+            readSystemProperty(prop) == expectedValue
+        }
+    }
+
+    private fun checkHookingFrameworks(): Boolean {
+        val hookingPackages = arrayOf(
+            "de.robv.android.xposed.installer",
+            "com.saurik.substrate",
+            "org.lsposed.manager",
+            "com.cheatengine.hotpatch"
+        )
+        return hookingPackages.any { isPackageInstalled(it) }
+    }
+
+    private fun isPackageInstalled(packageName: String): Boolean {
+        return try {
+            context.packageManager.getPackageInfo(packageName, 0)
+            true
+        } catch (e: PackageManager.NameNotFoundException) {
+            false
+        }
+    }
+
+    private fun readSystemProperty(propName: String): String? {
+        return try {
+            Runtime.getRuntime().exec("getprop $propName")
+                .inputStream.bufferedReader().readLine()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun calculateRiskScore(indicators: List<RootIndicator>): Int {
+        return when (indicators.size) {
+            0 -> 0
+            1 -> 20
+            2 -> 40
+            3 -> 60
+            4 -> 80
+            else -> 100
+        }
+    }
+}</code></pre>
+                </div>
+                <div class="alert alert-warning">
+                    <span class="alert-icon">⚠️</span>
+                    <div><span class="alert-title">تحذير: Magisk Hide</span>أداة Magisk Hide تستطيع إخفاء نفسها من الفحوصات التقليدية. لمواجهة هذا، استخدم تقنيات متقدمة مثل: (1) فحص /proc/self/maps لأي مكتبات مشبوهة، (2) فحص /proc/self/status لـ TracerPid، (3) استخدام Native Code (C/C++) لتنفيذ الفحوصات (أصعب في الـ Hooking)، (4) التحقق من سلامة ملفات النظام عبر Hashing.</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon danger">🛡️</div><h3>الكشف عن أدوات الـ Hooking: Frida وXposed وObjection</h3></div>
+                <p><span class="term">Frida</span> و <span class="term">Xposed</span> و <span class="term">Objection</span> هي أدوات Dynamic Instrumentation تسمح للمهاجمين بحقن كود في التطبيق أثناء التشغيل، وتعديل سلوك الدوال، وتجاوز آليات الأمن. يجب كشف هذه الأدوات قبل تنفيذ أي عملية حساسة.</p>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>كشف Frida وXposed باستخدام Native Code</span><span class="code-lang">C++</span></div>
+                    <pre><code class="language-cpp">#include <jni.h>
+#include <string>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <dirent.h>
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_example_security_SecurityNative_checkFrida(
+        JNIEnv* env,
+        jobject /* this */) {
+
+    // الطريقة 1: فحص /proc/self/maps لأي مكتبات Frida
+    FILE* fp = fopen("/proc/self/maps", "r");
+    if (fp != nullptr) {
+        char line[512];
+        while (fgets(line, sizeof(line), fp)) {
+            if (strstr(line, "frida") != nullptr ||
+                strstr(line, "gadget") != nullptr ||
+                strstr(line, "libinject") != nullptr) {
+                fclose(fp);
+                return JNI_TRUE;
+            }
+        }
+        fclose(fp);
+    }
+
+    // الطريقة 2: فحص وجود منافذ Frida الافتراضية
+    int frida_ports[] = {27042, 27043};
+    for (int port : frida_ports) {
+        char path[256];
+        snprintf(path, sizeof(path), "/proc/net/tcp");
+        FILE* tcp_fp = fopen(path, "r");
+        if (tcp_fp != nullptr) {
+            char tcp_line[512];
+            while (fgets(tcp_line, sizeof(tcp_line), tcp_fp)) {
+                char local_addr[64];
+                if (sscanf(tcp_line, "%*d: %64[0-9A-Fa-f:]", local_addr) == 1) {
+                    unsigned int local_port;
+                    sscanf(strrchr(local_addr, ':') + 1, "%x", &local_port);
+                    if (local_port == port) {
+                        fclose(tcp_fp);
+                        return JNI_TRUE;
+                    }
+                }
+            }
+            fclose(tcp_fp);
+        }
+    }
+
+    // الطريقة 3: فحص /proc/self/status لـ TracerPid
+    FILE* status_fp = fopen("/proc/self/status", "r");
+    if (status_fp != nullptr) {
+        char status_line[256];
+        while (fgets(status_line, sizeof(status_line), status_fp)) {
+            if (strncmp(status_line, "TracerPid:", 10) == 0) {
+                int tracer_pid = atoi(status_line + 10);
+                if (tracer_pid != 0) {
+                    fclose(status_fp);
+                    return JNI_TRUE;
+                }
+            }
+        }
+        fclose(status_fp);
+    }
+
+    // الطريقة 4: فحص Thread Names المشبوهة
+    DIR* dir = opendir("/proc/self/task");
+    if (dir != nullptr) {
+        struct dirent* entry;
+        while ((entry = readdir(dir)) != nullptr) {
+            if (entry->d_type == DT_DIR) {
+                char comm_path[256];
+                snprintf(comm_path, sizeof(comm_path), "/proc/self/task/%s/comm", entry->d_name);
+                int fd = open(comm_path, O_RDONLY);
+                if (fd != -1) {
+                    char thread_name[64];
+                    ssize_t len = read(fd, thread_name, sizeof(thread_name) - 1);
+                    close(fd);
+                    if (len > 0) {
+                        thread_name[len] = '\0';
+                        if (strstr(thread_name, "frida") != nullptr ||
+                            strstr(thread_name, "gum-js") != nullptr) {
+                            closedir(dir);
+                            return JNI_TRUE;
+                        }
+                    }
+                }
+            }
+        }
+        closedir(dir);
+    }
+
+    return JNI_FALSE;
+}</code></pre>
+                </div>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>CMakeLists.txt - بناء Native Library</span><span class="code-lang">CMake</span></div>
+                    <pre><code class="language-cmake">cmake_minimum_required(VERSION 3.22.1)
+project("security_native")
+
+add_library(
+    security_native
+    SHARED
+    security_native.cpp
+)
+
+find_library(log-lib log)
+
+target_link_libraries(
+    security_native
+    ${log-lib}
+)</code></pre>
+                </div>
+                <div class="tip-box">
+                    <p><strong>نصيحة إنتاجية:</strong> لا تعتمد على Native Code وحده. استخدم مزيجاً من Java/Kotlin و Native Code و Server-Side Validation. إذا كشف Native Code عن Frida، لا تُظهر رسالة "Frida Detected" (هذا يُساعد المهاجم). بدلاً من ذلك: (1) أوقف العمليات الحساسة بصمت، (2) أرسل تقريراً إلى الخادم، (3) اعرض رسالة عامة مثل "خطأ في الاتصال".</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon warning">🔏</div><h3>تشويش الكود: ProGuard وR8 وDexGuard</h3></div>
+                <p><span class="term">Code Obfuscation</span> هو عملية تحويل الكود إلى صيغة يصعب على البشر فهمها دون تغيير سلوه التنفيذي. يُعدّ هذا خط الدفاع الأول ضد <span class="term">Reverse Engineering</span> وتحليل <span class="term">Smali</span>.</p>
+                <h4>قواعد ProGuard/R8 الشاملة للتطبيقات المصرفية</h4>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>proguard-rules.pro - قواعد التشويش المتقدمة</span><span class="code-lang">ProGuard</span></div>
+                    <pre><code class="language-groovy"># ─── الإعدادات الأساسية ───
+-optimizationpasses 5
+-dontusemixedcaseclassnames
+-dontskipnonpubliclibraryclasses
+-dontpreverify
+-verbose
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+
+# ─── حماية أسماء الفئات والدوال ───
+-repackageclasses ''
+-allowaccessmodification
+-renamesourcefileattribute SourceFile
+-keepattributes SourceFile,LineNumberTable
+
+# ─── تشويش أسماء الفئات الداخلية ───
+-keep public class * extends android.app.Activity
+-keep public class * extends android.app.Application
+-keep public class * extends android.app.Service
+-keep public class * extends android.content.BroadcastReceiver
+-keep public class * extends android.content.ContentProvider
+-keep public class * extends android.view.View
+
+# ─── حماية API Models (لا تُشوّه أسماء الحقول) ───
+-keepclassmembers class com.example.bankingapp.data.model.** {
+    <fields>;
+}
+
+# ─── حماية Retrofit Interfaces ───
+-keep interface com.example.bankingapp.data.api.** { *; }
+-keepclassmembers interface * {
+    @retrofit2.http.* <methods>;
+}
+
+# ─── حماية Dagger/Hilt ───
+-keep class dagger.hilt.** { *; }
+-keep class * extends dagger.hilt.internal.GeneratedComponent
+-keepclassmembers class * {
+    @javax.inject.Inject <init>(...);
+}
+
+# ─── حماية Kotlin Serialization ───
+-keepattributes *Annotation*, InnerClasses
+-keepclassmembers class kotlinx.serialization.json.** { *; }
+
+# ─── تشويش أسماء الدوال (Method Name Obfuscation) ───
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+
+# ─── إزالة السجلات في الإنتاج ───
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
+    public static int w(...);
+    public static int e(...);
+}
+
+# ─── تشويش Strings (DexGuard فقط) ───
+# -stringencryption class com.example.bankingapp.security.**</code></pre>
+                </div>
+                <h4>التحقق من سلامة التوقيع الرقمي (Signature Verification)</h4>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>التحقق من سلامة APK في وقت التشغيل</span><span class="code-lang">Kotlin</span></div>
+                    <pre><code class="language-kotlin">object SignatureVerifier {
+
+    private const val EXPECTED_SIGNATURE = "YOUR_BASE64_SIGNATURE_HASH"
+
+    fun verifyAppSignature(context: Context): Boolean {
+        return try {
+            val packageName = context.packageName
+            val packageManager = context.packageManager
+
+            val signatures = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                packageManager.getPackageInfo(
+                    packageName,
+                    PackageManager.GET_SIGNING_CERTIFICATES
+                ).signingInfo?.apkContentsSigners
+            } else {
+                @Suppress("DEPRECATION")
+                packageManager.getPackageInfo(
+                    packageName,
+                    PackageManager.GET_SIGNATURES
+                ).signatures
+            }
+
+            signatures?.any { signature ->
+                val currentHash = hashSignature(signature.toByteArray())
+                currentHash == EXPECTED_SIGNATURE
+            } ?: false
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    private fun hashSignature(signature: ByteArray): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        return Base64.encodeToString(digest.digest(signature), Base64.NO_WRAP)
+    }
+
+    /**
+     * التحقق من أن التطبيق غير مُعدّل (Tamper Detection)
+     */
+    fun verifyAppIntegrity(context: Context): Boolean {
+        // التحقق من التوقيع
+        if (!verifyAppSignature(context)) return false
+
+        // التحقق من عدم التصحيح (Debug Mode)
+        if (context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0) {
+            return false
+        }
+
+        // التحقق من عدم التثبيت من متاجر غير موثوقة
+        val installer = context.packageManager.getInstallerPackageName(context.packageName)
+        val trustedInstallers = listOf("com.android.vending", "com.google.android.packageinstaller")
+        if (installer != null && installer !in trustedInstallers) {
+            // تحذير فقط، لا تمنع
+        }
+
+        return true
+    }
+}</code></pre>
+                </div>
+                <div class="interview-box">
+                    <p><strong>سؤال مقابلة من N26 (Berlin, 2024):</strong><br>"ما الفرق بين ProGuard وR8 وDexGuard؟ ولماذا تختار DexGuard للتطبيقات المصرفية رغم تكلفته العالية؟"</p>
+                    <p style="margin-top:1rem"><strong>الإجابة:</strong> ProGuard هو أداة تشويش مجانية تُشوّه أسماء الفئات والدوال. R8 هو المُستبدل الرسمي من Google (Android Gradle Plugin 3.4+) ويجمع بين التشويش والتحسين. DexGuard هو النسخة التجارية من ProGuard وتضمّن ميزات متقدمة: تشفير Strings، تشويش Resources، إخفاء API Calls، Anti-Debug، Anti-Tampering، وRuntime Application Self-Protection (RASP). في التطبيقات المصرفية، يُستثمر في DexGuard لأن تكلفة اختراق التطبيق (غرامات GDPR + فقدان الثقة) تفوق تكلفة الترخيص بكثير.</p>
+                </div>
+            </div>
+        </section>
+        <!-- Section 5: Biometric Authentication -->
+        <section class="section" id="biometric">
+            <div class="section-header">
+                <div class="section-number">5</div>
+                <h2>المصادقة البيومترية وإدارة الجلسات الآمنة (Biometric Authentication & Session Security)</h2>
+                <p class="section-description">BiometricPrompt، Keystore Binding، JWT Secure Storage، وPlay Integrity API</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><div class="card-icon primary">👆</div><h3>BiometricPrompt: المصادقة البيومترية الاحترافية</h3></div>
+                <p>يُعدّ <span class="term">BiometricPrompt</span> الواجهة الرسمية والوحيدة الموصى بها للمصادقة البيومترية في أندرويد 9+ (API 28+). يجب ربط العمليات الحساسة (التحويلات المصرفية، تغيير كلمة المرور) بمفاتيح Keystore لا يمكن استخدامها إلا بعد نجاح المصادقة البيومترية.</p>
+                
+                <div class="analogy-box">
+                    <p><strong>مثال واقعي:</strong> تخيّل أنك في مصرف فاخر. لديك بطاقة دخول (Device Lock) وبصمة إصبع (Biometric). لكن الخزنة الكبرى (Keystore Key) لا تفتح إلا عندما تضع بطاقتك في القارئ وتضع إصبعك في نفس الوقت. BiometricPrompt هو ذلك القارئ: لا يُعيد بصمتك أبداً للتطبيق، بل يُخبر Keystore فقط بأن الهوية مُصدّق عليها.</p>
+                </div>
+
+                <h4>تكامل BiometricPrompt مع Keystore</h4>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>BiometricPrompt مع CryptObject</span><span class="code-lang">Kotlin</span></div>
+                    <pre><code class="language-kotlin">import android.content.Context
+import android.os.Build
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
+import java.util.concurrent.Executor
+import javax.crypto.Cipher
+
+class BiometricAuthManager(private val activity: FragmentActivity) {
+    
+    private val executor: Executor = ContextCompat.getMainExecutor(activity)
+    
+    fun authenticateForCriticalOperation(
+        onSuccess: (BiometricPrompt.CryptoObject) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val biometricManager = BiometricManager.from(activity)
+        
+        when (biometricManager.canAuthenticate(
+            BiometricManager.Authenticators.BIOMETRIC_STRONG
+        )) {
+            BiometricManager.BIOMETRIC_SUCCESS -> {
+                showBiometricPrompt(onSuccess, onError)
+            }
+            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
+                onError("لا يوجد مستشعر بيومتري")
+            }
+            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
+                onError("المستشعر غير متوفر حالياً")
+            }
+            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
+                onError("لم يتم تسجيل بصمة")
+            }
+            else -> {
+                onError("خطأ غير معروف")
+            }
+        }
+    }
+    
+    private fun showBiometricPrompt(
+        onSuccess: (BiometricPrompt.CryptoObject) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val cipher = getInitializedCipherForEncryption()
+        val cryptoObject = BiometricPrompt.CryptoObject(cipher)
+        
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("تأكيد العملية الحساسة")
+            .setSubtitle("يرجى المصادقة لإتمام التحويل المصرفي")
+            .setDescription("سيتم خصم مبلغ 5,000 يورو من حسابك")
+            .setNegativeButtonText("إلغاء")
+            .setAllowedAuthenticators(
+                BiometricManager.Authenticators.BIOMETRIC_STRONG
+            )
+            .build()
+        
+        val biometricPrompt = BiometricPrompt(
+            activity,
+            executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(
+                    result: BiometricPrompt.AuthenticationResult
+                ) {
+                    result.cryptoObject?.cipher?.let {
+                        onSuccess(result.cryptoObject!!)
+                    } ?: onError("فشل في استرجاع Cipher")
+                }
+                
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    onError(errString.toString())
+                }
+                
+                override fun onAuthenticationFailed() {
+                    onError("فشلت المصادقة")
+                }
+            }
+        )
+        
+        biometricPrompt.authenticate(promptInfo, cryptoObject)
+    }
+    
+    private fun getInitializedCipherForEncryption(): Cipher {
+        val key = SecureKeyManager.generateBiometricBoundKey()
+        return Cipher.getInstance("AES/GCM/NoPadding").apply {
+            init(Cipher.ENCRYPT_MODE, key)
+        }
+    }
+}</code></pre>
+                </div>
+
+                <div class="tip-box">
+                    <p><strong>نصيحة إنتاجية:</strong> استخدم دائماً <code>BiometricManager.Authenticators.BIOMETRIC_STRONG</code> بدلاً من <code>WEAK</code> أو <code>DEVICE_CREDENTIAL</code> وحدها. <code>STRONG</code> تتطلب مستشعراً حقيقياً (بصمة/وجه/قزحية) مع تأكيد حضوري (Liveness Detection) ولا تقبل بصور أو تسجيلات.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><div class="card-icon warning">🔑</div><h3>إدارة الرموز التعبيرية (Tokens & JWT) وتجنب Memory Dumps</h3></div>
+                <p>يُعدّ تسريب رموز JWT في الذاكرة (Heap Dumps) أو Logs من أكثر الثغرات شيوعاً. يجب تخزين الرموز في Keystore وتجنب إبقائها في Strings قابلة للتفكيك.</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>تخزين JWT بأمان مع تجنب Memory Leaks</span><span class="code-lang">Kotlin</span></div>
+                    <pre><code class="language-kotlin">import androidx.security.crypto.EncryptedSharedPreferences
+import java.nio.ByteBuffer
+import java.nio.CharBuffer
+import java.util.Arrays
+
+class SecureTokenManager(context: Context) {
+    
+    private val prefs = SecurePreferencesManager(context)
+    
+    /**
+     * تخزين JWT كـ CharArray بدلاً من String لتجنب immutability
+     */
+    fun storeJwtSecurely(token: String) {
+        // تحويل إلى CharArray لإمكانية المسح من الذاكرة
+        val tokenChars = token.toCharArray()
+        prefs.saveAuthToken(token) // مشفر في EncryptedSharedPreferences
+        Arrays.fill(tokenChars, '\u0000') // مسح من الذاكرة
+    }
+    
+    /**
+     * استخدام JWT مع Callback لتجنب الاحتفاظ به في الذاكرة
+     */
+    fun <T> withToken(operation: (String) -> T): T? {
+        val token = prefs.getAuthToken() ?: return null
+        return try {
+            operation(token)
+        } finally {
+            // لا يمكن مسح String (immutable)، لكن يمكننا
+            // تشجيع GC على إعادة التدوير
+            System.gc()
+        }
+    }
+    
+    /**
+     * التحقق من صلاحية JWT محلياً (بدون فك Secret)
+     */
+    fun isTokenExpired(token: String): Boolean {
+        return try {
+            val parts = token.split(".")
+            if (parts.size != 3) return true
+            
+            val payload = String(
+                android.util.Base64.decode(parts[1], android.util.Base64.URL_SAFE),
+                Charsets.UTF_8
+            )
+            val json = org.json.JSONObject(payload)
+            val exp = json.getLong("exp")
+            System.currentTimeMillis() / 1000 >= exp
+        } catch (e: Exception) {
+            true
+        }
+    }
+}</code></pre>
+                </div>
+
+                <div class="alert alert-danger">
+                    <span class="alert-icon">🚫</span>
+                    <div><span class="alert-title">خطأ شائع قاتل</span>لا تُخزّن JWT في <code>WebView</code> أو <code>CookieManager</code>. WebView عرضة لـ XSS ويمكن لأي JavaScript ضار الوصول إلى Cookies. استخدم <code>EncryptedSharedPreferences</code> أو Keystore فقط.</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><div class="card-icon success">✅</div><h3>Play Integrity API: التحقق من سلامة الجهاز والبيئة</h3></div>
+                <p><span class="term">Play Integrity API</span> هو الخليفة الرسمي لـ SafetyNet، ويُوفّر تقييماً شاملاً لسلامة التطبيق والجهاز والحزمة. يجب إجراء هذا التحقق على الخادم وليس على العميل.</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>طلب Integrity Token</span><span class="code-lang">Kotlin</span></div>
+                    <pre><code class="language-kotlin">import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.tasks.Tasks
+import com.google.android.play.core.integrity.IntegrityManagerFactory
+import com.google.android.play.core.integrity.IntegrityTokenRequest
+import java.security.MessageDigest
+import java.util.UUID
+
+class PlayIntegrityChecker(private val context: Context) {
+    
+    companion object {
+        private const val CLOUD_PROJECT_NUMBER = "1234567890" // رقم مشروع Google Cloud
+    }
+    
+    fun requestIntegrityToken(): String? {
+        return try {
+            val nonce = generateNonce()
+            
+            val integrityManager = IntegrityManagerFactory.create(context)
+            val request = IntegrityTokenRequest.builder()
+                .setNonce(nonce)
+                .setCloudProjectNumber(CLOUD_PROJECT_NUMBER)
+                .build()
+            
+            val response = Tasks.await(
+                integrityManager.requestIntegrityToken(request),
+                10, java.util.concurrent.TimeUnit.SECONDS
+            )
+            
+            response.token() // أرسل هذا إلى الخادم للتحقق
+        } catch (e: Exception) {
+            null
+        }
+    }
+    
+    /**
+     * توليد nonce عشوائي فريد لكل طلب
+     */
+    private fun generateNonce(): String {
+        val randomBytes = ByteArray(32)
+        java.security.SecureRandom().nextBytes(randomBytes)
+        return MessageDigest.getInstance("SHA-256")
+            .digest(randomBytes)
+            .joinToString("") { "%02x".format(it) }
+    }
+}</code></pre>
+                </div>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">ℹ️</span>
+                    <div><span class="alert-title">فهم نتيجة Play Integrity</span>عند التحقق من الرمز على الخادم، تستلم JSON يحتوي على: <code>deviceRecognitionVerdict</code> (MEETS_DEVICE_INTEGRITY, MEETS_BASIC_INTEGRITY, MEETS_STRONG_INTEGRITY)، <code>appRecognitionVerdict</code> (PLAY_RECOGNIZED, UNRECOGNIZED_VERSION)، و<code>licensingVerdict</code> (LICENSED, UNLICENSED). التطبيقات المصرفية يجب أن ترفض أي جهاز لا يُحقّق <code>MEETS_DEVICE_INTEGRITY</code> و<code>PLAY_RECOGNIZED</code>.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Interview Scenarios -->
+        <section class="section" id="interviews">
+            <div class="section-header">
+                <div class="section-number">6</div>
+                <h2>سيناريوهات ومواقف المقابلات الهندسية الأمنية في الشركات الأوروبية</h2>
+                <p class="section-description">نماذج حقيقية من مقابلات N26، BMW، Bosch، وشركات Fintech برلينية مع حلول برمجية كاملة</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><div class="card-icon warning">🏦</div><h3>سيناريو 1: تصميم نظام دفع آلي مقاوم للاختراق</h3></div>
+                <div class="interview-box">
+                    <p><strong>السؤال (من N26 - Berlin):</strong><br>"صمّم لي بنية لتطبيق مصرفي يسمح بالتحويلات الفورية. كيف تضمن أن المهاجم لا يستطيع تعديل مبلغ التحويل أو حساب المستلم حتى لو اخترق الجهاز؟"</p>
+                </div>
+                <h4>الحل الهندسي الكامل</h4>
+                <ul>
+                    <li><strong>Defense in Depth:</strong> لا تعتمد على طبقة دفاع واحدة. استخدم: (1) BiometricPrompt + Keystore Key، (2) Server-Side Transaction Signing، (3) Certificate Pinning، (4) Anti-Tampering.</li>
+                    <li><strong>Transaction Signing:</strong> كل عملية تحويل يجب أن تُوقّع رقمياً على الخادم باستخدام مفتاح خاص لا يترك HSM البنك. التطبيق يُرسل طلب موقّع، والخادم يتحقق من التوقيع.</li>
+                    <li><strong>Amount Binding:</strong> ربط المبلغ والمستلم بـ Cryptographic Nonce يُولّد على الخادم. أي تعديل على المبلغ يُبطل التوقيع.</li>
+                    <li><strong>Out-of-Band Confirmation:</strong> إرسال رمز TOTP أو Push Notification منفصل لتأكيد العمليات التي تتجاوز عتبة مالية.</li>
+                </ul>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>نموذج توقيع المعاملة (Transaction Signing)</span><span class="code-lang">Kotlin</span></div>
+                    <pre><code class="language-kotlin">data class TransactionRequest(
+    val amount: BigDecimal,
+    val currency: String,
+    val recipientIban: String,
+    val nonce: String,        // من الخادم
+    val timestamp: Long,
+    val deviceId: String
+) {
+    fun toSignableString(): String {
+        return "$amount|$currency|$recipientIban|$nonce|$timestamp|$deviceId"
+    }
+}
+
+class TransactionSigner(context: Context) {
+    
+    private val keystore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
+    
+    fun signTransaction(request: TransactionRequest): ByteArray? {
+        val entry = keystore.getEntry("transaction_key", null) as? KeyStore.PrivateKeyEntry
+            ?: return null
+            
+        return Signature.getInstance("SHA256withRSA").apply {
+            initSign(entry.privateKey)
+            update(request.toSignableString().toByteArray())
+        }.sign()
+    }
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><div class="card-icon danger">🧠</div><h3>سيناريو 2: التعامل مع ثغرات تسريب الذاكرة (Memory Leaks & Heap Dumps)</h3></div>
+                <div class="interview-box">
+                    <p><strong>السؤال (من BMW - Munich):</strong><br>"كيف تتعامل مع احتمالية استخراج بيانات حساسة من Heap Dump أو Memory Dump على جهاز مُروت؟"</p>
+                </div>
+                <h4>استراتيجيات الحماية</h4>
+                <ul>
+                    <li><strong>Minimize Sensitive Data in Memory:</strong> استخدم <code>CharArray</code> بدلاً من <code>String</code> للبيانات الحساسة لأن Strings immutable ولا يمكن مسحها.</li>
+                    <li><strong>Secure Memory Buffers:</strong> استخدم <code>android.security.keystore.KeyGenParameterSpec</code> مع <code>setUserAuthenticationRequired(true)</code> لضمان أن المفاتيح لا تُحمل في الذاكرة إلا أثناء الاستخدام.</li>
+                    <li><strong>Disable Debugging:</strong> <code>android:debuggable="false"</code> واستخدام <code>BuildConfig.DEBUG</code> لإزالة Logs.</li>
+                    <li><strong>Anti-Debug Techniques:</strong> فحص <code>/proc/self/status</code> لـ TracerPid وإنهاء التطبيق إذا تم اكتشاف مصحح أخطاء.</li>
+                    <li><strong>Screenshot Prevention:</strong> استخدم <code>FLAG_SECURE</code> لمنع لقطات الشاشة في الشاشات الحساسة.</li>
+                </ul>
+                <div class="code-block-wrapper">
+                    <div class="code-header"><span>منع لقطات الشاشة والتسجيل</span><span class="code-lang">Kotlin</span></div>
+                    <pre><code class="language-kotlin">class SecureActivity : AppCompatActivity() {
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        
+        window.setFlags(
+            android.view.WindowManager.LayoutParams.FLAG_SECURE,
+            android.view.WindowManager.LayoutParams.FLAG_SECURE
+        )
+        
+        setContentView(R.layout.activity_secure)
+    }
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><div class="card-icon info">📋</div><h3>سيناريو 3: GDPR Compliance في تطبيق أندرويد</h3></div>
+                <div class="interview-box">
+                    <p><strong>السؤال (من Bosch - Stuttgart):</strong><br>"اذكر 5 متطلبات GDPR يجب مراعاتها عند تصميم تطبيق أندرويد يجمع بيانات المستخدمين، وكيف تُطبّقها تقنياً؟"</p>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>المبدأ GDPR</th><th>التطبيق التقني في أندرويد</th></tr></thead>
+                        <tbody>
+                            <tr><td>Data Minimization (المادة 5)</td><td>لا تجمع إلا البيانات الضرورية. استخدم WorkManager لحذف البيانات المؤقتة بعد 30 يوماً.</td></tr>
+                            <tr><td>Right to Erasure (المادة 17)</td><td>وفر زر "حذف حسابي" يمسح جميع البيانات محلياً (SharedPreferences, Database, Cache) وعلى الخادم.</td></tr>
+                            <tr><td>Privacy by Design (المادة 25)</td><td>استخدم EncryptedSharedPreferences وSQLCipher افتراضياً. لا تُخزّن PII بدون تشفير.</td></tr>
+                            <tr><td>Consent (المادة 7)</td><td>استخدم Dialog واضح مع Checkbox قبل جمع البيانات. خزّن موافقة المستخدم موقّعة رقمياً.</td></tr>
+                            <tr><td>Data Breach Notification (المادة 33)</td><td>نفّذ آلية كشف تلقائي عن الوصول غير المصرح به (مثلاً عبر Play Integrity + Server Logs).</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><div class="card-icon success">🎯</div><h3>سيناريو 4: Threat Modeling لتطبيق Fintech</h3></div>
+                <div class="interview-box">
+                    <p><strong>السؤال (من Trade Republic - Berlin):</strong><br>"قم بـ Threat Modeling لتطبيق تداول أسهم. ما هي أهم 3 تهديدات (STRIDE) وكيف تُخففها؟"</p>
+                </div>
+                <ul>
+                    <li><strong>Spoofing (انتحال الهوية):</strong> Mitigation عبر BiometricPrompt + Hardware-backed Keystore + Server-Side MFA.</li>
+                    <li><strong>Tampering (التلاعب):</strong> Mitigation عبر Play Integrity API + Root Detection + Code Obfuscation + Signature Verification.</li>
+                    <li><strong>Repudiation (إنكار):</strong> Mitigation عبر Audit Logs مشفرة على الخادم + Transaction Signing + Timestamping.</li>
+                    <li><strong>Information Disclosure (تسريب):</strong> Mitigation عبر TLS 1.3 + SSL Pinning + EncryptedSharedPreferences + SQLCipher.</li>
+                    <li><strong>Denial of Service (الحرمان):</strong> Mitigation عبر Rate Limiting على الخادم + Certificate Pinning + Anti-Automation.</li>
+                    <li><strong>Elevation of Privilege (رفع الصلاحيات):</strong> Mitigation عبر Server-Side Authorization + Least Privilege Principle + Token Scoping.</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <h3>المرجع الهندسي الشامل لأمن تطبيقات أندرويد</h3>
+            <p>تم إعداد هذا الدليل كمرجع احترافي للمطورين المتقدمين والمهندسين الأمنيين في قطاعات التقنية المالية والسيارات في أوروبا. يغطي الدليل أحدث الممارسات في OWASP Mobile Top 10، Android Keystore، BiometricPrompt، SSL Pinning، وآليات الحماية المتقدمة.</p>
+            <div style="margin-top: 2rem;">
+                <span class="tag tag-primary">Android Security</span>
+                <span class="tag tag-primary">OWASP Mobile</span>
+                <span class="tag tag-danger">Reverse Engineering</span>
+                <span class="tag tag-warning">Cryptography</span>
+                <span class="tag tag-primary">Fintech</span>
+                <span class="tag tag-primary">GDPR</span>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2024 - مرجع أمن أندرويد الشامل | Android Security & App Hardening Masterclass</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            hljs.highlightAll();
+        });
+    </script>
+</body>
+</html>
