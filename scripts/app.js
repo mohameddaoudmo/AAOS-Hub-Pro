@@ -11,6 +11,7 @@ const guides = [
     { id: 'pagination', title: 'Modern Pagination Guide', desc: 'معمارية التصفح والتحميل اللانهائي العصري.', icon: '📄', path: 'pagination_guide.html' },
     { id: 'frag-nav', title: 'Fragment & Navigation Guide', desc: 'إدارة الفراجمينت والتنقل الشامل مع Navigation Component.', icon: '🧩', path: 'fragment_navigation_guide.html' },
     { id: 'detekt-cicd', title: 'CI/CD with Git & Detekt', desc: 'أتمتة جودة الكود والتفتيش الساكن Detekt.', icon: '⚙️', path: 'cicd_git_detekt_android.html' },
+    { id: 'design-patterns-kt', title: 'Kotlin Design Patterns & SOLID', desc: 'أنماط التصميم ومبادئ SOLID في كوتلن — دليل شامل.', icon: '🎨', path: 'design_patterns_kotlin_guide.html' },
     { id: 'oop-master', title: 'OOP & Design Patterns Masterclass', desc: 'البرمجة الكائنية المتقدمة وأنماط التصميم لأندرويد.', icon: '💎', path: 'oop_masterclass.html' },
     { id: 'oop-chal', title: 'OOP Interview Challenges', desc: 'أصعب أسئلة البرمجة كائنية التوجه وتحديات المقابلات.', icon: '🎯', path: 'oop_interview_challenges.html' },
     { id: 'rn-sheet', title: 'React Native Interview Sheet', desc: 'دليل المقابلات المعماري لـ React Native.', icon: '⚛️', path: 'react_native_interview_sheet.html' },

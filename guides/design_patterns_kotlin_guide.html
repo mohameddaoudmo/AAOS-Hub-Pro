@@ -1,0 +1,1968 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أنماط التصميم ومبادئ SOLID في Kotlin | دليل شامل</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Prism.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-sidebar: #f1f5f9;
+            --bg-code: #1e293b;
+            --bg-inline-code: #f1f5f9;
+            --bg-callout-info: #eff6ff;
+            --bg-callout-warning: #fffbeb;
+            --bg-callout-tip: #f0fdf4;
+            --bg-callout-key: #faf5ff;
+            --border-color: #e2e8f0;
+            --border-sidebar: #cbd5e1;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --text-on-dark: #f8fafc;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --radius: 0.75rem;
+            --font-body: 'Inter', 'Noto Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-sidebar: #0f172a;
+            --bg-inline-code: #334155;
+            --bg-callout-info: #1e3a8a;
+            --bg-callout-warning: #78350f;
+            --bg-callout-tip: #064e3b;
+            --bg-callout-key: #581c87;
+            --border-color: #334155;
+            --border-sidebar: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --text-on-dark: #0f172a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 5rem;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.8;
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+
+        /* Layout */
+        .page-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100vh;
+            background-color: var(--bg-sidebar);
+            border-left: 1px solid var(--border-sidebar);
+            overflow-y: auto;
+            padding: 1.5rem;
+            z-index: 50;
+            transition: transform 0.3s ease, background-color 0.3s;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.125rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .toc-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list li {
+            margin-bottom: 0.25rem;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-right: 2px solid transparent;
+        }
+
+        .toc-list a:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--accent-blue);
+        }
+
+        .toc-list a.active {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--accent-blue);
+            border-right-color: var(--accent-blue);
+            font-weight: 700;
+        }
+
+        .toc-list ul {
+            list-style: none;
+            margin-right: 1rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-right: 300px;
+            min-width: 0;
+        }
+
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background-color: var(--bg-body);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background-color 0.3s;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .mobile-menu-btn:hover {
+            background-color: var(--bg-surface);
+        }
+
+        .theme-toggle {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 1.125rem;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .content-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            font-weight: 800;
+            line-height: 1.3;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            scroll-margin-top: 5rem;
+            letter-spacing: -0.02em;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-top: 0;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-size: 1.875rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        h2 .section-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            border-radius: 0.75rem;
+            font-size: 1.125rem;
+            flex-shrink: 0;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--accent-purple);
+            margin-top: 2rem;
+        }
+
+        h4 {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-top: 1.5rem;
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            color: var(--text-secondary);
+            font-size: 1.0625rem;
+        }
+
+        strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 3rem 0 4rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1));
+            border: 1px solid rgba(59,130,246,0.2);
+            color: var(--accent-blue);
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* Callouts */
+        .callout {
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .callout::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .callout-icon {
+            font-size: 1.25rem;
+            margin-left: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .callout-header {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .callout p {
+            margin: 0;
+            font-size: 0.975rem;
+        }
+
+        .callout p + p {
+            margin-top: 0.75rem;
+        }
+
+        .callout-info {
+            background-color: var(--bg-callout-info);
+        }
+        .callout-info::before { background-color: var(--accent-blue); }
+        .callout-info .callout-header { color: var(--accent-blue); }
+
+        .callout-warning {
+            background-color: var(--bg-callout-warning);
+        }
+        .callout-warning::before { background-color: var(--accent-amber); }
+        .callout-warning .callout-header { color: var(--accent-amber); }
+
+        .callout-tip {
+            background-color: var(--bg-callout-tip);
+        }
+        .callout-tip::before { background-color: var(--accent-emerald); }
+        .callout-tip .callout-header { color: var(--accent-emerald); }
+
+        .callout-key {
+            background-color: var(--bg-callout-key);
+        }
+        .callout-key::before { background-color: var(--accent-purple); }
+        .callout-key .callout-header { color: var(--accent-purple); }
+
+        /* Code Blocks */
+        pre {
+            background-color: var(--bg-code);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            position: relative;
+            border: 1px solid #334155;
+            direction: ltr;
+            text-align: left;
+        }
+
+        pre code {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            line-height: 1.7;
+            color: #e2e8f0;
+            background: none;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1.25rem;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-bottom: none;
+            border-radius: var(--radius) var(--radius) 0 0;
+            margin-top: 1.5rem;
+            direction: ltr;
+        }
+
+        .code-lang {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #94a3b8;
+            font-family: var(--font-mono);
+        }
+
+        .copy-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #94a3b8;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: #f8fafc;
+        }
+
+        .copy-btn.copied {
+            color: var(--accent-emerald);
+        }
+
+        pre + .code-explanation,
+        .code-block-wrapper + .code-explanation {
+            margin-top: -0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .code-explanation {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+        }
+
+        .code-explanation h4 {
+            font-size: 1rem;
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+            color: var(--accent-blue);
+        }
+
+        .code-explanation ul {
+            margin: 0;
+            padding-right: 1.25rem;
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+        }
+
+        .code-explanation li {
+            margin-bottom: 0.5rem;
+        }
+
+        .code-explanation li:last-child {
+            margin-bottom: 0;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.875em;
+            background-color: var(--bg-inline-code);
+            color: var(--accent-rose);
+            padding: 0.2em 0.4em;
+            border-radius: 0.375rem;
+            font-weight: 600;
+        }
+
+        pre code {
+            color: #e2e8f0;
+            background: none;
+            padding: 0;
+            font-weight: 400;
+        }
+
+        /* Accordions */
+        .accordion {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            margin: 1rem 0;
+            overflow: hidden;
+            background-color: var(--bg-surface);
+        }
+
+        .accordion-header {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: none;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: right;
+        }
+
+        .accordion-header:hover {
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s;
+            color: var(--accent-blue);
+            font-size: 1.25rem;
+            margin-right: 0.5rem;
+        }
+
+        .accordion.open .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .accordion.open .accordion-body {
+            max-height: 2000px;
+            transition: max-height 0.5s ease-in;
+        }
+
+        .accordion-content {
+            padding: 0 1.25rem 1.25rem;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1rem 0;
+            padding-right: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        li::marker {
+            color: var(--accent-blue);
+        }
+
+        /* Separator */
+        .section-separator {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+            margin: 4rem 0;
+            border: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(100%);
+                box-shadow: var(--shadow-lg);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-right: 0;
+            }
+            
+            .mobile-menu-btn {
+                display: flex;
+            }
+            
+            .overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 45;
+            }
+            
+            .overlay.active {
+                display: block;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .content-wrapper {
+                padding: 2rem 1rem;
+            }
+            
+            .top-bar {
+                padding: 0.75rem 1rem;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        [data-theme="dark"] ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        
+        [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Utility */
+        .text-gradient {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .mt-0 { margin-top: 0; }
+        .mb-4 { margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+
+<div class="overlay" id="overlay"></div>
+
+<div class="page-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">Kotlin Patterns</div>
+            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                <span id="theme-icon">🌙</span>
+            </button>
+        </div>
+        
+        <div class="toc-title">جدول المحتويات</div>
+        <nav>
+            <ul class="toc-list">
+                <li><a href="#intro" class="active">مقدمة</a></li>
+                <li>
+                    <a href="#factory">Factory Method & Abstract Factory</a>
+                    <ul>
+                        <li><a href="#factory-problem">المشكلة</a></li>
+                        <li><a href="#factory-method">Factory Method</a></li>
+                        <li><a href="#abstract-factory">Abstract Factory</a></li>
+                        <li><a href="#factory-kotlin">التبسيط في Kotlin</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#observer">Observer Pattern</a>
+                    <ul>
+                        <li><a href="#observer-problem">الارتباط الشديد</a></li>
+                        <li><a href="#observer-classic">الحل الكلاسيكي</a></li>
+                        <li><a href="#observer-kotlin">التحديثات الحديثة</a></li>
+                        <li><a href="#observer-async">التزامن والـ Flow</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#strategy">Strategy Pattern</a>
+                    <ul>
+                        <li><a href="#strategy-problem">الانفجار التوافقي</a></li>
+                        <li><a href="#strategy-classic">الاستراتيجية الكلاسيكية</a></li>
+                        <li><a href="#strategy-kotlin">الدوال من الدرجة الأولى</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#decorator">Decorator Pattern</a>
+                    <ul>
+                        <li><a href="#decorator-problem">تعقيد الـ Logger</a></li>
+                        <li><a href="#decorator-classic">التزيين الكلاسيكي</a></li>
+                        <li><a href="#decorator-kotlin">الأسلوب السلس في Kotlin</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#state">State Pattern</a>
+                    <ul>
+                        <li><a href="#state-problem">جمل when المتكررة</a></li>
+                        <li><a href="#state-classic">نمط الحالة الكلاسيكي</a></li>
+                        <li><a href="#state-kotlin">الـ Enum والـ Lambdas</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#builder">Builder Pattern</a>
+                    <ul>
+                        <li><a href="#builder-problem">قيود الـ Constructor</a></li>
+                        <li><a href="#builder-classic">البناء الكلاسيكي</a></li>
+                        <li><a href="#builder-kotlin">بدائل Kotlin المدمجة</a></li>
+                        <li><a href="#builder-dsl">DSL مع Lambdas with Receivers</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#solid">مبادئ SOLID</a>
+                    <ul>
+                        <li><a href="#solid-s">Single Responsibility</a></li>
+                        <li><a href="#solid-o">Open/Closed</a></li>
+                        <li><a href="#solid-l">Liskov Substitution</a></li>
+                        <li><a href="#solid-i">Interface Segregation</a></li>
+                        <li><a href="#solid-d">Dependency Inversion</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="top-bar">
+            <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Open menu">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <div style="font-weight: 700; font-size: 0.9375rem;">دليل شامل لأنماط التصميم في Kotlin</div>
+            <div style="width: 40px;"></div>
+        </div>
+
+        <div class="content-wrapper">
+            <!-- Hero -->
+            <header class="hero" id="intro">
+                <div class="hero-badge">
+                    <span>📘</span>
+                    <span>دليل تقني متكامل</span>
+                </div>
+                <h1>أنماط التصميم ومبادئ SOLID في Kotlin</h1>
+                <p class="hero-subtitle">رحلة من الحلول الكلاسيكية إلى التعبيرات الاصطلاحية في لغة حديثة، مع استعراض كامل للمقايضات والفلسفة وراء كل نمط.</p>
+            </header>
+
+            <p>يستعرض هذا الدليل سبع محاضرات تقنية مفصلة حول أنماط التصميم الأكثر شيوعًا ومبادئ SOLID، مع التركيز على تطبيقها بلغة Kotlin الحديثة. الهدف ليس مجرد نقل الكود، بل فهم <strong>لماذا</strong> نشأ كل نمط، و<strong>كيف</strong> تتيح لنا اللغات الحديثة التعبير عن ذات المبادئ بأدوات أكثر أناقة وقوة.</p>
+
+            <div class="callout callout-key">
+                <div class="callout-header"><span class="callout-icon">💡</span> الفكرة المركزية</div>
+                <p>المبادئ هي التي تعيش، لا التطبيق الحرفي. مبدأ مثل <strong>Composition over Inheritance</strong> سيظل صحيحًا، لكن طريقة تحقيقه تتغير مع تطور اللغات. الأنماط يجب أن تكون مصدر إلهام لا قيودًا.</p>
+            </div>
+
+            <hr class="section-separator">
+
+            <!-- ==================== FACTORY ==================== -->
+            <section id="factory">
+                <h2><span class="section-number">1</span> Factory Method & Abstract Factory</h2>
+                
+                <p>تبدأ الرحلة من موقف مألوف لكل مبرمج: كود صغير يبدأ ويتوسع فجأة لتجد نفسك أمام Class واحد يحاول عمل كل شيء في نفس الوقت. في مثال المستندات، كان لدينا Class اسمه <code>Document</code> يدير مجموعة عناصر (Paragraphs)، لكنه كان يحمل أيضًا منطق تنسيق كل عنصر لكل صيغة (HTML وMarkdown).</p>
+
+                <div class="callout callout-warning">
+                    <div class="callout-header"><span class="callout-icon">⚠️</span> المشكلة الأساسية</div>
+                    <p>الـ <code>Document</code> تحول من "مدير تحرير" يُرتب المحتوى فقط إلى "مصمم" يعرف تفاصيل التنسيق الدقيقة لكل صيغة. هذا يربطه بشدة بالتفاصيل ويخالف مبدأ <strong>Open-Closed Principle</strong>: الكود يجب أن يكون مفتوحًا للإضافة ومغلقًا للتعديل.</p>
+                </div>
+
+                <h3 id="factory-method">Factory Method: الورشة المتخصصة</h3>
+                <p>الخطوة الأولى في الحل الكلاسيكي هي تحويل <code>Document</code> إلى <strong>Abstract Class</strong>. هذا يغير العقد الأساسي: لم يعد هناك "مستند عام"، بل يجب تحديد النوع بدقة (<code>HTMLDocument</code> أو <code>MarkdownDocument</code>). ثم نضيف دالة Abstract اسمها <code>createParagraph()</code> — وهي الـ Factory Method.</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">abstract class Document {
+    private val paragraphs = mutableListOf&lt;Paragraph&gt;()
+    
+    // Factory Method: يسند الإنشاء للوريث
+    protected abstract fun createParagraph(text: String): Paragraph
+    
+    fun addParagraph(text: String) {
+        val paragraph = createParagraph(text)
+        paragraphs.add(paragraph)
+    }
+    
+    fun render(): String = paragraphs.joinToString("\n") { it.render() }
+}
+
+class HTMLDocument : Document() {
+    override fun createParagraph(text: String): Paragraph = HTMLParagraph(text)
+}
+
+class MarkdownDocument : Document() {
+    override fun createParagraph(text: String): Paragraph = MarkdownParagraph(text)
+}</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><code>abstract class Document</code>: يحدد الهيكل العام للمستند لكنه لا يعرف كيفية إنشاء الفقرات.</li>
+                        <li><code>protected abstract fun createParagraph</code>: الـ Factory Method. هو "العقد" الذي يُلزم كل مستند متخصص بتوفير طريقته الخاصة في صناعة الفقرات.</li>
+                        <li><code>HTMLDocument</code> و <code>MarkdownDocument</code>: الـ Concrete Creators. كل واحد يمتلك "ورشة صغيرة" تنتج فقرات بتنسيقه.</li>
+                        <li><code>addParagraph</code>: الكود الأساسي يعمل بلا معرفة بالتفاصيل. هو يطلب الفقرة ويثق بأن الوريث المتخصص سيتصرف.</li>
+                    </ul>
+                </div>
+
+                <p>باستخدام مصطلحات Gang of Four: <code>Document</code> هو الـ Creator، والفئات الوراثية هي الـ Concrete Creators. الفقرة كفكرة مجردة هي الـ Product، والفقرات الفعلية (<code>HTMLParagraph</code>، <code>MarkdownParagraph</code>) هي الـ Concrete Products.</p>
+
+                <h3 id="abstract-factory">Abstract Factory: عائلة المنتجات</h3>
+                <p>عندما نحتاج لإضافة عناصر جديدة مثل العناوين (<code>Heading</code>) والروابط (<code>Link</code>)، يظهر قيد Factory Method: كل Subclass سيحتاج إضافة <code>createHeading</code> و <code>createLink</code>، والأب سيُملأ بدوال Abstract جديدة. هنا ننتقل من مشكلة "إنشاء كائن واحد" إلى مشكلة "إنشاء عائلة متكاملة من الكائنات".</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">// العقد: Abstract Factory
+interface ElementFactory {
+    fun createParagraph(text: String): Paragraph
+    fun createHeading(level: Int, text: String): Heading
+    fun createLink(url: String, text: String): Link
+}
+
+// Concrete Factory للـ HTML
+class HTMLElementFactory : ElementFactory {
+    override fun createParagraph(text: String) = HTMLParagraph(text)
+    override fun createHeading(level: Int, text: String) = HTMLHeading(level, text)
+    override fun createLink(url: String, text: String) = HTMLLink(url, text)
+}
+
+// Concrete Factory للـ Markdown
+class MarkdownElementFactory : ElementFactory {
+    override fun createParagraph(text: String) = MarkdownParagraph(text)
+    override fun createHeading(level: Int, text: String) = MarkdownHeading(level, text)
+    override fun createLink(url: String, text: String) = MarkdownLink(url, text)
+}
+
+// الـ Client يستخدم التكوين بدل الوراثة
+class Document(private val factory: ElementFactory) {
+    private val elements = mutableListOf&lt;Element&gt;()
+    
+    fun addParagraph(text: String) = elements.add(factory.createParagraph(text))
+    fun addHeading(level: Int, text: String) = elements.add(factory.createHeading(level, text))
+}</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><code>ElementFactory</code>: الـ Abstract Factory. يضمن أن كل مصنع ينتج عناصر متوافقة مع بعضها (HTML مع HTML، Markdown مع Markdown).</li>
+                        <li><code>HTMLElementFactory</code> و <code>MarkdownElementFactory</code>: الـ Concrete Factories. كل مصنع مسؤول عن عائلة منتجات كاملة.</li>
+                        <li><strong>Composition over Inheritance</strong>: <code>Document</code> لم يعد يرث نوعًا محددًا. العلاقة أصبحت "has-a" (لديه مصنع) بدل "is-a" (هو نوع من). هذا يتيح تغيير المصنع في وقت التشغيل.</li>
+                    </ul>
+                </div>
+
+                <h3 id="factory-kotlin">التبسيط الاصطلاحي في Kotlin</h3>
+                <p>تقدم Kotlin أدوات تُغيّر طريقة التفكير. المصانع مثل <code>HTMLFactory</code> هي مجرد حاويات لدوال بلا حالة داخلية (State). بدلًا من كلاسات نُنشئ منها كائنات، نستخدم <code>object</code> لجعلها Singletons:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">// Singleton Factory: نسخة واحدة في البرنامج كله
+object HTMLElementFactory : ElementFactory {
+    override fun createParagraph(text: String) = HTMLParagraph(text)
+    // ...
+}</code></pre>
+                </div>
+
+                <p>لكن النقلة الأكبر هي استخدام <strong>First-class Functions</strong>. بدلًا من كلاسات صغيرة لكل منتج، نستطيع استبدالها بـ Lambdas:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">// بدل HTMLParagraph class، نستخدم Lambda للعرض
+data class Paragraph(val text: String, val render: (String) -> String)
+
+object HTMLElementFactory : ElementFactory {
+    override fun createParagraph(text: String) = 
+        Paragraph(text) { "&lt;p&gt;$it&lt;/p&gt;" }
+}
+
+// لكن هنا تظهر مشكلة: الـ Lambda لا تحتوي على منطق التحقق
+// مثلاً Heading يحتاج التأكد من أن المستوى بين 1 و 6
+// في هذه الحالة، قد نحتفظ بـ Subclasses للعناصر التي تحتاج قيودًا</code></pre>
+                </div>
+
+                <div class="callout callout-tip">
+                    <div class="callout-header"><span class="callout-icon">🎯</span> حكمة التطبيق</div>
+                    <p>في مشروع حقيقي، غالبًا ما يُفضل الحل الأقل أناقة إذا كان يحافظ على <strong>أمان البيانات</strong>. الـ Lambdas رائعة للعرض البسيط، لكن العناصر التي تحتاج تحققًا (Validation) تستحق كلاسًا مستقلًا. الأنماط ليست كتابًا مقدسًا، بل نقطة بداية نُكيّفها حسب احتياجاتنا.</p>
+                </div>
+
+                <p>في أبسط صوره، يمكن تقليل الكود لـ 35 سطرًا إذا قبلنا فقدان <strong>Type Safety</strong> بجعل كل شيء <code>String</code>. لاستعادة الأمان دون ثقل الكلاسات، تقدم Kotlin <strong>Value Classes</strong>:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">@JvmInline
+value class ParagraphString(val value: String)
+
+@JvmInline
+value class HeadingString(val value: String)
+
+// لا تكلفة إضافية في الذاكرة، لكن المترجم يفرق بين الأنواع</code></pre>
+                </div>
+
+                <div class="accordion">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>الغوص أعمق: لماذا Composition أفضل من Inheritance هنا؟</span>
+                        <span class="accordion-icon">▼</span>
+                    </button>
+                    <div class="accordion-body">
+                        <div class="accordion-content">
+                            <p>الوراثة (<code>is-a</code>) تخلق علاقة صلبة: <code>HTMLDocument</code> مرتبط للأبد بأنه "نوع من Document". أما التكوين (<code>has-a</code>) فهو مرن: <code>Document</code> يستطيع العمل مع أي مصنع تُعطيه له. يمكنك تغيير المصنع من <code>HTMLElementFactory</code> إلى <code>MarkdownElementFactory</code> في منتصف البرنامج. هذه المرونة هي جوهر الفرق.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <hr class="section-separator">
+
+            <!-- ==================== OBSERVER ==================== -->
+            <section id="observer">
+                <h2><span class="section-number">2</span> Observer Pattern</h2>
+                
+                <p>تخيل جروب واتساب لأصدقاء يُخططون لخروجة: كل دقيقة يقترح أحدهم مكانًا جديدًا ويغير آخر المعاد. لمنع الفوضى، يبلّغ صاحب التغيير "المهتمين" بالجديد. هذه هي فكرة Observer Pattern في جوهرها: فصل المُبلّغ عن المُبلَّغ إليه.</p>
+
+                <h3 id="observer-problem">الارتباط الشديد (Tight Coupling)</h3>
+                <p>في المثال الكلاسيكي، لدينا لعبة <code>Game</code> ومعلقين (<code>ScoreAnnouncer</code> و <code>WinnerAnnouncer</code>). في النسخة الأولى، كلما تغيرت النتيجة، كان Class الـ <code>Game</code> يذهب بنفسه لكل معلق ويُبلّغه. هنا يعرف <code>Game</code> تفاصيل دقيقة عن المعلقين — أسماءهم ودوالهم — مما يُنشئ <strong>ارتباطًا شديدًا</strong>.</p>
+
+                <div class="callout callout-warning">
+                    <div class="callout-header"><span class="callout-icon">⚠️</span> عواقب الارتباط الشديد</div>
+                    <p>إضافة معلق ثالث (مثل محلل إحصائيات) يتطلب فتح كود <code>Game</code> نفسه وإضافة سطر جديد. الكود يصبح عاملًا كالمبنى الذي كل حوائطه تدعم بعضها: تغيير حائطة واحدة قد يسقط المبنى.</p>
+                </div>
+
+                <h3 id="observer-classic">الحل الكلاسيكي: طبقة الوساطة</h3>
+                <p>الحل يقوم على إضافة طبقة وسيطة. نُنشئ نوعين مجردين: <strong>Subject</strong> (الشيء المراقب) و <strong>Observer</strong> (المراقب). <code>Game</code> يرث من <code>Subject</code> ويحتفظ بقائمة من المراقبين. المراقبون يسجّلون أنفسهم (<code>subscribe</code>) وينتظرون التبليغ.</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">// العقد الكلاسيكي
+interface Observer {
+    fun update(score: Int)
+}
+
+abstract class Subject {
+    private val observers = mutableListOf&lt;Observer&gt;()
+    
+    fun attach(observer: Observer) = observers.add(observer)
+    fun detach(observer: Observer) = observers.remove(observer)
+    
+    fun notifyObservers(score: Int) {
+        observers.forEach { it.update(score) }
+    }
+}
+
+class Game : Subject() {
+    var score: Int = 0
+        set(value) {
+            field = value
+            notifyObservers(value) // التبليغ اليدوي
+        }
+}</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><code>Observer</code>: واجهة العقد. أي شيء يريد الاستماع يجب أن ينفذ <code>update</code>.</li>
+                        <li><code>Subject</code>: يدير قائمة المراقبين ويُبلّغهم عند التغيير.</li>
+                        <li><strong>Dependency Inversion</strong>: <code>Game</code> لم يعد يعرف المعلقين بالاسم. المعلقون هم الذين يعتمدون على <code>Game</code>، لا العكس.</li>
+                    </ul>
+                </div>
+
+                <div class="callout callout-info">
+                    <div class="callout-header"><span class="callout-icon">ℹ️</span> نقطة ضعف الكلاسيكي</div>
+                    <p>في Kotlin (وJava)، لكي يحصل <code>Game</code> على وظائف إدارة المراقبين، يجب أن <strong>يرث</strong> من <code>Subject</code>. وبما أن Kotlin تسمح بالوراثة من كلاس واحد فقط، فقد "استهلكنا الجوكر الوحيد". قد يحتاج <code>Game</code> في المستقبل للوراثة من كلاس آخر أهم لأسباب تتعلق بقواعد اللعبة نفسها.</p>
+                </div>
+
+                <h3 id="observer-kotlin">التحديثات الحديثة في Kotlin</h3>
+                <p>أول تحسين هو التخلص من التبليغ اليدوي باستخدام <code>Delegates.observable</code>:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">import kotlin.properties.Delegates
+
+class Game {
+    var score: Int by Delegates.observable(0) { _, oldValue, newValue ->
+        if (oldValue != newValue) {
+            notifyObservers(newValue) // تلقائي!
+        }
+    }
+}</code></pre>
+                </div>
+
+                <p>النقلة الفكرية الحقيقية تأتي عندما نسأل: لماذا نحتاج Interface كاملة اسمها <code>Observer</code>؟ كل ما نريده هو <strong>سلوك</strong> معين يُنفّذ عند التغيير. في Kotlin، الدوال هي مواطنون من الدرجة الأولى (First-class citizens):</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">class Game {
+    private val listeners = mutableListOf&lt;(Int) -> Unit&gt;() // قائمة من الدوال!
+    
+    fun addListener(listener: (Int) -> Unit) = listeners.add(listener)
+    
+    var score: Int by Delegates.observable(0) { _, _, newValue ->
+        listeners.forEach { it(newValue) } // Push Model
+    }
+}
+
+// الاستخدام: لا حاجة لكلاسات!
+val game = Game()
+game.addListener { score -> println("النتيجة: $score") }
+game.addListener { score -> sendPushNotification(score) }</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><code>mutableListOf&lt;(Int) -> Unit&gt;()</code>: قائمة تحتفظ بـ "وصفات" كود بدل كائنات. كل عنصر هو دالة تقبل <code>Int</code> ولا ترجع شيئًا.</li>
+                        <li><strong>Push Model</strong>: اللعبة تدفع المعلومة (النتيجة الجديدة) مباشرةً كمعامل للدالة. هذا يختلف عن النمط الكلاسيكي (Pull Model) حيث كان المراقب يسأل اللعبة عن النتيجة بعد التبليغ.</li>
+                        <li>المرونة: يمكن تسجيل دالة Logging بسيطة، أو دالة إرسال إشعار، دون إنشاء كلاس لكل منها.</li>
+                    </ul>
+                </div>
+
+                <h3 id="observer-async">التزامن والـ Flow</h3>
+                <p>في تطبيقات الواجهات الرسومية (UI)، قد يكون أحد المراقبين بطيئًا (مثل رسم بياني معقد أو إرسال بيانات للسيرفر). إذا كان الكود يعمل على مسار واحد رئيسي (Main Thread)، سيُجمّد التطبيق. الحل في Kotlin هو <strong>Coroutines</strong> و <strong>Flow</strong>:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.yield
+
+class Game {
+    private val _score = MutableStateFlow(0)
+    val score: StateFlow&lt;Int&gt; = _score
+    
+    suspend fun updateScoreLoop() {
+        repeat(10) { i ->
+            _score.value = i
+            yield() // يسمح للمراقبين بالتنفس!
+        }
+    }
+}
+
+// الاشتراك: كل مراقب في مساره الخاص
+viewModelScope.launch {
+    game.score.collect { score ->
+        updateComplexChart(score) // بطيء، لكن لا يُجمّد الآخرين
+    }
+}</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><code>MutableStateFlow</code>: قناة بث تحتفظ بآخر قيمة. أي مشترك جديد يحصل على القيمة الأخيرة فورًا (مثل تطبيق الأسهم).</li>
+                        <li><code>yield()</code>: تُخبر الـ Coroutine الحالي "تنازل عن دورك للحظة". هذا يعطي فرصة لـ Coroutines المراقبين لالتقاط التحديثات الوسطى، لا أول قيمة وآخر قيمة فقط.</li>
+                        <li><code>collect</code>: كل مشترك ينتظر التحديثات في مسار تنفيذ منفصل خاص به.</li>
+                    </ul>
+                </div>
+
+                <div class="callout callout-key">
+                    <div class="callout-header"><span class="callout-icon">🎯</span> الخلاصة</div>
+                    <p>الفكرة الأساسية (فصل المُبلّغ عن المُبلَّغ) بقيت ثابتة، لكن التطبيق تطور من كلاسات متشابكة إلى <strong>دوال مستقلة</strong> تتواصل عبر <strong>قنوات بيانات غير متزامنة</strong>. Kotlin تدمج المبادئ العريقة داخل اللغة نفسها عبر First-class Functions و Coroutines.</p>
+                </div>
+            </section>
+
+            <hr class="section-separator">
+
+            <!-- ==================== STRATEGY ==================== -->
+            <section id="strategy">
+                <h2><span class="section-number">3</span> Strategy Pattern</h2>
+                
+                <p>تخيل نموذج إدخال (Form) على الإنترنت: حقل إيميل، حقل اسم مستخدم، حقل باسورد. في البداية، كل حقل له كلاس يحتوي على منطق التحقق (Validation). الكارثة تبدأ عندما يطلب البيزنس تفرقة بين الحقول <strong>الإجبارية</strong> والـ <strong>اختيارية</strong>.</p>
+
+                <h3 id="strategy-problem">الانفجار التوافقي للكلاسات</h3>
+                <p>الحل المباشر: عمل نسخة اختيارية من كل كلاس. إذا بدأنا بثلاثة حقول، فجأة يصبح لدينا 6 كلاسات. هذا ما يُسمى <strong>Combinatorial Explosion</strong>: كل بُعد جديد (إجباري/اختياري، نص/رقم) يضرب عدد الكلاسات في بعضها. كأنك في مطعم يقدم 3 سندوتشات × 2 نوع عيش × 3 صوصات = 18 صنفًا!</p>
+
+                <div class="callout callout-warning">
+                    <div class="callout-header"><span class="callout-icon">⚠️</span> الانفجار التوافقي</div>
+                    <p>كل بُعد جديد نضيفه يُضاعف عدد الكلاسات. الكود يتحول لكابوس صيانة مستحيل التعامل معه. المشكلة ليست في عدد الكلاسات فقط، بل في تكرار المنطق وصعوبة تعديله.</p>
+                </div>
+
+                <h3 id="strategy-classic">الاستراتيجية الكلاسيكية</h3>
+                <p>المبدأ الأساسي: <strong>استخرج ما يختلف</strong>. إذا نظرنا إلى <code>EmailField</code> و <code>UsernameField</code>، نجد أن الجزء المتغير هو <code>isValid()</code>. نستخرج هذا المنطق إلى Interface:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">// الاستراتيجية المجردة
+interface Validator {
+    fun isValid(input: String): Boolean
+}
+
+// استراتيجيات ملموسة
+class EmailValidator : Validator {
+    override fun isValid(input: String): Boolean = 
+        input.contains("@") && input.contains(".com")
+}
+
+class UsernameValidator : Validator {
+    override fun isValid(input: String): Boolean = input.isNotBlank()
+}
+
+// المدير (Context)
+class FormField(private val validator: Validator) {
+    var value: String = ""
+    fun isValid(): Boolean = validator.isValid(value)
+}</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><code>Validator</code>: الاستراتيجية المجردة. تحدد العقد: أي مدقق يجب أن يقدم دالة <code>isValid</code>.</li>
+                        <li><code>EmailValidator</code> و <code>UsernameValidator</code>: استراتيجيات ملموسة. كل واحد يحمل منطق التحقق الخاص به.</li>
+                        <li><code>FormField</code>: الـ Context. لا يعرف تفاصيل التحقق، بل يوظف الخبير (Validator) الذي يُعطى له.</li>
+                    </ul>
+                </div>
+
+                <p>النتيجة: بدل 6 كلاسات، لدينا <code>FormField</code> واحد وعدة Validators. لكن في Kotlin، يمكن الاختصار أكثر. إذا كانت الواجهة تحتوي على دالة واحدة فقط، فهي <strong>Functional Interface</strong> يمكن استبدالها بـ Lambda:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">// بدل Interface، نستخدم نوع الدالة مباشرة
+typealias Validator = (String) -> Boolean
+
+class FormField(private val validator: Validator) {
+    var value: String = ""
+    fun isValid(): Boolean = validator(value)
+}
+
+// الاستخدام: لا حاجة لكلاسات!
+val emailField = FormField { input -> input.contains("@") }
+val userField = FormField { it.isNotBlank() }</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><code>typealias Validator = (String) -> Boolean</code>: يعرف اسمًا بديلًا لنوع "دالة تأخذ String وترجع Boolean". لا حاجة لـ Interface أو كلاسات.</li>
+                        <li><code>FormField { input -> ... }</code>: نمرر Lambda مباشرة كمعامل. الكلاس يحتفظ بالدالة ويناديها عند الحاجة.</li>
+                        <li><code>it</code>: في Lambda ذي المعامل الواحد، Kotlin توفر اسمًا افتراضيًا <code>it</code> لتبسيط الكود.</li>
+                    </ul>
+                </div>
+
+                <p>لحل مشكلة الحقول الاختيارية، نستخدم <strong>Higher-order Function</strong> (دالة تُنتج دوال):</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">// دالة تُنتج Validator اختياريًا
+fun optional(validator: Validator): Validator = { input ->
+    if (input.isBlank()) true else validator(input)
+}
+
+// الاستخدام
+val optionalEmail = optional { input -> input.contains("@") }
+val field = FormField(optionalEmail)
+field.value = ""        // صحيح (اختياري)
+field.value = "a@b.com" // صحيح
+field.value = "invalid" // خطأ</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><code>optional</code>: دالة تستقبل Validator وتُعيد Validator جديدًا. الجديد يتحقق أولًا من الفراغ: إذا كان النص فارغًا يرجع <code>true</code>، وإلا ينادي الـ Validator الأصلي.</li>
+                        <li>حلّت المشكلة بدون إضافة أي كلاس جديد. الكود أصبح مرنًا بشكل لا يصدق.</li>
+                    </ul>
+                </div>
+
+                <div class="callout callout-key">
+                    <div class="callout-header"><span class="callout-icon">🎯</span> الفكرة النهائية</div>
+                    <p>القوة الحقيقية ليست في حفظ أسماء الأنماط، بل في القدرة على تمييز اللحظة التي تسمح فيها لغتك بالتعبير عن القصد من النمط مباشرةً. الانتقال من التفكير في <strong>الأسماء</strong> (كلاسات وواجهات) إلى التفكير في <strong>الأفعال</strong> (دوال وسلوكيات).</p>
+                </div>
+            </section>
+
+            <hr class="section-separator">
+
+            <!-- ==================== DECORATOR ==================== -->
+            <section id="decorator">
+                <h2><span class="section-number">4</span> Decorator Pattern</h2>
+                
+                <p>تخيل كلاس <code>Logger</code> بسيط وظيفته طباعة رسالة في الكونسول. مع الوقت، تُطلب إضافات: طباعة التاريخ، إضافة معرف فريد (UUID)، اسم الـ Thread. الحل المباشر هو إضافة Parameters منطقية (<code>Boolean</code>) في Constructor. لكن هذا يؤدي لـ "كونستركتور المرعب" ذي الـ 20 معاملًا.</p>
+
+                <h3 id="decorator-problem">مشاكل التصميم الأولي</h3>
+                <ul>
+                    <li><strong>التعقيد المتزايد:</strong> كل ميزة جديدة تُضيف Parameter، والاستخدام يصبح غريبًا.</li>
+                    <li><strong>الاعتماديات غير الضرورية:</strong> لإضافة الوقت، يحتاج الكود <code>Clock Object</code>. حتى لو لم ترد الطباعة بالوقت، ستُجبر على تمرير الـ Clock.</li>
+                    <li><strong>عدم المرونة:</strong> الكود مصمم للطباعة في الكونسول فقط. لتسجيل في ملف أو إرسال لسيرفر، يجب تعديل الكلاس الأصلي.</li>
+                </ul>
+
+                <div class="callout callout-warning">
+                    <div class="callout-header"><span class="callout-icon">⚠️</span> فخ الوراثة</div>
+                    <p>أول حل قد يخطر على البال هو الوراثة: <code>LoggerWithTimestamp</code> يرث <code>Logger</code>، و <code>LoggerWithUUID</code> يرث <code>Logger</code>. لكن مع 3 ميزات، نحتاج 7 كلاسات لتغطية كل التركيبات. إضافة ميزة رابعة تُضاعف العدد. هذا <strong>انفجار الكلاسات</strong> (Class Explosion).</p>
+                </div>
+
+                <h3 id="decorator-classic">التزيين الكلاسيكي</h3>
+                <p>فكرة Decorator: بدل تغيير جوهر الشيء، نُغلّفه من الخارج. نُنشئ Interface مشتركًا، وكل ميزة تصبح كلاسًا منفصلًا يُغلّف Logger آخر:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">// العقد المشترك
+interface Logger {
+    fun log(message: String)
+}
+
+// العامل الأساسي
+class ConsoleLogger : Logger {
+    override fun log(message: String) = println(message)
+}
+
+// المزيّن: يضيف التاريخ والوقت
+class DateTimeLogger(private val wrapped: Logger) : Logger {
+    override fun log(message: String) {
+        val timestamp = java.time.Instant.now()
+        wrapped.log("[$timestamp] $message")
+    }
+}
+
+// المزيّن: يضيف UUID
+class UniqueIdLogger(private val wrapped: Logger) : Logger {
+    private var counter = 0
+    override fun log(message: String) {
+        wrapped.log("[${++counter}] $message")
+    }
+}
+
+// التركيب كطبقات كيكة
+val logger = UniqueIdLogger(DateTimeLogger(ConsoleLogger()))
+logger.log("خطأ في الاتصال") // [1] [2025-...] خطأ في الاتصال</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><code>Logger</code>: Interface يضمن أن كل مكون (أساسي أو مزيّن) يمكن استبداله بالآخر.</li>
+                        <li><code>DateTimeLogger</code>: يستقبل <code>Logger</code> آخر في Constructor. يضيف الطابع الزمني ثم ينادي الـ <code>wrapped.log</code>.</li>
+                        <li><strong>التركيب:</strong> كل طبقة تضيف سلوكها ثم تُمرر للطبقة الداخلية. يمكن إعادة الترتيب أو إزالة طبقة دون التأثير على الباقي.</li>
+                    </ul>
+                </div>
+
+                <h3 id="decorator-kotlin">الأسلوب السلس في Kotlin</h3>
+                <p>في Kotlin، يمكن تبسيط الهيكل باستخدام <strong>Functional Interface</strong> (fun interface) و <strong>Extension Functions</strong>:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">// واجهة وظيفية: دالة واحدة فقط
+fun interface Logger {
+    fun log(message: String)
+}
+
+// Logger أساسي باستخدام Lambda
+val consoleLogger = Logger { println(it) }
+
+// Extension Function: تبدو وكأنها دالة من Logger نفسه
+fun Logger.withTimestamp(): Logger = Logger { message ->
+    log("[${java.time.Instant.now()}] $message")
+}
+
+fun Logger.withUniqueId(): Logger = Logger { message ->
+    log("[${java.util.UUID.randomUUID()}] $message")
+}
+
+// استخدام سلس (Fluent Style)
+val fancyLogger = consoleLogger
+    .withTimestamp()
+    .withUniqueId()
+
+fancyLogger.log("تم تسجيل الدخول")</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><code>fun interface</code>: يسمح بإنشاء كائن من Interface باستخدام Lambda مباشرةً، دون كلاس منفصل.</li>
+                        <li><code>Logger { println(it) }</code>: ينشئ Logger جديدًا باستخدام Lambda. <code>it</code> هو المعامل الوحيد (الرسالة).</li>
+                        <li><code>withTimestamp()</code>: Extension Function. تبدو كأنها جزء من Logger، لكنها دالة منفصلة تأخذ Logger وتُعيد Logger جديدًا مُغلّفًا.</li>
+                        <li><strong>Fluent Style:</strong> السلسلة <code>consoleLogger.withTimestamp().withUniqueId()</code> تقرأ كجملة طبيعية: "Logger مع طابع زمني ومعرف فريد".</li>
+                    </ul>
+                </div>
+
+                <div class="accordion">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>المقايضة: الوضوح مقابل سهولة التتبع</span>
+                        <span class="accordion-icon">▼</span>
+                    </button>
+                    <div class="accordion-body">
+                        <div class="accordion-content">
+                            <p>الأسلوب السلس يُضحي ببعض سهولة التتبع (Debugging). عند وضع Breakpoint، ستجد نفسك تنتقل بين Lambda متداخلة. الكلاسات المنفصلة في النمط الكلاسيكي تُسهّل تتبع الرسالة وهي تنتقل من مزيّن إلى آخر. الاختيار يعتمد على تعقيد الفريق وخبرته.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <hr class="section-separator">
+
+            <!-- ==================== STATE ==================== -->
+            <section id="state">
+                <h2><span class="section-number">5</span> State Pattern</h2>
+                
+                <p>كيف تجعل كائنًا يتصرف بطرق مختلفة حسب حالته؟ المثال الكلاسيكي: طلب شراء أونلاين يمر بمراحل (قيد المراجعة → مؤكد → تم الشحن → تم التسليم). كل حالة لها قواعدها: في "قيد المراجعة" يمكن الإلغاء، لكن في "تم الشحن" تختفي هذه الصلاحية.</p>
+
+                <h3 id="state-problem">جمل when المتكررة</h3>
+                <p>في الكود المبدئي، كل دالة مثل <code>viewContent</code> أو <code>editProfile</code> تكون مليئة بجمل <code>when</code> (أو <code>switch</code>). هذا المنطق المُتفرق يجعل أي تغيير مستقبلي صعبًا:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">// كود هش: when متكررة في كل دالة
+class User(val state: UserState) {
+    fun viewContent() = when (state) {
+        UserState.ANONYMOUS -> "عرض محدود"
+        UserState.UNVERIFIED -> "عرض مع إعلان"
+        UserState.AUTHENTICATED -> "عرض كامل"
+    }
+
+    fun editProfile() = when (state) {
+        UserState.ANONYMOUS -> throw IllegalStateException("ممنوع!")
+        UserState.UNVERIFIED -> "طلب التحقق أولاً"
+        UserState.AUTHENTICATED -> "تعديل البيانات"
+    }
+}</code></pre>
+                </div>
+
+                <div class="callout callout-warning">
+                    <div class="callout-header"><span class="callout-icon">⚠️</span> مشكلة التكرار</div>
+                    <p>إضافة حالة جديدة (مثل <code>SUSPENDED</code>) تتطلب تعديل <strong>كل</strong> جملة <code>when</code> في الكود. نسيان دالة واحدة يُنشئ Bug غريبًا وصعب الاكتشاف.</p>
+                </div>
+
+                <h3 id="state-classic">نمط الحالة الكلاسيكي</h3>
+                <p>المبدأ: <strong>Code that grows together, goes together</strong>. بدل تنظيم الكود حسب الوظيفة، ننظمه حسب الحالة:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">// واجهة الحالة
+interface UserState {
+    fun viewContent(): String
+    fun editProfile(): String
+}
+
+// حالات ملموسة
+class AnonymousState : UserState {
+    override fun viewContent() = "عرض محدود"
+    override fun editProfile() = throw IllegalStateException("ممنوع!")
+}
+
+class AuthenticatedState : UserState {
+    override fun viewContent() = "عرض كامل"
+    override fun editProfile() = "تعديل البيانات"
+}
+
+// السياق: يُفوّض لحالته
+class User(private var state: UserState) {
+    fun viewContent() = state.viewContent()
+    fun editProfile() = state.editProfile()
+    fun changeState(newState: UserState) { state = newState }
+}</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><code>UserState</code>: يحدد كل الأفعال الممكنة. كل حالة جديدة تُنشئ كلاسًا واحدًا فقط.</li>
+                        <li><code>User</code>: أصبح وسيطًا بسيطًا (Delegate). كل طلب يُمرر للحالة الحالية.</li>
+                        <li>إضافة <code>SuspendedState</code> تتطلب كلاسًا واحدًا جديدًا فقط، دون تعديل أي كود قديم.</li>
+                    </ul>
+                </div>
+
+                <h3 id="state-kotlin">الـ Enum والـ Lambdas</h3>
+                <p>في Kotlin، يمكن استخدام <strong>Enum</strong> مع خصائص من نوع وظيفي (Function Type) للتخلص من Boilerplate:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">enum class UserState(
+    val viewContent: () -> String,
+    val editProfile: () -> String
+) {
+    ANONYMOUS(
+        viewContent = { "عرض محدود" },
+        editProfile = { throw IllegalStateException("ممنوع!") }
+    ),
+    UNVERIFIED(
+        viewContent = { "عرض مع إعلان" },
+        editProfile = { "طلب التحقق أولاً" }
+    ),
+    AUTHENTICATED(
+        viewContent = { "عرض كامل" },
+        editProfile = { "تعديل البيانات" }
+    )
+}
+
+class User(var state: UserState) {
+    fun viewContent() = state.viewContent()
+    fun editProfile() = state.editProfile()
+}</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><code>enum class</code> مع Constructor يأخذ دوال Lambda: كل حالة تحمل سلوكها مباشرةً.</li>
+                        <li>اختُصرت 3 كلاسات منفصلة إلى قيم Enum. الكود انكمش لأقل من نصف.</li>
+                        <li>الـ Compiler يضمن أن كل الحالات تُعرف كل السلوكيات المطلوبة.</li>
+                    </ul>
+                </div>
+
+                <p>يمكن الاختصار أكثر باستخدام <strong>Lambdas with Receivers</strong>، حيث يصبح الكود داخل Lambda كأنه جزء من كائن <code>User</code> نفسه:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">enum class UserState(
+    val viewContent: User.() -> String,
+    val editProfile: User.() -> String
+) {
+    AUTHENTICATED(
+        viewContent = { "مرحبًا $name" }, // this هو User
+        editProfile = { changeState(UNVERIFIED); "تم" }
+    ),
+    // ...
+}
+
+class User(var state: UserState, val name: String) {
+    fun viewContent() = state.viewContent(this)
+    fun editProfile() = state.editProfile(this)
+}</code></pre>
+                </div>
+
+                <div class="callout callout-info">
+                    <div class="callout-header"><span class="callout-icon">ℹ️</span> الإيجاز مقابل الوضوح</div>
+                    <p>النسخة الأخيرة مضغوطة لدرجة قد تربك المبرمج الجديد. اختفاء المتغيرات الصريحة (مثل <code>user</code>) يجعل الفهم معتمدًا على معرفة ضمنية بـ <code>Lambdas with Receivers</code>. إذا كان الفريق كله خبراء، فهذا قمة الأناقة. إذا كانت مستويات الخبرة متفاوتة، فالكود الأوضح — حتى لو أطول — قد يكون أفضل على المدى الطويل.</p>
+                </div>
+            </section>
+
+            <hr class="section-separator">
+
+            <!-- ==================== BUILDER ==================== -->
+            <section id="builder">
+                <h2><span class="section-number">6</span> Builder Pattern</h2>
+                
+                <p>تخيل بناء Object يمثل إعدادات الإشعارات: المستخدم مشترك في ماذا؟ أخبار، تحليلات، تحديثات أمنية؟ كل إشعار يصل كيف؟ فوري، يومي، أسبوعي؟ Constructor التقليدي يريد كل شيء جاهزًا دفعة واحدة، لكن الواقع مليء بالشروط والمنطق الديناميكي.</p>
+
+                <h3 id="builder-problem">قيود الـ Constructor</h3>
+                <p>الـ Constructor عامل كخط إنتاج: يأخذ كل المكونات مرة واحدة ويُخرج المنتج. لكن ماذا لو كان المنطق معقدًا؟ "أضف اشتراك الإيميل فقط إذا كان المستخدم لديه إيميل مسجل". لا يمكن كتابة <code>if</code> داخل استدعاء Constructor.</p>
+
+                <h3 id="builder-classic">البناء الكلاسيكي</h3>
+                <p>الحل الكلاسيكي (Gang of Four): ورشة عمل منفصلة (Builder) تُجهز كل شيء براحتك، ثم تأمر ببناء المنتج النهائي:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">data class NotificationSettings(
+    val subscriptions: List&lt;String&gt;,
+    val frequency: String,
+    val channels: List&lt;String&gt;
+)
+
+class NotificationSettingsBuilder {
+    private val subscriptions = mutableListOf&lt;String&gt;()
+    private var frequency = "immediate"
+    private val channels = mutableListOf&lt;String&gt;()
+
+    fun addSubscription(topic: String) = apply { subscriptions.add(topic) }
+    fun setFrequency(freq: String) = apply { frequency = freq }
+    fun addChannel(channel: String) = apply { channels.add(channel) }
+
+    fun build(): NotificationSettings {
+        return NotificationSettings(subscriptions, frequency, channels)
+    }
+}
+
+// الاستخدام
+val settings = NotificationSettingsBuilder()
+    .addSubscription("news")
+    .addSubscription("analytics")
+    .setFrequency("daily")
+    .addChannel("email")
+    .build()</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><code>NotificationSettingsBuilder</code>: نسخة طبق الأصل من الكلاس الأصلي، لكن كل خصائصه <strong>قابلة للتعديل</strong> (Mutable).</li>
+                        <li><code>apply</code>: تُعيد الكائن نفسه، مما يسمح بسلسلة الاستدعاءات (Chaining).</li>
+                        <li><code>build()</code>: الخطوة الأخيرة التي تحول الشيء الفوضوي القابل للتعديل إلى منتج نهائي ثابت (Immutable).</li>
+                    </ul>
+                </div>
+
+                <h3 id="builder-kotlin">بدائل Kotlin المدمجة</h3>
+                <p>في Kotlin، 80% من الحالات لا تحتاج Builder على الإطلاق:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">// 1. Default + Named Arguments
+data class NotificationSettings(
+    val subscriptions: List&lt;String&gt; = emptyList(),
+    val frequency: String = "immediate",
+    val channels: List&lt;String&gt; = emptyList()
+)
+
+// استخدام: لا حاجة لـ Builder!
+val settings = NotificationSettings(
+    subscriptions = listOf("news"),
+    frequency = "daily"
+)
+
+// 2. Scope Function (run) للمنطق الديناميكي
+val dynamicSettings = NotificationSettings(
+    subscriptions = mutableListOf&lt;String&gt;().apply {
+        if (user.hasEmail) add("news")
+        if (user.isPremium) add("analytics")
+    }
+)
+
+// 3. buildList: صندوق أدوات مخصص للقوائم
+val subs = buildList {
+    if (user.hasEmail) add("news")
+    if (user.isPremium) {
+        add("analytics")
+        add("security")
+    }
+}
+val settings2 = NotificationSettings(subscriptions = subs)</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><strong>Default Arguments:</strong> تحل مشكلة "20 معاملًا في الكونستركتور". كل قيمة افتراضية تُقلل الحاجة لتمريرها.</li>
+                        <li><strong>Named Arguments:</strong> تخليك تحدد أي Parameter تريد دون حفظ الترتيب.</li>
+                        <li><strong>buildList:</strong> دالة مدمجة تُعطيك بلوكًا داخله <code>add</code> مباشرةً. تتولى Kotlin إنشاء القائمة النهائية غير القابلة للتعديل.</li>
+                    </ul>
+                </div>
+
+                <h3 id="builder-dsl">DSL مع Lambdas with Receivers</h3>
+                <p>للحالات المعقدة، يمكن تحويل Builder إلى <strong>DSL</strong> (لغة مصغرة) باستخدام Lambdas with Receivers:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">// تعريف DSL
+class NotificationSettingsDsl {
+    val subscriptions = mutableListOf&lt;String&gt;()
+    var frequency = "immediate"
+    val channels = mutableListOf&lt;String&gt;()
+
+    fun send(topic: String, to: String, freq: String) {
+        subscriptions.add(topic)
+        channels.add(to)
+        frequency = freq
+    }
+}
+
+fun notificationSettings(block: NotificationSettingsDsl.() -> Unit): NotificationSettings {
+    val dsl = NotificationSettingsDsl().apply(block)
+    return NotificationSettings(dsl.subscriptions, dsl.frequency, dsl.channels)
+}
+
+// الاستخدام: كأنك تكتب جملة إنجليزية!
+val settings = notificationSettings {
+    send("analytics", to = "email", freq = "daily")
+    send("news", to = "mobile", freq = "weekly")
+}</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><code>NotificationSettingsDsl.() -> Unit</code>: Lambda with Receiver. داخل البلوك، <code>this</code> هو <code>NotificationSettingsDsl</code>، لذا يمكن استدعاء دواله مباشرةً.</li>
+                        <li><code>send(...)</code>: تبدو كأنها كلمة محجوزة في اللغة، لكنها دالة عادية داخل الـ DSL.</li>
+                        <li><strong>احتواء الفوضى:</strong> عملية البناء (الميوتنبل) محصورة داخل البلوك. المنتج النهائي (<code>NotificationSettings</code>) ثابت وآمن.</li>
+                    </ul>
+                </div>
+
+                <div class="callout callout-key">
+                    <div class="callout-header"><span class="callout-icon">🎯</span> مبدأ احتواء الفوضى</div>
+                    <p>في كل الحلول الفعّالة، كانت هناك خطوة أخيرة حاسمة: الـ <code>build</code>. عملية البناء بطبيعتها فوضوية ومتغيرة. المبدأ يقول: <strong>احتوِ الفوضى في صندوق صغير ومؤقت</strong> (Builder أو بلوك <code>buildList</code>). وبمجرد إغلاق الصندوق، يخرج منتج مثالي ثابت. بقية النظام يتعامل مع المنتج المثالي وهو مطمئن أنه لن يتغير.</p>
+                </div>
+            </section>
+
+            <hr class="section-separator">
+
+            <!-- ==================== SOLID ==================== -->
+            <section id="solid">
+                <h2><span class="section-number">7</span> مبادئ SOLID</h2>
+                
+                <p>رحلة تصليح كود واحد من دالة واحدة معقدة إلى نظام مرن ومُفصل. نبدأ بـ <code>loginUser</code> التي تفعل ثلاثة أشياء: مصادقة Firebase، تسجيل الأخطاء في ملف، وعرض رسالة ترحيب.</p>
+
+                <h3 id="solid-s">S — Single Responsibility Principle</h3>
+                <p>المبدأ لا يقول "دالة واحدة لكل شيء"، بل يقول "سبب واحد للتغيير". الدالة الحالية لها ثلاثة أسباب للتغيير: تغيير منطق المصادقة، تغيير طريقة تسجيل الأخطاء، أو تغيير شكل رسالة الترحيب.</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">// قبل: دالة واحدة تعمل كل شيء
+fun loginUser(email: String, password: String) {
+    val result = FirebaseAuth.signIn(email, password) // مصادقة
+    if (result.isFailure) {
+        File("errors.txt").appendText(result.exception.toString()) // تسجيل
+        return
+    }
+    showWelcomeMessage(result.user) // واجهة مستخدم
+}
+
+// بعد: فصل المسؤوليات
+class FileLogger {
+    fun logError(error: Throwable) {
+        File("errors.txt").appendText("$error\n")
+    }
+}
+
+class LoginUseCase(private val logger: FileLogger) {
+    fun execute(email: String, password: String): User? {
+        return try {
+            FirebaseAuth.signIn(email, password).getOrThrow()
+        } catch (e: Exception) {
+            logger.logError(e)
+            null
+        }
+    }
+}</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><code>FileLogger</code>: مسؤولية واحدة — تسجيل الأخطاء. إذا قررنا لاحقًا الانتقال لـ Sentry أو قاعدة بيانات، نعدل هنا فقط.</li>
+                        <li><code>LoginUseCase</code>: مسؤولية واحدة — منطق المصادقة. لا يعرف شيئًا عن الواجهة الرسومية أو تفاصيل التسجيل.</li>
+                    </ul>
+                </div>
+
+                <h3 id="solid-o">O — Open/Closed Principle</h3>
+                <p>قسم التسويق يطلب تسجيل أخطاء الحملات في ملف منفصل (<code>campaign_errors.txt</code>). الغريزة تقول: افتح <code>FileLogger</code> وغيّره. لكن هذا يكسر الكود القديم. الحل: <strong>التوسع بدل التعديل</strong>.</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">open class FileLogger(private val fileName: String = "errors.txt") {
+    open fun logError(error: Throwable) {
+        File(fileName).appendText("$error\n")
+    }
+}
+
+// توسيع بدون تعديل الكلاس الأصلي
+class CampaignFileLogger : FileLogger("campaign_errors.txt")</code></pre>
+                </div>
+
+                <div class="callout callout-tip">
+                    <div class="callout-header"><span class="callout-icon">✅</span> المبدأ</div>
+                    <p>الكود القديم فضل <strong>مغلقًا</strong> (لم نلمسه). النظام كان <strong>مفتوحًا</strong> لإضافة السلوك الجديد عبر الوراثة.</p>
+                </div>
+
+                <h3 id="solid-l">L — Liskov Substitution Principle</h3>
+                <p>ماذا لو كتبت في <code>CampaignFileLogger</code> دالة جديدة اسمها <code>logCampaignError</code> بدل <code>override</code> لـ <code>logError</code>؟</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">// ❌ خطأ: كسر العقد
+class CampaignFileLogger : FileLogger() {
+    fun logCampaignError(error: Throwable) { // دالة جديدة!
+        File("campaign_errors.txt").appendText("$error\n")
+    }
+}
+
+// الكود المستهلك لا يعرف عن الدالة الجديدة
+fun processError(logger: FileLogger, error: Throwable) {
+    logger.logError(error) // سيسجل في errors.txt وليس campaign_errors.txt!
+}</code></pre>
+                </div>
+
+                <div class="callout callout-warning">
+                    <div class="callout-header"><span class="callout-icon">⚠️</span> كسر الثقة</div>
+                    <p>الكلاس الأب يُعد بسلوك معين (<code>logError</code>). أي ابن يجب أن يكون <strong>بديلًا كاملًا</strong> للأب في أي مكان. إنشاء دالة جديدة باسم مختلف يُخفي السلوك عن الكود الذي يتعامل مع <code>FileLogger</code> عامةً. الـ Override يحافظ على العقد؛ إعادة التسمية تكسره.</p>
+                </div>
+
+                <h3 id="solid-i">I — Interface Segregation Principle</h3>
+                <p>ظهرت أنواع جديدة من اللوجرز: واحد يُرسل إيميلات، وآخر يطبع للـ Debugging. صنعنا واجهة ضخمة اسمها <code>ILogger</code> تحتوي على <code>logError</code> و <code>sendErrorEmail</code>. <code>FileLogger</code> أُجبر على تنفيذ <code>sendErrorEmail</code> وتركها فارغة. هذا <strong>Fat Interface</strong> يُلوث الكود.</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">// ✅ واجهات صغيرة متخصصة
+interface ErrorLogger {
+    fun logError(error: Throwable)
+}
+
+interface EmailNotifier {
+    fun sendErrorEmail(error: Throwable)
+}
+
+// كل كلاس ينفذ ما يحتاجه فقط
+class FileLogger : ErrorLogger {
+    override fun logError(error: Throwable) { /* ... */ }
+}
+
+class AlertService : ErrorLogger, EmailNotifier {
+    override fun logError(error: Throwable) { /* ... */ }
+    override fun sendErrorEmail(error: Throwable) { /* ... */ }
+}</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><code>ErrorLogger</code>: للتسجيل فقط.</li>
+                        <li><code>EmailNotifier</code>: للإيميلات فقط.</li>
+                        <li>الكلاس الذي يفعل الاثنين ينفذ الواجهتين معًا. لا أحد يُجبر على تنفيذ ما لا يحتاجه.</li>
+                    </ul>
+                </div>
+
+                <h3 id="solid-d">D — Dependency Inversion Principle</h3>
+                <p>في قلب كود تسجيل الدخول، لا يزال هناك سطر: <code>FirebaseAuth.signIn(...)</code>. نحن مرتبطون بشكل مباشر بخدمة Firebase. إذا غيّرنا نظام المصادقة غدًا، يجب فتح الكلاس وتعديله.</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">Kotlin</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 نسخ</button>
+                    </div>
+                    <pre><code class="language-kotlin">// التجريد: "أحتاج أي شيء يُجري المصادقة"
+interface Authenticator {
+    fun signIn(email: String, password: String): Result&lt;User&gt;
+}
+
+// التفاصيل تعتمد على التجريد
+class FirebaseAuthenticator : Authenticator {
+    override fun signIn(email: String, password: String): Result&lt;User&gt; {
+        return FirebaseAuth.signIn(email, password)
+    }
+}
+
+class CustomApiAuthenticator : Authenticator {
+    override fun signIn(email: String, password: String): Result&lt;User&gt; {
+        return apiClient.login(email, password)
+    }
+}
+
+// الكود الرئيسي يعتمد على التجريد فقط
+class LoginUseCase(private val authenticator: Authenticator) {
+    fun execute(email: String, password: String): User? {
+        return authenticator.signIn(email, password).getOrNull()
+    }
+}
+
+// في مكان واحد فقط نحدد التفصيلة
+val loginUseCase = LoginUseCase(FirebaseAuthenticator())</code></pre>
+                </div>
+
+                <div class="code-explanation">
+                    <h4>🔍 شرح الكود</h4>
+                    <ul>
+                        <li><code>Authenticator</code>: التجريد. يحدد "ما" المطلوب لا "كيف".</li>
+                        <li><code>FirebaseAuthenticator</code>: تفصيل منخفض المستوى يعتمد على التجريد.</li>
+                        <li><code>LoginUseCase</code>: كود عالي المستوى يعتمد على التجريد فقط. تغيير Firebase إلى API خاص يتطلب تعديل <strong>سطر واحد</strong> خارجي فقط.</li>
+                        <li><strong>اختبار:</strong> يمكن إعطاء <code>LoginUseCase</code> <code>FakeAuthenticator</code> في الاختبارات.</li>
+                    </ul>
+                </div>
+
+                <div class="callout callout-key">
+                    <div class="callout-header"><span class="callout-icon">🎯</span> ملخص الرحلة</div>
+                    <p><strong>S</strong> فكّك الزحمة. <strong>O</strong> أضف بأمان. <strong>L</strong> احترم العقود. <strong>I</strong> اجعل الواجهات دقيقة. <strong>D</strong> اقلب الاعتمادية: التفاصيل تعتمد على المفاهيم المجردة، لا العكس. الكود الناتج أرخص صيانة، وأسرع تطويرًا، وأكثر متعة في العمل.</p>
+                </div>
+            </section>
+
+            <hr class="section-separator">
+
+            <footer style="text-align: center; padding: 3rem 0; color: var(--text-muted);">
+                <p style="font-size: 1.125rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem;">المبادئ ثابتة، والأدوات تتطور</p>
+                <p>الانتقال من "ماذا يفعل النمط؟" إلى "لماذا يفعل ذلك؟" هو جوهر التفكير البرمجي الناضج.</p>
+            </footer>
+        </div>
+    </main>
+</div>
+
+<!-- Prism.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-kotlin.min.js"></script>
+<script>
+    // Theme Toggle
+    function toggleTheme() {
+        const html = document.documentElement;
+        const icon = document.getElementById('theme-icon');
+        if (html.getAttribute('data-theme') === 'dark') {
+            html.removeAttribute('data-theme');
+            icon.textContent = '🌙';
+            localStorage.setItem('theme', 'light');
+        } else {
+            html.setAttribute('data-theme', 'dark');
+            icon.textContent = '☀️';
+            localStorage.setItem('theme', 'dark');
+        }
+    }
+
+    // Load saved theme
+    if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.getElementById('theme-icon').textContent = '☀️';
+    }
+
+    // Mobile Sidebar
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('overlay').classList.toggle('active');
+    }
+
+    document.getElementById('overlay').addEventListener('click', toggleSidebar);
+
+    // Accordion
+    function toggleAccordion(header) {
+        const accordion = header.parentElement;
+        accordion.classList.toggle('open');
+    }
+
+    // Copy Code
+    function copyCode(btn) {
+        const codeBlock = btn.closest('.code-block-wrapper').querySelector('code');
+        const text = codeBlock.innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const original = btn.innerHTML;
+            btn.innerHTML = '✅ تم النسخ';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.innerHTML = original;
+                btn.classList.remove('copied');
+            }, 2000);
+        });
+    }
+
+    // Table of Contents Active State
+    const sections = document.querySelectorAll('section[id], h3[id]');
+    const tocLinks = document.querySelectorAll('.toc-list a');
+
+    function updateActiveLink() {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (scrollY >= sectionTop - 100) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        tocLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    window.addEventListener('scroll', updateActiveLink);
+    updateActiveLink();
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+                // Close mobile sidebar if open
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('overlay').classList.remove('active');
+            }
+        });
+    });
+</script>
+</body>
+</html>
