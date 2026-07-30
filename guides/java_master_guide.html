@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدليل الشامل لـ Java | Java Master Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Tajawal:wght@300;400;500;700;800;900&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --java-blue: #007396;
+            --java-blue-dark: #005a73;
+            --java-orange: #F89820;
+            --java-orange-light: #ffb347;
+            --dark-slate: #1E1E24;
+            --dark-slate-light: #2D2D35;
+            --off-white: #F9F9FB;
+            --off-white-dark: #EAEAEF;
+            --code-bg: #282A36;
+            --code-bg-light: #383A59;
+            --text-primary: #1E1E24;
+            --text-secondary: #5A5A6E;
+            --text-light: #8A8A9E;
+            --border-color: #E0E0E8;
+            --success: #27AE60;
+            --warning: #E67E22;
+            --danger: #E74C3C;
+            --info: #3498DB;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --shadow-xl: 0 20px 60px rgba(0,0,0,0.15);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+        body {
+            font-family: 'Cairo', 'Tajawal', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--off-white);
+            color: var(--text-primary);
+            line-height: 1.85;
+            font-size: 17px;
+            overflow-x: hidden;
+        }
+        .hero {
+            background: linear-gradient(135deg, var(--dark-slate) 0%, var(--java-blue-dark) 50%, var(--java-blue) 100%);
+            color: white;
+            padding: 100px 20px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: -50%; right: -20%;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(248,152,32,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero::after {
+            content: ''; position: absolute; bottom: -30%; left: -10%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-content { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+        .hero-badge {
+            display: inline-block; background: rgba(248,152,32,0.2);
+            border: 1px solid rgba(248,152,32,0.4); color: var(--java-orange-light);
+            padding: 8px 24px; border-radius: 50px; font-size: 14px;
+            font-weight: 600; margin-bottom: 24px; letter-spacing: 1px;
+        }
+        .hero h1 { font-size: 3.2rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; text-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+        .hero h1 span { color: var(--java-orange); }
+        .hero-subtitle { font-size: 1.25rem; opacity: 0.85; max-width: 700px; margin: 0 auto 40px; font-weight: 400; }
+        .hero-meta { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; font-size: 15px; opacity: 0.8; }
+        .hero-meta-item { display: flex; align-items: center; gap: 8px; }
+        .hero-meta-item svg { width: 20px; height: 20px; opacity: 0.9; }
+        .nav-bar {
+            position: sticky; top: 0; z-index: 1000;
+            background: rgba(249,249,251,0.92); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color); padding: 0 20px;
+        }
+        .nav-container { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+        .nav-logo { font-weight: 800; font-size: 1.3rem; color: var(--java-blue); display: flex; align-items: center; gap: 10px; }
+        .nav-logo svg { width: 32px; height: 32px; }
+        .nav-links { display: flex; gap: 8px; list-style: none; overflow-x: auto; scrollbar-width: none; }
+        .nav-links::-webkit-scrollbar { display: none; }
+        .nav-links a { text-decoration: none; color: var(--text-secondary); font-weight: 600; font-size: 14px; padding: 8px 14px; border-radius: var(--radius-sm); transition: all 0.2s ease; white-space: nowrap; }
+        .nav-links a:hover { color: var(--java-blue); background: rgba(0,115,150,0.08); }
+        .nav-links a.active { color: var(--java-blue); background: rgba(0,115,150,0.12); }
+        .main-container { max-width: 1100px; margin: 0 auto; padding: 60px 24px; }
+        .section { margin-bottom: 80px; scroll-margin-top: 90px; }
+        .section-header { margin-bottom: 40px; padding-bottom: 24px; border-bottom: 3px solid var(--java-blue); position: relative; }
+        .section-header::after { content: ''; position: absolute; bottom: -3px; right: 0; width: 120px; height: 3px; background: var(--java-orange); }
+        .section-number {
+            display: inline-flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, var(--java-blue), var(--java-blue-dark));
+            color: white; width: 48px; height: 48px; border-radius: 12px;
+            font-weight: 800; font-size: 1.2rem; margin-bottom: 16px; box-shadow: var(--shadow-md);
+        }
+        .section h2 { font-size: 2.2rem; font-weight: 800; color: var(--dark-slate); margin-bottom: 8px; }
+        .section-desc { font-size: 1.1rem; color: var(--text-secondary); max-width: 800px; }
+        .subsection { margin-bottom: 48px; }
+        .subsection h3 { font-size: 1.5rem; font-weight: 700; color: var(--dark-slate); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .subsection h3::before { content: ''; display: inline-block; width: 6px; height: 28px; background: var(--java-orange); border-radius: 3px; }
+        .subsection h4 { font-size: 1.15rem; font-weight: 700; color: var(--java-blue-dark); margin: 28px 0 14px; }
+        .subsection p { margin-bottom: 16px; text-align: justify; color: var(--text-primary); }
+        .subsection ul, .subsection ol { margin: 16px 0; padding-right: 24px; }
+        .subsection li { margin-bottom: 10px; color: var(--text-primary); }
+        .subsection li strong { color: var(--dark-slate); }
+        .callout { border-radius: var(--radius-md); padding: 24px 28px; margin: 28px 0; position: relative; border-right: 5px solid transparent; }
+        .callout-title { font-weight: 700; font-size: 1.05rem; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .callout-info { background: linear-gradient(to left, rgba(52,152,219,0.08), rgba(52,152,219,0.02)); border-right-color: var(--info); }
+        .callout-warning { background: linear-gradient(to left, rgba(230,126,34,0.08), rgba(230,126,34,0.02)); border-right-color: var(--warning); }
+        .callout-danger { background: linear-gradient(to left, rgba(231,76,60,0.08), rgba(231,76,60,0.02)); border-right-color: var(--danger); }
+        .callout-success { background: linear-gradient(to left, rgba(39,174,96,0.08), rgba(39,174,96,0.02)); border-right-color: var(--success); }
+        .callout-tip { background: linear-gradient(to left, rgba(0,115,150,0.08), rgba(0,115,150,0.02)); border-right-color: var(--java-blue); }
+        .code-block-wrapper { position: relative; margin: 24px 0; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-md); }
+        .code-header { background: var(--dark-slate); color: var(--text-light); padding: 10px 20px; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--code-bg-light); }
+        .code-header-lang { display: flex; align-items: center; gap: 8px; }
+        .code-header-lang::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--java-orange); }
+        .code-copy-btn { background: transparent; border: 1px solid var(--text-light); color: var(--text-light); padding: 4px 12px; border-radius: var(--radius-sm); font-size: 12px; font-family: inherit; cursor: pointer; transition: all 0.2s; }
+        .code-copy-btn:hover { background: var(--java-orange); border-color: var(--java-orange); color: white; }
+        pre { background: var(--code-bg); padding: 24px; overflow-x: auto; direction: ltr; text-align: left; margin: 0; font-family: 'Fira Code', 'Consolas', 'Monaco', monospace; font-size: 14.5px; line-height: 1.7; }
+        code { font-family: 'Fira Code', 'Consolas', 'Monaco', monospace; font-size: 0.92em; }
+        pre code { font-size: 14.5px; background: transparent; padding: 0; color: #F8F8F2; }
+        p code, li code, td code { background: rgba(0,115,150,0.1); color: var(--java-blue-dark); padding: 2px 8px; border-radius: 4px; font-size: 0.88em; direction: ltr; display: inline-block; }
+        .token-keyword { color: #FF79C6; }
+        .token-type { color: #8BE9FD; }
+        .token-string { color: #F1FA8C; }
+        .token-comment { color: #6272A4; font-style: italic; }
+        .token-number { color: #BD93F9; }
+        .token-function { color: #50FA7B; }
+        .token-class { color: #FFB86C; }
+        .token-operator { color: #FF79C6; }
+        .token-annotation { color: #F1FA8C; }
+        .table-wrapper { overflow-x: auto; margin: 28px 0; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 15px; }
+        thead { background: linear-gradient(135deg, var(--dark-slate), var(--dark-slate-light)); color: white; }
+        th { padding: 16px 20px; text-align: right; font-weight: 700; font-size: 14px; letter-spacing: 0.3px; }
+        td { padding: 14px 20px; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+        tr:nth-child(even) { background: rgba(0,115,150,0.02); }
+        tr:hover { background: rgba(0,115,150,0.04); }
+        tbody tr:last-child td { border-bottom: none; }
+        .compare-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin: 28px 0; }
+        .compare-card { background: white; border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); transition: all 0.3s ease; }
+        .compare-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .compare-card h4 { font-size: 1.1rem; color: var(--java-blue); margin-bottom: 16px; margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        .compare-card h4 .icon { width: 32px; height: 32px; background: rgba(0,115,150,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .compare-card ul { padding-right: 0; list-style: none; }
+        .compare-card li { padding: 6px 0; border-bottom: 1px solid var(--off-white-dark); font-size: 15px; }
+        .compare-card li:last-child { border-bottom: none; }
+        .compare-card li::before { content: '•'; color: var(--java-orange); margin-left: 10px; font-weight: bold; }
+        .diagram-box { background: white; border-radius: var(--radius-lg); padding: 32px; margin: 28px 0; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+        .diagram-title { font-weight: 700; font-size: 1.1rem; color: var(--dark-slate); margin-bottom: 20px; text-align: center; }
+        .diagram-flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 20px 0; }
+        .flow-node { background: linear-gradient(135deg, var(--java-blue), var(--java-blue-dark)); color: white; padding: 14px 22px; border-radius: var(--radius-sm); font-weight: 600; font-size: 14px; box-shadow: var(--shadow-sm); min-width: 140px; text-align: center; }
+        .flow-node.orange { background: linear-gradient(135deg, var(--java-orange), #e07b10); }
+        .flow-node.slate { background: linear-gradient(135deg, var(--dark-slate-light), var(--dark-slate)); }
+        .flow-arrow { color: var(--java-orange); font-size: 24px; font-weight: bold; }
+        .summary-card {
+            background: linear-gradient(135deg, var(--dark-slate) 0%, var(--java-blue-dark) 100%);
+            color: white; border-radius: var(--radius-xl); padding: 60px 48px;
+            margin-top: 60px; position: relative; overflow: hidden; box-shadow: var(--shadow-xl);
+        }
+        .summary-card::before { content: ''; position: absolute; top: -100px; left: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(248,152,32,0.15) 0%, transparent 70%); border-radius: 50%; }
+        .summary-card h2 { color: white; font-size: 2rem; margin-bottom: 24px; position: relative; }
+        .summary-card p { font-size: 1.1rem; opacity: 0.9; max-width: 800px; position: relative; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 36px; position: relative; }
+        .summary-item { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius-md); padding: 20px; text-align: center; transition: all 0.3s; }
+        .summary-item:hover { background: rgba(255,255,255,0.12); transform: translateY(-3px); }
+        .summary-item-icon { font-size: 2rem; margin-bottom: 10px; }
+        .summary-item-title { font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
+        .summary-item-desc { font-size: 13px; opacity: 0.75; }
+        .footer { text-align: center; padding: 40px 20px; color: var(--text-light); font-size: 14px; border-top: 1px solid var(--border-color); margin-top: 40px; }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .section h2 { font-size: 1.6rem; }
+            .main-container { padding: 40px 16px; }
+            .summary-card { padding: 40px 24px; }
+            .nav-links { gap: 4px; }
+            .nav-links a { padding: 6px 10px; font-size: 12px; }
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--off-white); }
+        ::-webkit-scrollbar-thumb { background: var(--java-blue); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--java-blue-dark); }
+        .complexity { font-family: 'Fira Code', monospace; background: rgba(0,115,150,0.08); padding: 2px 8px; border-radius: 4px; color: var(--java-blue-dark); font-size: 0.95em; }
+        .tag { display: inline-block; background: rgba(0,115,150,0.1); color: var(--java-blue); padding: 4px 12px; border-radius: 50px; font-size: 13px; font-weight: 600; margin: 4px; }
+        .tag-orange { background: rgba(248,152,32,0.12); color: #c26e0a; }
+        .tag-green { background: rgba(39,174,96,0.12); color: #1e8449; }
+    </style>
+</head>
+<body>
+
+<header class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">الدليل الشامل والنهائي</div>
+        <h1>كل ما يجب أن يعرفه المطور المحترف عن <span>Java</span></h1>
+        <p class="hero-subtitle">من الأساسيات إلى العمق التقني الكامل في JVM، المجموعات، التزامن، والميزات الحديثة حتى Java 21</p>
+        <div class="hero-meta">
+            <div class="hero-meta-item">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                7 أقسام تعليمية
+            </div>
+            <div class="hero-meta-item">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                أكثر من 50 مثال برمجي
+            </div>
+            <div class="hero-meta-item">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                يغطي Java 8 حتى Java 21
+            </div>
+        </div>
+    </div>
+</header>
+
+<nav class="nav-bar">
+    <div class="nav-container">
+        <div class="nav-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            Java Guide
+        </div>
+        <ul class="nav-links">
+            <li><a href="#sec1">الأساسيات</a></li>
+            <li><a href="#sec2">Generics</a></li>
+            <li><a href="#sec3">الاستثناءات</a></li>
+            <li><a href="#sec4">المجموعات</a></li>
+            <li><a href="#sec5">التزامن</a></li>
+            <li><a href="#sec6">Java الحديثة</a></li>
+            <li><a href="#sec7">JVM</a></li>
+        </ul>
+    </div>
+</nav>
+
+<main class="main-container">
+
+<!-- ==================== SECTION 1 ==================== -->
+<section class="section" id="sec1">
+    <div class="section-header">
+        <div class="section-number">01</div>
+        <h2>أساسيات Java وإدارة الذاكرة</h2>
+        <p class="section-desc">Java Foundations & Memory Model — الفهم العميق لكيفية عمل الذاكرة وإدارة البيانات الأساسية</p>
+    </div>
+
+    <div class="subsection">
+        <h3>Primitives vs Object Wrappers</h3>
+        <p>في Java، تُخزن الأنواع الأولية (<span class="complexity">Primitives</span>) مباشرة في Stack Memory، بينما تُخزن الكائنات (<span class="complexity">Objects</span>) في Heap Memory مع إشارة مرجعية (<span class="complexity">Reference</span>) في Stack. هذا الفرق الجوهري يؤثر بشكل كبير على الأداء واستهلاك الذاكرة.</p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>النوع الأولي (Primitive)</th><th>الـ Wrapper Class</th><th>الحجم في الذاكرة</th><th>النطاق</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>byte</code></td><td><code>Byte</code></td><td>1 byte</td><td>-128 to 127</td></tr>
+                    <tr><td><code>short</code></td><td><code>Short</code></td><td>2 bytes</td><td>-32,768 to 32,767</td></tr>
+                    <tr><td><code>int</code></td><td><code>Integer</code></td><td>4 bytes</td><td>~2.1 billion</td></tr>
+                    <tr><td><code>long</code></td><td><code>Long</code></td><td>8 bytes</td><td>~9.2 quintillion</td></tr>
+                    <tr><td><code>float</code></td><td><code>Float</code></td><td>4 bytes</td><td>IEEE 754 single-precision</td></tr>
+                    <tr><td><code>double</code></td><td><code>Double</code></td><td>8 bytes</td><td>IEEE 754 double-precision</td></tr>
+                    <tr><td><code>char</code></td><td><code>Character</code></td><td>2 bytes</td><td>Unicode UTF-16</td></tr>
+                    <tr><td><code>boolean</code></td><td><code>Boolean</code></td><td>~1 byte (JVM-dependent)</td><td><code>true</code> or <code>false</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4>Autoboxing & Unboxing — التحويل التلقائي وأثره على الأداء</h4>
+        <p>يُتيح Java التحويل التلقائي بين <span class="complexity">Primitives</span> و <span class="complexity">Wrappers</span>، لكن هذا يأتي بتكلفة أداء خفية. في الحلقات التكرارية الحساسة للأداء، يُفضل دائماً استخدام الأنواع الأولية لتجنب إنشاء ملايين الكائنات غير الضرورية.</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-comment">// ❌ أداء ضعيف — يُنشئ Integer objects في كل تكرار</span>
+<span class="token-keyword">public</span> <span class="token-type">long</span> <span class="token-function">sumSlow</span>() {
+    <span class="token-type">Long</span> sum = <span class="token-number">0L</span>;  <span class="token-comment">// Wrapper — يُنشئ كائنات</span>
+    <span class="token-keyword">for</span> (<span class="token-type">Long</span> i = <span class="token-number">0L</span>; i &lt; <span class="token-number">1_000_000</span>; i++) {
+        sum += i;  <span class="token-comment">// Unboxing + Autoboxing في كل خطوة</span>
+    }
+    <span class="token-keyword">return</span> sum;
+}
+
+<span class="token-comment">// ✅ أداء ممتاز — يستخدم Stack Memory مباشرة</span>
+<span class="token-keyword">public</span> <span class="token-type">long</span> <span class="token-function">sumFast</span>() {
+    <span class="token-type">long</span> sum = <span class="token-number">0L</span>;  <span class="token-comment">// Primitive — في Stack</span>
+    <span class="token-keyword">for</span> (<span class="token-type">long</span> i = <span class="token-number">0</span>; i &lt; <span class="token-number">1_000_000</span>; i++) {
+        sum += i;  <span class="token-comment">// عملية حسابية مباشرة</span>
+    }
+    <span class="token-keyword">return</span> sum;
+}</code></pre>
+        </div>
+
+        <div class="callout callout-warning">
+            <div class="callout-title">⚠️ تحذير أداء حرج</div>
+            <p>في التطبيقات عالية التردد (High-Frequency) أو المعالجة المكثفة للبيانات، يمكن أن يُسبب <span class="complexity">Autoboxing</span> تراجعاً في الأداء يصل إلى <strong>10x</strong> بسبب ضغط Garbage Collector على Heap Memory. استخدم دائماً <code>int</code> بدلاً من <code>Integer</code> في المتغيرات المحلية.</p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>Pass-by-Value في Java</h3>
+        <p>Java تستخدم دائماً نموذج <span class="complexity">Pass-by-Value</span> — أي أنه يتم نسخ القيمة وإرسالها للدالة. الفهم الخاطئ الشائع هو الاعتقاد بأن الكائنات تُمرر بالإشارة (<span class="complexity">Pass-by-Reference</span>). في الواقع، يتم نسخ قيمة الإشارة المرجعية (Reference Copy) وليس الكائن نفسه.</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-keyword">public class</span> <span class="token-class">PassByValueDemo</span> {
+    <span class="token-keyword">public static void</span> <span class="token-function">main</span>(<span class="token-type">String</span>[] args) {
+        <span class="token-type">int</span> x = <span class="token-number">10</span>;
+        <span class="token-function">modifyPrimitive</span>(x);
+        <span class="token-type">System</span>.out.println(x);  <span class="token-comment">// 10 — لم يتغير!</span>
+
+        <span class="token-type">StringBuilder</span> sb = <span class="token-keyword">new</span> <span class="token-type">StringBuilder</span>(<span class="token-string">"Hello"</span>);
+        <span class="token-function">modifyReference</span>(sb);
+        <span class="token-type">System</span>.out.println(sb);  <span class="token-comment">// Hello World — تغيّر!</span>
+
+        <span class="token-function">reassignReference</span>(sb);
+        <span class="token-type">System</span>.out.println(sb);  <span class="token-comment">// Hello World — لم يتغير!</span>
+    }
+
+    <span class="token-keyword">static void</span> <span class="token-function">modifyPrimitive</span>(<span class="token-type">int</span> value) {
+        value = <span class="token-number">100</span>;  <span class="token-comment">// نسخة محلية فقط</span>
+    }
+
+    <span class="token-keyword">static void</span> <span class="token-function">modifyReference</span>(<span class="token-type">StringBuilder</span> ref) {
+        ref.append(<span class="token-string">" World"</span>);  <span class="token-comment">// يُعدّل الكائن عبر الإشارة</span>
+    }
+
+    <span class="token-keyword">static void</span> <span class="token-function">reassignReference</span>(<span class="token-type">StringBuilder</span> ref) {
+        ref = <span class="token-keyword">new</span> <span class="token-type">StringBuilder</span>(<span class="token-string">"New"</span>);  <span class="token-comment">// يُغيّر الإشارة المحلية فقط</span>
+    }
+}</code></pre>
+        </div>
+
+        <div class="callout callout-info">
+            <div class="callout-title">💡 الفهم الصحيح</div>
+            <p>عند تمرير كائن ما، يتم نسخ قيمة الإشارة المرجعية (مثل نسخ عنوان المنزل). يمكنك تعديل محتوى المنزل عبر العنوان، لكن لا يمكنك استبدال العنوان نفسه داخل الدالة. هذا هو جوهر <span class="complexity">Pass-by-Value</span> في Java.</p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>Heap vs Stack Memory</h3>
+        <p>تستخدم JVM منطقتين رئيسيتين للذاكرة: <span class="complexity">Stack</span> و <span class="complexity">Heap</span>. كل منهما له دور محدد وآلية تخصيص مختلفة.</p>
+
+        <div class="compare-grid">
+            <div class="compare-card">
+                <h4><span class="icon">📚</span> Stack Memory</h4>
+                <ul>
+                    <li>يخزن المتغيرات المحلية والمعاملات</li>
+                    <li>يحتوي على إطارات الدوال (<span class="complexity">Stack Frames</span>)</li>
+                    <li>تخصيص سريع باستخدام <span class="complexity">LIFO</span></li>
+                    <li>يتم التخلص منه تلقائياً عند انتهاء الدالة</li>
+                    <li>حجمه محدود (<span class="complexity">-Xss</span>)</li>
+                    <li>لا يحتاج لـ <span class="complexity">Garbage Collection</span></li>
+                </ul>
+            </div>
+            <div class="compare-card">
+                <h4><span class="icon">🏭</span> Heap Memory</h4>
+                <ul>
+                    <li>يخزن جميع الكائنات والمصفوفات</li>
+                    <li>مشترك بين جميع Threads</li>
+                    <li>تخصيص ديناميكي عبر <code>new</code></li>
+                    <li>يتم إدارته بواسطة <span class="complexity">Garbage Collector</span></li>
+                    <li>أكبر بكثير من Stack</li>
+                    <li>مقسم لـ <span class="complexity">Young</span> و <span class="complexity">Old</span> Generation</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="diagram-box">
+            <div class="diagram-title">🔧 تدفق تخصيص الذاكرة عند إنشاء كائن جديد</div>
+            <div class="diagram-flow">
+                <div class="flow-node">new Object()</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-node orange">Heap Allocation</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-node slate">Reference في Stack</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-node">Object доступ</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>String Pool & Immutability</h3>
+        <p>السلاسل النصية (<span class="complexity">String</span>) في Java غير قابلة للتعديل (<span class="complexity">Immutable</span>) بشكل جوهري. هذا التصميم يضمن الأمان في التزامن (Thread-Safety) ويُتيح إعادة استخدام النصوص عبر <span class="complexity">String Pool</span>.</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-type">String</span> s1 = <span class="token-string">"Java"</span>;           <span class="token-comment">// في String Pool</span>
+<span class="token-type">String</span> s2 = <span class="token-string">"Java"</span>;           <span class="token-comment">// يشير لنفس الكائن في Pool</span>
+<span class="token-type">String</span> s3 = <span class="token-keyword">new</span> <span class="token-type">String</span>(<span class="token-string">"Java"</span>);  <span class="token-comment">// كائن جديد في Heap</span>
+<span class="token-type">String</span> s4 = s3.<span class="token-function">intern</span>();     <span class="token-comment">// يُضيف/يُرجع من String Pool</span>
+
+<span class="token-type">System</span>.out.println(s1 == s2);  <span class="token-comment">// true — نفس الإشارة</span>
+<span class="token-type">System</span>.out.println(s1 == s3);  <span class="token-comment">// false — كائن مختلف</span>
+<span class="token-type">System</span>.out.println(s1 == s4);  <span class="token-comment">// true — بعد intern()</span></code></pre>
+        </div>
+
+        <h4>StringBuilder vs StringBuffer</h4>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>المعيار</th><th>StringBuilder</th><th>StringBuffer</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Thread-Safety</td><td>غير آمن (<span class="complexity">Not Synchronized</span>)</td><td>آمن (<span class="complexity">Synchronized</span>)</td></tr>
+                    <tr><td>الأداء</td><td>أسرع (بدون Locking)</td><td>أبطأ (بسبب Synchronization)</td></tr>
+                    <tr><td>الاستخدام</td><td>متغيرات محلية في Thread واحد</td><td>متغيرات مشتركة بين Threads</td></tr>
+                    <tr><td>Java Version</td><td>Java 5+</td><td>Java 1.0+</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout callout-tip">
+            <div class="callout-title">✅ أفضل الممارسات</div>
+            <p>في Java 8+، عند الحاجة لسلسلة نصية قابلة للتعديل في Thread واحد، استخدم <code>StringBuilder</code> دائماً. استخدم <code>StringBuffer</code> فقط عند الضرورة القصوى للمشاركة بين Threads — ويفضل استخدام <code>StringBuilder</code> مع <code>ReentrantLock</code> أو <code>synchronized</code> blocks يدوياً للتحكم الأفضل.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SECTION 2 ==================== -->
+<section class="section" id="sec2">
+    <div class="section-header">
+        <div class="section-number">02</div>
+        <h2>نظام الأنواع والأنواع المجهولة</h2>
+        <p class="section-desc">Generics & Type System — الأمان النوعي في وقت الترجمة والتعامل مع الأنواع المجهولة</p>
+    </div>
+
+    <div class="subsection">
+        <h3>Generics Core Concept</h3>
+        <p>تُتيح <span class="complexity">Generics</span> كتابة كود قابل لإعادة الاستخدام مع الحفاظ على الأمان النوعي (<span class="complexity">Type Safety</span>) في وقت الترجمة (<span class="complexity">Compile-Time</span>). بدلاً من استخدام <code>Object</code> وإجراء Casting يدوي، تضمن Generics أن الأنواع متوافقة قبل تشغيل البرنامج.</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-comment">// ❌ قبل Generics — كود غير آمن ويحتاج Casting</span>
+<span class="token-type">List</span> rawList = <span class="token-keyword">new</span> <span class="token-type">ArrayList</span>();
+rawList.<span class="token-function">add</span>(<span class="token-string">"text"</span>);
+rawList.<span class="token-function">add</span>(<span class="token-number">42</span>);  <span class="token-comment">// مسموح — لكنه خطأ منطقي</span>
+<span class="token-type">String</span> s = (<span class="token-type">String</span>) rawList.<span class="token-function">get</span>(<span class="token-number">1</span>);  <span class="token-comment">// ClassCastException!</span>
+
+<span class="token-comment">// ✅ مع Generics — أمان نوعي في Compile-Time</span>
+<span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt; typedList = <span class="token-keyword">new</span> <span class="token-type">ArrayList</span>&lt;&gt;();
+typedList.<span class="token-function">add</span>(<span class="token-string">"text"</span>);
+<span class="token-comment">// typedList.add(42);  // ❌ خطأ في الترجمة — Type Mismatch</span>
+<span class="token-type">String</span> safe = typedList.<span class="token-function">get</span>(<span class="token-number">0</span>);  <span class="token-comment">// لا يحتاج Casting</span></code></pre>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>Type Erasure</h3>
+        <p>تستخدم Java تقنية <span class="complexity">Type Erasure</span> للتعامل مع <span class="complexity">Generics</span>. في وقت الترجمة، يتم "مسح" معلومات الأنواع العامة واستبدالها بأقرب حد (<span class="complexity">Bound</span>) أو <code>Object</code>. هذا يضمن التوافق مع الإصدارات القديمة (<span class="complexity">Backward Compatibility</span>) لكنه يفرض قيوداً على الوصول للأنواع في Runtime.</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-comment">// الكود المصدري (Source Code)</span>
+<span class="token-keyword">public class</span> <span class="token-class">Box</span>&lt;<span class="token-type">T</span>&gt; {
+    <span class="token-keyword">private</span> <span class="token-type">T</span> value;
+    <span class="token-keyword">public void</span> <span class="token-function">set</span>(<span class="token-type">T</span> value) { <span class="token-keyword">this</span>.value = value; }
+    <span class="token-keyword">public</span> <span class="token-type">T</span> <span class="token-function">get</span>() { <span class="token-keyword">return</span> value; }
+}
+
+<span class="token-comment">// ما يُترجم إليه بعد Type Erasure (Bytecode)</span>
+<span class="token-keyword">public class</span> <span class="token-class">Box</span> {
+    <span class="token-keyword">private</span> <span class="token-type">Object</span> value;
+    <span class="token-keyword">public void</span> <span class="token-function">set</span>(<span class="token-type">Object</span> value) { <span class="token-keyword">this</span>.value = value; }
+    <span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">get</span>() { <span class="token-keyword">return</span> value; }
+}
+
+<span class="token-comment">// القيود الناتجة عن Type Erasure</span>
+<span class="token-keyword">public</span> <span class="token-type">void</span> <span class="token-function">method</span>(<span class="token-type">T</span> item) {
+    <span class="token-comment">// if (item instanceof T) {}  // ❌ خطأ — T غير معروف في Runtime</span>
+    <span class="token-comment">// T[] array = new T[10];    // ❌ خطأ — Cannot create generic array</span>
+    <span class="token-type">T</span>[] array = (<span class="token-type">T</span>[]) <span class="token-keyword">new</span> <span class="token-type">Object</span>[<span class="token-number">10</span>];  <span class="token-comment">// ⚠️ Unchecked cast</span>
+}</code></pre>
+        </div>
+
+        <div class="callout callout-danger">
+            <div class="callout-title">🚫 قيود Type Erasure</div>
+            <p>لا يمكن إنشاء مصفوفات Generics (<code>new T[10]</code>) لأن JVM لا تعرف نوع <code>T</code> في Runtime. كذلك لا يمكن استخدام <code>instanceof</code> مع أنواع عامة. الحل هو استخدام <code>Class&lt;T&gt;</code> كمعامل أو الاعتماد على <span class="complexity">Reified Types</span> في لغات أخرى.</p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>Wildcards — PECS Principle</h3>
+        <p>تُستخدم الرموز البديلة (<span class="complexity">Wildcards</span>) <code>? extends T</code> و <code>? super T</code> لزيادة مرونة Generics مع الحفاظ على الأمان النوعي. قاعدة <span class="complexity">PECS</span> (<strong>P</strong>roducer <strong>E</strong>xtends, <strong>C</strong>onsumer <strong>S</strong>uper) هي القاعدة الذهبية لاختيار النوع المناسب.</p>
+
+        <div class="diagram-box">
+            <div class="diagram-title">📐 علاقة الوراثة مع Wildcards</div>
+            <div class="diagram-flow">
+                <div class="flow-node">List&lt;?&gt;</div>
+                <span class="flow-arrow">←</span>
+                <div class="flow-node orange">List&lt;? extends Animal&gt;</div>
+                <span class="flow-arrow">←</span>
+                <div class="flow-node slate">List&lt;Dog&gt;</div>
+            </div>
+            <div class="diagram-flow" style="margin-top: 16px;">
+                <div class="flow-node">List&lt;Animal&gt;</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-node orange">List&lt;? super Dog&gt;</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-node slate">List&lt;Object&gt;</div>
+            </div>
+        </div>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-keyword">class</span> <span class="token-class">Animal</span> { <span class="token-keyword">void</span> <span class="token-function">eat</span>() {} }
+<span class="token-keyword">class</span> <span class="token-class">Dog</span> <span class="token-keyword">extends</span> <span class="token-type">Animal</span> { <span class="token-keyword">void</span> <span class="token-function">bark</span>() {} }
+
+<span class="token-comment">// ✅ Producer Extends — نقرأ من القائمة (ننتج قيماً)</span>
+<span class="token-keyword">public</span> <span class="token-type">void</span> <span class="token-function">feedAnimals</span>(<span class="token-type">List</span>&lt;<span class="token-keyword">? extends</span> <span class="token-type">Animal</span>&gt; animals) {
+    <span class="token-keyword">for</span> (<span class="token-type">Animal</span> a : animals) {
+        a.<span class="token-function">eat</span>();  <span class="token-comment">// ✅ نقرأ — نعرف أنها Animal على الأقل</span>
+    }
+    <span class="token-comment">// animals.add(new Dog());  // ❌ لا يمكن الإضافة — نوع غير معروف</span>
+}
+
+<span class="token-comment">// ✅ Consumer Super — نكتب في القائمة (نستهلك قيماً)</span>
+<span class="token-keyword">public</span> <span class="token-type">void</span> <span class="token-function">addDogs</span>(<span class="token-type">List</span>&lt;<span class="token-keyword">? super</span> <span class="token-type">Dog</span>&gt; dogs) {
+    dogs.<span class="token-function">add</span>(<span class="token-keyword">new</span> <span class="token-type">Dog</span>());  <span class="token-comment">// ✅ نضيف Dog — آمن لأن القائمة تستقبل Dog أو أب</span>
+    <span class="token-type">Object</span> o = dogs.<span class="token-function">get</span>(<span class="token-number">0</span>);  <span class="token-comment">// ✅ نقرأ كـ Object فقط</span>
+}
+
+<span class="token-comment">// 🔥 PECS في الممارسة: Collections.copy</span>
+<span class="token-keyword">public static</span> <span class="token-keyword">&lt;</span><span class="token-type">T</span><span class="token-keyword">&gt;</span> <span class="token-type">void</span> <span class="token-function">copy</span>(<span class="token-type">List</span>&lt;<span class="token-keyword">? super</span> <span class="token-type">T</span>&gt; dest, <span class="token-type">List</span>&lt;<span class="token-keyword">? extends</span> <span class="token-type">T</span>&gt; src) {
+    <span class="token-keyword">for</span> (<span class="token-type">int</span> i = <span class="token-number">0</span>; i &lt; src.<span class="token-function">size</span>(); i++) {
+        dest.<span class="token-function">set</span>(i, src.<span class="token-function">get</span>(i));
+    }
+}</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>الرمز البديل</th><th>الاسم</th><th>القراءة</th><th>الكتابة</th><th>حالة الاستخدام</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>? extends T</code></td><td>Upper Bounded</td><td>آمنة (كـ T)</td><td>ممنوعة</td><td>Producer — ننتج قيماً</td></tr>
+                    <tr><td><code>? super T</code></td><td>Lower Bounded</td><td>آمنة (كـ Object)</td><td>آمنة (T وأبنائه)</td><td>Consumer — نستهلك قيماً</td></tr>
+                    <tr><td><code>?</code></td><td>Unbounded</td><td>كـ Object</td><td>ممنوعة</td><td>قراءة فقط من أي نوع</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SECTION 3 ==================== -->
+<section class="section" id="sec3">
+    <div class="section-header">
+        <div class="section-number">03</div>
+        <h2>معالجة الاستثناءات</h2>
+        <p class="section-desc">Exception Handling Architecture — البنية الهرمية للأخطاء وأفضل الممارسات في إدارة الموارد</p>
+    </div>
+
+    <div class="subsection">
+        <h3>Throwable Hierarchy</h3>
+        <p>تُنظم Java الاستثناءات في هرمية واضحة تبدأ من <code>Throwable</code>. الفهم الدقيق لهذا التصنيف يُجنبك التعامل الخاطئ مع الأخطاء الحرجة (<span class="complexity">Error</span>) مقابل الاستثناءات القابلة للاسترداد (<span class="complexity">Exception</span>).</p>
+
+        <div class="diagram-box">
+            <div class="diagram-title">🌳 التسلسل الهرمي لـ Throwable</div>
+            <div class="diagram-flow" style="flex-direction: column; gap: 8px;">
+                <div class="flow-node" style="min-width: 200px;">java.lang.Throwable</div>
+                <span class="flow-arrow">↓</span>
+                <div style="display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <div class="flow-node orange" style="min-width: 180px;">Error</div>
+                        <span class="flow-arrow">↓</span>
+                        <div class="flow-node slate" style="min-width: 180px; font-size: 12px;">OutOfMemoryError<br>StackOverflowError<br>NoClassDefFoundError</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <div class="flow-node orange" style="min-width: 180px;">Exception</div>
+                        <span class="flow-arrow">↓</span>
+                        <div class="flow-node slate" style="min-width: 180px; font-size: 12px;">RuntimeException<br>(Unchecked)<br><br>IOException<br>SQLException<br>(Checked)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="compare-grid">
+            <div class="compare-card">
+                <h4><span class="icon">🔴</span> Checked Exceptions</h4>
+                <ul>
+                    <li>تُرث من <code>Exception</code> مباشرة</li>
+                    <li>يجب التعامل معها عبر <code>try-catch</code> أو <code>throws</code></li>
+                    <li>تُفرض في وقت الترجمة (<span class="complexity">Compile-Time</span>)</li>
+                    <li>مثال: <code>IOException</code>، <code>SQLException</code></li>
+                    <li>تُستخدم للأخطاء القابلة للاسترداد</li>
+                </ul>
+            </div>
+            <div class="compare-card">
+                <h4><span class="icon">🟡</span> Unchecked Exceptions</h4>
+                <ul>
+                    <li>تُرث من <code>RuntimeException</code></li>
+                    <li>لا يُشترط التعامل معها</li>
+                    <li>تظهر في وقت التشغيل (<span class="complexity">Runtime</span>)</li>
+                    <li>مثال: <code>NullPointerException</code>، <code>IllegalArgumentException</code></li>
+                    <li>تُشير لأخطاء برمجية (Bugs)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>Try-with-resources & AutoCloseable</h3>
+        <p>أُدخلت في Java 7، تُتيح هذه الميزة إدارة تلقائية للموارد (<span class="complexity">Automatic Resource Management</span>) تضمن إغلاق الموارد حتى في حالة حدوث استثناء. أي كائن يُنفذ واجهة <code>AutoCloseable</code> يمكن استخدامه في <code>try-with-resources</code>.</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-comment">// ❌ الطريقة القديمة — عرضة لتسرب الموارد</span>
+<span class="token-type">BufferedReader</span> br = <span class="token-keyword">null</span>;
+<span class="token-keyword">try</span> {
+    br = <span class="token-keyword">new</span> <span class="token-type">BufferedReader</span>(<span class="token-keyword">new</span> <span class="token-type">FileReader</span>(<span class="token-string">"file.txt"</span>));
+    <span class="token-keyword">return</span> br.<span class="token-function">readLine</span>();
+} <span class="token-keyword">catch</span> (<span class="token-type">IOException</span> e) {
+    <span class="token-keyword">throw</span> <span class="token-keyword">new</span> <span class="token-type">RuntimeException</span>(e);
+} <span class="token-keyword">finally</span> {
+    <span class="token-keyword">if</span> (br != <span class="token-keyword">null</span>) {
+        <span class="token-keyword">try</span> { br.<span class="token-function">close</span>(); } <span class="token-keyword">catch</span> (<span class="token-type">IOException</span> e) { <span class="token-comment">/* ignore */</span> }
+    }
+}
+
+<span class="token-comment">// ✅ Java 7+ — try-with-resources أنظف وأكثر أماناً</span>
+<span class="token-keyword">try</span> (<span class="token-type">BufferedReader</span> br = <span class="token-keyword">new</span> <span class="token-type">BufferedReader</span>(<span class="token-keyword">new</span> <span class="token-type">FileReader</span>(<span class="token-string">"file.txt"</span>))) {
+    <span class="token-keyword">return</span> br.<span class="token-function">readLine</span>();
+} <span class="token-keyword">catch</span> (<span class="token-type">IOException</span> e) {
+    <span class="token-keyword">throw</span> <span class="token-keyword">new</span> <span class="token-type">RuntimeException</span>(e);
+}
+
+<span class="token-comment">// ✅ موارد متعددة — تُغلق بترتيب عكسي</span>
+<span class="token-keyword">try</span> (<span class="token-type">Connection</span> conn = dataSource.<span class="token-function">getConnection</span>();
+     <span class="token-type">PreparedStatement</span> ps = conn.<span class="token-function">prepareStatement</span>(sql);
+     <span class="token-type">ResultSet</span> rs = ps.<span class="token-function">executeQuery</span>()) {
+    <span class="token-keyword">while</span> (rs.<span class="token-function">next</span>()) { <span class="token-comment">/* ... */</span> }
+}</code></pre>
+        </div>
+
+        <div class="callout callout-success">
+            <div class="callout-title">✅ ميزات try-with-resources</div>
+            <p>تُغلق الموارد تلقائياً حتى لو حدث Exception. في حالة وجود Exception أثناء الإغلاق، يُضاف كـ <span class="complexity">Suppressed Exception</span> ولا يُفقد الـ Original Exception. يمكن الوصول للـ Suppressed عبر <code>e.getSuppressed()</code>.</p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>Best Practices — الاستثناءات المخصصة والمكافحة</h3>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-comment">// ✅ استثناء مخصص مع سياق واضح</span>
+<span class="token-keyword">public class</span> <span class="token-class">PaymentProcessingException</span> <span class="token-keyword">extends</span> <span class="token-type">RuntimeException</span> {
+    <span class="token-keyword">private final</span> <span class="token-type">String</span> transactionId;
+    <span class="token-keyword">private final</span> <span class="token-type">ErrorCode</span> errorCode;
+
+    <span class="token-keyword">public</span> <span class="token-function">PaymentProcessingException</span>(<span class="token-type">String</span> msg, <span class="token-type">String</span> txId, <span class="token-type">ErrorCode</span> code) {
+        <span class="token-keyword">super</span>(msg);
+        <span class="token-keyword">this</span>.transactionId = txId;
+        <span class="token-keyword">this</span>.errorCode = code;
+    }
+}
+
+<span class="token-comment">// ✅ Exception Translation — تحويل الاستثناءات منخفضة المستوى</span>
+<span class="token-keyword">public</span> <span class="token-type">User</span> <span class="token-function">findUser</span>(<span class="token-type">String</span> id) {
+    <span class="token-keyword">try</span> {
+        <span class="token-keyword">return</span> database.<span class="token-function">query</span>(id);
+    } <span class="token-keyword">catch</span> (<span class="token-type">SQLException</span> e) {
+        <span class="token-keyword">throw</span> <span class="token-keyword">new</span> <span class="token-type">DataAccessException</span>(<span class="token-string">"Failed to load user: "</span> + id, e);
+    }
+}
+
+<span class="token-comment">// ❌ Anti-Patterns يجب تجنبها</span>
+<span class="token-keyword">catch</span> (<span class="token-type">Exception</span> e) { <span class="token-function">e.printStackTrace</span>(); }  <span class="token-comment">// ابتلاع الاستثناء!</span>
+<span class="token-keyword">catch</span> (<span class="token-type">Exception</span> e) { <span class="token-keyword">return</span> <span class="token-keyword">null</span>; }     <span class="token-comment">// إخفاء الخطأ!</span>
+<span class="token-keyword">catch</span> (<span class="token-type">Throwable</span> t) { <span class="token-comment">/* ... */</span> }      <span class="token-comment">// الإمساك بـ Error خطير!</span></code></pre>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>الممارسة</th><th>✅ صحيح</th><th>❌ خاطئ</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>التقاط الاستثناءات</td><td>التقاط أنواع محددة</td><td><code>catch (Exception e)</code> عام</td></tr>
+                    <tr><td>الرسائل</td><td>رسائل واضحة مع السياق</td><td>رسائل عامة أو فارغة</td></tr>
+                    <tr><td>السلسلة</td><td>تضمين السبب (<code>cause</code>)</td><td>فقدان Stack Trace الأصلي</td></tr>
+                    <tr><td>الموارد</td><td>استخدام <code>try-with-resources</code></td><td>إغلاق يدوي في <code>finally</code></td></tr>
+                    <tr><td>الاستثناءات المخصصة</td><td>توريث من <code>RuntimeException</code> للأخطاء البرمجية</td><td>توريث من <code>Throwable</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SECTION 4 ==================== -->
+<section class="section" id="sec4">
+    <div class="section-header">
+        <div class="section-number">04</div>
+        <h2>المجموعات والتفاصيل الداخلية</h2>
+        <p class="section-desc">Java Collections Framework & Internals — فهم عميق لكيفية عمل المجموعات تحت الغطاء</p>
+    </div>
+
+    <div class="subsection">
+        <h3>Collections Overview</h3>
+        <p>يوفر Java Collections Framework بنية موحدة للتعامل مع مجموعات البيانات. تُنظم الواجهات الرئيسية (<span class="complexity">List</span>، <span class="complexity">Set</span>، <span class="complexity">Queue</span>، <span class="complexity">Map</span>) العلاقات بين الأنواع المختلفة وتضمن قابلية التبديل (<span class="complexity">Interchangeability</span>).</p>
+
+        <div class="diagram-box">
+            <div class="diagram-title">🗂️ هرمية Java Collections Framework</div>
+            <div class="diagram-flow" style="flex-direction: column; gap: 12px;">
+                <div class="flow-node" style="min-width: 300px;">java.util.Collection</div>
+                <span class="flow-arrow">↓</span>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                    <div class="flow-node orange" style="min-width: 140px;">List&lt;E&gt;</div>
+                    <div class="flow-node orange" style="min-width: 140px;">Set&lt;E&gt;</div>
+                    <div class="flow-node orange" style="min-width: 140px;">Queue&lt;E&gt;</div>
+                </div>
+                <div style="margin-top: 12px; text-align: center; color: var(--text-secondary); font-size: 14px;">Map&lt;K,V&gt; واجهة منفصلة — لا تُرث من Collection</div>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>الواجهة</th><th>السمات</th><th>التنفيذات الشائعة</th><th>حالة الاستخدام</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>List&lt;E&gt;</code></td><td>ترتيب محفوظ، تكرار مسموح، وصول عبر Index</td><td><code>ArrayList</code>، <code>LinkedList</code></td><td>قائمة ديناميكية</td></tr>
+                    <tr><td><code>Set&lt;E&gt;</code></td><td>فريد، بدون تكرار</td><td><code>HashSet</code>، <code>TreeSet</code>، <code>LinkedHashSet</code></td><td>مجموعة فريدة</td></tr>
+                    <tr><td><code>Queue&lt;E&gt;</code></td><td>FIFO أو Priority</td><td><code>LinkedList</code>، <code>PriorityQueue</code>، <code>ArrayDeque</code></td><td>طابور المهام</td></tr>
+                    <tr><td><code>Map&lt;K,V&gt;</code></td><td>زوج مفتاح-قيمة، مفتاح فريد</td><td><code>HashMap</code>، <code>TreeMap</code>، <code>LinkedHashMap</code></td><td>قاموس/بحث</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>HashMap Deep Dive</h3>
+        <p>يُعد <code>HashMap</code> من أكثر هياكل البيانات استخداماً في Java. يعتمد على جدول التجزئة (<span class="complexity">Hash Table</span>) مع تسلسلات مترابطة (<span class="complexity">Linked Lists</span>) لحل التصادمات (<span class="complexity">Hash Collisions</span>). بدءاً من Java 8، يتحول التسلسل إلى شجرة حمراء-سوداء (<span class="complexity">Red-Black Tree</span>) عند تجاوز عتبة معينة.</p>
+
+        <div class="diagram-box">
+            <div class="diagram-title">⚙️ بنية HashMap الداخلية (Java 8+)</div>
+            <div style="background: var(--code-bg); border-radius: var(--radius-md); padding: 24px; color: #F8F8F2; font-family: 'Fira Code', monospace; font-size: 13px; line-height: 1.8; direction: ltr; text-align: left; margin-top: 16px;">
+Index 0:  [K0,V0] → [K1,V1] → [K2,V2]  (Linked List)<br>
+Index 1:  null<br>
+Index 2:  [K3,V3] → [K4,V4]            (Linked List → Treeify if > 8)<br>
+Index 3:  null<br>
+...<br>
+Index N:  [Kn,Vn]                       (Red-Black Tree after Treeify)
+            </div>
+            <p style="text-align: center; margin-top: 16px; color: var(--text-secondary); font-size: 14px;">
+                <span class="tag">DEFAULT_INITIAL_CAPACITY = 16</span>
+                <span class="tag tag-orange">DEFAULT_LOAD_FACTOR = 0.75</span>
+                <span class="tag tag-green">TREEIFY_THRESHOLD = 8</span>
+                <span class="tag">UNTREEIFY_THRESHOLD = 6</span>
+            </p>
+        </div>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-comment">// HashMap Internal — فهم آلية Hashing</span>
+<span class="token-keyword">static final int</span> <span class="token-function">hash</span>(<span class="token-type">Object</span> key) {
+    <span class="token-type">int</span> h;
+    <span class="token-keyword">return</span> (key == <span class="token-keyword">null</span>) ? <span class="token-number">0</span> : (h = key.<span class="token-function">hashCode</span>()) ^ (h >>> <span class="token-number">16</span>);
+    <span class="token-comment">// XOR مع النصف العلوي — يُقلل التصادمات في Buckets الصغيرة</span>
+}
+
+<span class="token-comment">// Index = (n - 1) & hash  — بدلاً من % n (أسرع)</span>
+<span class="token-comment">// n يجب أن يكون قوة لـ 2 (power of 2)</span>
+
+<span class="token-comment">// ✅ أفضل الممارسات</span>
+<span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">User</span>&gt; map = <span class="token-keyword">new</span> <span class="token-type">HashMap</span>&lt;&gt;(<span class="token-number">1000</span>);  <span class="token-comment">// حجم أولي معروف</span>
+map.<span class="token-function">put</span>(<span class="token-string">"key"</span>, user);  <span class="token-comment">// O(1) average — O(log n) في حالة Treeify</span>
+
+<span class="token-comment">// ❌ مفتاح قابل للتغيّر = كارثة!</span>
+<span class="token-keyword">class</span> <span class="token-class">BadKey</span> {
+    <span class="token-type">int</span> value;  <span class="token-comment">// mutable!</span>
+    <span class="token-keyword">public int</span> <span class="token-function">hashCode</span>() { <span class="token-keyword">return</span> value; }
+}
+<span class="token-comment">// إذا تغيّرت قيمة value بعد الإدخال — يُفقد المفتاح!</span></code></pre>
+        </div>
+
+        <div class="callout callout-info">
+            <div class="callout-title">🔑 قواعد مفتاح HashMap</div>
+            <p>يجب أن يكون <code>hashCode()</code> متسقاً مع <code>equals()</code>: إذا كان <code>a.equals(b)</code> فإن <code>a.hashCode() == b.hashCode()</code>. كذلك يجب أن يكون المفتاح غير قابل للتغيّر (<span class="complexity">Immutable</span>) — لذا يُفضل استخدام <code>String</code>، <code>Integer</code>، أو <code>record</code> كمفتاح.</p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>ArrayList vs LinkedList</h3>
+        <p>يُمثلان تنفيذين مختلفين لواجهة <code>List</code>، كل منهما مُحسّن لحالات استخدام مختلفة. الفهم العميق لآلية عملهما يساعد في اختيار الهيكل المناسب.</p>
+
+        <div class="compare-grid">
+            <div class="compare-card">
+                <h4><span class="icon">📊</span> ArrayList</h4>
+                <ul>
+                    <li>مصفوفة ديناميكية (<span class="complexity">Dynamic Array</span>)</li>
+                    <li>الوصول العشوائي: <span class="complexity">O(1)</span></li>
+                    <li>الإضافة في النهاية: <span class="complexity">O(1)</span> amortized</li>
+                    <li>الإدراج/الحذف في الوسط: <span class="complexity">O(n)</span></li>
+                    <li>ذاكرة: Capacity × Reference Size</li>
+                    <li>Cache-friendly (تخزين متجاور)</li>
+                </ul>
+            </div>
+            <div class="compare-card">
+                <h4><span class="icon">🔗</span> LinkedList</h4>
+                <ul>
+                    <li>قائمة مترابطة مزدوجة (<span class="complexity">Doubly Linked List</span>)</li>
+                    <li>الوصول العشوائي: <span class="complexity">O(n)</span></li>
+                    <li>الإضافة في النهاية: <span class="complexity">O(1)</span></li>
+                    <li>الإدراج/الحذف في الوسط: <span class="complexity">O(1)</span> مع Iterator</li>
+                    <li>ذاكرة: Node Object + 2 References لكل عنصر</li>
+                    <li>غير Cache-friendly (تشتت في الذاكرة)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-comment">// ArrayList — توسيع تلقائي عند الامتلاء</span>
+<span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt; list = <span class="token-keyword">new</span> <span class="token-type">ArrayList</span>&lt;&gt;(<span class="token-number">100</span>);  <span class="token-comment">// حجم أولي يُجنب إعادة التخصيص</span>
+list.<span class="token-function">add</span>(<span class="token-string">"A"</span>);  <span class="token-comment">// O(1) — إلا إذا احتاج توسيع</span>
+list.<span class="token-function">get</span>(<span class="token-number">50</span>);   <span class="token-comment">// O(1) — وصول مباشر</span>
+list.<span class="token-function">remove</span>(<span class="token-number">0</span>);  <span class="token-comment">// O(n) — يُنقل جميع العناصر!</span>
+
+<span class="token-comment">// LinkedList — مناسب للإدراج المتكرر في الوسط</span>
+<span class="token-type">LinkedList</span>&lt;<span class="token-type">String</span>&gt; linked = <span class="token-keyword">new</span> <span class="token-type">LinkedList</span>&lt;&gt;();
+linked.<span class="token-function">addFirst</span>(<span class="token-string">"A"</span>);  <span class="token-comment">// O(1)</span>
+linked.<span class="token-function">addLast</span>(<span class="token-string">"Z"</span>);   <span class="token-comment">// O(1)</span>
+
+<span class="token-comment">// ⚠️ لا تستخدم LinkedList.get(i) في حلقة — O(n²)!</span>
+<span class="token-keyword">for</span> (<span class="token-type">int</span> i = <span class="token-number">0</span>; i &lt; linked.<span class="token-function">size</span>(); i++) {
+    linked.<span class="token-function">get</span>(i);  <span class="token-comment">// ❌ O(n) لكل get() — إجمالي O(n²)</span>
+}
+<span class="token-comment">// ✅ استخدم Iterator بدلاً من ذلك</span>
+<span class="token-keyword">for</span> (<span class="token-type">String</span> s : linked) { <span class="token-comment">/* O(n) */</span> }</code></pre>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>Concurrent Collections</h3>
+        <p>توفر Java مجموعات متزامنة (<span class="complexity">Concurrent Collections</span>) في حزمة <code>java.util.concurrent</code> تُتيح الوصول المتعدد للـ Threads بأمان دون الحاجة لـ <code>synchronized</code> blocks خارجية. هذه المجموعات أكثر كفاءة من الموروثة (<span class="complexity">Legacy</span>) مثل <code>Vector</code> و <code>Hashtable</code>.</p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>المجموعة</th><th>الآلية</th><th>الأداء</th><th>البديل الموروث</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>ConcurrentHashMap</code></td><td>Segment Locking / CAS</td><td>عالي — Parallel Reads</td><td><code>Hashtable</code> (Synchronized)</td></tr>
+                    <tr><td><code>CopyOnWriteArrayList</code></td><td>Copy-on-Write</td><td>قراءة O(1)، كتابة O(n)</td><td><code>Vector</code> (Synchronized)</td></tr>
+                    <tr><td><code>ConcurrentLinkedQueue</code></td><td>Lock-Free CAS</td><td>عالي جداً</td><td><code>LinkedList</code> + sync</td></tr>
+                    <tr><td><code>BlockingQueue</code></td><td>Condition Variables</td><td>متوسط — Producer/Consumer</td><td>—</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-comment">// ✅ ConcurrentHashMap — لا يُغلق الجدول بالكامل</span>
+<span class="token-type">ConcurrentHashMap</span>&lt;<span class="token-type">String</span>, <span class="token-type">Integer</span>&gt; map = <span class="token-keyword">new</span> <span class="token-type">ConcurrentHashMap</span>&lt;&gt;();
+map.<span class="token-function">put</span>(<span class="token-string">"key"</span>, <span class="token-number">1</span>);     <span class="token-comment">// Lock على Bucket فقط</span>
+map.<span class="token-function">get</span>(<span class="token-string">"key"</span>);          <span class="token-comment">// Lock-Free Read</span>
+
+<span class="token-comment">// ✅ CopyOnWriteArrayList — مثالي للقراءات المتكررة</span>
+<span class="token-type">CopyOnWriteArrayList</span>&lt;<span class="token-type">String</span>&gt; list = <span class="token-keyword">new</span> <span class="token-type">CopyOnWriteArrayList</span>&lt;&gt;();
+list.<span class="token-function">add</span>(<span class="token-string">"A"</span>);  <span class="token-comment">// يُنشئ نسخة جديدة من المصفوفة</span>
+<span class="token-keyword">for</span> (<span class="token-type">String</span> s : list) { <span class="token-comment">/* Iterator على Snapshot — آمن */</span> }
+
+<span class="token-comment">// ❌ Vector — Legacy وغير فعال</span>
+<span class="token-type">Vector</span>&lt;<span class="token-type">String</span>&gt; v = <span class="token-keyword">new</span> <span class="token-type">Vector</span>&lt;&gt;();  <span class="token-comment">// Synchronized على كل عملية</span>
+<span class="token-comment">// يُغلق الكائن بالكامل — يُبطئ الأداء مع Threads متعددة</span></code></pre>
+        </div>
+
+        <div class="callout callout-tip">
+            <div class="callout-title">📌 قاعدة الاختيار</div>
+            <p>استخدم <code>ConcurrentHashMap</code> بدلاً من <code>Collections.synchronizedMap()</code> دائماً. استخدم <code>CopyOnWriteArrayList</code> فقط عندما تكون القراءات أكثر بكثير من الكتابات (نسبة 100:1 أو أكثر)، لأن كل كتابة تُنشئ نسخة كاملة من المصفوفة.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SECTION 5 ==================== -->
+<section class="section" id="sec5">
+    <div class="section-header">
+        <div class="section-number">05</div>
+        <h2>البرمجة التزامنية والمتعددة</h2>
+        <p class="section-desc">Multithreading & Concurrency — بناء تطبيقات عالية الأداء مع إدارة آمنة للـ Threads</p>
+    </div>
+
+    <div class="subsection">
+        <h3>Thread Creation & Lifecycle</h3>
+        <p>تُتيح Java عدة طرق لإنشاء وإدارة الـ Threads. الطريقة الحديثة المُفضلة هي استخدام <code>ExecutorService</code>، لكن فهم الفروق بين <code>Thread</code> و <code>Runnable</code> و <code>Callable</code> أساسي.</p>
+
+        <div class="compare-grid">
+            <div class="compare-card">
+                <h4><span class="icon">🧵</span> Runnable</h4>
+                <ul>
+                    <li>واجهة وظيفية (<span class="complexity">Functional Interface</span>)</li>
+                    <li>طريقة واحدة: <code>void run()</code></li>
+                    <li>لا تُرجع قيمة</li>
+                    <li>لا يمكن رمي Checked Exceptions</li>
+                    <li>الأكثر شيوعاً في Thread Pools</li>
+                </ul>
+            </div>
+            <div class="compare-card">
+                <h4><span class="icon">📤</span> Callable&lt;V&gt;</h4>
+                <ul>
+                    <li>واجهة وظيفية مع Generic Return Type</li>
+                    <li>طريقة واحدة: <code>V call()</code></li>
+                    <li>تُرجع قيمة من نوع <code>V</code></li>
+                    <li>يمكن رمي Exception</li>
+                    <li>تُستخدم مع <code>Future&lt;V&gt;</code></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-comment">// 1️⃣ extends Thread — غير مُفضل (يفقد فرصة توريث آخر)</span>
+<span class="token-keyword">class</span> <span class="token-class">MyThread</span> <span class="token-keyword">extends</span> <span class="token-type">Thread</span> {
+    <span class="token-keyword">public void</span> <span class="token-function">run</span>() { <span class="token-type">System</span>.out.println(<span class="token-string">"Running"</span>); }
+}
+
+<span class="token-comment">// 2️⃣ implements Runnable — مُفضل</span>
+<span class="token-type">Runnable</span> task = () -> <span class="token-type">System</span>.out.println(<span class="token-string">"Runnable task"</span>);
+<span class="token-keyword">new</span> <span class="token-type">Thread</span>(task).<span class="token-function">start</span>();
+
+<span class="token-comment">// 3️⃣ Callable + Future — للمهام التي تُرجع قيمة</span>
+<span class="token-type">Callable</span>&lt;<span class="token-type">Integer</span>&gt; callable = () -> {
+    <span class="token-type">Thread</span>.<span class="token-function">sleep</span>(<span class="token-number">1000</span>);
+    <span class="token-keyword">return</span> <span class="token-number">42</span>;
+};
+
+<span class="token-type">FutureTask</span>&lt;<span class="token-type">Integer</span>&gt; futureTask = <span class="token-keyword">new</span> <span class="token-type">FutureTask</span>&lt;&gt;(callable);
+<span class="token-keyword">new</span> <span class="token-type">Thread</span>(futureTask).<span class="token-function">start</span>();
+<span class="token-type">Integer</span> result = futureTask.<span class="token-function">get</span>();  <span class="token-comment">// Blocking — ينتج 42</span></code></pre>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>Synchronization & Thread Safety</h3>
+        <p>يُعد التزامن (<span class="complexity">Synchronization</span>) آلية Java الأساسية لضمان أن قسم من الكود يُنفذ بواسطة Thread واحد في كل مرة. يعتمد على قفل داخلي (<span class="complexity">Intrinsic Lock / Monitor Lock</span>) مرتبط بكل كائن في Java.</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-keyword">public class</span> <span class="token-class">Counter</span> {
+    <span class="token-keyword">private int</span> count = <span class="token-number">0</span>;
+
+    <span class="token-comment">// ✅ synchronized method — يُغلق this</span>
+    <span class="token-keyword">public synchronized void</span> <span class="token-function">increment</span>() {
+        count++;
+    }
+
+    <span class="token-comment">// ✅ synchronized block — تحكم أدق في القفل</span>
+    <span class="token-keyword">public void</span> <span class="token-function">decrement</span>() {
+        <span class="token-keyword">synchronized</span> (<span class="token-keyword">this</span>) {
+            count--;
+        }
+    }
+
+    <span class="token-comment">// ✅ static synchronized — يُغلق Class Object</span>
+    <span class="token-keyword">public static synchronized void</span> <span class="token-function">staticMethod</span>() {
+        <span class="token-comment">// يُغلق Counter.class</span>
+    }
+}
+
+<span class="token-comment">// ✅ ReentrantLock — تحكم أكبر (timeout, interruptible, fairness)</span>
+<span class="token-keyword">private final</span> <span class="token-type">ReentrantLock</span> lock = <span class="token-keyword">new</span> <span class="token-type">ReentrantLock</span>(<span class="token-keyword">true</span>);  <span class="token-comment">// fair ordering</span>
+
+<span class="token-keyword">public void</span> <span class="token-function">safeOperation</span>() {
+    lock.<span class="token-function">lock</span>();
+    <span class="token-keyword">try</span> {
+        <span class="token-comment">// Critical section</span>
+    } <span class="token-keyword">finally</span> {
+        lock.<span class="token-function">unlock</span>();  <span class="token-comment">// دائماً في finally!</span>
+    }
+}</code></pre>
+        </div>
+
+        <div class="callout callout-danger">
+            <div class="callout-title">⚠️ Race Condition</div>
+            <p>عملية <code>count++</code> ليذرية (<span class="complexity">Not Atomic</span>) — تتكون من 3 خطوات: قراءة، زيادة، كتابة. بدون Synchronization، يمكن لـ Threadين قراءة نفس القيمة وكتابة نفس النتيجة، مما يؤدي لفقدان تحديث. استخدم <code>AtomicInteger</code> أو <code>synchronized</code> أو <code>ReentrantLock</code>.</p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>Memory Visibility & Volatile</h3>
+        <p>في بنية الذاكرة متعددة المعالجات، قد يحتفظ كل بروسيسور بنسخة محلية من المتغيرات في Cache. الكلمة المفتاحية <code>volatile</code> تضمن أن القراءة والكتابة تتم مباشرة في Main Memory، مما يضمن الرؤية (<span class="complexity">Visibility</span>) لجميع الـ Threads.</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-keyword">public class</span> <span class="token-class">VolatileExample</span> {
+    <span class="token-comment">// ✅ volatile — يضمن Visibility لكن لا يضمن Atomicity</span>
+    <span class="token-keyword">private volatile boolean</span> running = <span class="token-keyword">true</span>;
+
+    <span class="token-keyword">public void</span> <span class="token-function">shutdown</span>() {
+        running = <span class="token-keyword">false</span>;  <span class="token-comment">// مرئي فوراً لجميع Threads</span>
+    }
+
+    <span class="token-keyword">public void</span> <span class="token-function">doWork</span>() {
+        <span class="token-keyword">while</span> (running) {
+            <span class="token-comment">// يعمل حتى يُغيّر Thread آخر running إلى false</span>
+        }
+    }
+}
+
+<span class="token-comment">// ❌ لا تستخدم volatile للعمليات المركبة!</span>
+<span class="token-keyword">private volatile int</span> counter = <span class="token-number">0</span>;
+<span class="token-keyword">public void</span> <span class="token-function">increment</span>() {
+    counter++;  <span class="token-comment">// ❌ Race Condition — ليست ذرية!</span>
+}</code></pre>
+        </div>
+
+        <div class="callout callout-info">
+            <div class="callout-title">🔒 Happens-Before Relationship</div>
+            <p>تُنشئ <code>volatile</code> علاقة <span class="complexity">Happens-Before</span>: أي كتابة على متغير <code>volatile</code> تُضمن أن تكون مرئية لأي قراءة لاحقة. هذا يمنع إعادة ترتيب التعليمات (<span class="complexity">Instruction Reordering</span>) من قبل JIT Compiler أو المعالج.</p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>Atomic Variables & CAS</h3>
+        <p>تُقدم حزمة <code>java.util.concurrent.atomic</code> فئات ذرية (<span class="complexity">Atomic</span>) تعتمد على عملية <span class="complexity">Compare-And-Swap (CAS)</span> بدلاً من Locking. CAS هي عملية Hardware-level تتحقق من القيمة الحالية قبل التحديث، مما يضمن الذرية دون حظر الـ Threads.</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-keyword">public class</span> <span class="token-class">AtomicCounter</span> {
+    <span class="token-keyword">private final</span> <span class="token-type">AtomicInteger</span> count = <span class="token-keyword">new</span> <span class="token-type">AtomicInteger</span>(<span class="token-number">0</span>);
+
+    <span class="token-comment">// ✅ Atomic increment — Lock-Free</span>
+    <span class="token-keyword">public void</span> <span class="token-function">increment</span>() {
+        count.<span class="token-function">incrementAndGet</span>();  <span class="token-comment">// CAS-based</span>
+    }
+
+    <span class="token-comment">// ✅ AtomicReference — للكائنات المعقدة</span>
+    <span class="token-keyword">private final</span> <span class="token-type">AtomicReference</span>&lt;<span class="token-type">User</span>&gt; currentUser = <span class="token-keyword">new</span> <span class="token-type">AtomicReference</span>&lt;&gt;();
+
+    <span class="token-comment">// ✅ CAS Manual — Compare-And-Set</span>
+    <span class="token-keyword">public boolean</span> <span class="token-function">updateIfCurrent</span>(<span class="token-type">User</span> expected, <span class="token-type">User</span> newUser) {
+        <span class="token-keyword">return</span> currentUser.<span class="token-function">compareAndSet</span>(expected, newUser);
+    }
+}
+
+<span class="token-comment">// CAS Algorithm (conceptual):</span>
+<span class="token-comment">// 1. Read current value</span>
+<span class="token-comment">// 2. Compute new value</span>
+<span class="token-comment">// 3. Atomically: if current == expected, set to new</span>
+<span class="token-comment">// 4. If failed, retry (spin) or abort</span></code></pre>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>الفئة الذرية</th><th>النوع</th><th>العمليات</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>AtomicInteger</code></td><td><code>int</code></td><td>addAndGet, compareAndSet, getAndIncrement</td></tr>
+                    <tr><td><code>AtomicLong</code></td><td><code>long</code></td><td>incrementAndGet, decrementAndGet</td></tr>
+                    <tr><td><code>AtomicBoolean</code></td><td><code>boolean</code></td><td>compareAndSet, getAndSet</td></tr>
+                    <tr><td><code>AtomicReference&lt;T&gt;</code></td><td>كائن عام</td><td>compareAndSet, getAndSet, updateAndGet</td></tr>
+                    <tr><td><code>AtomicIntegerArray</code></td><td>مصفوفة <code>int[]</code></td><td>addAndGet(index, delta)</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>Executors Framework</h3>
+        <p>يُعد <span class="complexity">Executors Framework</span> الطريقة الحديثة والمُفضلة لإدارة الـ Threads. بدلاً من إنشاء Threads يدوياً، تُنشئ Thread Pools تُعيد استخدام الـ Threads وتتحكم في الحمل.</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-comment">// 1️⃣ Fixed Thread Pool — عدد ثابت من Threads</span>
+<span class="token-type">ExecutorService</span> fixedPool = <span class="token-type">Executors</span>.<span class="token-function">newFixedThreadPool</span>(<span class="token-number">4</span>);
+
+<span class="token-comment">// 2️⃣ Cached Thread Pool — ينمو وينكمش ديناميكياً</span>
+<span class="token-type">ExecutorService</span> cachedPool = <span class="token-type">Executors</span>.<span class="token-function">newCachedThreadPool</span>();
+
+<span class="token-comment">// 3️⃣ Single Thread Executor — تسلسلي (FIFO)</span>
+<span class="token-type">ExecutorService</span> single = <span class="token-type">Executors</span>.<span class="token-function">newSingleThreadExecutor</span>();
+
+<span class="token-comment">// 4️⃣ Scheduled Executor — مهام مجدولة</span>
+<span class="token-type">ScheduledExecutorService</span> scheduler = <span class="token-type">Executors</span>.<span class="token-function">newScheduledThreadPool</span>(<span class="token-number">2</span>);
+scheduler.<span class="token-function">scheduleAtFixedRate</span>(task, <span class="token-number">0</span>, <span class="token-number">5</span>, <span class="token-type">TimeUnit</span>.SECONDS);
+
+<span class="token-comment">// ✅ ThreadPoolExecutor Manual — تحكم كامل</span>
+<span class="token-type">ThreadPoolExecutor</span> executor = <span class="token-keyword">new</span> <span class="token-type">ThreadPoolExecutor</span>(
+    <span class="token-number">2</span>,                      <span class="token-comment">// corePoolSize</span>
+    <span class="token-number">10</span>,                     <span class="token-comment">// maximumPoolSize</span>
+    <span class="token-number">60L</span>,                    <span class="token-comment">// keepAliveTime</span>
+    <span class="token-type">TimeUnit</span>.SECONDS,
+    <span class="token-keyword">new</span> <span class="token-type">LinkedBlockingQueue</span>&lt;&gt;(<span class="token-number">100</span>)  <span class="token-comment">// workQueue</span>
+);
+
+<span class="token-comment">// ✅ إيقاف صحيح — لا تستخدم shutdown() فقط!</span>
+executor.<span class="token-function">shutdown</span>();           <span class="token-comment">// لا يقبل مهام جديدة</span>
+executor.<span class="token-function">awaitTermination</span>(<span class="token-number">60</span>, <span class="token-type">TimeUnit</span>.SECONDS);  <span class="token-comment">// انتظار الإنهاء</span></code></pre>
+        </div>
+
+        <div class="callout callout-warning">
+            <div class="callout-title">⚠️ تحذير: Executors.newCachedThreadPool()</div>
+            <p>يُنشئ <code>newCachedThreadPool()</code> عدد غير محدود من الـ Threads تحت الحمل العالي، مما قد يؤدي لـ <code>OutOfMemoryError</code>. في الإنتاج، استخدم دائماً <code>ThreadPoolExecutor</code> يدوياً مع <code>maximumPoolSize</code> محدود وـ <code>BlockingQueue</code> محدودة.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SECTION 6 ==================== -->
+<section class="section" id="sec6">
+    <div class="section-header">
+        <div class="section-number">06</div>
+        <h2>ميزات Java الحديثة</h2>
+        <p class="section-desc">Modern Java: Java 8 to Java 21 — التطورات الثورية التي حوّلت Java إلى لغة حديثة ووظيفية</p>
+    </div>
+
+    <div class="subsection">
+        <h3>Java 8 Paradigm Shift</h3>
+        <p>مثّل Java 8 نقلة نوعية في تاريخ اللغة. أُدخلت <span class="complexity">Lambdas</span>، <span class="complexity">Functional Interfaces</span>، و <span class="complexity">Optional&lt;T&gt;</span>، مما جعل Java تدعم البرمجة الوظيفية (<span class="complexity">Functional Programming</span>) بجانب البرمجة كائنية التوجه.</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-comment">// ✅ Lambda Expressions — تعبيرات وظيفية مختصرة</span>
+<span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt; names = <span class="token-type">Arrays</span>.<span class="token-function">asList</span>(<span class="token-string">"Alice"</span>, <span class="token-string">"Bob"</span>, <span class="token-string">"Charlie"</span>);
+names.<span class="token-function">forEach</span>(name -> <span class="token-type">System</span>.out.println(name));
+
+<span class="token-comment">// ✅ Functional Interfaces — 4 الأساسية</span>
+<span class="token-type">Function</span>&lt;<span class="token-type">String</span>, <span class="token-type">Integer</span>&gt; length = s -> s.<span class="token-function">length</span>();
+<span class="token-type">Predicate</span>&lt;<span class="token-type">String</span>&gt; isEmpty = s -> s.<span class="token-function">isEmpty</span>();
+<span class="token-type">Consumer</span>&lt;<span class="token-type">String</span>&gt; printer = s -> <span class="token-type">System</span>.out.println(s);
+<span class="token-type">Supplier</span>&lt;<span class="token-type">String</span>&gt; greeting = () -> <span class="token-string">"Hello"</span>;
+
+<span class="token-comment">// ✅ Optional — تجنب NullPointerException</span>
+<span class="token-type">Optional</span>&lt;<span class="token-type">String</span>&gt; maybeName = <span class="token-type">Optional</span>.<span class="token-function">ofNullable</span>(<span class="token-function">findName</span>());
+<span class="token-type">String</span> name = maybeName
+    .<span class="token-function">filter</span>(n -> n.<span class="token-function">length</span>() > <span class="token-number">3</span>)
+    .<span class="token-function">map</span>(<span class="token-type">String</span>::toUpperCase)
+    .<span class="token-function">orElse</span>(<span class="token-string">"UNKNOWN"</span>);
+
+<span class="token-comment">// ❌ لا تستخدم Optional كحقل في POJO</span>
+<span class="token-comment">// ❌ لا تستخدم Optional في معاملات الدوال</span>
+<span class="token-comment">// ✅ استخدم Optional كـ Return Type فقط</span></code></pre>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>Functional Interface</th><th>الطريقة المجردة</th><th>الاستخدام</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>Function&lt;T,R&gt;</code></td><td><code>R apply(T t)</code></td><td>تحويل T إلى R</td></tr>
+                    <tr><td><code>Predicate&lt;T&gt;</code></td><td><code>boolean test(T t)</code></td><td>فلترة/اختبار شرط</td></tr>
+                    <tr><td><code>Consumer&lt;T&gt;</code></td><td><code>void accept(T t)</code></td><td>عملية جانبية (side effect)</td></tr>
+                    <tr><td><code>Supplier&lt;T&gt;</code></td><td><code>T get()</code></td><td>توفير/إنشاء قيمة</td></tr>
+                    <tr><td><code>UnaryOperator&lt;T&gt;</code></td><td><code>T apply(T t)</code></td><td>تحويل T إلى T</td></tr>
+                    <tr><td><code>BinaryOperator&lt;T&gt;</code></td><td><code>T apply(T a, T b)</code></td><td>تجميع قيمتين</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>Streams API</h3>
+        <p>يُتيح <span class="complexity">Streams API</span> معالجة مجموعات البيانات بأسلوب وظيفي Declarative. يتكون الـ Stream من عمليات وسيطة (<span class="complexity">Intermediate Operations</span>) تُرجع Stream جديد، وعمليات نهائية (<span class="complexity">Terminal Operations</span>) تُنتج نتيجة أو تأثير جانبي.</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-type">List</span>&lt;<span class="token-type">Integer</span>&gt; numbers = <span class="token-type">Arrays</span>.<span class="token-function">asList</span>(<span class="token-number">1</span>, <span class="token-number">2</span>, <span class="token-number">3</span>, <span class="token-number">4</span>, <span class="token-number">5</span>, <span class="token-number">6</span>, <span class="token-number">7</span>, <span class="token-number">8</span>, <span class="token-number">9</span>, <span class="token-number">10</span>);
+
+<span class="token-type">List</span>&lt;<span class="token-type">Integer</span>&gt; result = numbers.<span class="token-function">stream</span>()
+    .<span class="token-function">filter</span>(n -> n % <span class="token-number">2</span> == <span class="token-number">0</span>)     <span class="token-comment">// Intermediate — Lazy</span>
+    .<span class="token-function">map</span>(n -> n * n)              <span class="token-comment">// Intermediate — Lazy</span>
+    .<span class="token-function">sorted</span>(<span class="token-type">Comparator</span>.<span class="token-function">reverseOrder</span>())
+    .<span class="token-function">limit</span>(<span class="token-number">3</span>)                     <span class="token-comment">// Intermediate — Short-circuiting</span>
+    .<span class="token-function">collect</span>(<span class="token-type">Collectors</span>.<span class="token-function">toList</span>());  <span class="token-comment">// Terminal — يُشغّل الـ Pipeline</span>
+
+<span class="token-comment">// ✅ Parallel Streams — حذر!</span>
+<span class="token-type">long</span> sum = numbers.<span class="token-function">parallelStream</span>()
+    .<span class="token-function">mapToLong</span>(<span class="token-type">Integer</span>::longValue)
+    .<span class="token-function">sum</span>();
+
+<span class="token-comment">// ⚠️ لا تستخدم parallelStream() مع:</span>
+<span class="token-comment">// - مصادر صغيرة (overhead > gain)</span>
+<span class="token-comment">// - عمليات غير Associative</span>
+<span class="token-comment">// - مصادر غير Thread-Safe (LinkedList, Stream.iterate)</span></code></pre>
+        </div>
+
+        <div class="callout callout-info">
+            <div class="callout-title">🔄 Lazy Evaluation</div>
+            <p>العمليات الوسيطة (<code>filter</code>، <code>map</code>، <code>sorted</code>) لا تُنفذ فوراً — تُخزن كـ Pipeline. تُنفذ فقط عند استدعاء عملية نهائية (<code>collect</code>، <code>forEach</code>، <code>reduce</code>). هذا يُتيح Short-Circuiting: إذا استخدمت <code>findFirst()</code> بعد <code>filter()</code>، سيتوقف الـ Stream عند أول تطابق.</p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>Records (Java 14/17)</h3>
+        <p>تُعتبر <span class="complexity">Records</span> (Java 14 Preview، Java 17 Final) طريقة مختصرة لإنشاء فئات ناقلة بيانات (<span class="complexity">Data Carrier Classes</span>). تُولد Java تلقائياً <code>constructor</code>، <code>equals()</code>، <code>hashCode()</code>، <code>toString()</code>، و <code>getter methods</code>.</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-comment">// ✅ Record — يُولد تلقائياً constructor, getters, equals, hashCode, toString</span>
+<span class="token-keyword">public record</span> <span class="token-class">Person</span>(<span class="token-type">String</span> name, <span class="token-type">int</span> age, <span class="token-type">String</span> email) {}
+
+<span class="token-comment">// الاستخدام</span>
+<span class="token-type">Person</span> person = <span class="token-keyword">new</span> <span class="token-type">Person</span>(<span class="token-string">"Ahmed"</span>, <span class="token-number">30</span>, <span class="token-string">"ahmed@example.com"</span>);
+<span class="token-type">System</span>.out.println(person.<span class="token-function">name</span>());   <span class="token-comment">// Ahmed (not getName())</span>
+<span class="token-type">System</span>.out.println(person);           <span class="token-comment">// Person[name=Ahmed, age=30, ...]</span>
+
+<span class="token-comment">// ✅ Record مع Validation</span>
+<span class="token-keyword">public record</span> <span class="token-class">ValidatedPerson</span>(<span class="token-type">String</span> name, <span class="token-type">int</span> age) {
+    <span class="token-keyword">public</span> <span class="token-function">ValidatedPerson</span> {
+        <span class="token-keyword">if</span> (age < <span class="token-number">0</span>) {
+            <span class="token-keyword">throw new</span> <span class="token-type">IllegalArgumentException</span>(<span class="token-string">"Age cannot be negative"</span>);
+        }
+        <span class="token-keyword">if</span> (name == <span class="token-keyword">null</span> || name.<span class="token-function">isBlank</span>()) {
+            <span class="token-keyword">throw new</span> <span class="token-type">IllegalArgumentException</span>(<span class="token-string">"Name is required"</span>);
+        }
+    }
+}
+
+<span class="token-comment">// ✅ Record كمفتاح HashMap — Immutable وله hashCode/equals صحيح</span>
+<span class="token-type">Map</span>&lt;<span class="token-type">Person</span>, <span class="token-type">String</span>&gt; personData = <span class="token-keyword">new</span> <span class="token-type">HashMap</span>&lt;&gt;();</code></pre>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>Sealed Classes & Interfaces (Java 17)</h3>
+        <p>تُتيح <span class="complexity">Sealed Classes</span> للمطور تقييد الفئات التي يمكنها توريث فئة أو واجهة معينة. هذا يُتيح Pattern Matching الكامل ويُحسن صيانة الكود.</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-comment">// ✅ Sealed Class — فقط Circle و Rectangle يمكنهما التوريث</span>
+<span class="token-keyword">public sealed class</span> <span class="token-class">Shape</span>
+    <span class="token-keyword">permits</span> <span class="token-type">Circle</span>, <span class="token-type">Rectangle</span>, <span class="token-type">Square</span> { }
+
+<span class="token-keyword">public final class</span> <span class="token-class">Circle</span> <span class="token-keyword">extends</span> <span class="token-type">Shape</span> {
+    <span class="token-keyword">private final double</span> radius;
+    <span class="token-keyword">public</span> <span class="token-function">Circle</span>(<span class="token-type">double</span> radius) { <span class="token-keyword">this</span>.radius = radius; }
+}
+
+<span class="token-keyword">public non-sealed class</span> <span class="token-class">Rectangle</span> <span class="token-keyword">extends</span> <span class="token-type">Shape</span> {
+    <span class="token-comment">// non-sealed: يسمح بالتوريث المفتوح</span>
+}
+
+<span class="token-comment">// ✅ Pattern Matching with Switch (Java 21)</span>
+<span class="token-keyword">public double</span> <span class="token-function">area</span>(<span class="token-type">Shape</span> shape) {
+    <span class="token-keyword">return</span> <span class="token-keyword">switch</span> (shape) {
+        <span class="token-keyword">case</span> <span class="token-type">Circle</span> c -> <span class="token-type">Math</span>.PI * c.<span class="token-function">radius</span>() * c.<span class="token-function">radius</span>();
+        <span class="token-keyword">case</span> <span class="token-type">Rectangle</span> r -> r.<span class="token-function">width</span>() * r.<span class="token-function">height</span>();
+        <span class="token-keyword">case</span> <span class="token-type">Square</span> s -> s.<span class="token-function">side</span>() * s.<span class="token-function">side</span>();
+    };  <span class="token-comment">// Exhaustive — لا يحتاج default!</span>
+}</code></pre>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>Virtual Threads (Project Loom — Java 21)</h3>
+        <p>تُعتبر <span class="complexity">Virtual Threads</span> (Java 21) أهم إضافة في Java منذ Lambdas. هي Threads خفيفة الوزن (<span class="complexity">Lightweight Threads</span>) تُديرها JVM بدلاً من نظام التشغيل، مما يُتيح إنشاء ملايين الـ Threads بسهولة.</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-comment">// ✅ Virtual Threads — Java 21</span>
+<span class="token-keyword">try</span> (<span class="token-keyword">var</span> executor = <span class="token-type">Executors</span>.<span class="token-function">newVirtualThreadPerTaskExecutor</span>()) {
+    <span class="token-keyword">for</span> (<span class="token-type">int</span> i = <span class="token-number">0</span>; i < <span class="token-number">1_000_000</span>; i++) {
+        executor.<span class="token-function">submit</span>(() -> {
+            <span class="token-type">Thread</span>.<span class="token-function">sleep</span>(<span class="token-type">Duration</span>.<span class="token-function">ofSeconds</span>(<span class="token-number">1</span>));  <span class="token-comment">// Blocking!</span>
+            <span class="token-keyword">return</span> <span class="token-string">"Done"</span>;
+        });
+    }
+}  <span class="token-comment">// 1 مليون Thread خفيف — لا يوجد OutOfMemoryError!</span>
+
+<span class="token-comment">// ✅ Structured Concurrency — Java 21 (Preview)</span>
+<span class="token-keyword">try</span> (<span class="token-keyword">var</span> scope = <span class="token-keyword">new</span> <span class="token-type">StructuredTaskScope</span>.ShutdownOnFailure()) {
+    <span class="token-type">Future</span>&lt;<span class="token-type">String</span>&gt; user = scope.<span class="token-function">fork</span>(() -> <span class="token-function">fetchUser</span>());
+    <span class="token-type">Future</span>&lt;<span class="token-type">Integer</span>&gt; order = scope.<span class="token-function">fork</span>(() -> <span class="token-function">fetchOrder</span>());
+    scope.<span class="token-function">join</span>().<span class="token-function">throwIfFailed</span>();
+    <span class="token-keyword">return new</span> <span class="token-type">Response</span>(user.<span class="token-function">resultNow</span>(), order.<span class="token-function">resultNow</span>());
+}
+
+<span class="token-comment">// ⚠️ Virtual Threads لا تُحسن CPU-bound tasks</span>
+<span class="token-comment">// ✅ مثالية لـ I/O-bound: HTTP requests, DB queries, File I/O</span></code></pre>
+        </div>
+
+        <div class="compare-grid">
+            <div class="compare-card">
+                <h4><span class="icon">🔩</span> Platform Threads</h4>
+                <ul>
+                    <li>Thread ثقيل من نظام التشغيل</li>
+                    <li>~1-2 MB Stack Memory</li>
+                    <li>محدود بعدد آلاف</li>
+                    <li>Blocking يُستهلك Thread كاملاً</li>
+                    <li>مناسب لـ CPU-bound tasks</li>
+                </ul>
+            </div>
+            <div class="compare-card">
+                <h4><span class="icon">🪶</span> Virtual Threads</h4>
+                <ul>
+                    <li>Thread خفيف تُديره JVM</li>
+                    <li>~几百 bytes فقط</li>
+                    <li>يمكن إنشاء ملايين</li>
+                    <li>Blocking يُطلق Carrier Thread</li>
+                    <li>مثالي لـ I/O-bound tasks</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SECTION 7 ==================== -->
+<section class="section" id="sec7">
+    <div class="section-header">
+        <div class="section-number">07</div>
+        <h2>معمارية الـ JVM والأنعكاس</h2>
+        <p class="section-desc">JVM Architecture & Advanced Concepts — فهم عميق لآلية تشغيل Java وإدارة الذاكرة المتقدمة</p>
+    </div>
+
+    <div class="subsection">
+        <h3>JVM Components</h3>
+        <p>تتكون Java Virtual Machine من مكونات رئيسية تعمل معاً لتنفيذ Bytecode. فهم هذه المكونات ضروري لتشخيص مشاكل الأداء وتحسين التطبيقات.</p>
+
+        <div class="diagram-box">
+            <div class="diagram-title">🏗️ مكونات JVM الرئيسية</div>
+            <div class="diagram-flow" style="flex-direction: column; gap: 16px; max-width: 700px; margin: 24px auto;">
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+                    <div class="flow-node" style="min-width: 200px;">ClassLoader Subsystem</div>
+                    <div class="flow-node orange" style="min-width: 200px;">Runtime Data Areas</div>
+                </div>
+                <span class="flow-arrow">↓</span>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+                    <div class="flow-node slate" style="min-width: 180px;">Method Area<br>(Metaspace)</div>
+                    <div class="flow-node slate" style="min-width: 180px;">Heap Memory</div>
+                    <div class="flow-node slate" style="min-width: 180px;">Stack / PC / Native</div>
+                </div>
+                <span class="flow-arrow">↓</span>
+                <div class="flow-node" style="min-width: 280px;">Execution Engine<br>(Interpreter + JIT Compiler)</div>
+            </div>
+        </div>
+
+        <div class="compare-grid">
+            <div class="compare-card">
+                <h4><span class="icon">📥</span> ClassLoader Subsystem</h4>
+                <ul>
+                    <li><strong>Bootstrap ClassLoader:</strong> فئات Java الأساسية (<code>rt.jar</code>)</li>
+                    <li><strong>Extension ClassLoader:</strong> إضافات JDK (<code>ext</code>)</li>
+                    <li><strong>Application ClassLoader:</strong> Classpath التطبيق</li>
+                    <li>Delegation Model: يطلب الأب أولاً</li>
+                    <li>Custom ClassLoaders للـ Hot Swapping</li>
+                </ul>
+            </div>
+            <div class="compare-card">
+                <h4><span class="icon">⚡</span> Execution Engine</h4>
+                <ul>
+                    <li><strong>Interpreter:</strong> يُفسر Bytecode سطراً بسطر</li>
+                    <li><strong>JIT Compiler:</strong> يُرجم الكود الساخن لـ Native Code</li>
+                    <li><strong>C1 Compiler:</strong> تجميع سريع (Client)</li>
+                    <li><strong>C2 Compiler:</strong> تجميع مُحسّن (Server)</li>
+                    <li><strong>GraalVM:</strong> JIT/AOT Compiler حديث</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>Garbage Collection (GC)</h3>
+        <p>يُعد <span class="complexity">Garbage Collector</span> أحد أهم مكونات JVM. يُدير تلقائياً تحرير الذاكرة عن طريق إزالة الكائنات غير المُشار إليها (<span class="complexity">Unreachable Objects</span>). يعتمد على نموذج الأجيال (<span class="complexity">Generational Hypothesis</span>): معظم الكائنات تموت شابة.</p>
+
+        <div class="diagram-box">
+            <div class="diagram-title">♻️ ترتيب الأجيال في Heap Memory</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                <div style="background: linear-gradient(135deg, #27AE60, #1e8449); color: white; padding: 24px; border-radius: var(--radius-md); text-align: center;">
+                    <div style="font-weight: 800; font-size: 1.2rem; margin-bottom: 12px;">Young Generation</div>
+                    <div style="font-size: 14px; opacity: 0.9;">
+                        Eden Space<br>↓<br>
+                        Survivor 0 (From)<br>↓<br>
+                        Survivor 1 (To)<br><br>
+                        <strong>Minor GC</strong> — سريع ومتكرر
+                    </div>
+                </div>
+                <div style="background: linear-gradient(135deg, #E67E22, #d35400); color: white; padding: 24px; border-radius: var(--radius-md); text-align: center;">
+                    <div style="font-weight: 800; font-size: 1.2rem; margin-bottom: 12px;">Old Generation</div>
+                    <div style="font-size: 14px; opacity: 0.9;">
+                        Tenured Objects<br><br>
+                        الكائنات التي نجت من<br>عدة دورات Minor GC<br><br>
+                        <strong>Major GC / Full GC</strong> — أبطأ
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 16px; text-align: center; color: var(--text-secondary); font-size: 14px;">
+                Metaspace (Java 8+) — يستبدل PermGen | يخزن Class Metadata خارج Heap
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>GC Algorithm</th><th>الاستراتيجية</th><th>الوقت المتوقف</th><th>حالة الاستخدام</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>Serial GC</code></td><td>Thread واحد</td><td>طويل</td><td>Client / Single-Core</td></tr>
+                    <tr><td><code>Parallel GC</code></td><td>Multiple Threads</td><td>متوسط</td><td>Throughput-oriented</td></tr>
+                    <tr><td><code>G1GC</code></td><td>Region-based</td><td>قصير ومتوقع</td><td>الإعدادات الافتراضية (Java 9+)</td></tr>
+                    <tr><td><code>ZGC</code></td><td>Concurrent / Colored Pointers</td><td>&lt; 1ms</td><td>Low-latency / Large Heap</td></tr>
+                    <tr><td><code>Shenandoah</code></td><td>Concurrent Compaction</td><td>&lt; 1ms</td><td>Low-latency</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-comment">// JVM Flags لاختيار GC ومراقبته</span>
+<span class="token-comment">// -XX:+UseG1GC                    // استخدام G1GC</span>
+<span class="token-comment">// -XX:+UseZGC                     // استخدام ZGC (Java 15+)</span>
+<span class="token-comment">// -XX:+PrintGCDetails             // تفاصيل GC</span>
+<span class="token-comment">// -Xms4g -Xmx4g                   // Heap ثابت</span>
+<span class="token-comment">// -XX:MaxGCPauseMillis=200        // هدف توقف GC</span>
+
+<span class="token-comment">// ✅ مراقبة GC برمجياً</span>
+<span class="token-type">List</span>&lt;<span class="token-type">GarbageCollectorMXBean</span>&gt; gcBeans =
+    <span class="token-type">ManagementFactory</span>.<span class="token-function">getGarbageCollectorMXBeans</span>();
+<span class="token-keyword">for</span> (<span class="token-type">GarbageCollectorMXBean</span> gc : gcBeans) {
+    <span class="token-type">System</span>.out.println(gc.<span class="token-function">getName</span>() + <span class="token-string">": "</span> + gc.<span class="token-function">getCollectionCount</span>());
+}</code></pre>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3>Reflection & Annotations</h3>
+        <p>يُتيح <span class="complexity">Reflection</span> فحص وتعديل الكائنات في Runtime. تُستخدم <span class="complexity">Annotations</span> لتوفير بيانات وصفية (<span class="complexity">Metadata</span>) يمكن معالجتها في وقت الترجمة أو التشغيل.</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-header-lang">Java</span>
+                <button class="code-copy-btn" onclick="copyCode(this)">نسخ</button>
+            </div>
+            <pre><code><span class="token-comment">// ✅ Annotation مخصصة</span>
+<span class="token-annotation">@Retention</span>(<span class="token-type">RetentionPolicy</span>.RUNTIME)
+<span class="token-annotation">@Target</span>(<span class="token-type">ElementType</span>.METHOD)
+<span class="token-keyword">public @interface</span> <span class="token-class">Timed</span> {
+    <span class="token-type">String</span> <span class="token-function">value</span>() <span class="token-keyword">default</span> <span class="token-string">""</span>;
+}
+
+<span class="token-comment">// ✅ Reflection — فحص الفئات في Runtime</span>
+<span class="token-keyword">public class</span> <span class="token-class">ReflectionDemo</span> {
+    <span class="token-keyword">public static void</span> <span class="token-function">inspect</span>(<span class="token-type">Object</span> obj) <span class="token-keyword">throws</span> <span class="token-type">Exception</span> {
+        <span class="token-type">Class</span>&lt;?&gt; clazz = obj.<span class="token-function">getClass</span>();
+
+        <span class="token-comment">// فحص Methods</span>
+        <span class="token-keyword">for</span> (<span class="token-type">Method</span> method : clazz.<span class="token-function">getDeclaredMethods</span>()) {
+            <span class="token-keyword">if</span> (method.<span class="token-function">isAnnotationPresent</span>(<span class="token-type">Timed</span>.class)) {
+                <span class="token-type">Timed</span> timed = method.<span class="token-function">getAnnotation</span>(<span class="token-type">Timed</span>.class);
+                <span class="token-type">System</span>.out.println(<span class="token-string">"Timed: "</span> + timed.<span class="token-function">value</span>());
+            }
+        }
+
+        <span class="token-comment">// استدعاء Method خاص</span>
+        <span class="token-type">Method</span> privateMethod = clazz.<span class="token-function">getDeclaredMethod</span>(<span class="token-string">"secret"</span>);
+        privateMethod.<span class="token-function">setAccessible</span>(<span class="token-keyword">true</span>);
+        privateMethod.<span class="token-function">invoke</span>(obj);
+    }
+}
+
+<span class="token-comment">// ⚠️ تحذير: setAccessible(true) قد يُعطل في Java 9+</span>
+<span class="token-comment">// --add-opens java.base/java.lang=ALL-UNNAMED</span></code></pre>
+        </div>
+
+        <div class="callout callout-warning">
+            <div class="callout-title">⚠️ تحذير أداء Reflection</div>
+            <p>الـ Reflection أبطأ بكثير من الاستدعاء المباشر (Direct Invocation) بسبب Bypassing Access Checks وعدم قابلية JIT Compiler لتحسينه. في الحلقات المتكررة، استخدم <code>MethodHandle</code> (Java 7+) أو <code>LambdaMetafactory</code> (Java 8+) لأداء أفضل. في Java 9+، استخدم <code>VarHandle</code> للوصول للحقول.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SUMMARY CARD ==================== -->
+<div class="summary-card">
+    <h2>🚀 Java: لغة المؤسسات والتصميم الحديث</h2>
+    <p>منذ إطلاقها في عام 1995، تطورت Java لتصبح حجر الزاوية في أنظمة المؤسسات الكبيرة. بفضل JVM القوية، نظام الأنواع الصارم، البنية التحتية الواسعة للـ Libraries، والتطور المستمر (Lambdas، Streams، Records، Virtual Threads)، تظل Java الخيار الأمثل للتطبيقات التي تتطلب الموثوقية، الأداء، وقابلية التوسع.</p>
+    <div class="summary-grid">
+        <div class="summary-item">
+            <div class="summary-item-icon">🏢</div>
+            <div class="summary-item-title">Enterprise Ready</div>
+            <div class="summary-item-desc">Spring Boot، Jakarta EE، ونظام بيئي غني</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-item-icon">⚡</div>
+            <div class="summary-item-title">High Performance</div>
+            <div class="summary-item-desc">JIT Compiler، GC متقدم، وتحسينات JVM</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-item-icon">🔒</div>
+            <div class="summary-item-title">Type Safety</div>
+            <div class="summary-item-desc">Compile-Time Checks ونظام أنواع قوي</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-item-icon">🌍</div>
+            <div class="summary-item-title">Cross Platform</div>
+            <div class="summary-item-desc">"Write Once, Run Anywhere" عبر JVM</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-item-icon">🧵</div>
+            <div class="summary-item-title">Modern Concurrency</div>
+            <div class="summary-item-desc">Virtual Threads وStructured Concurrency</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-item-icon">📦</div>
+            <div class="summary-item-title">Rich Ecosystem</div>
+            <div class="summary-item-desc">Maven، Gradle، وملايين المكتبات</div>
+        </div>
+    </div>
+</div>
+
+</main>
+
+<footer class="footer">
+    <p>تم إعداد هذا الدليل بعناية فائقة — يغطي Java SE 8 حتى Java 21 | JVM Internals | Concurrency | Modern Features</p>
+    <p style="margin-top: 8px; opacity: 0.7;">Java Master Guide — Senior Software Engineer Reference</p>
+</footer>
+
+<script>
+    // Copy code functionality
+    function copyCode(btn) {
+        const code = btn.closest('.code-block-wrapper').querySelector('pre').innerText;
+        navigator.clipboard.writeText(code).then(() => {
+            const original = btn.innerText;
+            btn.innerText = '✓ تم النسخ';
+            btn.style.background = 'var(--success)';
+            btn.style.borderColor = 'var(--success)';
+            btn.style.color = 'white';
+            setTimeout(() => {
+                btn.innerText = original;
+                btn.style.background = '';
+                btn.style.borderColor = '';
+                btn.style.color = '';
+            }, 2000);
+        });
+    }
+
+    // Active nav link on scroll
+    const sections = document.querySelectorAll('.section');
+    const navLinks = document.querySelectorAll('.nav-links a');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (scrollY >= sectionTop - 120) {
+                current = section.getAttribute('id');
+            }
+        });
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

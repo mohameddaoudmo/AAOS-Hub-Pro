@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دليل Kotlin الشامل — من Java إلى Kotlin 2.x</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@300;400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --kotlin-purple: #7F52FF;
+  --kotlin-orange: #F88909;
+  --dark-slate: #1E1E24;
+  --soft-bg: #F9F9FB;
+  --code-bg: #282A36;
+  --code-bg-light: #2D2F3A;
+  --text-primary: #1E1E24;
+  --text-secondary: #5A5A6E;
+  --text-muted: #8A8A9E;
+  --border-light: #E2E2EA;
+  --border-medium: #D0D0DC;
+  --success: #10B981;
+  --danger: #EF4444;
+  --warning: #F59E0B;
+  --info: #3B82F6;
+  --card-shadow: 0 4px 20px rgba(30,30,36,0.08);
+  --card-shadow-hover: 0 8px 30px rgba(30,30,36,0.14);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'Tajawal','Cairo',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--soft-bg); color:var(--text-primary); line-height:1.9; font-size:17px; overflow-x:hidden;
+}
+::-webkit-scrollbar { width:10px; }
+::-webkit-scrollbar-track { background:var(--soft-bg); }
+::-webkit-scrollbar-thumb { background:var(--kotlin-purple); border-radius:5px; }
+::-webkit-scrollbar-thumb:hover { background:var(--kotlin-orange); }
+.hero {
+  background:linear-gradient(135deg,var(--dark-slate) 0%,#2D2B55 50%,#1E1E24 100%);
+  color:white; padding:100px 20px 80px; text-align:center; position:relative; overflow:hidden;
+}
+.hero::before { content:''; position:absolute; top:-50%; right:-20%; width:600px; height:600px; background:radial-gradient(circle,rgba(127,82,255,0.15) 0%,transparent 70%); border-radius:50%; }
+.hero::after { content:''; position:absolute; bottom:-30%; left:-10%; width:400px; height:400px; background:radial-gradient(circle,rgba(248,137,9,0.12) 0%,transparent 70%); border-radius:50%; }
+.hero-content { position:relative; z-index:1; max-width:900px; margin:0 auto; }
+.hero-badge { display:inline-block; background:rgba(127,82,255,0.2); border:1px solid var(--kotlin-purple); color:var(--kotlin-purple); padding:8px 24px; border-radius:50px; font-size:14px; font-weight:700; margin-bottom:24px; letter-spacing:1px; }
+.hero h1 { font-size:52px; font-weight:900; margin-bottom:20px; line-height:1.3; text-shadow:0 4px 20px rgba(0,0,0,0.3); }
+.hero h1 .highlight { background:linear-gradient(90deg,var(--kotlin-purple),var(--kotlin-orange)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.hero-subtitle { font-size:22px; color:rgba(255,255,255,0.75); font-weight:400; max-width:700px; margin:0 auto 30px; }
+.hero-meta { display:flex; justify-content:center; gap:30px; flex-wrap:wrap; margin-top:30px; }
+.hero-meta-item { display:flex; align-items:center; gap:8px; font-size:15px; color:rgba(255,255,255,0.6); }
+.hero-meta-item svg { width:18px; height:18px; fill:var(--kotlin-orange); }
+.nav-container { position:sticky; top:0; z-index:100; background:rgba(249,249,251,0.95); backdrop-filter:blur(12px); border-bottom:1px solid var(--border-light); padding:0; }
+.nav { max-width:1200px; margin:0 auto; display:flex; overflow-x:auto; gap:4px; padding:12px 20px; scrollbar-width:none; }
+.nav::-webkit-scrollbar { display:none; }
+.nav a { color:var(--text-secondary); text-decoration:none; padding:10px 18px; border-radius:8px; font-weight:600; font-size:15px; white-space:nowrap; transition:all 0.3s ease; border:1px solid transparent; }
+.nav a:hover { background:rgba(127,82,255,0.08); color:var(--kotlin-purple); }
+.nav a.active { background:var(--kotlin-purple); color:white; box-shadow:0 4px 12px rgba(127,82,255,0.3); }
+.container { max-width:1100px; margin:0 auto; padding:40px 20px; }
+.section { margin-bottom:80px; scroll-margin-top:80px; }
+.section-header { display:flex; align-items:center; gap:16px; margin-bottom:40px; padding-bottom:20px; border-bottom:3px solid var(--border-light); }
+.section-number { width:56px; height:56px; background:linear-gradient(135deg,var(--kotlin-purple),var(--kotlin-orange)); color:white; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:900; flex-shrink:0; box-shadow:0 4px 15px rgba(127,82,255,0.3); }
+.section-title-group h2 { font-size:32px; font-weight:800; color:var(--dark-slate); margin-bottom:6px; }
+.section-title-group .en-subtitle { font-size:15px; color:var(--text-muted); font-weight:500; letter-spacing:0.5px; }
+.subsection { margin-bottom:50px; }
+.subsection-title { font-size:24px; font-weight:700; color:var(--dark-slate); margin-bottom:20px; display:flex; align-items:center; gap:12px; }
+.subsection-title::before { content:''; width:6px; height:28px; background:linear-gradient(180deg,var(--kotlin-purple),var(--kotlin-orange)); border-radius:3px; flex-shrink:0; }
+.subsection-desc { color:var(--text-secondary); font-size:17px; margin-bottom:24px; line-height:1.8; }
+.code-compare { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:24px 0; }
+.code-block-wrapper { background:var(--code-bg); border-radius:16px; overflow:hidden; box-shadow:var(--card-shadow); transition:transform 0.3s ease,box-shadow 0.3s ease; }
+.code-block-wrapper:hover { transform:translateY(-2px); box-shadow:var(--card-shadow-hover); }
+.code-header { display:flex; align-items:center; justify-content:space-between; padding:12px 18px; background:var(--code-bg-light); border-bottom:1px solid rgba(255,255,255,0.05); }
+.code-lang-badge { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:rgba(255,255,255,0.7); }
+.code-lang-badge .dot { width:10px; height:10px; border-radius:50%; }
+.dot.java { background:var(--warning); }
+.dot.kotlin { background:var(--kotlin-purple); }
+.code-block-wrapper pre { margin:0; padding:20px; overflow-x:auto; direction:ltr; text-align:left; }
+.code-block-wrapper code { font-family:'Fira Code','JetBrains Mono','Consolas',monospace; font-size:14px; line-height:1.7; color:#E6E6E6; direction:ltr; display:block; }
+.kw { color:#FF79C6; font-weight:600; }
+.fn { color:#50FA7B; }
+.st { color:#F1FA8C; }
+.cm { color:#6272A4; font-style:italic; }
+.ty { color:#8BE9FD; }
+.nu { color:#BD93F9; }
+.op { color:#FF79C6; }
+.an { color:#FFB86C; }
+.code-single { background:var(--code-bg); border-radius:16px; overflow:hidden; margin:24px 0; box-shadow:var(--card-shadow); }
+.code-single pre { margin:0; padding:24px; overflow-x:auto; direction:ltr; text-align:left; }
+.code-single code { font-family:'Fira Code','JetBrains Mono','Consolas',monospace; font-size:14.5px; line-height:1.8; color:#E6E6E6; direction:ltr; display:block; }
+.callout { border-radius:16px; padding:24px 28px; margin:24px 0; position:relative; overflow:hidden; }
+.callout::before { content:''; position:absolute; top:0; right:0; width:5px; height:100%; }
+.callout-info { background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(59,130,246,0.03)); border:1px solid rgba(59,130,246,0.2); }
+.callout-info::before { background:var(--info); }
+.callout-warning { background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(245,158,11,0.03)); border:1px solid rgba(245,158,11,0.2); }
+.callout-warning::before { background:var(--warning); }
+.callout-success { background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(16,185,129,0.03)); border:1px solid rgba(16,185,129,0.2); }
+.callout-success::before { background:var(--success); }
+.callout-danger { background:linear-gradient(135deg,rgba(239,68,68,0.08),rgba(239,68,68,0.03)); border:1px solid rgba(239,68,68,0.2); }
+.callout-danger::before { background:var(--danger); }
+.callout-title { font-weight:800; font-size:18px; margin-bottom:10px; display:flex; align-items:center; gap:10px; }
+.callout-info .callout-title { color:var(--info); }
+.callout-warning .callout-title { color:var(--warning); }
+.callout-success .callout-title { color:var(--success); }
+.callout-danger .callout-title { color:var(--danger); }
+.callout p { color:var(--text-secondary); font-size:16px; line-height:1.8; }
+.badge-container { display:flex; flex-wrap:wrap; gap:10px; margin:16px 0; }
+.badge { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:50px; font-size:13px; font-weight:700; letter-spacing:0.3px; }
+.badge-purple { background:rgba(127,82,255,0.12); color:var(--kotlin-purple); border:1px solid rgba(127,82,255,0.25); }
+.badge-orange { background:rgba(248,137,9,0.12); color:#D97706; border:1px solid rgba(248,137,9,0.25); }
+.badge-green { background:rgba(16,185,129,0.12); color:var(--success); border:1px solid rgba(16,185,129,0.25); }
+.badge-red { background:rgba(239,68,68,0.12); color:var(--danger); border:1px solid rgba(239,68,68,0.25); }
+.compare-table { width:100%; border-collapse:separate; border-spacing:0; margin:24px 0; border-radius:16px; overflow:hidden; box-shadow:var(--card-shadow); background:white; }
+.compare-table th { background:linear-gradient(135deg,var(--dark-slate),#2D2B55); color:white; padding:18px 24px; font-weight:700; font-size:15px; text-align:right; }
+.compare-table th:first-child { border-radius:0 16px 0 0; }
+.compare-table th:last-child { border-radius:16px 0 0 0; }
+.compare-table td { padding:18px 24px; border-bottom:1px solid var(--border-light); color:var(--text-secondary); font-size:15.5px; line-height:1.7; }
+.compare-table tr:last-child td { border-bottom:none; }
+.compare-table tr:hover td { background:rgba(127,82,255,0.03); }
+.compare-table code { font-family:'Fira Code',monospace; background:rgba(127,82,255,0.08); color:var(--kotlin-purple); padding:2px 8px; border-radius:6px; font-size:13px; }
+.feature-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:24px; margin:30px 0; }
+.feature-card { background:white; border-radius:20px; padding:28px; box-shadow:var(--card-shadow); border:1px solid var(--border-light); transition:all 0.3s ease; position:relative; overflow:hidden; }
+.feature-card::before { content:''; position:absolute; top:0; right:0; left:0; height:4px; background:linear-gradient(90deg,var(--kotlin-purple),var(--kotlin-orange)); opacity:0; transition:opacity 0.3s ease; }
+.feature-card:hover { transform:translateY(-4px); box-shadow:var(--card-shadow-hover); }
+.feature-card:hover::before { opacity:1; }
+.feature-card-icon { width:50px; height:50px; background:linear-gradient(135deg,rgba(127,82,255,0.1),rgba(248,137,9,0.1)); border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:24px; margin-bottom:16px; }
+.feature-card h4 { font-size:20px; font-weight:800; margin-bottom:10px; color:var(--dark-slate); }
+.feature-card p { color:var(--text-secondary); font-size:15px; line-height:1.7; }
+.summary-card { background:linear-gradient(135deg,var(--dark-slate),#2D2B55); border-radius:24px; padding:50px 40px; color:white; text-align:center; margin-top:60px; position:relative; overflow:hidden; }
+.summary-card::before { content:''; position:absolute; top:-100px; right:-100px; width:300px; height:300px; background:radial-gradient(circle,rgba(127,82,255,0.2) 0%,transparent 70%); border-radius:50%; }
+.summary-card::after { content:''; position:absolute; bottom:-80px; left:-80px; width:250px; height:250px; background:radial-gradient(circle,rgba(248,137,9,0.15) 0%,transparent 70%); border-radius:50%; }
+.summary-card h3 { font-size:36px; font-weight:900; margin-bottom:20px; position:relative; z-index:1; }
+.summary-card .highlight-stat { font-size:64px; font-weight:900; background:linear-gradient(90deg,var(--kotlin-purple),var(--kotlin-orange)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; display:block; margin:20px 0; position:relative; z-index:1; }
+.summary-card p { font-size:18px; color:rgba(255,255,255,0.7); max-width:700px; margin:0 auto; position:relative; z-index:1; line-height:1.8; }
+p code, li code, td code { font-family:'Fira Code',monospace; background:rgba(127,82,255,0.08); color:var(--kotlin-purple); padding:2px 8px; border-radius:6px; font-size:14px; direction:ltr; display:inline-block; }
+ul, ol { margin:16px 0; padding-right:24px; }
+li { margin-bottom:10px; color:var(--text-secondary); font-size:16.5px; }
+li::marker { color:var(--kotlin-purple); }
+p { margin-bottom:16px; color:var(--text-secondary); font-size:17px; }
+.divider { height:1px; background:linear-gradient(90deg,transparent,var(--border-medium),transparent); margin:50px 0; }
+.footer { text-align:center; padding:40px 20px; color:var(--text-muted); font-size:14px; border-top:1px solid var(--border-light); margin-top:60px; }
+@media (max-width:768px) {
+  .hero h1 { font-size:32px; }
+  .hero-subtitle { font-size:17px; }
+  .code-compare { grid-template-columns:1fr; }
+  .section-title-group h2 { font-size:24px; }
+  .feature-grid { grid-template-columns:1fr; }
+  .summary-card .highlight-stat { font-size:48px; }
+  .nav { padding:10px 12px; }
+  .nav a { padding:8px 12px; font-size:13px; }
+}
+html { scroll-behavior:smooth; }
+::selection { background:rgba(127,82,255,0.3); color:var(--dark-slate); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">دليل شامل ومُعمّق</div>
+        <h1>من <span class="highlight">Java</span> إلى <span class="highlight">Kotlin 2.x</span></h1>
+        <p class="hero-subtitle">
+            دليلك المرجعي الشامل لجميع الاختلافات الصرفية والنمطية بين Kotlin وJava،<br>
+            مع التركيز على نظام الأنواع، البرمجة الوظيفية، والميزات الحديثة.
+        </p>
+        <div class="hero-meta">
+            <div class="hero-meta-item">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                Kotlin 2.2 &amp; 2.3
+            </div>
+            <div class="hero-meta-item">
+                <svg viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
+                تحديث يوليو 2026
+            </div>
+            <div class="hero-meta-item">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                6 أقسام رئيسية
+            </div>
+        </div>
+    </div>
+</header>
+
+<nav class="nav-container">
+    <div class="nav">
+        <a href="#syntax" class="active">الصياغة</a>
+        <a href="#exceptions">الاستثناءات</a>
+        <a href="#functions">الدوال</a>
+        <a href="#oop">OOP</a>
+        <a href="#collections">المجموعات</a>
+        <a href="#modern">Kotlin 2.x</a>
+    </div>
+</nav>
+
+<main class="container">
+
+<!-- SECTION 1 -->
+<section class="section" id="syntax">
+    <div class="section-header">
+        <div class="section-number">1</div>
+        <div class="section-title-group">
+            <h2>أساسيات الصياغة ونظام الأنواع</h2>
+            <div class="en-subtitle">Syntax Foundations &amp; Type System</div>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title"><code>val</code> مقابل <code>var</code> واستنتاج النوع</h3>
+        <p class="subsection-desc">
+            في Kotlin، يُفرّق بين المتغيرات القابلة للتعديل وغير القابلة للتعديل على مستوى الصياغة نفسها،
+            بينما في Java يعتمد ذلك على الكلمة المفتاحية <code>final</code> التي يُغفلها المطوّرون كثيراً.
+        </p>
+        <div class="code-compare">
+            <div class="code-block-wrapper">
+                <div class="code-header"><div class="code-lang-badge"><span class="dot java"></span> Java</div></div>
+                <pre><code><span class="cm">// يجب كتابة final يدوياً</span>
+<span class="kw">final</span> <span class="ty">String</span> <span class="fn">name</span> = <span class="st">"Kotlin"</span>;
+<span class="ty">String</span> <span class="fn">version</span> = <span class="st">"2.3"</span>;
+
+<span class="cm">// Type Inference غير موجود</span>
+<span class="ty">Map</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt; <span class="fn">scores</span> = 
+    <span class="kw">new</span> <span class="ty">HashMap</span>&lt;&gt;();</code></pre>
+            </div>
+            <div class="code-block-wrapper">
+                <div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+                <pre><code><span class="cm">// val = final (read-only reference)</span>
+<span class="kw">val</span> name: <span class="ty">String</span> = <span class="st">"Kotlin"</span>
+<span class="kw">var</span> version = <span class="st">"2.3"</span>  <span class="cm">// Type Inference تلقائي</span>
+
+<span class="cm">// لا حاجة لتكرار النوع</span>
+<span class="kw">val</span> scores = <span class="fn">mutableMapOf</span>&lt;<span class="ty">String</span>, <span class="ty">Int</span>&gt;()</code></pre>
+            </div>
+        </div>
+        <div class="callout callout-info">
+            <div class="callout-title">💡 نصيحة مهنية</div>
+            <p>اعتمد <code>val</code> كافتراضي في كل مكان ممكن. استخدم <code>var</code> فقط عندما يكون التغيير ضرورياً فعلياً. هذا النمط يُقلّل من الأخطاء المنطقية ويجعل الكود أكثر قابلية للتنبؤ.</p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">نظام Null Safety — القضاء على NPE</h3>
+        <p class="subsection-desc">
+            تمثّل <strong>Null Safety</strong> أبرز نقلة نوعية في Kotlin. يفرّق المترجم بين الأنواع التي يمكن أن تكون <code>null</code>
+            والأنواع التي لا يمكنها ذلك، مما يُلغي <code>NullPointerException</code> (NPE) في وقت الترجمة.
+        </p>
+        <div class="badge-container">
+            <span class="badge badge-purple">Nullable Types <code>String?</code></span>
+            <span class="badge badge-orange">Safe Call <code>?.</code></span>
+            <span class="badge badge-green">Elvis Operator <code>?:</code></span>
+            <span class="badge badge-purple">Safe Cast <code>as?</code></span>
+            <span class="badge badge-red">Non-null Assertion <code>!!</code></span>
+        </div>
+        <div class="code-compare">
+            <div class="code-block-wrapper">
+                <div class="code-header"><div class="code-lang-badge"><span class="dot java"></span> Java</div></div>
+                <pre><code><span class="cm">// كل شيء قابل للـ null</span>
+<span class="ty">String</span> <span class="fn">name</span> = <span class="kw">null</span>;
+
+<span class="cm">// فحص يدوي مطلوب</span>
+<span class="kw">if</span> (name != <span class="kw">null</span>) {
+    <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(name.<span class="fn">length</span>());
+} <span class="kw">else</span> {
+    <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="st">"Unknown"</span>);
+}
+
+<span class="cm">// Ternary operator</span>
+<span class="ty">String</span> <span class="fn">display</span> = 
+    (name != <span class="kw">null</span>) ? name : <span class="st">"Guest"</span>;</code></pre>
+            </div>
+            <div class="code-block-wrapper">
+                <div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+                <pre><code><span class="cm">// النوع غير nullable افتراضياً</span>
+<span class="kw">val</span> name: <span class="ty">String</span> = <span class="st">"Kotlin"</span>  <span class="cm">// لا يمكن أن يكون null</span>
+<span class="kw">val</span> nullable: <span class="ty">String</span>? = <span class="kw">null</span>  <span class="cm">// يمكن أن يكون null</span>
+
+<span class="cm">// Safe Call + Elvis Operator</span>
+<span class="kw">val</span> length = nullable?.<span class="fn">length</span> ?: <span class="nu">0</span>
+
+<span class="cm">// Safe Cast</span>
+<span class="kw">val</span> number = obj <span class="kw">as</span>? <span class="ty">Int</span> ?: <span class="nu">0</span>
+
+<span class="cm">// Non-null assertion (تجنبه قدر الإمكان)</span>
+<span class="kw">val</span> risky = nullable!!  <span class="cm">// يرمي NPE إن كان null</span></code></pre>
+            </div>
+        </div>
+        <div class="callout callout-danger">
+            <div class="callout-title">⚠️ تحذير: Non-null Assertion <code>!!</code></div>
+            <p>يُعتبر استخدام <code>!!</code> رائحة كودية (Code Smell) في معظم الحالات. يُفضّل دائماً استخدام <code>?.</code> أو <code>?:</code> أو <code>let</code> للتعامل مع القيم القابلة للـ <code>null</code>.</p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">Smart Casts — الاستنتاج الذكي للنوع</h3>
+        <p class="subsection-desc">
+            بعد فحص النوع باستخدام <code>is</code>، يُدرك المترجم تلقائياً أن المتغير أصبح من النوع المحدد،
+            مما يُلغي الحاجة للـ Casting الصريح الذي يُرهق الكود في Java.
+        </p>
+        <div class="code-compare">
+            <div class="code-block-wrapper">
+                <div class="code-header"><div class="code-lang-badge"><span class="dot java"></span> Java</div></div>
+                <pre><code><span class="kw">if</span> (obj <span class="kw">instanceof</span> <span class="ty">String</span>) {
+    <span class="cm">// Casting صريح مطلوب في كل مرة</span>
+    <span class="ty">String</span> <span class="fn">str</span> = ((<span class="ty">String</span>) obj);
+    <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(str.<span class="fn">length</span>());
+
+    <span class="cm">// إذا أردت استخدامه مرة أخرى</span>
+    <span class="ty">String</span> <span class="fn">str2</span> = ((<span class="ty">String</span>) obj);
+    <span class="fn">process</span>(str2);
+}</code></pre>
+            </div>
+            <div class="code-block-wrapper">
+                <div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+                <pre><code><span class="kw">if</span> (obj <span class="kw">is</span> <span class="ty">String</span>) {
+    <span class="cm">// المترجم يعرف أن obj هو String هنا</span>
+    <span class="fn">println</span>(obj.<span class="fn">length</span>)
+
+    <span class="cm">// يمكن استخدامه مباشرة</span>
+    <span class="fn">process</span>(obj)  <span class="cm">// String تلقائياً</span>
+}
+
+<span class="cm">// في العبارة المعاكسة أيضاً</span>
+<span class="kw">if</span> (obj !<span class="kw">is</span> <span class="ty">String</span>) <span class="kw">return</span>
+<span class="fn">println</span>(obj.<span class="fn">length</span>)  <span class="cm">// String مضمون</span></code></pre>
+            </div>
+        </div>
+        <div class="callout callout-success">
+            <div class="callout-title">✅ ميزة Smart Casts</div>
+            <p>يعمل <strong>Smart Casts</strong> أيضاً مع العبارات المنطقية (<code>&amp;&amp;</code> و <code>||</code>)، والحلقات <code>while</code>، والدوال التي تُرجع <code>Nothing</code>. المترجم يُحلّل تدفق البيانات (Control Flow Analysis) ليحدد متى يكون النوع آمناً.</p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">Expressions مقابل Statements</h3>
+        <p class="subsection-desc">
+            في Kotlin، تعمل عبارات <code>if</code> و <code>when</code> و <code>try-catch</code> كـ <strong>Expressions</strong> تُرجع قيماً،
+            مما يُلغي الحاجة لعامل Java الثلاثي <code>? :</code> ويُبسّط المنطق الشرطي.
+        </p>
+        <div class="code-compare">
+            <div class="code-block-wrapper">
+                <div class="code-header"><div class="code-lang-badge"><span class="dot java"></span> Java</div></div>
+                <pre><code><span class="cm">// if هو statement فقط</span>
+<span class="ty">String</span> <span class="fn">result</span>;
+<span class="kw">if</span> (score >= <span class="nu">60</span>) {
+    result = <span class="st">"Pass"</span>;
+} <span class="kw">else</span> {
+    result = <span class="st">"Fail"</span>;
+}
+
+<span class="cm">// Ternary operator محدود</span>
+<span class="ty">String</span> <span class="fn">status</span> = 
+    (age >= <span class="nu">18</span>) ? <span class="st">"Adult"</span> : <span class="st">"Minor"</span>;
+
+<span class="cm">// switch تقليدي</span>
+<span class="kw">switch</span> (day) {
+    <span class="kw">case</span> <span class="st">"MON"</span>: result = <span class="nu">1</span>; <span class="kw">break</span>;
+    <span class="kw">case</span> <span class="st">"TUE"</span>: result = <span class="nu">2</span>; <span class="kw">break</span>;
+    <span class="kw">default</span>: result = <span class="nu">0</span>;
+}</code></pre>
+            </div>
+            <div class="code-block-wrapper">
+                <div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+                <pre><code><span class="cm">// if هو expression يُرجع قيمة</span>
+<span class="kw">val</span> result = <span class="kw">if</span> (score >= <span class="nu">60</span>) <span class="st">"Pass"</span> <span class="kw">else</span> <span class="st">"Fail"</span>
+
+<span class="cm">// when يُبدل switch بالكامل</span>
+<span class="kw">val</span> dayNumber = <span class="kw">when</span> (day) {
+    <span class="st">"MON"</span> -> <span class="nu">1</span>
+    <span class="st">"TUE"</span> -> <span class="nu">2</span>
+    <span class="kw">else</span> -> <span class="nu">0</span>
+}
+
+<span class="cm">// try-catch كـ expression</span>
+<span class="kw">val</span> number = <span class="kw">try</span> {
+    str.<span class="fn">toInt</span>()
+} <span class="kw">catch</span> (e: <span class="ty">NumberFormatException</span>) {
+    <span class="nu">0</span>
+}</code></pre>
+            </div>
+        </div>
+        <div class="callout callout-info">
+            <div class="callout-title">🔍 مقارنة <code>when</code> مع <code>switch</code></div>
+            <p>عبارة <code>when</code> في Kotlin أقوى بكثير من <code>switch</code> في Java: تدعم نطاقات الأرقام (<code>in 1..10</code>)، أنواع متعددة (<code>is String</code>)، شروط منطقية (<code>when { x > 0 -> ... }</code>)، ولا تحتاج إلى <code>break</code> لأنها لا تتسرب (No Fall-through).</p>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+        <div class="code-single">
+            <div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+            <pre><code><span class="kw">import</span> kotlin.jvm.Throws
+
+<span class="an">@Throws</span>(<span class="ty">IOException</span>::<span class="kw">class</span>)
+<span class="kw">fun</span> <span class="fn">readFromNetwork</span>(url: <span class="ty">String</span>): <span class="ty">String</span> {
+    <span class="cm">// من Java: يجب معالجة IOException</span>
+    <span class="kw">return</span> <span class="ty">URL</span>(url).<span class="fn">readText</span>()
+}
+
+<span class="cm">// عند استخدام @Throws مع عدة استثناءات</span>
+<span class="an">@Throws</span>(<span class="ty">IOException</span>::<span class="kw">class</span>, <span class="ty">IllegalArgumentException</span>::<span class="kw">class</span>)
+<span class="kw">fun</span> <span class="fn">processData</span>(input: <span class="ty">String</span>): <span class="ty">ByteArray</span> {
+    <span class="kw">if</span> (input.<span class="fn">isBlank</span>()) <span class="kw">throw</span> <span class="ty">IllegalArgumentException</span>(<span class="st">"Empty input"</span>)
+    <span class="kw">return</span> input.<span class="fn">toByteArray</span>()
+}</code></pre>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SECTION 3 -->
+<section class="section" id="functions">
+<div class="section-header">
+<div class="section-number">3</div>
+<div class="section-title-group">
+<h2>الدوال والبرمجة الوظيفية</h2>
+<div class="en-subtitle">Functions &amp; Functional Paradigm</div>
+</div>
+</div>
+
+<div class="subsection">
+<h3 class="subsection-title">دوال وخصائص المستوى الأعلى (Top-Level)</h3>
+<p class="subsection-desc">
+في Kotlin، يمكن تعريف الدوال والخصائص مباشرة خارج الأصناف، مما يُلغي الحاجة لـ Utility Classes
+مثل StringUtils.java أو Collections.java.
+</p>
+<div class="code-compare">
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot java"></span> Java</div></div>
+<pre><code>// Utility Class مطلوب
+public final class StringUtils {
+    private StringUtils() {}  // منع الإنشاء
+
+    public static String capitalize(String s) {
+        return s.substring(0, 1).toUpperCase() 
+            + s.substring(1);
+    }
+}
+
+// الاستخدام
+String result = StringUtils.capitalize("hello");</code></pre>
+</div>
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+<pre><code>// دالة مباشرة في الملف
+fun capitalize(s: String): String =
+    s.replaceFirstChar { it.uppercase() }
+
+// خاصية على المستوى الأعلى
+val PI = 3.14159
+
+// الاستخدام — لا حاجة لاسم الصنف
+val result = capitalize("hello")
+val radius = 2 * PI</code></pre>
+</div>
+</div>
+</div>
+
+<div class="subsection">
+<h3 class="subsection-title">الوسائط الافتراضية والمُسماة</h3>
+<p class="subsection-desc">
+تُلغي Default Arguments و Named Arguments في Kotlin الحاجة لكتابة دوال مُحمّلة (Overloads)
+متعددة في Java، مما يُقلّل Boilerplate بشكل كبير.
+</p>
+<div class="code-compare">
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot java"></span> Java</div></div>
+<pre><code>// Overloads متعددة مطلوبة
+public void connect(String host) {
+    connect(host, 8080, 5000);
+}
+
+public void connect(String host, int port) {
+    connect(host, port, 5000);
+}
+
+public void connect(String host, int port, int timeout) {
+    // ...
+}
+
+// الاستخدام
+connect("api.example.com", 443, 10000);
+// أي قيمة لـ timeout؟ يجب تذكر الترتيب!</code></pre>
+</div>
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+<pre><code>// دالة واحدة فقط
+fun connect(
+    host: String,
+    port: Int = 8080,
+    timeout: Int = 5000
+) {
+    // ...
+}
+
+// الاستخدام المرن
+connect("api.example.com")                    // port=8080, timeout=5000
+connect("api.example.com", 443)              // timeout=5000
+connect("api.example.com", timeout = 10000)  // port=8080
+connect(port = 443, host = "api.example.com") // أي ترتيب!</code></pre>
+</div>
+</div>
+</div>
+
+<div class="subsection">
+<h3 class="subsection-title">دوال الامتداد (Extension Functions)</h3>
+<p class="subsection-desc">
+تُمكّن Extension Functions من إضافة دوال وخصائص لأي صنف (حتى الأصناف النهائية أو من SDK)
+دون وراثة أو تعديل الكود المصدري. هذا يُحسّن قابلية القراءة ويُبني DSLs قوية.
+</p>
+<div class="code-compare">
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot java"></span> Java</div></div>
+<pre><code>// لا يمكن إضافة دوال لـ String
+// يجب استخدام Utility Class
+public class StringExtensions {
+    public static String addExclamation(String s) {
+        return s + "!";
+    }
+}
+
+// الاستخدام غير طبيعي
+String excited = StringExtensions.addExclamation("Hello");</code></pre>
+</div>
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+<pre><code>// إضافة دالة لـ String مباشرة
+fun String.addExclamation(): String = this + "!"
+
+// خاصية امتداد
+val String.wordCount: Int
+    get() = this.split(" ").size
+
+// الاستخدام الطبيعي
+val excited = "Hello".addExclamation()
+val count = "Hello World".wordCount  // 2</code></pre>
+</div>
+</div>
+<div class="callout callout-info">
+<div class="callout-title">🔍 ملاحظة تقنية</div>
+<p>Extension Functions لا تُعدّل الصنف الأصلي فعلياً. يتم تجميعها (Compile) كدوال static تأخذ المستقبل (Receiver) كمعامل أول. هذا يعني أنها لا تُمكنك من الوصول لأعضاء private أو protected في الصنف المُمتد.</p>
+</div>
+</div>
+
+<div class="subsection">
+<h3 class="subsection-title">دوال الرتبة العليا والـ Lambdas</h3>
+<p class="subsection-desc">
+في Kotlin، الدوال هي First-Class Citizens. يمكن تمريرها كمعاملات، تخزينها في متغيرات،
+وإرجاعها من دوال أخرى. يدعم Kotlin أيضاً Trailing Lambda Syntax و it الضمني.
+</p>
+<div class="code-single">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+<pre><code>// دالة ترتبة عليا
+fun operateOnNumbers(
+    a: Int,
+    b: Int,
+    operation: (Int, Int) -> Int
+): Int = operation(a, b)
+
+// Trailing Lambda — صياغة أنيقة
+val sum = operateOnNumbers(5, 3) { x, y ->
+    x + y
+}
+
+// it الضمني لمعامل واحد
+val doubled = list.map { it * 2 }
+
+// تخزين دالة في متغير
+val multiply: (Int, Int) -> Int = { a, b -> a * b }
+
+// إرجاع دالة من دالة
+fun multiplierOf(factor: Int): (Int) -> Int =
+    { number -> number * factor }</code></pre>
+</div>
+</div>
+
+<div class="subsection">
+<h3 class="subsection-title">دوال Inline و Reified Types</h3>
+<p class="subsection-desc">
+تُستخدم inline لتجنب تكلفة إنشاء كائنات Lambda في وقت التشغيل. مع reified،
+يمكن الوصول إلى معلومات Generics في وقت التشغيل — شيء مستحيل في Java بسبب Type Erasure.
+</p>
+<div class="code-compare">
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot java"></span> Java</div></div>
+<pre><code>// Type Erasure — لا يمكن معرفة T في Runtime
+public <T> T findFirst(List<?> list, 
+    Class<T> clazz) {
+    for (Object item : list) {
+        if (clazz.isInstance(item)) {
+            return clazz.cast(item);
+        }
+    }
+    return null;
+}
+
+// الاستخدام — يجب تمرير Class
+String first = findFirst(list, String.class);</code></pre>
+</div>
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+<pre><code>// reified يحفظ معلومات النوع
+inline fun <reified T> List<Any>.findFirst(): T? {
+    return this.filterIsInstance<T>().firstOrNull()
+}
+
+// الاستخدام — لا حاجة لتمرير Class
+val firstString = list.findFirst<String>()
+
+// inline مع crossinline و noinline
+inline fun measureTime(
+    crossinline block: () -> Unit
+) {
+    val start = System.currentTimeMillis()
+    block()
+    println("Time: ${System.currentTimeMillis() - start}ms")
+}</code></pre>
+</div>
+</div>
+<div class="callout callout-warning">
+<div class="callout-title">⚠️ تحذير: inline</div>
+<p>لا تُفرط في استخدام inline. يُناسب الدوال الصغيرة التي تستقبل Lambdas. الدوال الكبيرة المُعلّمة بـ inline تُسبب تضخماً في حجم الكود (Code Bloat). استخدم noinline للمعاملات التي لا تريد inline لها.</p>
+</div>
+</div>
+
+<div class="subsection">
+<h3 class="subsection-title">دوال Infix وتحميل المعاملات</h3>
+<p class="subsection-desc">
+تُمكّن Infix Functions من كتابة كود يقرأ مثل اللغة الطبيعية. يدعم Kotlin أيضاً
+Operator Overloading لتخصيص سلوك المعاملات القياسية.
+</p>
+<div class="code-single">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+<pre><code>// Infix Function
+infix fun Int.times(str: String) = str.repeat(this)
+val repeated = 3 times "Hello "  // "Hello Hello Hello "
+
+// Operator Overloading
+data class Point(val x: Int, val y: Int) {
+    operator fun plus(other: Point) = 
+        Point(x + other.x, y + other.y)
+
+    operator fun get(index: Int): Int = when (index) {
+        0 -> x
+        1 -> y
+        else -> throw IndexOutOfBoundsException()
+    }
+}
+
+// الاستخدام
+val p1 = Point(1, 2)
+val p2 = Point(3, 4)
+val p3 = p1 + p2        // Point(4, 6)
+val xCoord = p3[0]     // 4</code></pre>
+</div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SECTION 4: OOP -->
+<section class="section" id="oop">
+<div class="section-header">
+<div class="section-number">4</div>
+<div class="section-title-group">
+<h2>البرمجة كائنية التوجه المتقدمة</h2>
+<div class="en-subtitle">OOP Redefined</div>
+</div>
+</div>
+
+<div class="subsection">
+<h3 class="subsection-title">البناء والخصائص (Constructors &amp; Properties)</h3>
+<p class="subsection-desc">
+تُدمج Kotlin البناء الرئيسي (Primary Constructor) مع تعريف الخصائص في سطر واحد.
+يتم توليد getters و setters ضمنياً، مع إمكانية تخصيصها عبر field.
+</p>
+<div class="code-compare">
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot java"></span> Java</div></div>
+<pre><code>public class Person {
+    private String name;
+    private int age;
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public int getAge() { return age; }
+}</code></pre>
+</div>
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+<pre><code>// Primary Constructor + Properties في سطر واحد
+class Person(
+    var name: String,
+    val age: Int  // val = getter فقط (read-only)
+)
+
+// init block للتحقق
+class User(val email: String) {
+    init {
+        require(email.contains("@")) { "Invalid email" }
+    }
+}
+
+// Custom getter/setter مع backing field
+class Employee(var salary: Double) {
+    var bonus: Double = 0.0
+        set(value) {
+            require(value >= 0) { "Bonus must be positive" }
+            field = value  // field = backing field
+        }
+        get() = field * 1.1  // getter مخصص
+}</code></pre>
+</div>
+</div>
+</div>
+<!-- Section 4 continued: Data Classes -->
+<div class="subsection">
+<h3 class="subsection-title">أصناف البيانات (Data Classes)</h3>
+<p class="subsection-desc">
+تُولّد <code>data class</code> تلقائياً <code>equals()</code> و <code>hashCode()</code> و <code>toString()</code> و <code>copy()</code>
+و <code>componentN()</code> للـ Destructuring Declarations. هذا يُلغي مئات الأسطر من Boilerplate في Java.
+</p>
+<div class="code-compare">
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot java"></span> Java</div></div>
+<pre><code>public class User {
+    private final String id;
+    private final String name;
+    
+    public User(String id, String name) {
+        this.id = id; this.name = name;
+    }
+    
+    // equals, hashCode, toString, getters
+    // copy method يدوي
+    // ... مئات الأسطر
+}</code></pre>
+</div>
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+<pre><code>// سطر واحد يُولّد كل شيء
+data class User(val id: String, val name: String)
+
+// copy() مع named arguments
+val updated = user.copy(name = "New Name")
+
+// Destructuring
+val (id, name) = user
+
+// toString() تلقائي
+println(user)  // User(id=1, name=Ahmed)
+
+// equals() و hashCode() مُولّدان تلقائياً
+val same = user == User("1", "Ahmed")  // true</code></pre>
+</div>
+</div>
+</div>
+
+<!-- Sealed Classes -->
+<div class="subsection">
+<h3 class="subsection-title">الأصناف المختومة (Sealed Classes &amp; Interfaces)</h3>
+<p class="subsection-desc">
+تُقيّد <strong>Sealed Classes</strong> و <strong>Sealed Interfaces</strong> التسلسل الهرمي للأصناف، مما يُمكّن
+المترجم من التحقق من Exhaustiveness في <code>when</code> — أي أنك مضطر لمعالجة كل الحالات الممكنة.
+</p>
+<div class="code-single">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+<pre><code>// Sealed Class — لا يمكن توسيعها إلا في نفس الوحدة
+sealed class Result&lt;T&gt; {
+    data class Success&lt;T&gt;(val data: T) : Result&lt;T&gt;()
+    data class Error(val message: String) : Result&lt;Nothing&gt;()
+    object Loading : Result&lt;Nothing&gt;()
+}
+
+// Exhaustive when — المترجم يتحقق من كل الحالات
+fun &lt;T&gt; handleResult(result: Result&lt;T&gt;) = when (result) {
+    is Result.Success -&gt; println("Data: ${result.data}")
+    is Result.Error -&gt; println("Error: ${result.message}")
+    Result.Loading -&gt; println("Loading...")
+}  // لا حاجة لـ else — كل الحالات مُغطاة!
+
+// Sealed Interface (Kotlin 1.5+)
+sealed interface UiState {
+    object Idle : UiState
+    object Loading : UiState
+    data class Success&lt;T&gt;(val data: T) : UiState
+}</code></pre>
+</div>
+<div class="callout callout-success">
+<div class="callout-title">✅ فائدة Sealed Classes</div>
+<p>عند إضافة حالة جديدة لـ <code>sealed class</code>، سيُنبّهك المترجم بجميع أماكن <code>when</code> التي لم تُعالج الحالة الجديدة. هذا يُمنع أخطاء وقت التشغيل ويُحسّن صيانة الكود بشكل جذري.</p>
+</div>
+</div>
+
+<!-- Object Declarations & Companion Objects -->
+<div class="subsection">
+<h3 class="subsection-title">Object Declarations &amp; Companion Objects</h3>
+<p class="subsection-desc">
+يُوفّر <code>object</code> نمط Singleton مُدمج في اللغة. <code>companion object</code> يُبدل الأعضاء <code>static</code>
+في Java بطريقة أكثر مرونة وموضوعية (OOP-oriented).
+</p>
+<div class="code-compare">
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot java"></span> Java</div></div>
+<pre><code>// Singleton يدوي
+public class Database {
+    private static final Database INSTANCE = 
+        new Database();
+    
+    private Database() {}
+    
+    public static Database getInstance() {
+        return INSTANCE;
+    }
+}
+
+// static members
+public class Config {
+    public static final String API_URL = "...";
+}</code></pre>
+</div>
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+<pre><code>// Singleton مُدمج
+object Database {
+    fun connect() { /* ... */ }
+}
+
+// الاستخدام
+Database.connect()
+
+// Companion Object
+class User(val name: String) {
+    companion object {
+        const val MAX_NAME_LENGTH = 50
+        
+        fun createGuest() = User("Guest")
+    }
+}
+
+// الاستخدام
+val guest = User.createGuest()
+val maxLen = User.MAX_NAME_LENGTH</code></pre>
+</div>
+</div>
+<div class="callout callout-info">
+<div class="callout-title">🔍 الفرق بين object و companion object</div>
+<p><code>object</code> يُنشئ Singleton واحداً لكل التطبيق. <code>companion object</code> مرتبط بصنف معين (Class-level) ويمكنه الوصول لأعضاء <code>private</code> في الصنف. يمكن تسمية <code>companion object</code> وتطبيق Interfaces عليه.</p>
+</div>
+</div>
+
+<!-- Delegation -->
+<div class="subsection">
+<h3 class="subsection-title">نمط التفويض (Delegation Pattern)</h3>
+<p class="subsection-desc">
+يدعم Kotlin <strong>Class Delegation</strong> و <strong>Property Delegation</strong> بصياغة أنيقة عبر الكلمة <code>by</code>.
+هذا يُبسّط نمط Decorator ويُلغي Boilerplate كبير.
+</p>
+<div class="code-single">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+<pre><code>// Class Delegation
+interface Repository {
+    fun getData(): String
+}
+
+// Decorator بدون Boilerplate
+class LoggingRepository(
+    private val delegate: Repository
+) : Repository by delegate {
+    // override فقط ما تريد تخصيصه
+    override fun getData(): String {
+        println("Fetching data...")
+        return delegate.getData()
+    }
+}
+
+// Property Delegation — by lazy
+val heavyObject: ExpensiveService by lazy {
+    println("Initializing...")
+    ExpensiveService()
+}
+
+// Delegates.observable
+var name: String by Delegates.observable("") { _, old, new -&gt;
+    println("Name changed from $old to $new")
+}
+
+// Custom Delegate
+class TrimDelegate : ReadWriteProperty&lt;Any?, String&gt; {
+    private var value = ""
+    override fun getValue(thisRef: Any?, property: KProperty&lt;*&gt;) = value
+    override fun setValue(thisRef: Any?, property: KProperty&lt;*&gt;, newValue: String) {
+        value = newValue.trim()
+    }
+}
+
+var username: String by TrimDelegate()</code></pre>
+</div>
+</div>
+
+<!-- Value Classes -->
+<div class="subsection">
+<h3 class="subsection-title">أصناف القيمة (Value / Inline Classes)</h3>
+<p class="subsection-desc">
+تُوفّر <strong>Value Classes</strong> (سابقاً Inline Classes) نوعاً جديداً يلتف حول قيمة واحدة
+دون أي تكلفة وقت تشغيل (Zero-cost Abstraction). يتم تجميعها كالنوع الأساسي في JVM.
+</p>
+<div class="code-single">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+<pre><code>// Zero-cost wrapper للـ UserId
+@JvmInline
+value class UserId(val value: Long)
+
+@JvmInline
+value class Email(val address: String) {
+    init {
+        require('@' in address) { "Invalid email" }
+    }
+    
+    val domain: String
+        get() = address.substringAfter('@')
+}
+
+// الاستخدام — لا Boxting في وقت التشغيل
+fun getUser(id: UserId): User { /* ... */ }
+val user = getUser(UserId(123))  // يُمرّر كـ Long في JVM
+
+// Type Safety دون تكلفة
+fun sendEmail(to: Email, from: Email) { /* ... */ }
+// لا يمكن الخلط بين Email و String عادي</code></pre>
+</div>
+<div class="callout callout-success">
+<div class="callout-title">✅ فائدة Value Classes</div>
+<p>قبل Value Classes، كان المطوّرون يستخدمون <code>typealias</code> (بدون Type Safety) أو Wrapper Classes (مع تكلفة Boxing). Value Classes تجمع الأفضل من العالمين: Type Safety كامل مع أداء النوع الأساسي.</p>
+</div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SECTION 5: Collections & Scope Functions -->
+<section class="section" id="collections">
+<div class="section-header">
+<div class="section-number">5</div>
+<div class="section-title-group">
+<h2>المجموعات ودوال النطاق</h2>
+<div class="en-subtitle">Collections &amp; Scope Functions</div>
+</div>
+</div>
+
+<div class="subsection">
+<h3 class="subsection-title">المجموعات غير القابلة للتعديل (Immutable Collections)</h3>
+<p class="subsection-desc">
+في Kotlin، تكون المجموعات افتراضياً <strong>غير قابلة للتعديل</strong> (Read-only). يجب استخدام <code>MutableList</code> و <code>MutableMap</code>
+صريحاً للحصول على مجموعات قابلة للتعديل. هذا يُحسّن Thread Safety ويُقلّل الأخطاء.
+</p>
+<div class="code-compare">
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot java"></span> Java</div></div>
+<pre><code>// كل المجموعات قابلة للتعديل افتراضياً
+List&lt;String&gt; list = new ArrayList&lt;&gt;();
+list.add("A");  // مسموح دائماً
+
+// Collections.unmodifiableList يُرجع wrapper فقط
+List&lt;String&gt; readonly = 
+    Collections.unmodifiableList(list);
+// readonly.add("B") // يرمي UnsupportedOperationException</code></pre>
+</div>
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+<pre><code>// List غير قابل للتعديل افتراضياً
+val list = listOf("A", "B")  // List&lt;String&gt;
+// list.add("C") // خطأ في الترجمة!
+
+// MutableList صريح
+val mutable = mutableListOf("A", "B")
+mutable.add("C")  // مسموح
+
+// Map و Set أيضاً
+val map = mapOf(1 to "One", 2 to "Two")
+val mutableMap = mutableMapOf&lt;Int, String&gt;()</code></pre>
+</div>
+</div>
+</div>
+
+<div class="subsection">
+<h3 class="subsection-title">دوال النطاق (Scope Functions)</h3>
+<p class="subsection-desc">
+تُوفّر Kotlin خمس دوال نطاق (<code>let</code>، <code>run</code>، <code>apply</code>، <code>also</code>، <code>with</code>) لتنظيم الكود
+وتجنب المتغيرات المؤقتة. يختلفون في: كائن السياق (<code>it</code> مقابل <code>this</code>) والقيمة المُرجعة.
+</p>
+
+<table class="compare-table">
+<thead>
+<tr>
+<th>الدالة</th>
+<th>كائن السياق</th>
+<th>القيمة المُرجعة</th>
+<th>الاستخدام الأمثل</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>let</code></td>
+<td><code>it</code></td>
+<td>نتيجة Lambda</td>
+<td>تنفيذ كود على nullable، تحويل النوع</td>
+</tr>
+<tr>
+<td><code>run</code></td>
+<td><code>this</code></td>
+<td>نتيجة Lambda</td>
+<td>تهيئة كائن + حساب قيمة</td>
+</tr>
+<tr>
+<td><code>apply</code></td>
+<td><code>this</code></td>
+<td>الكائن نفسه</td>
+<td>تهيئة الكائن (Builder-style)</td>
+</tr>
+<tr>
+<td><code>also</code></td>
+<td><code>it</code></td>
+<td>الكائن نفسه</td>
+<td>تسجيل أو side effects بدون تعديل</td>
+</tr>
+<tr>
+<td><code>with</code></td>
+<td><code>this</code></td>
+<td>نتيجة Lambda</td>
+<td>تجميع عمليات على نفس الكائن</td>
+</tr>
+</tbody>
+</table>
+
+<div class="code-single">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+<pre><code>// let — مع nullable وتحويل النوع
+val length = name?.let { 
+    it.length  // it = name (non-null)
+} ?: 0
+
+// apply — تهيئة Builder-style
+val user = User("").apply {
+    name = "Ahmed"   // this = User
+    age = 30
+}
+
+// also — side effect بدون تعديل
+val numbers = mutableListOf(1, 2, 3).also {
+    println("Created list with ${it.size} elements")
+}
+
+// run — تهيئة + حساب
+val result = service.run {
+    connect()       // this = service
+    fetchData()     // يرجع نتيجة Lambda
+}
+
+// with — تجميع العمليات
+val description = with(user) {
+    "$name is $age years old"  // this = user
+}</code></pre>
+</div>
+</div>
+
+<div class="subsection">
+<h3 class="subsection-title">Sequences مقابل Java Streams</h3>
+<p class="subsection-desc">
+تُوفّر <strong>Sequences</strong> في Kotlin تقييماً كسولاً (Lazy Evaluation) مشابهاً لـ Java Streams،
+لكنها أكثر كفاءة لأنها تتجنب إنشاء مجموعات وسيطة (Intermediate Collections).
+</p>
+<div class="code-compare">
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot java"></span> Java</div></div>
+<pre><code>// Stream API — متاح من Java 8
+List&lt;Integer&gt; result = numbers.stream()
+    .filter(n -&gt; n % 2 == 0)
+    .map(n -&gt; n * 2)
+    .limit(10)
+    .collect(Collectors.toList());
+
+// لا يمكن إعادة استخدام Stream
+// stream.iterator() يُستهلك مرة واحدة</code></pre>
+</div>
+<div class="code-block-wrapper">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin</div></div>
+<pre><code>// Sequence — كسول وقابل لإعادة الاستخدام
+val result = numbers.asSequence()
+    .filter { it % 2 == 0 }
+    .map { it * 2 }
+    .take(10)
+    .toList()
+
+// الفرق: لا يُنشأ List وسيط!
+// filter ثم map على كل عنصر قبل الانتقال للتالي
+
+// generateSequence لأعداد لانهائية
+val fibonacci = generateSequence(0 to 1) { 
+    it.second to it.first + it.second 
+}.map { it.first }</code></pre>
+</div>
+</div>
+<div class="callout callout-info">
+<div class="callout-title">💡 متى تستخدم Sequence؟</div>
+<p>استخدم <code>Sequence</code> عندما يكون لديك سلسلة طويلة من العمليات (filter, map, flatMap) على مجموعات كبيرة. إذا كانت المجموعة صغيرة (&lt; 1000 عنصر)، فإن <code>List</code> العادية قد تكون أسرع بسبب overhead إنشاء Sequence.</p>
+</div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SECTION 6: Modern Kotlin -->
+<section class="section" id="modern">
+<div class="section-header">
+<div class="section-number">6</div>
+<div class="section-title-group">
+<h2>أحدث ميزات الصياغة في Kotlin 2.2 &amp; 2.3</h2>
+<div class="en-subtitle">Modern Kotlin Syntax Features</div>
+</div>
+</div>
+
+<div class="subsection">
+<h3 class="subsection-title">Guard Conditions في <code>when</code></h3>
+<p class="subsection-desc">
+تُمكّن Kotlin 2.2 من إرفاق شروط <code>if</code> مباشرة بفروع <code>when</code>، مما يُقلّل التداخل
+ويجعل المنطق الشرطي أكثر وضوحاً.
+</p>
+<div class="code-single">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin 2.2+</div></div>
+<pre><code>// قبل Kotlin 2.2 — تداخل مُزعج
+when (val response = fetchData()) {
+    is Result.Success -&gt; {
+        if (response.data.isNotEmpty()) {
+            process(response.data)
+        } else {
+            showEmpty()
+        }
+    }
+    is Result.Error -&gt; showError()
+}
+
+// Kotlin 2.2 — Guard Conditions مباشرة
+when (val response = fetchData()) {
+    is Result.Success if response.data.isNotEmpty() 
+        -&gt; process(response.data)
+    is Result.Success 
+        -&gt; showEmpty()
+    is Result.Error 
+        -&gt; showError()
+}</code></pre>
+</div>
+</div>
+
+<div class="subsection">
+<h3 class="subsection-title">Explicit Backing Fields</h3>
+<p class="subsection-desc">
+تُمكّن Kotlin 2.2 من تعريف Backing Fields صريحة للخصائص بصياغة نظيفة،
+مما يُسهّل فصل الواجهة العامة عن التخزين الداخلي.
+</p>
+<div class="code-single">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin 2.2+</div></div>
+<pre><code>// Kotlin 2.2 — Explicit Backing Field
+class DataContainer&lt;T&gt; {
+    val items: List&lt;T&gt;
+        field = mutableListOf()  // field صريح
+    
+    fun add(item: T) {
+        field.add(item)  // الوصول المباشر للـ field
+    }
+}
+
+// مقارنة مع الطريقة القديمة
+class OldContainer&lt;T&gt; {
+    private val _items = mutableListOf&lt;T&gt;()  // naming convention
+    val items: List&lt;T&gt; get() = _items
+}</code></pre>
+</div>
+</div>
+
+<div class="subsection">
+<h3 class="subsection-title">Multi-dollar String Interpolation</h3>
+<p class="subsection-desc">
+تُعالج Kotlin 2.3 مشكلة استخدام <code>$</code> في القوالب النصية وDSLs
+عبر صياغة <code>$$"..."</code> التي تُعامل <code>$</code> كحرف عادي افتراضياً.
+</p>
+<div class="code-single">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin 2.3+</div></div>
+<pre><code>// المشكلة: $ يتطلب escaping دائماً
+val price = "The price is ${'$'}50"  // مُزعج
+
+// Kotlin 2.3 — Multi-dollar String
+val query = $$"
+    SELECT * FROM users 
+    WHERE name = ${userName}
+    AND price &gt; $minPrice
+"
+// $minPrice يُعامل كحرف عادي!
+// ${userName} فقط يُفسّر كـ interpolation</code></pre>
+</div>
+</div>
+
+<div class="subsection">
+<h3 class="subsection-title">Non-local break و continue</h3>
+<p class="subsection-desc">
+تُمكّن Kotlin 2.3 من استخدام <code>break</code> و <code>continue</code> غير المحلي (Non-local)
+داخل Lambdas المُعلّمة بـ <code>inline</code>، مما يُحسّن التحكم في التكرار.
+</p>
+<div class="code-single">
+<div class="code-header"><div class="code-lang-badge"><span class="dot kotlin"></span> Kotlin 2.3+</div></div>
+<pre><code>// Non-local break في inline lambda
+fun processList(items: List&lt;Int&gt;) {
+    items.forEach { item -&gt;
+        if (item &lt; 0) {
+            break  // يُخرج من processList بالكامل!
+        }
+        println(item)
+    }
+}
+
+// Non-local continue
+items.forEach { item -&gt;
+    if (item == 0) {
+        continue  // يتخطى العنصر ويستمر في forEach
+    }
+    process(item)
+}
+
+// يعمل فقط مع inline functions
+// لا يعمل مع lambdas عادية (تتطلب @ label)</code></pre>
+</div>
+</div>
+</section>
+
+<!-- SUMMARY CARD -->
+<div class="summary-card">
+<h3>الخلاصة: Kotlin يُقلّل Boilerplate</h3>
+<span class="highlight-stat">40%</span>
+<p>
+بفضل Null Safety، Data Classes، Type Inference، Extension Functions، وإلغاء Checked Exceptions،
+يُقلّل Kotlin حجم الكود بنسبة تصل إلى <strong>40%</strong> مقارنة بـ Java،
+مع تحسين Type Safety ومعالجة الأخطاء بشكل جذري.
+الانتقال من Java إلى Kotlin ليس مجرد تغيير لغة — إنه تحول نمطي في كيفية التفكير في البرمجة.
+</p>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+<div style="font-size: 28px; margin-bottom: 12px;">🚀</div>
+<p>دليل Kotlin الشامل — من Java إلى Kotlin 2.x</p>
+<p style="margin-top: 8px;">تم إعداده بعناية للمطوّرين العرب</p>
+</footer>
+
+</main>
+</body>
+</html>

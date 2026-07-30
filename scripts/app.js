@@ -1,5 +1,10 @@
 const guides = [
     // Android Core
+    { id: 'sys-design', title: 'Android System Design Master Guide', desc: 'الدليل الشامل لتصميم المعماريات الضخمة والـ System Design في أندرويد.', icon: '🏗️', path: 'android_system_design_guide.html' },
+    { id: 'kt-guide', title: 'Kotlin Master Guide', desc: 'دليل Kotlin الشامل — الانتقال من Java إلى كوتلن 2.x والمعماريات المتقدمة.', icon: '🟪', path: 'kotlin_guide.html' },
+    { id: 'java-master', title: 'Java Master Guide', desc: 'المرجع الهندسي الشامل لـ Java — من الأساسيات إلى الميزات المتقدمة والأداء.', icon: '☕', path: 'java_master_guide.html' },
+    { id: 'compose-master', title: 'Jetpack Compose Master Guide', desc: 'الدليل الشامل لـ Jetpack Compose — من الواجهات إلى المعمارية والعمليات الداخلية.', icon: '🎨', path: 'jetpack_compose_master_guide.html' },
+    { id: 'di-master', title: 'Dependency Injection Masterclass', desc: 'حقن التبعيات في أندرويد — المرجع الشامل لـ Dagger Hilt و Koin.', icon: '💉', path: 'di_masterclass.html' },
     { id: 'act-life', title: 'Activity Lifecycle Masterclass', desc: 'دورة حياة الأكتيفيتي والحالات المتعددة وأسئلة المقابلات.', icon: '📱', path: 'activity_lifecycle_guide.html' },
     { id: 'components', title: 'Core Components Masterclass', desc: 'مكونات أندرويد الأساسية Architectural Masterclass.', icon: '🧱', path: 'android_components_masterclass.html' },
     { id: 'life-master', title: 'Android Lifecycle Masterclass', desc: 'إدارة State وViewModel والمحافظة على البيانات.', icon: '🔄', path: 'android_lifecycle_masterclass.html' },
