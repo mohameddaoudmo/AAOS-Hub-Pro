@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدليل الشامل لحقن التبعيات في Android | Dagger Hilt & Koin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Tajawal:wght@300;400;500;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --android-navy: #073042;
+            --android-slate: #0D2B3A;
+            --accent-green: #3DDC84;
+            --accent-green-dim: #2DBB6E;
+            --modern-purple: #7F52FF;
+            --modern-purple-dim: #6B3FE8;
+            --bg-offwhite: #F9F9FB;
+            --bg-card: #FFFFFF;
+            --bg-code: #1E2A38;
+            --bg-code-alt: #16202B;
+            --text-primary: #1A1A2E;
+            --text-secondary: #4A5568;
+            --text-muted: #718096;
+            --border-light: #E2E8F0;
+            --border-medium: #CBD5E0;
+            --shadow-sm: 0 1px 3px rgba(7,48,66,0.08);
+            --shadow-md: 0 4px 12px rgba(7,48,66,0.12);
+            --shadow-lg: 0 8px 30px rgba(7,48,66,0.15);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Tajawal', 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-offwhite);
+            color: var(--text-primary);
+            line-height: 1.8;
+            font-size: 17px;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg-offwhite); }
+        ::-webkit-scrollbar-thumb { background: var(--android-navy); border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-green-dim); }
+        ::selection { background: var(--accent-green); color: var(--android-navy); }
+        .nav-bar {
+            position: fixed;
+            top: 0; right: 0; left: 0;
+            background: rgba(7,48,66,0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            padding: 0 2rem;
+            border-bottom: 1px solid rgba(61,220,132,0.15);
+        }
+        .nav-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.15rem;
+            color: #fff;
+            text-decoration: none;
+        }
+        .nav-logo .logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent-green), var(--modern-purple));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+        }
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            list-style: none;
+        }
+        .nav-links a {
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 8px;
+            transition: all 0.25s ease;
+        }
+        .nav-links a:hover {
+            color: var(--accent-green);
+            background: rgba(61,220,132,0.1);
+        }
+        .hero {
+            background: linear-gradient(160deg, var(--android-navy) 0%, var(--android-slate) 50%, #0F1F2D 100%);
+            padding: 140px 2rem 100px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -20%;
+            width: 800px; height: 800px;
+            background: radial-gradient(circle, rgba(61,220,132,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%; left: -10%;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(127,82,255,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(61,220,132,0.12);
+            border: 1px solid rgba(61,220,132,0.25);
+            color: var(--accent-green);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 28px;
+            letter-spacing: 0.5px;
+        }
+        .hero h1 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.3;
+            margin-bottom: 24px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .hero h1 .highlight-green { color: var(--accent-green); }
+        .hero h1 .highlight-purple { color: var(--modern-purple); }
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: rgba(255,255,255,0.7);
+            max-width: 700px;
+            margin: 0 auto 40px;
+            line-height: 1.8;
+        }
+        .hero-tags {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .hero-tag {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.85);
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .hero-tag:hover {
+            background: rgba(61,220,132,0.15);
+            border-color: rgba(61,220,132,0.3);
+            transform: translateY(-2px);
+        }
+        .main-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 60px 2rem;
+        }
+        .section { margin-bottom: 70px; }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border-light);
+        }
+        .section-number {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, var(--accent-green), var(--modern-purple));
+            color: var(--android-navy);
+            font-weight: 900;
+            font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+        .section-title {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: var(--android-navy);
+        }
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-top: 4px;
+        }
+        .subsection { margin-bottom: 40px; }
+        .subsection-title {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .subsection-title::before {
+            content: '';
+            width: 4px; height: 24px;
+            background: linear-gradient(180deg, var(--accent-green), var(--modern-purple));
+            border-radius: 2px;
+        }
+        p {
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+            text-align: justify;
+        }
+        strong { color: var(--android-navy); font-weight: 700; }
+        pre {
+            background: var(--bg-code);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 1px solid #2A3A4D;
+            position: relative;
+            box-shadow: var(--shadow-md);
+        }
+        pre::before {
+            content: 'Kotlin';
+            position: absolute;
+            top: 0; right: 0;
+            background: linear-gradient(135deg, var(--accent-green), var(--modern-purple));
+            color: var(--android-navy);
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 4px 14px;
+            border-bottom-left-radius: 10px;
+            letter-spacing: 1px;
+        }
+        code {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.88rem;
+            line-height: 1.7;
+            color: #E2E8F0;
+        }
+        pre code {
+            display: block;
+            direction: ltr;
+            text-align: left;
+        }
+        code .keyword { color: #C792EA; font-weight: 600; }
+        code .annotation { color: #F78C6C; }
+        code .string { color: #C3E88D; }
+        code .type { color: #82AAFF; }
+        code .function { color: #82AAFF; }
+        code .comment { color: #546E7A; font-style: italic; }
+        code .number { color: #F78C6C; }
+        code .property { color: #FFCB6B; }
+        :not(pre) > code {
+            background: rgba(127,82,255,0.1);
+            color: var(--modern-purple-dim);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            font-weight: 600;
+            border: 1px solid rgba(127,82,255,0.15);
+        }
+        .callout {
+            border-radius: var(--radius-lg);
+            padding: 24px 28px;
+            margin: 24px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .callout::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; bottom: 0;
+            width: 5px;
+        }
+        .callout-info {
+            background: linear-gradient(135deg, rgba(127,82,255,0.06), rgba(127,82,255,0.02));
+            border: 1px solid rgba(127,82,255,0.15);
+        }
+        .callout-info::before { background: var(--modern-purple); }
+        .callout-success {
+            background: linear-gradient(135deg, rgba(61,220,132,0.08), rgba(61,220,132,0.02));
+            border: 1px solid rgba(61,220,132,0.2);
+        }
+        .callout-success::before { background: var(--accent-green); }
+        .callout-warning {
+            background: linear-gradient(135deg, rgba(255,193,7,0.08), rgba(255,193,7,0.02));
+            border: 1px solid rgba(255,193,7,0.2);
+        }
+        .callout-warning::before { background: #FFC107; }
+        .callout-danger {
+            background: linear-gradient(135deg, rgba(239,68,68,0.06), rgba(239,68,68,0.02));
+            border: 1px solid rgba(239,68,68,0.15);
+        }
+        .callout-danger::before { background: #EF4444; }
+        .callout-title {
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .callout-info .callout-title { color: var(--modern-purple); }
+        .callout-success .callout-title { color: var(--accent-green-dim); }
+        .callout-warning .callout-title { color: #B8860B; }
+        .callout-danger .callout-title { color: #DC2626; }
+        .callout p { margin-bottom: 8px; color: var(--text-secondary); }
+        .callout p:last-child { margin-bottom: 0; }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin: 2px;
+        }
+        .badge-hilt {
+            background: rgba(61,220,132,0.12);
+            color: var(--accent-green-dim);
+            border: 1px solid rgba(61,220,132,0.2);
+        }
+        .badge-koin {
+            background: rgba(127,82,255,0.12);
+            color: var(--modern-purple-dim);
+            border: 1px solid rgba(127,82,255,0.2);
+        }
+        .badge-core { background: var(--android-navy); color: #fff; }
+        .badge-advanced { background: var(--modern-purple); color: #fff; }
+        ul, ol {
+            margin: 16px 0;
+            padding-right: 24px;
+        }
+        li {
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+        }
+        li::marker { color: var(--accent-green); }
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 24px 0;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            font-size: 0.95rem;
+        }
+        thead {
+            background: linear-gradient(135deg, var(--android-navy), var(--android-slate));
+            color: #fff;
+        }
+        th {
+            padding: 16px 20px;
+            font-weight: 700;
+            text-align: right;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.92rem;
+            letter-spacing: 0.3px;
+        }
+        td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            vertical-align: top;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) { background: rgba(127,82,255,0.02); }
+        tr:hover { background: rgba(61,220,132,0.04); }
+        .table-hilt { color: var(--accent-green-dim); font-weight: 700; }
+        .table-koin { color: var(--modern-purple-dim); font-weight: 700; }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin: 32px 0;
+        }
+        .comparison-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+        .comparison-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+        .comparison-card.hilt-card { border-top: 4px solid var(--accent-green); }
+        .comparison-card.koin-card { border-top: 4px solid var(--modern-purple); }
+        .comparison-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .comparison-card-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+        }
+        .hilt-card .comparison-card-icon { background: rgba(61,220,132,0.12); }
+        .koin-card .comparison-card-icon { background: rgba(127,82,255,0.12); }
+        .comparison-card-title {
+            font-family: 'Cairo', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+        .hilt-card .comparison-card-title { color: var(--accent-green-dim); }
+        .koin-card .comparison-card-title { color: var(--modern-purple-dim); }
+        .component-flow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            margin: 28px 0;
+            padding: 28px;
+            background: linear-gradient(135deg, rgba(7,48,66,0.03), rgba(127,82,255,0.03));
+            border-radius: var(--radius-lg);
+            border: 1px dashed var(--border-medium);
+        }
+        .flow-node {
+            background: var(--bg-card);
+            border: 2px solid var(--border-light);
+            padding: 14px 22px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+        .flow-node:hover {
+            border-color: var(--accent-green);
+            transform: scale(1.05);
+        }
+        .flow-node.scope {
+            background: var(--android-navy);
+            color: #fff;
+            border-color: var(--android-navy);
+        }
+        .flow-arrow {
+            color: var(--accent-green);
+            font-size: 1.4rem;
+            font-weight: 900;
+        }
+        .scope-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .scope-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+        .scope-card:hover {
+            border-color: var(--accent-green);
+            box-shadow: var(--shadow-md);
+        }
+        .scope-card-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent-green-dim);
+            background: rgba(61,220,132,0.08);
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .scope-card-component {
+            font-weight: 700;
+            color: var(--android-navy);
+            margin-bottom: 6px;
+            font-size: 1rem;
+        }
+        .scope-card-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        .advice-card {
+            background: linear-gradient(135deg, var(--android-navy), #0A2230);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            color: #fff;
+            margin: 40px 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+        .advice-card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -20%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(61,220,132,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .advice-card-title {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        .advice-card-title .highlight { color: var(--accent-green); }
+        .advice-content { position: relative; z-index: 2; }
+        .advice-item {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+        .advice-item-icon {
+            width: 40px; height: 40px;
+            background: rgba(61,220,132,0.15);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .advice-item-title {
+            font-weight: 800;
+            font-size: 1.05rem;
+            margin-bottom: 4px;
+            color: var(--accent-green);
+        }
+        .advice-item-desc {
+            color: rgba(255,255,255,0.75);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .footer {
+            background: var(--android-navy);
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            padding: 40px 2rem;
+            font-size: 0.9rem;
+        }
+        .section-anchor {
+            display: block;
+            position: relative;
+            top: -80px;
+            visibility: hidden;
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .hero-subtitle { font-size: 1rem; }
+            .nav-links { display: none; }
+            .section-title { font-size: 1.5rem; }
+            .main-wrapper { padding: 40px 1rem; }
+            pre { padding: 18px; font-size: 0.8rem; }
+            .comparison-grid { grid-template-columns: 1fr; }
+            .scope-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav-bar">
+    <div class="nav-inner">
+        <a href="#" class="nav-logo">
+            <div class="logo-icon">&#9889;</div>
+            <span>DI Masterclass</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#sec1">الأساسيات</a></li>
+            <li><a href="#sec2">Dagger Hilt</a></li>
+            <li><a href="#sec3">Koin</a></li>
+            <li><a href="#sec4">المقارنة</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Hero -->
+<header class="hero">
+    <div class="hero-inner">
+        <div class="hero-badge">&#128214; الدليل الشامل والنهائي</div>
+        <h1>
+            <span class="highlight-green">Dependency Injection</span> في Android<br>
+            الدليل العميق لـ <span class="highlight-purple">Dagger Hilt</span> و <span class="highlight-green">Koin</span>
+        </h1>
+        <p class="hero-subtitle">
+            دليل تقني شامل يغطي كل جوانب حقن التبعيات في تطوير Android، من المفاهيم الأساسية إلى السيناريوهات المتقدمة، مع مقارنة معمارية دقيقة بين أبرز إطاري العمل.
+        </p>
+        <div class="hero-tags">
+            <span class="hero-tag">@HiltAndroidApp</span>
+            <span class="hero-tag">@Inject</span>
+            <span class="hero-tag">@Module</span>
+            <span class="hero-tag">@Provides</span>
+            <span class="hero-tag">@Binds</span>
+            <span class="hero-tag">@Qualifier</span>
+            <span class="hero-tag">startKoin</span>
+            <span class="hero-tag">single / factory</span>
+            <span class="hero-tag">Jetpack Compose</span>
+            <span class="hero-tag">KMP</span>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-wrapper">
+
+<!-- SECTION 1: DI Basics -->
+<span class="section-anchor" id="sec1"></span>
+<section class="section">
+    <div class="section-header">
+        <div class="section-number">1</div>
+        <div>
+            <h2 class="section-title">أساسيات حقن التبعيات (Dependency Injection 101)</h2>
+            <div class="section-subtitle">المفاهيم الأساسية التي يجب على كل مهندس Android إتقانها</div>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">ما هو Dependency Injection ولماذا هو إلزامي؟</h3>
+        <p>
+            <strong>Dependency Injection (DI)</strong> هو نمط تصميم معماري (Design Pattern) يهدف إلى تقليل الارتباط الوثيق (Tight Coupling) بين الكائنات في التطبيق. بدلاً من أن يقوم الكائن بإنشاء تبعياته بنفسه (عبر <code>new</code> أو Factory methods)، يتم "حقن" هذه التبعيات من الخارج عبر Constructor أو Field أو Method Injection.
+        </p>
+        <p>
+            في عالم Android، حيث تتعقد الأنظمة بشكل هائل مع نمو التطبيقات، يصبح <strong>DI إلزامياً وليس اختيارياً</strong>. التطبيقات التي لا تستخدم DI تعاني من كود صعب الاختبار (Untestable)، وصيانة مكلفة، وتكرار غير ضروري. مع DI، يصبح كل مكون مستقلاً، ويمكن اختباره بمعزول، ويمكن استبدال تبعياته بسهولة.
+        </p>
+
+        <div class="callout callout-info">
+            <div class="callout-title">&#128161; المبدأ الأساسي</div>
+            <p>
+                <strong>Dependency Inversion Principle (DIP)</strong> — أحد مبادئ SOLID — ينص على أن الكائنات عالية المستوى لا يجب أن تعتمد على كائنات منخفضة المستوى، بل يجب أن تعتمد كلاهما على Abstractions. DI هو الآلية العملية لتطبيق هذا المبدأ.
+            </p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">الفوائد الجوهرية لـ DI</h3>
+
+        <div class="comparison-grid">
+            <div class="comparison-card hilt-card">
+                <div class="comparison-card-header">
+                    <div class="comparison-card-icon">&#128279;</div>
+                    <div class="comparison-card-title">Decoupling (فك الارتباط)</div>
+                </div>
+                <p>يفصل الكود عن التفاصيل التنفيذية. يمكن تغيير Database implementation من Room إلى Realm دون تعديل ViewModels أو Repositories.</p>
+            </div>
+            <div class="comparison-card koin-card">
+                <div class="comparison-card-header">
+                    <div class="comparison-card-icon">&#129514;</div>
+                    <div class="comparison-card-title">Testability (قابلية الاختبار)</div>
+                </div>
+                <p>يمكن استبدال الـ Dependencies الحقيقية بـ Mocks أو Fakes أثناء Unit Testing. لا حاجة لـ Robolectric في كل اختبار.</p>
+            </div>
+            <div class="comparison-card hilt-card">
+                <div class="comparison-card-header">
+                    <div class="comparison-card-icon">&#128295;</div>
+                    <div class="comparison-card-title">Maintainability (قابلية الصيانة)</div>
+                </div>
+                <p>تغيير في مكان واحد (Module) ينعكس على كل التطبيق. لا حاجة لتعديل عشرات الملفات عند تغيير Constructor.</p>
+            </div>
+            <div class="comparison-card koin-card">
+                <div class="comparison-card-header">
+                    <div class="comparison-card-icon">&#9203;</div>
+                    <div class="comparison-card-title">Lifecycle Management</div>
+                </div>
+                <p>إدارة دورة حياة الكائنات تلقائياً. Singleton يعيش مع التطبيق، ActivityScoped يُدمَر مع الـ Activity، وهكذا.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">Service Locator مقابل Dependency Injection</h3>
+        <p>
+            يخلط الكثير بين <strong>Service Locator</strong> و <strong>Dependency Injection</strong>، لكن الفرق جوهري في الآلية والفلسفة:
+        </p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>المعيار</th>
+                        <th>Service Locator</th>
+                        <th>Dependency Injection</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>آلية البحث</strong></td>
+                        <td>Active Lookup: الكائن يطلب التبعية بنفسه عبر <code>ServiceLocator.get()</code></td>
+                        <td>Passive Injection: التبعية تُحقن تلقائياً من الخارج</td>
+                    </tr>
+                    <tr>
+                        <td><strong>الارتباط</strong></td>
+                        <td>يرتبط الكائن بـ Locator نفسه (Hidden Dependency)</td>
+                        <td>الاعتمادات ظاهرة في Constructor parameters</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Testability</strong></td>
+                        <td>أقل: يتطلب إعداد Locator في كل اختبار</td>
+                        <td>أعلى: يمكن حقن Mock مباشرة في Constructor</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Compile-time Safety</strong></td>
+                        <td>لا يوجد: الأخطاء تظهر في Runtime</td>
+                        <td>موجودة (في Hilt): الأخطاء تُكتشف أثناء Build</td>
+                    </tr>
+                    <tr>
+                        <td><strong>أمثلة</strong></td>
+                        <td>Koin (جزئياً)، Dagger (بدون Hilt)</td>
+                        <td>Hilt، Pure Constructor Injection</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout callout-warning">
+            <div class="callout-title">&#9888; تحذير هام</div>
+            <p>
+                Koin يُصنف أحياناً كـ "Lightweight DI" لكنه في جوهره يستخدم Service Locator Pattern مع DSL. الفرق أنه يخفي ذلك عن المطور. Hilt يستخدم Pure DI مع Code Generation أثناء Compile-time.
+            </p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">أنواع Injection في Kotlin</h3>
+
+        <p><strong>1. Constructor Injection (الأفضل والأكثر تفضيلاً):</strong></p>
+<pre><code><span class="keyword">class</span> <span class="type">UserRepository</span> <span class="annotation">@Inject</span> <span class="function">constructor</span>(
+    <span class="keyword">private val</span> <span class="property">apiService</span>: <span class="type">ApiService</span>,
+    <span class="keyword">private val</span> <span class="property">database</span>: <span class="type">AppDatabase</span>
+) {
+    <span class="comment">// Dependencies are immutable and available immediately</span>
+}</code></pre>
+
+        <p><strong>2. Field Injection (يُستخدم فقط عند الضرورة):</strong></p>
+<pre><code><span class="keyword">class</span> <span class="type">MainActivity</span> : <span class="type">AppCompatActivity</span>() {
+    <span class="annotation">@Inject</span>
+    <span class="keyword">lateinit var</span> <span class="property">viewModel</span>: <span class="type">MainViewModel</span>
+    <span class="comment">// Used when constructor injection is impossible (e.g., Android framework classes)</span>
+}</code></pre>
+
+        <div class="callout callout-success">
+            <div class="callout-title">&#9989; أفضل الممارسات</div>
+            <p>
+                دائماً استخدم <strong>Constructor Injection</strong> كلما كان ذلك ممكناً. Field Injection يُستخدم فقط في Android Components (Activity, Fragment, Service) لأن Framework لا يسمح بـ Constructor Injection فيها. حتى في ViewModels، استخدم <code>@HiltViewModel</code> مع Constructor Injection.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 2: Dagger Hilt -->
+<span class="section-anchor" id="sec2"></span>
+<section class="section">
+    <div class="section-header">
+        <div class="section-number">2</div>
+        <div>
+            <h2 class="section-title">الدليل العميق والمتقدم لـ Dagger Hilt</h2>
+            <div class="section-subtitle">Hilt Masterclass — كل ما تحتاج معرفته عن Compile-time DI</div>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">ما هو Dagger Hilt؟</h3>
+        <p>
+            <strong>Dagger Hilt</strong> هو إطار عمل (Framework) لحقن التبعيات مبني أعلى Dagger 2، طورته Google خصيصاً لتبسيط DI في Android. Hilt يقوم بتوليد كود Java/Kotlin أثناء Compile-time باستخدام Annotation Processing Tool (APT) أو Kotlin Symbol Processing (KSP)، مما يضمن:
+        </p>
+        <ul>
+            <li><strong>Compile-time Validation:</strong> أي خطأ في Graph يُكتشف أثناء Build وليس في Runtime.</li>
+            <li><strong>Zero Reflection:</strong> لا يستخدم Reflection أبداً، مما يعني أداءً ممتازاً في Startup.</li>
+            <li><strong>Android-aware Components:</strong> يفهم دورة حياة Android (Activity, Fragment, ViewModel) بشكل أصلي.</li>
+        </ul>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">الإعداد والتهيئة</h3>
+        <p>أضف الـ Dependencies في <code>build.gradle.kts</code>:</p>
+<pre><code><span class="comment">// Project level build.gradle.kts</span>
+plugins {
+    <span class="property">id</span>(<span class="string">"com.google.dagger.hilt.android"</span>) version <span class="string">"2.51"</span> apply <span class="keyword">false</span>
+}
+
+<span class="comment">// App level build.gradle.kts</span>
+plugins {
+    <span class="property">id</span>(<span class="string">"com.google.dagger.hilt.android"</span>)
+    <span class="property">id</span>(<span class="string">"com.google.devtools.ksp"</span>) <span class="comment">// Recommended over kapt</span>
+}
+
+dependencies {
+    implementation(<span class="string">"com.google.dagger:hilt-android:2.51"</span>)
+    ksp(<span class="string">"com.google.dagger:hilt-compiler:2.51"</span>)
+
+    <span class="comment">// For ViewModel support</span>
+    implementation(<span class="string">"androidx.hilt:hilt-navigation-compose:1.2.0"</span>)
+
+    <span class="comment">// For Worker support</span>
+    implementation(<span class="string">"androidx.hilt:hilt-work:1.2.0"</span>)
+    ksp(<span class="string">"androidx.hilt:hilt-compiler:1.2.0"</span>)
+}</code></pre>
+
+        <p>ثم أنشئ <code>Application</code> class مع <code>@HiltAndroidApp</code>:</p>
+<pre><code><span class="annotation">@HiltAndroidApp</span>
+<span class="keyword">class</span> <span class="type">MyApplication</span> : <span class="type">Application</span>() {
+    <span class="comment">// Hilt generates the necessary Dagger components automatically</span>
+}</code></pre>
+
+        <div class="callout callout-info">
+            <div class="callout-title">&#128204; دور @HiltAndroidApp</div>
+            <p>
+                هذه الـ Annotation تُنشئ <strong>ApplicationComponent</strong> (المعروف الآن بـ <code>SingletonComponent</code>) تلقائياً. هذا هو الجذر (Root) لـ Dependency Graph في التطبيق. بدونها، لن يعمل Hilt.
+            </p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">@AndroidEntryPoint — نقاط الدخول</h3>
+        <p>
+            أي Android Component (Activity, Fragment, Service, BroadcastReceiver, View) يريد استقبال Injection يجب أن يحمل <code>@AndroidEntryPoint</code>. هذا يُعلم Hilt بأن يولد Component فرعي مرتبط بدورة حياة هذا الـ Component.
+        </p>
+<pre><code><span class="annotation">@AndroidEntryPoint</span>
+<span class="keyword">class</span> <span class="type">MainActivity</span> : <span class="type">AppCompatActivity</span>() {
+
+    <span class="annotation">@Inject</span>
+    <span class="keyword">lateinit var</span> <span class="property">analytics</span>: <span class="type">AnalyticsTracker</span>
+
+    <span class="keyword">private val</span> <span class="property">viewModel</span>: <span class="type">MainViewModel</span> <span class="keyword">by</span> <span class="function">viewModels</span>()
+
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: <span class="type">Bundle</span>?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        <span class="comment">// analytics is injected automatically before onCreate</span>
+    }
+}</code></pre>
+
+        <div class="callout callout-warning">
+            <div class="callout-title">&#9888; قاعدة مهمة</div>
+            <p>
+                إذا كان <code>Fragment</code> يستخدم <code>@AndroidEntryPoint</code>، يجب أن يكون الـ <code>Activity</code> المضيف أيضاً يحمل <code>@AndroidEntryPoint</code>. وإذا كان <code>View</code> يستخدمها، يجب أن يكون الـ Fragment أو Activity المضيف يحملها.
+            </p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">Modules & Provider Bindings</h3>
+        <p>
+            <strong>Module</strong> في Hilt هو Class يُعلم Hilt كيفية توفير (Provide) instances لأنواع لا يمكن حقنها تلقائياً (مثل مكتبات الطرف الثالث: Retrofit, Room, OkHttp).
+        </p>
+
+        <p><strong>@Provides — للمكتبات الخارجية:</strong></p>
+<pre><code><span class="annotation">@Module</span>
+<span class="annotation">@InstallIn</span>(<span class="type">SingletonComponent</span>::<span class="keyword">class</span>)
+<span class="keyword">object</span> <span class="type">NetworkModule</span> {
+
+    <span class="annotation">@Provides</span>
+    <span class="annotation">@Singleton</span>
+    <span class="keyword">fun</span> <span class="function">provideOkHttpClient</span>(): <span class="type">OkHttpClient</span> {
+        <span class="keyword">return</span> <span class="type">OkHttpClient</span>.Builder()
+            .addInterceptor(<span class="type">HttpLoggingInterceptor</span>().apply {
+                level = <span class="type">HttpLoggingInterceptor.Level</span>.BODY
+            })
+            .build()
+    }
+
+    <span class="annotation">@Provides</span>
+    <span class="annotation">@Singleton</span>
+    <span class="keyword">fun</span> <span class="function">provideRetrofit</span>(okHttpClient: <span class="type">OkHttpClient</span>): <span class="type">Retrofit</span> {
+        <span class="keyword">return</span> <span class="type">Retrofit</span>.Builder()
+            .baseUrl(<span class="string">"https://api.example.com/"</span>)
+            .client(okHttpClient)
+            .addConverterFactory(<span class="type">GsonConverterFactory</span>.create())
+            .build()
+    }
+
+    <span class="annotation">@Provides</span>
+    <span class="annotation">@Singleton</span>
+    <span class="keyword">fun</span> <span class="function">provideApiService</span>(retrofit: <span class="type">Retrofit</span>): <span class="type">ApiService</span> {
+        <span class="keyword">return</span> retrofit.create(<span class="type">ApiService</span>::<span class="keyword">class</span>.java)
+    }
+}</code></pre>
+
+        <p><strong>@Binds — لتنفيذات Interfaces (أكثر كفاءة):</strong></p>
+<pre><code><span class="annotation">@Module</span>
+<span class="annotation">@InstallIn</span>(<span class="type">SingletonComponent</span>::<span class="keyword">class</span>)
+<span class="keyword">abstract class</span> <span class="type">RepositoryModule</span> {
+
+    <span class="annotation">@Binds</span>
+    <span class="annotation">@Singleton</span>
+    <span class="keyword">abstract fun</span> <span class="function">bindUserRepository</span>(
+        impl: <span class="type">UserRepositoryImpl</span>
+    ): <span class="type">UserRepository</span>
+
+    <span class="annotation">@Binds</span>
+    <span class="annotation">@Singleton</span>
+    <span class="keyword">abstract fun</span> <span class="function">bindAuthRepository</span>(
+        impl: <span class="type">AuthRepositoryImpl</span>
+    ): <span class="type">AuthRepository</span>
+}</code></pre>
+
+        <div class="callout callout-success">
+            <div class="callout-title">&#9989; @Provides مقابل @Binds</div>
+            <p>
+                استخدم <code>@Binds</code> دائماً عند ربط Interface بتنفيذ. لماذا؟ لأن <code>@Binds</code> يولد كود أقل وأسرع لأنه لا يحتاج إلى Instance Provider. <code>@Provides</code> يُستخدم فقط عندما تحتاج إلى Logic إضافي (مثل إنشاء Retrofit أو Room).
+            </p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">Components & Scope Hierarchy</h3>
+        <p>
+            Hilt يُنشئ تلقائياً هرمية من <strong>Components</strong> تتوافق مع دورة حياة Android. كل Component له <strong>Scope</strong> خاص يحدد مدة حياة الـ Instances.
+        </p>
+
+        <div class="component-flow">
+            <div class="flow-node scope">@Singleton<br><small>SingletonComponent</small></div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-node scope">@ActivityRetainedScoped<br><small>ActivityRetainedComponent</small></div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-node scope">@ActivityScoped<br><small>ActivityComponent</small></div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-node scope">@FragmentScoped<br><small>FragmentComponent</small></div>
+        </div>
+
+        <div class="scope-grid">
+            <div class="scope-card">
+                <div class="scope-card-name">@Singleton</div>
+                <div class="scope-card-component">SingletonComponent</div>
+                <div class="scope-card-desc">يعيش طوال عمر التطبيق. مثالي لـ Database, Retrofit, Repositories.</div>
+            </div>
+            <div class="scope-card">
+                <div class="scope-card-name">@ActivityRetainedScoped</div>
+                <div class="scope-card-component">ActivityRetainedComponent</div>
+                <div class="scope-card-desc">يعيش عبر تغييرات الإعدادات (Config Changes). مثالي لـ ViewModels.</div>
+            </div>
+            <div class="scope-card">
+                <div class="scope-card-name">@ViewModelScoped</div>
+                <div class="scope-card-component">ViewModelComponent</div>
+                <div class="scope-card-desc">يرتبط بدورة حياة ViewModel واحد. يُستخدم داخل ViewModel.</div>
+            </div>
+            <div class="scope-card">
+                <div class="scope-card-name">@ActivityScoped</div>
+                <div class="scope-card-component">ActivityComponent</div>
+                <div class="scope-card-desc">يرتبط بـ Activity واحد. يُدمَر عند onDestroy() للـ Activity.</div>
+            </div>
+            <div class="scope-card">
+                <div class="scope-card-name">@FragmentScoped</div>
+                <div class="scope-card-component">FragmentComponent</div>
+                <div class="scope-card-desc">يرتبط بـ Fragment واحد. يُدمَر عند onDestroy() للـ Fragment.</div>
+            </div>
+            <div class="scope-card">
+                <div class="scope-card-name">@ServiceScoped</div>
+                <div class="scope-card-component">ServiceComponent</div>
+                <div class="scope-card-desc">يرتبط بـ Service واحد. يُدمَر عند onDestroy() للـ Service.</div>
+            </div>
+        </div>
+
+        <div class="callout callout-info">
+            <div class="callout-title">&#128204; قاعدة الـ Scope</div>
+            <p>
+                يمكن لـ Component "الأعلى" (مثل SingletonComponent) توفير Dependencies لـ Component "الأدنى" (مثل ActivityComponent)، لكن العكس غير صحيح. ActivityScoped لا يمكنه توفير Singleton.
+            </p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">Multiple Implementations & Qualifiers</h3>
+        <p>
+            عندما يكون لديك أكثر من تنفيذ لنفس Interface (مثل <code>ImageLoader</code> مع تنفيذين: Glide و Coil)، يجب استخدام <strong>Qualifiers</strong> لتمييزها.
+        </p>
+
+        <p><strong>1. باستخدام @Named (الأسهل لكن أقل أماناً):</strong></p>
+<pre><code><span class="annotation">@Module</span>
+<span class="annotation">@InstallIn</span>(<span class="type">SingletonComponent</span>::<span class="keyword">class</span>)
+<span class="keyword">object</span> <span class="type">ImageLoaderModule</span> {
+
+    <span class="annotation">@Provides</span>
+    <span class="annotation">@Singleton</span>
+    <span class="annotation">@Named</span>(<span class="string">"glide"</span>)
+    <span class="keyword">fun</span> <span class="function">provideGlideLoader</span>(context: <span class="type">Context</span>): <span class="type">ImageLoader</span> = <span class="type">GlideImageLoader</span>(context)
+
+    <span class="annotation">@Provides</span>
+    <span class="annotation">@Singleton</span>
+    <span class="annotation">@Named</span>(<span class="string">"coil"</span>)
+    <span class="keyword">fun</span> <span class="function">provideCoilLoader</span>(context: <span class="type">Context</span>): <span class="type">ImageLoader</span> = <span class="type">CoilImageLoader</span>(context)
+}
+
+<span class="comment">// Usage</span>
+<span class="keyword">class</span> <span class="type">ProfileViewModel</span> <span class="annotation">@Inject</span> <span class="function">constructor</span>(
+    <span class="annotation">@Named</span>(<span class="string">"coil"</span>) <span class="keyword">private val</span> <span class="property">imageLoader</span>: <span class="type">ImageLoader</span>
+)</code></pre>
+
+        <p><strong>2. باستخدام Custom Qualifier (الأفضل والأكثر أماناً):</strong></p>
+<pre><code><span class="annotation">@Qualifier</span>
+<span class="annotation">@Retention</span>(AnnotationRetention.RUNTIME)
+<span class="keyword">annotation class</span> <span class="type">GlideLoader</span>
+
+<span class="annotation">@Qualifier</span>
+<span class="annotation">@Retention</span>(AnnotationRetention.RUNTIME)
+<span class="keyword">annotation class</span> <span class="type">CoilLoader</span>
+
+<span class="annotation">@Module</span>
+<span class="annotation">@InstallIn</span>(<span class="type">SingletonComponent</span>::<span class="keyword">class</span>)
+<span class="keyword">object</span> <span class="type">ImageLoaderModule</span> {
+
+    <span class="annotation">@Provides</span>
+    <span class="annotation">@Singleton</span>
+    <span class="annotation">@GlideLoader</span>
+    <span class="keyword">fun</span> <span class="function">provideGlide</span>(context: <span class="type">Context</span>): <span class="type">ImageLoader</span> = <span class="type">GlideImageLoader</span>(context)
+
+    <span class="annotation">@Provides</span>
+    <span class="annotation">@Singleton</span>
+    <span class="annotation">@CoilLoader</span>
+    <span class="keyword">fun</span> <span class="function">provideCoil</span>(context: <span class="type">Context</span>): <span class="type">ImageLoader</span> = <span class="type">CoilImageLoader</span>(context)
+}
+
+<span class="comment">// Usage — Type-safe, no string literals</span>
+<span class="keyword">class</span> <span class="type">ProfileViewModel</span> <span class="annotation">@Inject</span> <span class="function">constructor</span>(
+    <span class="annotation">@CoilLoader</span> <span class="keyword">private val</span> <span class="property">imageLoader</span>: <span class="type">ImageLoader</span>
+)</code></pre>
+
+        <div class="callout callout-success">
+            <div class="callout-title">&#9989; نصيحة Senior</div>
+            <p>
+                تجنب <code>@Named</code> قدر الإمكان. Custom Qualifiers توفر Type Safety وتمنع أخطاء الكتابة (Typos) التي لا يكتشفها Compiler مع <code>@Named</code>.
+            </p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">Predefined Context Bindings</h3>
+        <p>
+            Hilt يوفر Context bindings جاهزة لا تحتاج إلى Module. يمكنك حقن <code>Context</code> مباشرة مع تحديد نوعه:
+        </p>
+<pre><code><span class="keyword">class</span> <span class="type">AnalyticsTracker</span> <span class="annotation">@Inject</span> <span class="function">constructor</span>(
+    <span class="annotation">@ApplicationContext</span> <span class="keyword">private val</span> <span class="property">appContext</span>: <span class="type">Context</span>
+) {
+    <span class="comment">// Application-wide Context</span>
+}
+
+<span class="keyword">class</span> <span class="type">DialogHelper</span> <span class="annotation">@Inject</span> <span class="function">constructor</span>(
+    <span class="annotation">@ActivityContext</span> <span class="keyword">private val</span> <span class="property">activityContext</span>: <span class="type">Context</span>
+) {
+    <span class="comment">// Activity-specific Context — only available in ActivityComponent scope</span>
+}</code></pre>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">السيناريوهات المتقدمة</h3>
+
+        <p><strong>1. توفير Retrofit و Room Database:</strong></p>
+<pre><code><span class="annotation">@Module</span>
+<span class="annotation">@InstallIn</span>(<span class="type">SingletonComponent</span>::<span class="keyword">class</span>)
+<span class="keyword">object</span> <span class="type">DatabaseModule</span> {
+
+    <span class="annotation">@Provides</span>
+    <span class="annotation">@Singleton</span>
+    <span class="keyword">fun</span> <span class="function">provideDatabase</span>(
+        <span class="annotation">@ApplicationContext</span> context: <span class="type">Context</span>
+    ): <span class="type">AppDatabase</span> {
+        <span class="keyword">return</span> <span class="type">Room</span>.databaseBuilder(
+            context,
+            <span class="type">AppDatabase</span>::<span class="keyword">class</span>.java,
+            <span class="string">"app_database.db"</span>
+        )
+        .addMigrations(<span class="type">Migrations</span>.MIGRATION_1_2)
+        .build()
+    }
+
+    <span class="annotation">@Provides</span>
+    <span class="keyword">fun</span> <span class="function">provideUserDao</span>(db: <span class="type">AppDatabase</span>): <span class="type">UserDao</span> = db.userDao()
+}</code></pre>
+
+        <p><strong>2. @EntryPoint — للـ Classes التي لا يدعمها Hilt أصلاً:</strong></p>
+        <p>
+            بعض الـ Android Components لا تدعم <code>@AndroidEntryPoint</code> بشكل أصلي، مثل <code>ContentProvider</code>، <code>Custom Views</code> المُنشأة برمجياً، أو الـ Classes التي تُنشأ من قبل Framework.
+        </p>
+<pre><code><span class="annotation">@EntryPoint</span>
+<span class="annotation">@InstallIn</span>(<span class="type">SingletonComponent</span>::<span class="keyword">class</span>)
+<span class="keyword">interface</span> <span class="type">AnalyticsEntryPoint</span> {
+    <span class="keyword">fun</span> <span class="function">analyticsTracker</span>(): <span class="type">AnalyticsTracker</span>
+}
+
+<span class="comment">// Usage in ContentProvider</span>
+<span class="keyword">class</span> <span class="type">MyContentProvider</span> : <span class="type">ContentProvider</span>() {
+
+    <span class="keyword">private lateinit var</span> <span class="property">analytics</span>: <span class="type">AnalyticsTracker</span>
+
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(): <span class="type">Boolean</span> {
+        <span class="keyword">val</span> appContext = context?.applicationContext ?: <span class="keyword">return false</span>
+        <span class="keyword">val</span> entryPoint = <span class="type">EntryPointAccessors</span>.fromApplication(
+            appContext,
+            <span class="type">AnalyticsEntryPoint</span>::<span class="keyword">class</span>.java
+        )
+        analytics = entryPoint.analyticsTracker()
+        <span class="keyword">return true</span>
+    }
+}</code></pre>
+
+        <div class="callout callout-info">
+            <div class="callout-title">&#128204; متى تستخدم @EntryPoint؟</div>
+            <p>
+                استخدم <code>@EntryPoint</code> فقط عندما لا يمكنك استخدام <code>@AndroidEntryPoint</code>. أمثلة: ContentProvider، BroadcastReceiver مع <code>android:directBootAware="true"</code>، Custom Views التي تُنشأ بـ <code>new</code>، أو الـ EntryPoints للـ Tests.
+            </p>
+        </div>
+
+        <p><strong>3. Hilt Worker — WorkManager Integration:</strong></p>
+<pre><code><span class="annotation">@HiltWorker</span>
+<span class="keyword">class</span> <span class="type">SyncWorker</span> <span class="annotation">@AssistedInject</span> <span class="function">constructor</span>(
+    <span class="annotation">@Assisted</span> context: <span class="type">Context</span>,
+    <span class="annotation">@Assisted</span> params: <span class="type">WorkerParameters</span>,
+    <span class="keyword">private val</span> <span class="property">repository</span>: <span class="type">UserRepository</span>,
+    <span class="keyword">private val</span> <span class="property">apiService</span>: <span class="type">ApiService</span>
+) : <span class="type">CoroutineWorker</span>(context, params) {
+
+    <span class="keyword">override suspend fun</span> <span class="function">doWork</span>(): <span class="type">Result</span> {
+        <span class="keyword">return try</span> {
+            repository.syncWithRemote()
+            <span class="type">Result</span>.success()
+        } <span class="keyword">catch</span> (e: <span class="type">Exception</span>) {
+            <span class="type">Result</span>.retry()
+        }
+    }
+}
+
+<span class="comment">// In Application class</span>
+<span class="annotation">@HiltAndroidApp</span>
+<span class="keyword">class</span> <span class="type">MyApplication</span> : <span class="type">Application</span>(), <span class="type">Configuration.Provider</span> {
+
+    <span class="annotation">@Inject</span>
+    <span class="keyword">lateinit var</span> <span class="property">workerFactory</span>: <span class="type">HiltWorkerFactory</span>
+
+    <span class="keyword">override val</span> <span class="property">workManagerConfiguration</span>: <span class="type">Configuration</span>
+        <span class="keyword">get</span>() = <span class="type">Configuration.Builder</span>()
+            .setWorkerFactory(workerFactory)
+            .build()
+}</code></pre>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">Hilt في Jetpack Compose</h3>
+        <p>
+            Hilt يتكامل بسلاسة مع Jetpack Compose عبر مكتبة <code>hilt-navigation-compose</code>. يمكنك حقن ViewModels بسهولة:
+        </p>
+<pre><code><span class="annotation">@Composable</span>
+<span class="keyword">fun</span> <span class="function">ProfileScreen</span>(
+    viewModel: <span class="type">ProfileViewModel</span> = <span class="function">hiltViewModel</span>()
+) {
+    <span class="keyword">val</span> uiState <span class="keyword">by</span> viewModel.uiState.collectAsStateWithLifecycle()
+
+    <span class="type">Column</span>(
+        modifier = <span class="type">Modifier</span>.fillMaxSize(),
+        horizontalAlignment = <span class="type">Alignment.CenterHorizontally</span>
+    ) {
+        <span class="type">Text</span>(text = uiState.userName)
+        <span class="type">Button</span>(onClick = { viewModel.refresh() }) {
+            <span class="type">Text</span>(<span class="string">"Refresh"</span>)
+        }
+    }
+}
+
+<span class="comment">// ViewModel with SavedStateHandle</span>
+<span class="annotation">@HiltViewModel</span>
+<span class="keyword">class</span> <span class="type">ProfileViewModel</span> <span class="annotation">@Inject</span> <span class="function">constructor</span>(
+    <span class="keyword">private val</span> <span class="property">repository</span>: <span class="type">UserRepository</span>,
+    savedStateHandle: <span class="type">SavedStateHandle</span>
+) : <span class="type">ViewModel</span>() {
+
+    <span class="keyword">private val</span> <span class="property">userId</span>: <span class="type">String</span> = savedStateHandle[<span class="string">"userId"</span>] ?: <span class="string">""</span>
+
+    <span class="keyword">val</span> uiState = repository.getUser(userId)
+        .stateIn(viewModelScope, <span class="type">SharingStarted</span>.WhileSubscribed(5000), <span class="type">UiState</span>.Loading)
+}</code></pre>
+
+        <div class="callout callout-success">
+            <div class="callout-title">&#9989; نصيحة Compose</div>
+            <p>
+                استخدم دائماً <code>hiltViewModel()</code> بدلاً من <code>viewModel()</code> في Compose. <code>hiltViewModel()</code> يتأكد من أن الـ ViewModel يتم إنشاؤه مع الـ Dependencies المحقونة بشكل صحيح ويربطه بدورة حياة الـ Navigation Back Stack.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 3: Koin -->
+<span class="section-anchor" id="sec3"></span>
+<section class="section">
+    <div class="section-header">
+        <div class="section-number">3</div>
+        <div>
+            <h2 class="section-title">الدليل الشامل لـ Koin</h2>
+            <div class="section-subtitle">Koin DSL & Lightweight DI — حقن التبعيات بدون Code Generation</div>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">ما هو Koin وكيف يعمل؟</h3>
+        <p>
+            <strong>Koin</strong> هو إطار عمل لحقن التبعيات مكتوب بالكامل بلغة Kotlin، ويعتمد على <strong>Kotlin DSL (Domain Specific Language)</strong> بدلاً من Annotation Processing. Koin لا يولد كود أثناء Compile-time، بل يبني Dependency Graph في Runtime باستخدام Reflection خفيف أو Kotlin Compiler Plugin (Koin Annotations).
+        </p>
+        <p>
+            الفلسفة الأساسية لـ Koin: <strong>"Just DSL, no magic"</strong>. كل شيء صريح ومرئي في الكود. لا توجد Annotations مخفية، ولا Generated Code غامض، ولا Build Errors معقدة.
+        </p>
+
+        <div class="callout callout-info">
+            <div class="callout-title">&#128161; آلية عمل Koin</div>
+            <p>
+                Koin يستخدم <strong>Service Locator Pattern</strong> تحت الغطاء. عند استدعاء <code>by inject()</code> أو <code>get()</code>، يبحث Koin في الـ Registry الداخلية عن Definition مطابق، ثم يُنشئ Instance (أو يعيد Instance موجود) بناءً على النوع (single, factory, scoped).
+            </p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">التهيئة والإعداد</h3>
+        <p>أضف الـ Dependencies في <code>build.gradle.kts</code>:</p>
+<pre><code>dependencies {
+    <span class="comment">// Core Koin</span>
+    implementation(<span class="string">"io.insert-koin:koin-android:3.5.6"</span>)
+
+    <span class="comment">// For Jetpack Compose</span>
+    implementation(<span class="string">"io.insert-koin:koin-androidx-compose:3.5.6"</span>)
+
+    <span class="comment">// For Navigation Compose</span>
+    implementation(<span class="string">"io.insert-koin:koin-androidx-navigation:3.5.6"</span>)
+
+    <span class="comment">// For KMP (Kotlin Multiplatform)</span>
+    implementation(<span class="string">"io.insert-koin:koin-core:3.5.6"</span>)
+}</code></pre>
+
+        <p>ثم ابدأ Koin في <code>Application</code> class:</p>
+<pre><code><span class="keyword">class</span> <span class="type">MyApplication</span> : <span class="type">Application</span>() {
+
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>() {
+        <span class="keyword">super</span>.onCreate()
+
+        <span class="function">startKoin</span> {
+            <span class="comment">// Bind Android Context</span>
+            <span class="function">androidContext</span>(<span class="keyword">this</span>@MyApplication)
+
+            <span class="comment">// Load modules</span>
+            <span class="function">modules</span>(
+                networkModule,
+                databaseModule,
+                repositoryModule,
+                viewModelModule
+            )
+        }
+    }
+}</code></pre>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">Modules & Definitions</h3>
+        <p>
+            في Koin، تُعرّف الـ Dependencies داخل <code>module { ... }</code> blocks باستخدام دوال مثل <code>single</code>، <code>factory</code>، و <code>viewModel</code>.
+        </p>
+
+        <p><strong>single — Singleton (نفس Instance لكل التطبيق):</strong></p>
+<pre><code><span class="keyword">val</span> networkModule = <span class="function">module</span> {
+    <span class="comment">// Singleton: same instance everywhere</span>
+    <span class="function">single</span> { <span class="function">OkHttpClient</span>.Builder().build() }
+
+    <span class="function">single</span> {
+        <span class="function">Retrofit.Builder</span>()
+            .baseUrl(<span class="string">"https://api.example.com/"</span>)
+            .client(<span class="function">get</span>()) <span class="comment">// get() resolves OkHttpClient</span>
+            .addConverterFactory(<span class="function">GsonConverterFactory.create</span>())
+            .build()
+    }
+
+    <span class="function">single</span> { <span class="function">get</span>&lt;<span class="type">Retrofit</span>&gt;().create(<span class="type">ApiService</span>::<span class="keyword">class</span>.java) }
+}</code></pre>
+
+        <p><strong>factory — New Instance في كل مرة:</strong></p>
+<pre><code><span class="keyword">val</span> useCaseModule = <span class="function">module</span> {
+    <span class="comment">// Factory: new instance every time it's requested</span>
+    <span class="function">factory</span> { <span class="type">ValidateEmailUseCase</span>() }
+    <span class="function">factory</span> { <span class="type">ValidatePasswordUseCase</span>() }
+}</code></pre>
+
+        <p><strong>viewModel / viewModelOf — لـ Android ViewModels:</strong></p>
+<pre><code><span class="keyword">val</span> viewModelModule = <span class="function">module</span> {
+    <span class="comment">// Method 1: Explicit DSL</span>
+    <span class="function">viewModel</span> { <span class="type">MainViewModel</span>(<span class="function">get</span>(), <span class="function">get</span>()) }
+
+    <span class="comment">// Method 2: viewModelOf (Kotlin 1.8+, cleaner)</span>
+    <span class="function">viewModelOf</span>(::<span class="type">ProfileViewModel</span>)
+    <span class="function">viewModelOf</span>(::<span class="type">SettingsViewModel</span>)
+}</code></pre>
+
+        <div class="callout callout-success">
+            <div class="callout-title">&#9989; متى تستخدم كل نوع؟</div>
+            <p>
+                استخدم <code>single</code> للـ Repositories، Databases، Retrofit Instances. استخدم <code>factory</code> للـ UseCases أو الـ Objects التي لا تحتاج إلى State مشترك. استخدم <code>viewModel</code> للـ ViewModels (تُدار دورة حياةها تلقائياً).
+            </p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">Injection Resolution: Lazy vs Eager</h3>
+        <p>
+            Koin يوفر طريقتين لاسترجاع Dependencies: <strong>Lazy</strong> (التقييم الكسول) و <strong>Eager</strong> (التقييم الفوري).
+        </p>
+
+        <p><strong>Lazy Evaluation — by inject():</strong></p>
+<pre><code><span class="keyword">class</span> <span class="type">MainActivity</span> : <span class="type">AppCompatActivity</span>() {
+    <span class="comment">// Lazy: resolved only when first accessed</span>
+    <span class="keyword">private val</span> <span class="property">viewModel</span>: <span class="type">MainViewModel</span> <span class="keyword">by</span> <span class="function">inject</span>()
+    <span class="keyword">private val</span> <span class="property">analytics</span>: <span class="type">AnalyticsTracker</span> <span class="keyword">by</span> <span class="function">inject</span>()
+
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: <span class="type">Bundle</span>?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        <span class="comment">// viewModel is resolved here, not before</span>
+        viewModel.loadData()
+    }
+}</code></pre>
+
+        <p><strong>Eager Evaluation — get():</strong></p>
+<pre><code><span class="keyword">class</span> <span class="type">UserRepository</span>(
+    <span class="keyword">private val</span> <span class="property">apiService</span>: <span class="type">ApiService</span>,
+    <span class="keyword">private val</span> <span class="property">database</span>: <span class="type">AppDatabase</span>
+) {
+    <span class="comment">// Both are resolved immediately at construction time</span>
+}
+
+<span class="comment">// In a module:</span>
+<span class="function">single</span> { <span class="type">UserRepository</span>(<span class="function">get</span>(), <span class="function">get</span>()) }
+
+<span class="comment">// Or directly:</span>
+<span class="keyword">val</span> repository: <span class="type">UserRepository</span> = <span class="function">getKoin</span>().<span class="function">get</span>()</code></pre>
+
+        <div class="callout callout-info">
+            <div class="callout-title">&#128204; الفرق الأساسي</div>
+            <p>
+                <code>by inject()</code> مثالي للـ Properties في Activity/Fragment لأنه يؤجل الـ Resolution إلى وقت الاستخدام. <code>get()</code> مثالي داخل Modules أو Constructor Parameters حيث تحتاج إلى الـ Instance فوراً.
+            </p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">Koin في Jetpack Compose</h3>
+        <p>
+            Koin يتكامل مع Jetpack Compose عبر <code>koin-androidx-compose</code>. يمكنك حقن ViewModels باستخدام <code>koinViewModel()</code>:
+        </p>
+<pre><code><span class="annotation">@Composable</span>
+<span class="keyword">fun</span> <span class="function">ProfileScreen</span>(
+    viewModel: <span class="type">ProfileViewModel</span> = <span class="function">koinViewModel</span>()
+) {
+    <span class="keyword">val</span> uiState <span class="keyword">by</span> viewModel.uiState.collectAsStateWithLifecycle()
+
+    <span class="type">Column</span>(modifier = <span class="type">Modifier</span>.fillMaxSize()) {
+        <span class="type">Text</span>(text = uiState.userName)
+    }
+}
+
+<span class="comment">// With parameters</span>
+<span class="annotation">@Composable</span>
+<span class="keyword">fun</span> <span class="function">DetailScreen</span>(userId: <span class="type">String</span>) {
+    <span class="keyword">val</span> viewModel: <span class="type">DetailViewModel</span> = <span class="function">koinViewModel</span>(
+        parameters = { <span class="function">parametersOf</span>(userId) }
+    )
+}</code></pre>
+
+        <p><strong>تمرير Parameters ديناميكية:</strong></p>
+<pre><code><span class="keyword">val</span> viewModelModule = <span class="function">module</span> {
+    <span class="function">viewModel</span> { (userId: <span class="type">String</span>) ->
+        <span class="type">DetailViewModel</span>(userId, <span class="function">get</span>())
+    }
+}</code></pre>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">Koin في Kotlin Multiplatform (KMP)</h3>
+        <p>
+            <strong>Koin هو الخيار الأول لـ Kotlin Multiplatform</strong>، وهذا أحد أبرز مميزاته مقارنة بـ Hilt. بينما Hilt مرتبط بـ Android JVM-only، Koin يعمل على:
+        </p>
+        <ul>
+            <li><strong>Android</strong> — عبر <code>koin-android</code></li>
+            <li><strong>iOS</strong> — عبر <code>koin-core</code> مع Kotlin/Native</li>
+            <li><strong>Desktop (JVM)</strong> — عبر <code>koin-core</code></li>
+            <li><strong>JavaScript / WASM</strong> — عبر <code>koin-core</code></li>
+        </ul>
+
+        <p><strong>مثال على Module مشترك في KMP:</strong></p>
+<pre><code><span class="comment">// commonMain — shared across all platforms</span>
+<span class="keyword">val</span> sharedModule = <span class="function">module</span> {
+    <span class="function">single</span>&lt;<span class="type">HttpClient</span>&gt; { <span class="function">createHttpClient</span>() }
+    <span class="function">single</span>&lt;<span class="type">UserRepository</span>&gt; { <span class="type">UserRepositoryImpl</span>(<span class="function">get</span>()) }
+    <span class="function">factory</span> { <span class="type">GetUserUseCase</span>(<span class="function">get</span>()) }
+}
+
+<span class="comment">// androidMain</span>
+<span class="keyword">fun</span> <span class="function">initKoin</span>(context: <span class="type">Context</span>) {
+    <span class="function">startKoin</span> {
+        <span class="function">androidContext</span>(context)
+        <span class="function">modules</span>(sharedModule, androidModule)
+    }
+}
+
+<span class="comment">// iosMain</span>
+<span class="keyword">fun</span> <span class="function">initKoin</span>() {
+    <span class="function">startKoin</span> {
+        <span class="function">modules</span>(sharedModule, iosModule)
+    }
+}</code></pre>
+
+        <div class="callout callout-success">
+            <div class="callout-title">&#9989; لماذا Koin هو الأفضل لـ KMP؟</div>
+            <p>
+                Hilt يعتمد على Java Annotation Processing (APT) و Dagger 2، اللذان يعملان فقط على JVM. Koin مكتوب بالكامل بلغة Kotlin ويعتمد على Kotlin DSL، مما يجعله Portable عبر كل المنصات التي تدعمها Kotlin Multiplatform.
+            </p>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">Koin Annotations (الجيل الجديد)</h3>
+        <p>
+            Koin 3.2+ يقدم <strong>Koin Annotations</strong> التي تسمح باستخدام Annotations مشابهة لـ Hilt مع الاحتفاظ ببساطة Koin:
+        </p>
+<pre><code><span class="comment">// build.gradle.kts</span>
+plugins {
+    <span class="property">id</span>(<span class="string">"com.google.devtools.ksp"</span>) version <span class="string">"1.9.22-1.0.17"</span>
+}
+
+dependencies {
+    implementation(<span class="string">"io.insert-koin:koin-annotations:1.3.1"</span>)
+    ksp(<span class="string">"io.insert-koin:koin-ksp-compiler:1.3.1"</span>)
+}
+
+<span class="comment">// Usage</span>
+<span class="annotation">@Single</span>
+<span class="keyword">class</span> <span class="type">UserRepository</span>(<span class="keyword">private val</span> <span class="property">api</span>: <span class="type">ApiService</span>)
+
+<span class="annotation">@Factory</span>
+<span class="keyword">class</span> <span class="type">ValidateEmailUseCase</span>()
+
+<span class="annotation">@KoinViewModel</span>
+<span class="keyword">class</span> <span class="type">MainViewModel</span>(<span class="keyword">private val</span> <span class="property">repo</span>: <span class="type">UserRepository</span>) : <span class="type">ViewModel</span>()</code></pre>
+
+        <div class="callout callout-warning">
+            <div class="callout-title">&#9888; ملاحظة</div>
+            <p>
+                Koin Annotations تستخدم KSP لتوليد كود Module تلقائياً. هذا يجمع بين بساطة Koin وقوة Code Generation، لكنه لا يزال أقل صرامة من Hilt في Compile-time Validation.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 4: Hilt vs Koin Showdown -->
+<span class="section-anchor" id="sec4"></span>
+<section class="section">
+    <div class="section-header">
+        <div class="section-number">4</div>
+        <div>
+            <h2 class="section-title">المقارنة المعمارية الحاسمة: Hilt مقابل Koin</h2>
+            <div class="section-subtitle">Hilt vs. Koin Showdown — قرار معماري يحدد مستقبل مشروعك</div>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">الجدول الشامل للمقارنة</h3>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:22%">المعيار</th>
+                        <th style="width:39%" class="table-hilt">Dagger Hilt</th>
+                        <th style="width:39%" class="table-koin">Koin</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Core Paradigm</strong></td>
+                        <td><span class="badge badge-hilt">Compile-time Code Generation</span><br>يستخدم APT/KSP لتوليد كود Java أثناء Build. الـ Dependency Graph يُبنى ويُتحقق بالكامل قبل تشغيل التطبيق.</td>
+                        <td><span class="badge badge-koin">Runtime DSL / Service Locator</span><br>يستخدم Kotlin DSL لبناء Graph في Runtime. لا يوجد Code Generation (إلا مع Koin Annotations اختيارياً).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Performance Impact</strong></td>
+                        <td><strong>Build Time:</strong> أعلى بسبب Code Generation والـ Annotation Processing.<br><strong>Runtime:</strong> صفر Reflection. أداء ممتاز في Startup.</td>
+                        <td><strong>Build Time:</strong> أقل بكثير. لا يوجد Annotation Processing.<br><strong>Runtime:</strong> يستخدم Reflection خفيف (أو Kotlin Compiler Plugin). Startup أبطأ قليلاً.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Safety & Bug Catching</strong></td>
+                        <td><span class="badge badge-core">&#9989; Compile-time Validation</span><br>أي Dependency مفقود أو Cycle أو Scope غير صحيح يُكتشف أثناء Build. لا يمكن تشغيل تطبيق به Errors.</td>
+                        <td><span class="badge badge-advanced">&#9888; Runtime Crashes</span><br>أخطاء الـ Missing Dependencies تظهر فقط عند الاستخدام الأول. يتطلب اختبار شامل (Integration Tests) لاكتشاف الأخطاء.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Learning Curve</strong></td>
+                        <td><strong>متوسط إلى عالٍ.</strong> يتطلب فهم Annotations (@Module, @Provides, @Binds, Scopes, Components). الأخطاء في Build قد تكون غامضة للمبتدئين.</td>
+                        <td><strong>منخفض جداً.</strong> DSL بسيط وبديهي. أي مطور Kotlin يمكنه فهمه في دقائق. الأخطاء Runtime أسهل في الفهم.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Boilerplate Code</strong></td>
+                        <td>أقل من Dagger 2 لكن أكثر من Koin. يتطلب Modules، Annotations، وربما EntryPoints.</td>
+                        <td>أقل بكثير. Module واحد بسيط يمكن أن يغطي كل التطبيق. لا حاجة لـ Annotations في معظم الحالات.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>KMP Compatibility</strong></td>
+                        <td><span class="badge badge-advanced">&#10060; Android JVM Only</span><br>Hilt مبني على Dagger 2 و Java APT. لا يعمل إلا على Android JVM. لا يمكن استخدامه في iOS أو JS.</td>
+                        <td><span class="badge badge-core">&#9989; Full KMP Support</span><br>يعمل على Android، iOS (Kotlin/Native)، Desktop (JVM)، و JavaScript/WASM. الخيار الوحيد لـ KMP DI.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Google Support</strong></td>
+                        <td><span class="badge badge-hilt">&#9989; Official Google</span><br>مدعوم رسمياً من Google. مدمج في Android Architecture Components. توثيق رسمي وتحديثات مستمرة.</td>
+                        <td><span class="badge badge-koin">Community-Driven</span><br>مشروع Open Source قوي بقيادة InsertKoinIO. لكنه ليس Official Google. الدعم من المجتمع والشركات التي تستخدمه.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Jetpack Compose</strong></td>
+                        <td><code>hiltViewModel()</code> مع Navigation Integration ممتاز. SavedStateHandle مدعوم أصلاً.</td>
+                        <td><code>koinViewModel()</code> مع Compose Integration ممتاز. Parameters ديناميكية أسهل في Koin.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Testing</strong></td>
+                        <td>Hilt Testing Framework مع <code>@HiltAndroidTest</code>، <code>HiltTestApplication</code>، و <code>@BindValue</code> للـ Mocks.</td>
+                        <td>بسيط جداً: <code>startKoin { modules(testModule) }</code> أو <code>loadKoinModules()</code> / <code>unloadKoinModules()</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Debugging</strong></td>
+                        <td>أخطاء Build معقدة (ComponentProcessor Errors). لكنها تمنع Runtime Crashes.</td>
+                        <td>أخطاء Runtime واضحة (StackTrace يوضح أي Dependency مفقود). لكنها تحدث عند المستخدم النهائي إذا لم تُختبر.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">متى تختار Hilt؟ ومتى تختار Koin؟</h3>
+
+        <div class="comparison-grid">
+            <div class="comparison-card hilt-card">
+                <div class="comparison-card-header">
+                    <div class="comparison-card-icon">&#127942;</div>
+                    <div class="comparison-card-title">اختر Hilt إذا...</div>
+                </div>
+                <ul>
+                    <li>تبني <strong>تطبيق Android Enterprise</strong> كبير الحجم مع فريق متعدد المطورين.</li>
+                    <li>الـ <strong>Compile-time Safety</strong> أولوية قصوى (Banking, Healthcare, Fintech).</li>
+                    <li>تريد دعماً رسمياً من Google مع ضمان الاستمرارية.</li>
+                    <li>لا تحتاج إلى Kotlin Multiplatform — Android فقط.</li>
+                    <li>تريد أداءً ممتازاً في Startup مع Zero Reflection.</li>
+                    <li>تفضل أخطاء Build واضحة على Crashes في Production.</li>
+                </ul>
+            </div>
+            <div class="comparison-card koin-card">
+                <div class="comparison-card-header">
+                    <div class="comparison-card-icon">&#128640;</div>
+                    <div class="comparison-card-title">اختر Koin إذا...</div>
+                </div>
+                <ul>
+                    <li>تبني مشروع <strong>Kotlin Multiplatform</strong> (Android + iOS + Desktop).</li>
+                    <li>تريد <strong>سرعة في التطوير</strong> مع أقل Boilerplate ممكن.</li>
+                    <li>المشروع صغير إلى متوسط الحجم (MVVM بسيط).</li>
+                    <li>فريقك يفضل <strong>Kotlin DSL</strong> على Annotations.</li>
+                    <li>تريد <strong>Build Time سريع</strong> دون Annotation Processing.</li>
+                    <li>تبني Prototype أو MVP وتحتاج إلى Velocity عالية.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Senior Architectural Advice -->
+    <div class="advice-card">
+        <div class="advice-card-title">
+            <span class="highlight">&#127775;</span> نصيحة معمارية Senior
+        </div>
+        <div class="advice-content">
+            <div class="advice-item">
+                <div class="advice-item-icon">&#127968;</div>
+                <div>
+                    <div class="advice-item-title">التطبيقات المؤسسية (Enterprise Android Apps)</div>
+                    <div class="advice-item-desc">
+                        اختر <strong>Hilt</strong> دائماً. الـ Compile-time Safety تمنع أخطاء Production مكلفة. في المؤسسات الكبيرة، يكون الـ Build Time أقل أهمية من الـ Runtime Safety. Hilt مدمج مع Android Architecture Components ويوفر تجربة موحدة للفريق.
+                    </div>
+                </div>
+            </div>
+            <div class="advice-item">
+                <div class="advice-item-icon">&#127760;</div>
+                <div>
+                    <div class="advice-item-title">مشاريع Kotlin Multiplatform (KMP)</div>
+                    <div class="advice-item-desc">
+                        اختر <strong>Koin</strong> دون تردد. هو الخيار الوحيد العملي لـ KMP DI. يمكنك مشاركة Modules بين Android و iOS و Desktop بسهولة. مع Koin Annotations، تحصل على تجربة قريبة من Hilt مع الحفاظ على Portability.
+                    </div>
+                </div>
+            </div>
+            <div class="advice-item">
+                <div class="advice-item-icon">&#9889;</div>
+                <div>
+                    <div class="advice-item-title">المشاريع السريعة (Fast-Paced / MVPs)</div>
+                    <div class="advice-item-desc">
+                        اختر <strong>Koin</strong> للـ Velocity. Setup في دقائق، DSL بديهي، ولا يوجد Build Errors معقدة. عندما ينمو المشروع وتحتاج إلى Compile-time Safety، يمكنك الترحيل إلى Hilt (أو الاستمرار مع Koin Annotations).
+                    </div>
+                </div>
+            </div>
+            <div class="advice-item">
+                <div class="advice-item-icon">&#128161;</div>
+                <div>
+                    <div class="advice-item-title">الاستراتيجية الهجينة (Hybrid Strategy)</div>
+                    <div class="advice-item-desc">
+                        في المشاريع الكبيرة، يمكنك استخدام <strong>Hilt للـ Android Module</strong> و <strong>Koin للـ Shared KMP Module</strong>. Define Interfaces في commonMain مع Koin، وImplementها في Android بـ Hilt. هذا يتطلب Bridge صغير لكنه يعطيك أفضل ما في العالمين.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="subsection">
+        <h3 class="subsection-title">الخلاصة النهائية</h3>
+        <p>
+            لا يوجد "إطار أفضل" بشكل مطلق — الاختيار يعتمد على السياق. <strong>Hilt</strong> هو الخيار الأكثر أماناً وأداءً للـ Android Native. <strong>Koin</strong> هو الخيار الأكثر مرونة وسرعةً للـ KMP والمشاريع الخفيفة. المهندس Senior يختار الأداة بناءً على احتياجات المشروع، لا بناءً على الترند أو التفضيل الشخصي.
+        </p>
+        <p>
+            المهم أن تفهم <strong>المبادئ</strong> وراء DI — Decoupling, Inversion of Control, و Lifecycle Management — لأن هذه المبادئ تنطبق بغض النظر عن الإطار. إطار العمل مجرد أداة؛ المعمارية الصحيحة هي الهدف.
+        </p>
+    </div>
+</section>
+
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>&#128218; الدليل الشامل لحقن التبعيات في Android | Dagger Hilt & Koin Masterclass</p>
+    <p style="margin-top:8px; opacity:0.7;">مكتوب بعناية فائقة — كل المصطلحات التقنية بالإنجليزية والشرح بالعربية</p>
+</footer>
+
+</body>
+</html>

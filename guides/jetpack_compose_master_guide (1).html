@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدليل الشامل لـ Jetpack Compose — من واجهة المستخدم إلى العمق الداخلي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@300;400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --compose-blue: #4285F4;
+            --deep-indigo: #1A237E;
+            --mint-green: #00E676;
+            --kotlin-purple: #7F52FF;
+            --off-white: #F8F9FA;
+            --dark-bg: #0D1117;
+            --card-bg: #FFFFFF;
+            --text-primary: #1A1A2E;
+            --text-secondary: #4A4A6A;
+            --border-color: #E2E8F0;
+            --code-bg: #1B1D28;
+            --warning-orange: #FF9800;
+            --danger-red: #F44336;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Tajawal', 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--off-white);
+            color: var(--text-primary);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--off-white); }
+        ::-webkit-scrollbar-thumb { background: var(--compose-blue); border-radius: 4px; }
+        .hero {
+            background: linear-gradient(135deg, var(--deep-indigo) 0%, var(--compose-blue) 50%, var(--kotlin-purple) 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.3;
+            animation: float 20s linear infinite;
+        }
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(30px, 30px); }
+        }
+        .hero-content { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px 24px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            letter-spacing: 1px;
+        }
+        .hero h1 { font-size: 3rem; font-weight: 900; margin-bottom: 20px; line-height: 1.3; text-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+        .hero-subtitle { font-size: 1.3rem; font-weight: 300; opacity: 0.95; max-width: 700px; margin: 0 auto 30px; }
+        .hero-meta { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-top: 30px; }
+        .hero-meta-item { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; }
+        .nav-container {
+            background: white;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; overflow-x: auto; gap: 4px; }
+        .nav-item {
+            padding: 16px 20px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .nav-item:hover { color: var(--compose-blue); }
+        .nav-item.active { color: var(--compose-blue); border-bottom-color: var(--compose-blue); }
+        .main-container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        .section { margin-bottom: 60px; scroll-margin-top: 80px; }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 30px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .section-number {
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, var(--compose-blue), var(--kotlin-purple));
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 800;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+        }
+        .section-title { font-size: 1.8rem; font-weight: 800; color: var(--deep-indigo); }
+        .section-title-en { font-size: 0.9rem; color: var(--text-secondary); font-weight: 400; margin-top: 4px; }
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--deep-indigo);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--mint-green), var(--compose-blue));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+        .callout {
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 20px 0;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .callout-info { background: linear-gradient(135deg, rgba(66,133,244,0.1), rgba(127,82,255,0.05)); border-right: 4px solid var(--compose-blue); }
+        .callout-warning { background: linear-gradient(135deg, rgba(255,152,0,0.1), rgba(255,152,0,0.05)); border-right: 4px solid var(--warning-orange); }
+        .callout-success { background: linear-gradient(135deg, rgba(0,230,118,0.1), rgba(0,230,118,0.05)); border-right: 4px solid var(--mint-green); }
+        .callout-danger { background: linear-gradient(135deg, rgba(244,67,54,0.1), rgba(244,67,54,0.05)); border-right: 4px solid var(--danger-red); }
+        .callout-icon { font-size: 1.5rem; flex-shrink: 0; }
+        .callout-content { flex: 1; }
+        .callout-title { font-weight: 700; margin-bottom: 6px; font-size: 1rem; }
+        .callout-info .callout-title { color: var(--compose-blue); }
+        .callout-warning .callout-title { color: var(--warning-orange); }
+        .callout-success .callout-title { color: var(--mint-green); }
+        .callout-danger .callout-title { color: var(--danger-red); }
+        pre {
+            background: var(--code-bg);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 16px 0;
+            border: 1px solid #2D2D3A;
+            position: relative;
+        }
+        pre::before {
+            content: 'KOTLIN';
+            position: absolute;
+            top: 8px; left: 16px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--mint-green);
+            font-family: 'Fira Code', monospace;
+            letter-spacing: 1px;
+        }
+        code {
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #E6E6E6;
+            direction: ltr;
+            display: block;
+            text-align: left;
+        }
+        .inline-code {
+            background: rgba(66, 133, 244, 0.1);
+            color: var(--compose-blue);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            direction: ltr;
+            display: inline-block;
+        }
+        .k { color: #FF79C6; }
+        .f { color: #50FA7B; }
+        .s { color: #F1FA8C; }
+        .c { color: #6272A4; }
+        .t { color: #8BE9FD; }
+        .n { color: #F8F8F2; }
+        .a { color: #BD93F9; }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin: 4px;
+            letter-spacing: 0.5px;
+        }
+        .badge-blue { background: rgba(66,133,244,0.15); color: var(--compose-blue); }
+        .badge-purple { background: rgba(127,82,255,0.15); color: var(--kotlin-purple); }
+        .badge-green { background: rgba(0,230,118,0.15); color: #00C853; }
+        .badge-orange { background: rgba(255,152,0,0.15); color: #E65100; }
+        .badge-red { background: rgba(244,67,54,0.15); color: #C62828; }
+        .diagram {
+            background: linear-gradient(135deg, #1A1A2E, #16213E);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 24px 0;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .diagram-title { text-align: center; font-size: 1.1rem; font-weight: 700; margin-bottom: 24px; color: var(--mint-green); }
+        .flow-container { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+        .flow-box {
+            background: linear-gradient(135deg, var(--compose-blue), var(--kotlin-purple));
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-align: center;
+            min-width: 140px;
+            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+        }
+        .flow-arrow { font-size: 1.5rem; color: var(--mint-green); }
+        .flow-sub { font-size: 0.75rem; opacity: 0.8; margin-top: 4px; font-weight: 400; }
+        .tree-diagram { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+        .tree-level { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+        .tree-node {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px 20px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 120px;
+            position: relative;
+        }
+        .tree-node::after {
+            content: '';
+            position: absolute;
+            bottom: -16px; left: 50%;
+            width: 1px; height: 16px;
+            background: rgba(255,255,255,0.3);
+        }
+        .tree-node:last-child::after { display: none; }
+        .table-container { overflow-x: auto; margin: 24px 0; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 0.95rem; }
+        th {
+            background: linear-gradient(135deg, var(--deep-indigo), var(--compose-blue));
+            color: white;
+            padding: 16px;
+            text-align: right;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        td { padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: top; }
+        tr:hover { background: rgba(66, 133, 244, 0.03); }
+        tr:nth-child(even) { background: rgba(248, 249, 250, 0.5); }
+        .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 24px 0; }
+        .compare-card { background: white; border-radius: 12px; padding: 24px; border: 2px solid var(--border-color); }
+        .compare-card.imperative { border-color: var(--warning-orange); }
+        .compare-card.declarative { border-color: var(--mint-green); }
+        .compare-header { font-weight: 800; font-size: 1.1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .compare-card.imperative .compare-header { color: var(--warning-orange); }
+        .compare-card.declarative .compare-header { color: var(--mint-green); }
+        .phases-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 24px 0; }
+        .phase-card { background: white; border-radius: 16px; padding: 24px; border: 2px solid transparent; position: relative; overflow: hidden; }
+        .phase-card::before { content: ''; position: absolute; top: 0; right: 0; width: 100%; height: 4px; }
+        .phase-card:nth-child(1)::before { background: var(--compose-blue); }
+        .phase-card:nth-child(2)::before { background: var(--kotlin-purple); }
+        .phase-card:nth-child(3)::before { background: var(--mint-green); }
+        .phase-number { font-size: 2.5rem; font-weight: 900; color: rgba(66,133,244,0.1); position: absolute; top: 10px; left: 20px; }
+        .phase-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 12px; color: var(--deep-indigo); }
+        .styled-list { list-style: none; padding: 0; }
+        .styled-list li { padding: 10px 0; padding-right: 28px; position: relative; }
+        .styled-list li::before { content: '▸'; position: absolute; right: 0; color: var(--compose-blue); font-weight: 700; font-size: 1.2rem; }
+        .summary-card {
+            background: linear-gradient(135deg, var(--deep-indigo), #2D3561);
+            color: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: -100px; right: -100px;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(66,133,244,0.2), transparent);
+            border-radius: 50%;
+        }
+        .summary-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .summary-content { position: relative; z-index: 1; }
+        .footer { text-align: center; padding: 40px 20px; color: var(--text-secondary); font-size: 0.9rem; border-top: 1px solid var(--border-color); margin-top: 40px; }
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(127,82,255,0.1), rgba(66,133,244,0.05));
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+            border-right: 4px solid var(--kotlin-purple);
+        }
+        .highlight-box-title { font-weight: 700; color: var(--kotlin-purple); margin-bottom: 8px; }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .compare-grid { grid-template-columns: 1fr; }
+            .phases-grid { grid-template-columns: 1fr; }
+            .section-title { font-size: 1.4rem; }
+            .nav { padding: 0 10px; }
+            .nav-item { padding: 12px 14px; font-size: 0.8rem; }
+        }
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">📘 الدليل الشامل والنهائي</div>
+            <h1>Jetpack Compose<br>من واجهة المستخدم إلى العمق الداخلي</h1>
+            <p class="hero-subtitle">
+                دليل معماري شامل يغطي النموذج الفكري، وإدارة التأثيرات الجانبية، والآليات الداخلية العميقة للـ Compiler والـ Runtime، واستراتيجيات الأداء المتقدمة
+            </p>
+            <div class="hero-meta">
+                <div class="hero-meta-item">
+                    <span>⚡</span>
+                    <span>Compose Compiler & Runtime Internals</span>
+                </div>
+                <div class="hero-meta-item">
+                    <span>🎯</span>
+                    <span>Performance Optimization</span>
+                </div>
+                <div class="hero-meta-item">
+                    <span>🏗️</span>
+                    <span>Architectural Patterns</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <nav class="nav-container">
+        <div class="nav">
+            <a href="#mental-model" class="nav-item active">النموذج الفكري</a>
+            <a href="#side-effects" class="nav-item">التأثيرات الجانبية</a>
+            <a href="#under-the-hood" class="nav-item">خلف الكواليس</a>
+            <a href="#performance" class="nav-item">الأداء</a>
+            <a href="#custom-graphics" class="nav-item">الرسوميات</a>
+            <a href="#decision-matrix" class="nav-item">مصفوفة القرار</a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+
+        <section id="mental-model" class="section">
+            <div class="section-header">
+                <div class="section-number">1</div>
+                <div>
+                    <h2 class="section-title">النموذج الفكري لـ Jetpack Compose</h2>
+                    <div class="section-title-en">The Compose Mental Model</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">🔄</div>
+                    Declarative vs Imperative UI
+                </div>
+                <p style="margin-bottom: 16px;">
+                    يمثل Jetpack Compose تحولاً جذرياً في طريقة بناء واجهات المستخدم على Android. فبدلاً من التعامل مع View Tree قابل للتعديل (Imperative)، نصف واجهة المستخدم كدالة رياضية تحول State إلى UI.
+                </p>
+
+                <div class="compare-grid">
+                    <div class="compare-card imperative">
+                        <div class="compare-header">
+                            <span>⚠️</span> Imperative (النمط القديم)
+                        </div>
+                        <ul class="styled-list">
+                            <li>تعديل Views مباشرةً عبر المراجع (<span class="inline-code">findViewById</span>)</li>
+                            <li>إدارة State يدوية داخل كل View</li>
+                            <li>صعوبة التزامن بين البيانات والعرض</li>
+                            <li>كود متكرر ومعقد عند التغييرات</li>
+                        </ul>
+                    </div>
+                    <div class="compare-card declarative">
+                        <div class="compare-header">
+                            <span>✅</span> Declarative (Jetpack Compose)
+                        </div>
+                        <ul class="styled-list">
+                            <li>وصف UI كدالة من State</li>
+                            <li>State-driven: تغيير البيانات = تغيير الواجهة</li>
+                            <li>إدارة State مركزية ومتنبؤة</li>
+                            <li>كود أقصر وأكثر قابلية للصيانة</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="callout callout-info">
+                    <div class="callout-icon">💡</div>
+                    <div class="callout-content">
+                        <div class="callout-title">المبدأ الأساسي</div>
+                        <p>في Compose، واجهة المستخدم ليست "شيئاً" يتم تعديله، بل هي "نتيجة" يتم إعادة حسابها. كل Composable Function هي دالة نقية (Pure Function) تقبل State وتُنتج UI Tree.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">⬇️</div>
+                    Unidirectional Data Flow (UDF)
+                </div>
+                <p style="margin-bottom: 20px;">
+                    يعتمد Compose على نمط تدفق البيانات الأحادي الاتجاه، حيث تتدفق الـ State من الأعلى إلى الأسفل، وتتدفق الأحداث (Events) من الأسفل إلى الأعلى.
+                </p>
+
+                <div class="diagram">
+                    <div class="diagram-title">Unidirectional Data Flow Architecture</div>
+                    <div class="tree-diagram">
+                        <div class="tree-level">
+                            <div class="tree-node" style="background: linear-gradient(135deg, var(--compose-blue), var(--kotlin-purple)); font-weight: 700;">
+                                ViewModel / State Holder
+                                <div style="font-size: 0.75rem; opacity: 0.8; margin-top: 4px;">Single Source of Truth</div>
+                            </div>
+                        </div>
+                        <div style="color: var(--mint-green); font-size: 1.5rem;">⬇️ State Flows Down</div>
+                        <div class="tree-level">
+                            <div class="tree-node">Composable Parent</div>
+                        </div>
+                        <div style="color: var(--mint-green); font-size: 1.5rem;">⬇️</div>
+                        <div class="tree-level">
+                            <div class="tree-node">Composable Child A</div>
+                            <div class="tree-node">Composable Child B</div>
+                        </div>
+                        <div style="color: var(--warning-orange); font-size: 1.5rem;">⬆️ Events Flow Up</div>
+                        <div class="tree-level">
+                            <div class="tree-node" style="background: rgba(255,152,0,0.2); border-color: var(--warning-orange);">
+                                onClick, onValueChange
+                                <div style="font-size: 0.75rem; opacity: 0.8; margin-top: 4px;">Lambda Callbacks</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="callout callout-success">
+                    <div class="callout-icon">✅</div>
+                    <div class="callout-content">
+                        <div class="callout-title">فوائد UDF</div>
+                        <p>تبسيط تتبع البيانات، إمكانية اختبار الواجهة بسهولة، تقليل الأخطاء المتعلقة بالتزامن، وتحسين قابلية إعادة الاستخدام للمكونات.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">🧠</div>
+                    State Management Basics
+                </div>
+
+                <div class="highlight-box">
+                    <div class="highlight-box-title">remember & mutableStateOf</div>
+                    <p>تُستخدم <span class="inline-code">remember</span> للاحتفاظ بقيمة عبر Recompositions، بينما <span class="inline-code">mutableStateOf</span> تُنشئ State قابلاً للملاحظة (Observable) يُطلق Recomposition عند تغيره.</p>
+                </div>
+
+                <pre><code><span class="k">var</span> <span class="n">count</span> <span class="k">by</span> <span class="n">remember</span> { <span class="n">mutableStateOf</span>(<span class="s">0</span>) }
+
+<span class="a">@Composable</span>
+<span class="k">fun</span> <span class="f">Counter</span>() {
+    <span class="k">var</span> <span class="n">count</span> <span class="k">by</span> <span class="n">remember</span> { <span class="n">mutableStateOf</span>(<span class="s">0</span>) }
+
+    <span class="n">Button</span>(<span class="k">onClick</span> = { <span class="n">count</span>++ }) {
+        <span class="n">Text</span>(<span class="s">"Count: </span><span class="n">$count</span><span class="s">"</span>)
+    }
+}</code></pre>
+
+                <div class="highlight-box">
+                    <div class="highlight-box-title">State Hoisting</div>
+                    <p>نمط رفع الـ State إلى أعلى مستوى ممكن في شجرة المكونات (Composable Tree) لجعل المكونات Stateless وقابلة لإعادة الاستخدام.</p>
+                </div>
+
+                <pre><code><span class="c">// Stateless Composable - يستقبل State و Event كمعاملات</span>
+<span class="a">@Composable</span>
+<span class="k">fun</span> <span class="f">StatelessCounter</span>(
+    <span class="n">count</span>: <span class="t">Int</span>,
+    <span class="k">onIncrement</span>: () -> <span class="t">Unit</span>
+) {
+    <span class="n">Button</span>(<span class="k">onClick</span> = <span class="n">onIncrement</span>) {
+        <span class="n">Text</span>(<span class="s">"Count: </span><span class="n">$count</span><span class="s">"</span>)
+    }
+}
+
+<span class="c">// Stateful Wrapper - يدير الـ State</span>
+<span class="a">@Composable</span>
+<span class="k">fun</span> <span class="f">StatefulCounter</span>() {
+    <span class="k">var</span> <span class="n">count</span> <span class="k">by</span> <span class="n">remember</span> { <span class="n">mutableStateOf</span>(<span class="s">0</span>) }
+    <span class="n">StatelessCounter</span>(
+        <span class="n">count</span> = <span class="n">count</span>,
+        <span class="k">onIncrement</span> = { <span class="n">count</span>++ }
+    )
+}</code></pre>
+
+                <div class="highlight-box">
+                    <div class="highlight-box-title">derivedStateOf vs remember</div>
+                    <p>استخدم <span class="inline-code">derivedStateOf</span> عندما تكون القيمة المشتقة (Derived Value) تتغير بمعدل أقل من الـ State المصدر. هذا يمنع Recompositions غير الضرورية.</p>
+                </div>
+
+                <pre><code><span class="c">// ❌ سيُسبب Recomposition عند كل تغيير في list</span>
+<span class="k">val</span> <span class="n">isEmpty</span> = <span class="n">list</span>.<span class="n">isEmpty</span>()
+
+<span class="c">// ✅ سيُسبب Recomposition فقط عندما يتغير ناتج isEmpty</span>
+<span class="k">val</span> <span class="n">isEmpty</span> <span class="k">by</span> <span class="n">derivedStateOf</span> { <span class="n">list</span>.<span class="n">isEmpty</span>() }</code></pre>
+
+                <div class="callout callout-warning">
+                    <div class="callout-icon">⚠️</div>
+                    <div class="callout-content">
+                        <div class="callout-title">متى تستخدم rememberUpdatedState؟</div>
+                        <p>عندما تحتاج إلى الوصول إلى أحدث قيمة لـ Lambda أو State داخل <span class="inline-code">LaunchedEffect</span> أو <span class="inline-code">DisposableEffect</span> دون إعادة تشغيل الـ Effect. تُستخدم بشكل شائع في الـ Callbacks التي تستمر عبر Recompositions.</p>
+                    </div>
+                </div>
+
+                <pre><code><span class="a">@Composable</span>
+<span class="k">fun</span> <span class="f">Timer</span>(<span class="n">onTimeout</span>: () -> <span class="t">Unit</span>) {
+    <span class="c">// يضمن الوصول إلى أحدث onTimeout داخل LaunchedEffect</span>
+    <span class="k">val</span> <span class="n">currentOnTimeout</span> <span class="k">by</span> <span class="n">rememberUpdatedState</span>(<span class="n">onTimeout</span>)
+
+    <span class="n">LaunchedEffect</span>(<span class="t">Unit</span>) {
+        <span class="n">delay</span>(<span class="s">3000</span>)
+        <span class="n">currentOnTimeout</span>() <span class="c">// دائماً تستخدم أحدث قيمة</span>
+    }
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="side-effects" class="section">
+            <div class="section-header">
+                <div class="section-number">2</div>
+                <div>
+                    <h2 class="section-title">إدارة التأثيرات الجانبية والتخطيط</h2>
+                    <div class="section-title-en">Side-Effects & Layout Architecture</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">⚡</div>
+                    Side-Effects API Masterclass
+                </div>
+                <p style="margin-bottom: 20px;">
+                    التأثيرات الجانبية (Side Effects) هي العمليات التي تؤثر على العالم الخارجي (مثل الـ Coroutines، الـ Listeners، أو الـ Callbacks). يوفر Compose API متكاملاً لإدارتها بأمان.
+                </p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الـ API</th>
+                                <th>الاستخدام</th>
+                                <th>الدورة الحياتية</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="inline-code">LaunchedEffect</span></td>
+                                <td>تشغيل Coroutine مرتبطة بـ Composable</td>
+                                <td>تُلغى عندما يتغير الـ key أو يُزال المكون</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">DisposableEffect</span></td>
+                                <td>إعداد وإلغاء Resources (Listeners, Subscriptions)</td>
+                                <td>يستدعى onDispose عند التغيير أو الإزالة</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">SideEffect</span></td>
+                                <td>تشغيل كود بعد كل Recomposition ناجحة</td>
+                                <td>يُنفذ بعد كل Composition Commit</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">rememberCoroutineScope</span></td>
+                                <td>إنشاء CoroutineScope مرتبط بـ Composable</td>
+                                <td>يُلغى عند خروج المكون من الـ Composition</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">produceState</span></td>
+                                <td>تحويل State من مصدر خارجي إلى Compose State</td>
+                                <td>يدير الـ Producer Coroutine تلقائياً</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">snapshotFlow</span></td>
+                                <td>تحويل Compose State إلى Kotlin Flow</td>
+                                <td>يلتقط تغييرات الـ Snapshot System</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <pre><code><span class="c">// LaunchedEffect: تشغيل Coroutine عند تغيير الـ key</span>
+<span class="a">@Composable</span>
+<span class="k">fun</span> <span class="f">UserProfile</span>(<span class="n">userId</span>: <span class="t">String</span>) {
+    <span class="n">LaunchedEffect</span>(<span class="n">userId</span>) {
+        <span class="c">// يُلغى ويُعاد تشغيله عندما يتغير userId</span>
+        <span class="k">val</span> <span class="n">user</span> = <span class="n">repository</span>.<span class="n">fetchUser</span>(<span class="n">userId</span>)
+        <span class="n">userState</span>.<span class="n">value</span> = <span class="n">user</span>
+    }
+}
+
+<span class="c">// DisposableEffect: إدارة Resources مع التنظيف</span>
+<span class="a">@Composable</span>
+<span class="k">fun</span> <span class="f">BackHandler</span>(<span class="k">onBack</span>: () -> <span class="t">Unit</span>) {
+    <span class="k">val</span> <span class="n">callback</span> = <span class="n">rememberUpdatedState</span>(<span class="n">onBack</span>)
+
+    <span class="n">DisposableEffect</span>(<span class="t">Unit</span>) {
+        <span class="k">val</span> <span class="n">dispatcher</span> = <span class="n">requireActivity</span>().<span class="n">onBackPressedDispatcher</span>
+        <span class="k">val</span> <span class="n">backCallback</span> = <span class="n">object</span> : <span class="t">OnBackPressedCallback</span>(<span class="s">true</span>) {
+            <span class="k">override fun</span> <span class="f">handleOnBackPressed</span>() { <span class="n">callback</span>.<span class="n">value</span>() }
+        }
+        <span class="n">dispatcher</span>.<span class="n">addCallback</span>(<span class="n">backCallback</span>)
+
+        <span class="k">onDispose</span> { <span class="n">backCallback</span>.<span class="n">remove</span>() }
+    }
+}
+
+<span class="c">// produceState: تحويل Flow/Callback إلى State</span>
+<span class="a">@Composable</span>
+<span class="k">fun</span> <span class="f">NetworkState</span>(): <span class="t">State</span><<span class="t">Boolean</span>> = <span class="n">produceState</span>(<span class="n">initialValue</span> = <span class="s">false</span>) {
+    <span class="k">val</span> <span class="n">callback</span> = <span class="n">NetworkCallback</span> { <span class="n">isAvailable</span> ->
+        <span class="n">value</span> = <span class="n">isAvailable</span>
+    }
+    <span class="n">connectivityManager</span>.<span class="n">registerDefaultNetworkCallback</span>(<span class="n">callback</span>)
+    <span class="k">awaitDispose</span> {
+        <span class="n">connectivityManager</span>.<span class="n">unregisterNetworkCallback</span>(<span class="n">callback</span>)
+    }
+}
+
+<span class="c">// snapshotFlow: مراقبة State كـ Flow</span>
+<span class="a">@Composable</span>
+<span class="k">fun</span> <span class="f">ScrollToTop</span>(<span class="n">listState</span>: <span class="t">LazyListState</span>) {
+    <span class="n">LaunchedEffect</span>(<span class="n">listState</span>) {
+        <span class="n">snapshotFlow</span> { <span class="n">listState</span>.<span class="n">firstVisibleItemIndex</span> }
+            .<span class="n">filter</span> { <span class="n">it</span> > <span class="s">0</span> }
+            .<span class="n">collect</span> { <span class="n">index</span> ->
+                <span class="n">showScrollToTop</span>.<span class="n">value</span> = <span class="s">true</span>
+            }
+    }
+}</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">📐</div>
+                    Core Layouts & Modifiers
+                </div>
+
+                <div class="callout callout-info">
+                    <div class="callout-icon">📌</div>
+                    <div class="callout-content">
+                        <div class="callout-title">المبدأ الأساسي للـ Layout</div>
+                        <p>كل Layout في Compose يتبع نمط القياس الأحادي (Single-Pass Measurement) لضمان أداء خطي O(n) بدلاً من الأداء الأسي في الأنظمة التقليدية.</p>
+                    </div>
+                </div>
+
+                <pre><code><span class="c">// Column: ترتيب العناصر عمودياً</span>
+<span class="n">Column</span>(
+    <span class="n">modifier</span> = <span class="n">Modifier</span>.<span class="n">fillMaxSize</span>(),
+    <span class="n">verticalArrangement</span> = <span class="n">Arrangement</span>.<span class="n">spacedBy</span>(<span class="s">16.dp</span>),
+    <span class="n">horizontalAlignment</span> = <span class="n">Alignment</span>.<span class="n">CenterHorizontally</span>
+) {
+    <span class="n">Text</span>(<span class="s">"Item 1"</span>)
+    <span class="n">Text</span>(<span class="s">"Item 2"</span>)
+}
+
+<span class="c">// LazyColumn مع استراتيجية key</span>
+<span class="n">LazyColumn</span> {
+    <span class="n">items</span>(
+        <span class="n">items</span> = <span class="n">messages</span>,
+        <span class="n">key</span> = { <span class="n">message</span> -> <span class="n">message</span>.<span class="n">id</span> },
+        <span class="n">contentType</span> = { <span class="n">message</span> -> <span class="n">message</span>.<span class="n">type</span> }
+    ) { <span class="n">message</span> ->
+        <span class="n">MessageItem</span>(<span class="n">message</span> = <span class="n">message</span>)
+    }
+}</code></pre>
+
+                <div class="callout callout-success">
+                    <div class="callout-icon">🚀</div>
+                    <div class="callout-content">
+                        <div class="callout-title">أهمية معامل key في Lazy Lists</div>
+                        <p>يضمن معامل <span class="inline-code">key</span> أن Compose يتعرف على العناصر بشكل صحيح عند التغييرات (إضافة/حذف/نقل)، مما يحافظ على الـ State الداخلي ويمنع Recompositions غير الضرورية.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">🔗</div>
+                    Modifier Execution Order
+                </div>
+                <p style="margin-bottom: 16px;">
+                    تُطبق الـ Modifiers بترتيب التسلسل (Sequential Application). كل Modifier يُغلف (Wraps) المكون السابق، ويؤثر على القياس والرسم.
+                </p>
+
+                <div class="diagram">
+                    <div class="diagram-title">Modifier Chain Execution Flow</div>
+                    <div style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+                        <div style="background: linear-gradient(135deg, var(--danger-red), #FF6B6B); padding: 12px 24px; border-radius: 8px; font-weight: 700;">
+                            Draw Phase (الرسم)
+                        </div>
+                        <div style="color: var(--mint-green); font-size: 1.2rem;">⬆️</div>
+                        <div style="background: linear-gradient(135deg, var(--kotlin-purple), #9C27B0); padding: 12px 24px; border-radius: 8px; font-weight: 700;">
+                            Layout Phase (القياس والوضع)
+                        </div>
+                        <div style="color: var(--mint-green); font-size: 1.2rem;">⬆️</div>
+                        <div style="background: linear-gradient(135deg, var(--compose-blue), #2196F3); padding: 12px 24px; border-radius: 8px; font-weight: 700;">
+                            Composition Phase (التركيب)
+                        </div>
+                    </div>
+                    <p style="text-align: center; margin-top: 20px; opacity: 0.8; font-size: 0.9rem;">
+                        Modifier.padding().background().clickable() — يُطبق clickable أولاً ثم background ثم padding
+                    </p>
+                </div>
+
+                <pre><code><span class="c">// ❌ خطأ: الـ clickable سيُطبق على المساحة بدون padding</span>
+<span class="n">Modifier</span>.<span class="n">clickable</span> { }.<span class="n">padding</span>(<span class="s">16.dp</span>)
+
+<span class="c">// ✅ صحيح: الـ padding يُطبق أولاً ثم clickable على المساحة الكاملة</span>
+<span class="n">Modifier</span>.<span class="n">padding</span>(<span class="s">16.dp</span>).<span class="n">clickable</span> { }</code></pre>
+            </div>
+        </section>
+
+        <section id="under-the-hood" class="section">
+            <div class="section-header">
+                <div class="section-number">3</div>
+                <div>
+                    <h2 class="section-title">ما الذي يحدث خلف الكواليس؟</h2>
+                    <div class="section-title-en">Jetpack Compose Under the Hood - Deep Dive</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">🔧</div>
+                    The Compose Compiler Plugin
+                </div>
+                <p style="margin-bottom: 20px;">
+                    الـ <span class="inline-code">@Composable</span> ليست مجرد Annotation تقليدية. إنها محوّل نوع (Type Transformer) يقوم الـ Kotlin Compiler Plugin بمعالجته على مستوى الـ IR (Intermediate Representation).
+                </p>
+
+                <div class="diagram">
+                    <div class="diagram-title">Compiler Transformation Pipeline</div>
+                    <div class="flow-container">
+                        <div class="flow-box">
+                            Kotlin Source
+                            <div class="flow-sub">@Composable fun Greeting()</div>
+                        </div>
+                        <div class="flow-arrow">➜</div>
+                        <div class="flow-box">
+                            IR Generation
+                            <div class="flow-sub">Kotlin Compiler IR</div>
+                        </div>
+                        <div class="flow-arrow">➜</div>
+                        <div class="flow-box">
+                            Compose Plugin
+                            <div class="flow-sub">IR Transformation</div>
+                        </div>
+                        <div class="flow-arrow">➜</div>
+                        <div class="flow-box">
+                            JVM Bytecode
+                            <div class="flow-sub">Transformed Signature</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <div class="highlight-box-title">التوقيع المُحوّل للـ Composable Function</div>
+                    <p>يقوم الـ Plugin بإضافة معاملين سريين: <span class="inline-code">$composer</span> (Composer) و <span class="inline-code">$changed</span> (Bitmask) لتتبع التغييرات وتحسين Recomposition.</p>
+                </div>
+
+                <pre><code><span class="c">// ما تكتبه أنت:</span>
+<span class="a">@Composable</span>
+<span class="k">fun</span> <span class="f">Greeting</span>(<span class="n">name</span>: <span class="t">String</span>) {
+    <span class="n">Text</span>(<span class="s">"Hello, </span><span class="n">$name</span><span class="s">"</span>)
+}
+
+<span class="c">// ما يُنتجه الـ Compiler (مبسط):</span>
+<span class="k">fun</span> <span class="f">Greeting</span>(
+    <span class="n">name</span>: <span class="t">String</span>,
+    <span class="n">$composer</span>: <span class="t">Composer</span>?,  <span class="c">// يُضاف تلقائياً</span>
+    <span class="n">$changed</span>: <span class="t">Int</span>           <span class="c">// Bitmask للمعاملات</span>
+) {
+    <span class="n">$composer</span>?.<span class="n">startRestartGroup</span>(...)
+    <span class="c">// ... group logic for tracking</span>
+    <span class="n">$composer</span>?.<span class="n">endRestartGroup</span>()
+}</code></pre>
+
+                <div class="callout callout-warning">
+                    <div class="callout-icon">🔍</div>
+                    <div class="callout-content">
+                        <div class="callout-title">Bitmask & $changed Parameter</div>
+                        <p>يستخدم الـ Compiler Bitmask (مثلاً <span class="inline-code">0b0001</span> أو <span class="inline-code">0b0010</span>) لتحديد أي المعاملات قد تغيرت. إذا لم يتغير أي معامل، يتخطى Compose الـ Recomposition لهذا المكون.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">🗂️</div>
+                    The Compose Runtime & The Slot Table
+                </div>
+
+                <div class="highlight-box">
+                    <div class="highlight-box-title">ما هو Slot Table؟</div>
+                    <p>الـ <span class="inline-code">Slot Table</span> هو بنية بيانات داخلية تعمل كـ <span class="inline-code">Gap Buffer Array</span> يخزن معاملات الـ Composables، والـ States، والقيم المُحفوظة (Memoized Values). يمثل "ذاكرة" الـ Composition.</p>
+                </div>
+
+                <div class="diagram">
+                    <div class="diagram-title">Slot Table Architecture</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                        <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
+                            <div style="font-weight: 700; margin-bottom: 12px; color: var(--mint-green);">Slots Array</div>
+                            <div style="font-family: monospace; font-size: 0.85rem; line-height: 2;">
+                                [0] Group Start: "Box"<br>
+                                [1] Key: 100<br>
+                                [2] Data: Modifier<br>
+                                [3] Group Start: "Text"<br>
+                                [4] Key: 200<br>
+                                [5] Data: "Hello"<br>
+                                [6] Group End<br>
+                                [7] Group End
+                            </div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
+                            <div style="font-weight: 700; margin-bottom: 12px; color: var(--compose-blue);">Gap Buffer</div>
+                            <div style="font-family: monospace; font-size: 0.85rem; line-height: 2;">
+                                [Active] [Active] [GAP] [Active]<br>
+                                ↑ يتم إعادة استخدام المساحة الفارغة<br><br>
+                                <span style="color: var(--mint-green);">O(1) Insert/Delete</span><br>
+                                <span style="color: var(--warning-orange);">O(n) Gap Movement</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="callout callout-info">
+                    <div class="callout-icon">🧠</div>
+                    <div class="callout-content">
+                        <div class="callout-title">Positional Memoization</div>
+                        <p>يستخدم Compose <span class="inline-code">Positional Memoization</span> حيث يُستخدم موقع استدعاء الدالة في شجرة التنفيذ (Execution Tree) كهوية (Identity) لتخزين واسترجاع القيم المُحفوظة. هذا هو السبب في أهمية استقرار شجرة الـ Composition.</p>
+                    </div>
+                </div>
+
+                <pre><code><span class="c">// كل استدعاء لـ remember يُخزن في Slot Table</span>
+<span class="c">// بناءً على موقعه في الـ Call Tree</span>
+<span class="a">@Composable</span>
+<span class="k">fun</span> <span class="f">Example</span>() {
+    <span class="k">val</span> <span class="n">a</span> = <span class="n">remember</span> { <span class="s">"Value A"</span> }  <span class="c">// Slot [0]</span>
+    <span class="k">if</span> (<span class="n">condition</span>) {
+        <span class="k">val</span> <span class="n">b</span> = <span class="n">remember</span> { <span class="s">"Value B"</span> }  <span class="c">// Slot [1] - مشروط</span>
+    }
+    <span class="k">val</span> <span class="n">c</span> = <span class="n">remember</span> { <span class="s">"Value C"</span> }  <span class="c">// Slot [2] أو [1]</span>
+}
+
+<span class="c">// ⚠️ تحذير: الشروط تُغير المواقع وتُسبب فقدان الـ State!</span></code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">⚙️</div>
+                    The 3 Phases of Compose Pipeline
+                </div>
+
+                <div class="phases-grid">
+                    <div class="phase-card">
+                        <div class="phase-number">01</div>
+                        <div class="phase-title">Composition</div>
+                        <p>تنفيذ الـ Composables وتحديث الـ Slot Table. يحدد "ما" الذي سيتم عرضه. يتم في هذه المرحلة تخصيص الـ States وتحديد هيكل UI Tree.</p>
+                        <div style="margin-top: 12px;">
+                            <span class="badge badge-blue">Slot Table</span>
+                            <span class="badge badge-purple">State Allocation</span>
+                        </div>
+                    </div>
+                    <div class="phase-card">
+                        <div class="phase-number">02</div>
+                        <div class="phase-title">Layout</div>
+                        <p>قياس (Measure) ووضع (Place) العناصر. يحدد "أين" سيظهر كل عنصر. نظام قياس أحادي (Single-Pass) يضمن أداءً خطياً O(n).</p>
+                        <div style="margin-top: 12px;">
+                            <span class="badge badge-green">Constraints</span>
+                            <span class="badge badge-blue">Measure/Place</span>
+                        </div>
+                    </div>
+                    <div class="phase-card">
+                        <div class="phase-number">03</div>
+                        <div class="phase-title">Drawing</div>
+                        <p>رسم العناصر على الـ Canvas. يحدد "كيف" يبدو كل عنصر. استدعاءات Canvas مباشرة لـ Render Thread.</p>
+                        <div style="margin-top: 12px;">
+                            <span class="badge badge-purple">Canvas API</span>
+                            <span class="badge badge-green">Render Thread</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="diagram">
+                    <div class="diagram-title">Compose Pipeline Flow</div>
+                    <div class="flow-container">
+                        <div class="flow-box">
+                            State Change
+                            <div class="flow-sub">mutableStateOf.value = x</div>
+                        </div>
+                        <div class="flow-arrow">➜</div>
+                        <div class="flow-box">
+                            Composition
+                            <div class="flow-sub">Slot Table Update</div>
+                        </div>
+                        <div class="flow-arrow">➜</div>
+                        <div class="flow-box">
+                            Layout
+                            <div class="flow-sub">Measure & Place</div>
+                        </div>
+                        <div class="flow-arrow">➜</div>
+                        <div class="flow-box">
+                            Drawing
+                            <div class="flow-sub">Canvas Rendering</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">🌳</div>
+                    LayoutNode & Applier
+                </div>
+                <p style="margin-bottom: 16px;">
+                    يترجم Compose استدعاءات الدوال إلى شجرة <span class="inline-code">LayoutNode</span> باستخدام واجهة <span class="inline-code">Applier</span> التي تربط بين Slot Table وشجرة الـ UI الفعلية.
+                </p>
+
+                <div class="diagram">
+                    <div class="diagram-title">Applier & LayoutNode Translation</div>
+                    <div class="tree-diagram">
+                        <div class="tree-level">
+                            <div class="tree-node" style="background: linear-gradient(135deg, var(--compose-blue), var(--kotlin-purple)); font-weight: 700;">
+                                Applier&lt;LayoutNode&gt;
+                            </div>
+                        </div>
+                        <div style="color: var(--mint-green); font-size: 1.5rem;">⬇️</div>
+                        <div class="tree-level">
+                            <div class="tree-node">
+                                LayoutNode (Root)
+                                <div style="font-size: 0.75rem; opacity: 0.8; margin-top: 4px;">measure(), place(), draw()</div>
+                            </div>
+                        </div>
+                        <div style="color: var(--mint-green); font-size: 1.5rem;">⬇️</div>
+                        <div class="tree-level">
+                            <div class="tree-node">LayoutNode (Column)</div>
+                            <div class="tree-node">LayoutNode (Box)</div>
+                        </div>
+                        <div style="color: var(--mint-green); font-size: 1.5rem;">⬇️</div>
+                        <div class="tree-level">
+                            <div class="tree-node">LayoutNode (Text)</div>
+                            <div class="tree-node">LayoutNode (Image)</div>
+                            <div class="tree-node">LayoutNode (Button)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <pre><code><span class="c">// Applier Interface - يُستخدم لبناء UI Tree</span>
+<span class="k">interface</span> <span class="t">Applier</span>&lt;<span class="t">N</span>&gt; {
+    <span class="k">fun</span> <span class="f">down</span>(<span class="n">node</span>: <span class="t">N</span>)      <span class="c">// الدخول إلى Node جديد</span>
+    <span class="k">fun</span> <span class="f">up</span>()               <span class="c">// العودة إلى Node الأب</span>
+    <span class="k">fun</span> <span class="f">insertTopDown</span>(...) <span class="c">// إدراج Node من الأعلى</span>
+    <span class="k">fun</span> <span class="f">insertBottomUp</span>(...) <span class="c">// إدراج Node من الأسفل</span>
+    <span class="k">fun</span> <span class="f">remove</span>(...)        <span class="c">// حذف Node</span>
+    <span class="k">fun</span> <span class="f">move</span>(...)          <span class="c">// نقل Node</span>
+}</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">🔄</div>
+                    Recomposition Mechanics
+                </div>
+
+                <div class="callout callout-info">
+                    <div class="callout-icon">🎯</div>
+                    <div class="callout-content">
+                        <div class="callout-title">Smart Recomposition</div>
+                        <p>عندما تتغير قيمة <span class="inline-code">mutableStateOf</span>، يسجل الـ Snapshot System القراءات (Reads) ويُعلم (Invalidates) الـ Recomposition Scopes المرتبطة. يقوم Compose بإعادة التركيب فقط للمكونات المتأثرة.</p>
+                    </div>
+                </div>
+
+                <div class="diagram">
+                    <div class="diagram-title">Recomposition Invalidation Flow</div>
+                    <div class="flow-container">
+                        <div class="flow-box">
+                            State Write
+                            <div class="flow-sub">state.value = newValue</div>
+                        </div>
+                        <div class="flow-arrow">➜</div>
+                        <div class="flow-box">
+                            Snapshot System
+                            <div class="flow-sub">Records Changes</div>
+                        </div>
+                        <div class="flow-arrow">➜</div>
+                        <div class="flow-box">
+                            Invalidation
+                            <div class="flow-sub">Mark Scopes Dirty</div>
+                        </div>
+                        <div class="flow-arrow">➜</div>
+                        <div class="flow-box">
+                            Recomposition
+                            <div class="flow-sub">Skip Unchanged</div>
+                        </div>
+                    </div>
+                </div>
+
+                <pre><code><span class="c">// Smart Recomposition: يتخطى المكونات غير المتأثرة</span>
+<span class="a">@Composable</span>
+<span class="k">fun</span> <span class="f">Parent</span>() {
+    <span class="k">var</span> <span class="n">count</span> <span class="k">by</span> <span class="n">remember</span> { <span class="n">mutableStateOf</span>(<span class="s">0</span>) }
+
+    <span class="n">Column</span> {
+        <span class="n">ExpensiveWidget</span>()        <span class="c">// ✅ لا يُعاد تركيبه</span>
+        <span class="n">CounterDisplay</span>(<span class="n">count</span>)  <span class="c">// ✅ يُعاد تركيبه فقط</span>
+        <span class="n">Button</span>({ <span class="n">count</span>++ })    <span class="c">// ✅ لا يُعاد تركيبه</span>
+    }
+}
+
+<span class="c">// Compose يتتبع القراءات (Reads) على مستوى الـ Scope</span>
+<span class="c">// ويُعيد التركيب فقط للـ Composables التي تقرأ الـ State</span></code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">🛡️</div>
+                    Stability System (@Stable & @Immutable)
+                </div>
+
+                <div class="highlight-box">
+                    <div class="highlight-box-title">قواعد Smart Recomposition</div>
+                    <p>يقوم Compose بتحليل استقرار (Stability) أنواع البيانات لتحديد ما إذا كان المكون يحتاج إلى Recomposition. الأنواع <span class="inline-code">@Stable</span> و <span class="inline-code">@Immutable</span> تُعلم الـ Compiler بأن النوع آمن للمقارنة بالمرجع (Referential Equality).</p>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الـ Annotation</th>
+                                <th>المعنى</th>
+                                <th>الاستخدام</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="inline-code">@Stable</span></td>
+                                <td>النوع قابل للتغيير لكنه يُعلم Compose عند التغيير</td>
+                                <td>Classes مع mutableStateOf داخلها</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">@Immutable</span></td>
+                                <td>النوع غير قابل للتغيير نهائياً بعد الإنشاء</td>
+                                <td>Data Classes مع val فقط</td>
+                            </tr>
+                            <tr>
+                                <td>بدون Annotation</td>
+                                <td>الـ Compiler يفترض أن النوع غير مستقر (Unstable)</td>
+                                <td>قد يُسبب Recompositions غير ضرورية</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <pre><code><span class="c">// ❌ غير مستقر - سيُسبب Recomposition دائماً</span>
+<span class="k">data class</span> <span class="t">User</span>(<span class="k">var</span> <span class="n">name</span>: <span class="t">String</span>)
+
+<span class="c">// ✅ Immutable - Compose يثق بأنها لا تتغير</span>
+<span class="a">@Immutable</span>
+<span class="k">data class</span> <span class="t">User</span>(<span class="k">val</span> <span class="n">name</span>: <span class="t">String</span>)
+
+<span class="c">// ✅ Stable - يُعلم Compose عند التغيير عبر State</span>
+<span class="a">@Stable</span>
+<span class="k">class</span> <span class="t">UserViewModel</span> {
+    <span class="k">var</span> <span class="n">name</span> <span class="k">by</span> <span class="n">mutableStateOf</span>(<span class="s">""</span>)
+}
+
+<span class="c">// ✅ استخدام Immutable Collections</span>
+<span class="k">import</span> <span class="n">kotlinx.collections.immutable.ImmutableList</span>
+<span class="k">import</span> <span class="n">kotlinx.collections.immutable.persistentListOf</span>
+
+<span class="a">@Composable</span>
+<span class="k">fun</span> <span class="f">UserList</span>(<span class="n">users</span>: <span class="t">ImmutableList</span><<span class="t">User</span>>) { ... }</code></pre>
+
+                <div class="callout callout-warning">
+                    <div class="callout-icon">⚠️</div>
+                    <div class="callout-content">
+                        <div class="callout-title">مشكلة Multi-Module Data Models</div>
+                        <p>عندما تكون Data Models في modules منفصلة، قد لا يستطيع الـ Compose Compiler تحليل استقرارها. الحلول: استخدام <span class="inline-code">@Stable</span> أو <span class="inline-code">@Immutable</span>، أو تفعيل <span class="inline-code">strongSkipping</span> mode في Compose Compiler 1.5.0+.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="performance" class="section">
+            <div class="section-header">
+                <div class="section-number">4</div>
+                <div>
+                    <h2 class="section-title">هندسة الأداء والتحسين</h2>
+                    <div class="section-title-en">Performance Optimization & Metrics</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">⚡</div>
+                    Deferred State Reading
+                </div>
+                <p style="margin-bottom: 16px;">
+                    يتيح <span class="inline-code">Deferred State Reading</span> تجاوز مرحلة الـ Composition والانتقال مباشرة إلى مراحل الـ Layout أو Draw. يُستخدم بشكل شائع في الـ Scroll Animations والـ Gestures.
+                </p>
+
+                <div class="highlight-box">
+                    <div class="highlight-box-title">Lambda-based Modifiers</div>
+                    <p>عند استخدام Lambda-based modifiers مثل <span class="inline-code">Modifier.offset { ... }</span> أو <span class="inline-code">Modifier.drawWithContent { ... }</span>، يتم قراءة الـ State داخل الـ Lambda بدلاً من الـ Composition، مما يتجنب Recomposition.</p>
+                </div>
+
+                <pre><code><span class="c">// ❌ سيُسبب Recomposition عند كل تغيير في scroll</span>
+<span class="k">val</span> <span class="n">offset</span> = <span class="n">scrollState</span>.<span class="n">value</span>.<span class="n">toFloat</span>()
+<span class="n">Box</span>(<span class="n">modifier</span> = <span class="n">Modifier</span>.<span class="n">offset</span>(<span class="n">y</span> = <span class="n">offset</span>.<span class="n">dp</span>))
+
+<span class="c">// ✅ يتجنب Recomposition - يقرأ State في Layout Phase</span>
+<span class="n">Box</span>(
+    <span class="n">modifier</span> = <span class="n">Modifier</span>.<span class="n">offset</span> {
+        <span class="n">IntOffset</span>(<span class="s">0</span>, <span class="n">scrollState</span>.<span class="n">value</span>) <span class="c">// قراءة مؤجلة</span>
+    }
+)
+
+<span class="c">// ✅ Modifier.drawWithContent - قراءة مؤجلة في Draw Phase</span>
+<span class="n">Box</span>(
+    <span class="n">modifier</span> = <span class="n">Modifier</span>.<span class="n">drawWithContent</span> {
+        <span class="k">val</span> <span class="n">progress</span> = <span class="n">animationState</span>.<span class="n">value</span> <span class="c">// قراءة في Draw</span>
+        <span class="n">drawRect</span>(
+            <span class="n">color</span> = <span class="n">Color</span>.<span class="n">Red</span>,
+            <span class="n">alpha</span> = <span class="n">progress</span>
+        )
+        <span class="n">drawContent</span>()
+    }
+)</code></pre>
+
+                <div class="callout callout-success">
+                    <div class="callout-icon">🚀</div>
+                    <div class="callout-content">
+                        <div class="callout-title">الفائدة الأدائية</div>
+                        <p>بتأجيل قراءة الـ State إلى مراحل Layout أو Draw، تتجنب إعادة تنفيذ الـ Composition بالكامل. هذا يقلل من استخدام CPU ويحسن معدل الإطارات (Frame Rate) بشكل ملحوظ في الـ Animations.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">📊</div>
+                    Lazy List Optimization
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الاستراتيجية</th>
+                                <th>الوصف</th>
+                                <th>التأثير</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="inline-code">key</span></td>
+                                <td>معرف فريد مستقر لكل عنصر</td>
+                                <td>يحافظ على State ويمنع Recomposition غير ضروري</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">contentType</span></td>
+                                <td>تجميع العناصر المتشابهة لإعادة استخدام الـ ViewHolders</td>
+                                <td>يقلل من إنشاء الـ LayoutNodes الجديدة</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">@Stable</span> Items</td>
+                                <td>تأكد من استقرار Data Model لكل عنصر</td>
+                                <td>يتخطى Compose Recomposition للعناصر غير المتغيرة</td>
+                            </tr>
+                            <tr>
+                                <td>Lazy List State</td>
+                                <td>استخدام derivedStateOf للقراءات المشتقة</td>
+                                <td>يقلل من Recompositions الناتجة عن Scroll</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <pre><code><span class="n">LazyColumn</span>(
+    <span class="n">state</span> = <span class="n">listState</span>,
+    <span class="n">modifier</span> = <span class="n">Modifier</span>.<span class="n">fillMaxSize</span>()
+) {
+    <span class="n">items</span>(
+        <span class="n">items</span> = <span class="n">messages</span>,
+        <span class="n">key</span> = { <span class="n">it</span>.<span class="n">id</span> },           <span class="c">// مفتاح مستقر</span>
+        <span class="n">contentType</span> = { <span class="n">it</span>.<span class="n">type</span> }   <span class="c">// نوع المحتوى للتجميع</span>
+    ) { <span class="n">message</span> ->
+        <span class="n">MessageItem</span>(
+            <span class="n">message</span> = <span class="n">message</span>,
+            <span class="n">onClick</span> = { <span class="n">viewModel</span>.<span class="n">onMessageClick</span>(<span class="n">it</span>) }
+        )
+    }
+}
+
+<span class="c">// derivedStateOf لتقليل Recompositions الناتجة عن Scroll</span>
+<span class="k">val</span> <span class="n">showScrollToTop</span> <span class="k">by</span> <span class="n">remember</span> {
+    <span class="n">derivedStateOf</span> { <span class="n">listState</span>.<span class="n">firstVisibleItemIndex</span> > <span class="s">5</span> }
+}</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">🔍</div>
+                    Compiler Reports & Layout Inspector
+                </div>
+
+                <div class="callout callout-info">
+                    <div class="callout-icon">📋</div>
+                    <div class="callout-content">
+                        <div class="callout-title">تفعيل Compiler Reports</div>
+                        <p>يمكنك تفعيل تقارير الـ Compose Compiler لتحليل استقرار الأنواع وعدد Recompositions. أضف إلى <span class="inline-code">build.gradle</span>:</p>
+                    </div>
+                </div>
+
+                <pre><code><span class="n">composeCompiler</span> {
+    <span class="n">reportsDestination</span> = <span class="n">layout</span>.<span class="n">buildDirectory</span>.<span class="n">dir</span>(<span class="s">"compose_compiler"</span>)
+    <span class="n">metricsDestination</span> = <span class="n">layout</span>.<span class="n">buildDirectory</span>.<span class="n">dir</span>(<span class="s">"compose_compiler"</span>)
+}</code></pre>
+
+                <div class="highlight-box">
+                    <div class="highlight-box-title">ملفات التقرير</div>
+                    <ul class="styled-list">
+                        <li><span class="inline-code">&lt;module&gt;-classes.txt</span> — استقرار كل نوع (Stable/Unstable)</li>
+                        <li><span class="inline-code">&lt;module&gt;-composables.txt</span> — قابلية التخطي (Skippable) لكل Composable</li>
+                        <li><span class="inline-code">&lt;module&gt;-composables.csv</span> — إحصائيات Recomposition</li>
+                    </ul>
+                </div>
+
+                <pre><code><span class="c">// مثال من تقرير الـ Compiler:</span>
+<span class="c">// restartable skippable scheme("[androidx.compose.ui.UiComposable]")</span>
+<span class="c">// fun MyComposable(Stable user: User)</span>
+
+<span class="c">// restartable skippable scheme("[androidx.compose.ui.UiComposable]")</span>
+<span class="c">// fun BadComposable(Unstable user: User) ← سيُعاد تركيبه دائماً</span></code></pre>
+            </div>
+        </section>
+
+        <section id="custom-graphics" class="section">
+            <div class="section-header">
+                <div class="section-number">5</div>
+                <div>
+                    <h2 class="section-title">التخصيص والحركة المتقدمة</h2>
+                    <div class="section-title-en">Custom Graphics & Animations</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">📐</div>
+                    Custom Layouts
+                </div>
+                <p style="margin-bottom: 16px;">
+                    يتيح <span class="inline-code">Layout</span> Composable إنشاء تخطيطات مخصصة بتحديد منطق القياس (Measure) والوضع (Place) يدوياً.
+                </p>
+
+                <pre><code><span class="a">@Composable</span>
+<span class="k">fun</span> <span class="f">CustomLayout</span>(
+    <span class="n">modifier</span>: <span class="t">Modifier</span> = <span class="t">Modifier</span>,
+    <span class="n">content</span>: <span class="a">@Composable</span> () -> <span class="t">Unit</span>
+) {
+    <span class="n">Layout</span>(
+        <span class="n">content</span> = <span class="n">content</span>,
+        <span class="n">modifier</span> = <span class="n">modifier</span>
+    ) { <span class="n">measurables</span>, <span class="n">constraints</span> ->
+        <span class="c">// Measure children</span>
+        <span class="k">val</span> <span class="n">placeables</span> = <span class="n">measurables</span>.<span class="n">map</span> { <span class="n">measurable</span> ->
+            <span class="n">measurable</span>.<span class="n">measure</span>(<span class="n">constraints</span>)
+        }
+
+        <span class="c">// Calculate layout size</span>
+        <span class="k">val</span> <span class="n">width</span> = <span class="n">placeables</span>.<span class="n">maxOfOrNull</span> { <span class="n">it</span>.<span class="n">width</span> } ?: <span class="s">0</span>
+        <span class="k">val</span> <span class="n">height</span> = <span class="n">placeables</span>.<span class="n">sumOf</span> { <span class="n">it</span>.<span class="n">height</span> }
+
+        <span class="c">// Place children</span>
+        <span class="n">layout</span>(<span class="n">width</span>, <span class="n">height</span>) {
+            <span class="k">var</span> <span class="n">yPosition</span> = <span class="s">0</span>
+            <span class="n">placeables</span>.<span class="n">forEach</span> { <span class="n">placeable</span> ->
+                <span class="n">placeable</span>.<span class="n">placeRelative</span>(<span class="n">x</span> = <span class="s">0</span>, <span class="n">y</span> = <span class="n">yPosition</span>)
+                <span class="n">yPosition</span> += <span class="n">placeable</span>.<span class="n">height</span>
+            }
+        }
+    }
+}</code></pre>
+
+                <div class="callout callout-info">
+                    <div class="callout-icon">📌</div>
+                    <div class="callout-content">
+                        <div class="callout-title">قواعد القياس الأحادي</div>
+                        <p>في Custom Layouts، يجب قياس كل Child مرة واحدة فقط (Single-Pass). القياس المزدوج (Double Measurement) يُعتبر خطأً في Compose ويُسبب <span class="inline-code">IllegalStateException</span>.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">🎨</div>
+                    Canvas API
+                </div>
+
+                <pre><code><span class="a">@Composable</span>
+<span class="k">fun</span> <span class="f">CustomChart</span>(<span class="n">dataPoints</span>: <span class="t">List</span><<span class="t">Float</span>>) {
+    <span class="n">Canvas</span>(<span class="n">modifier</span> = <span class="n">Modifier</span>.<span class="n">fillMaxSize</span>()) {
+        <span class="k">val</span> <span class="n">path</span> = <span class="n">Path</span>()
+        <span class="k">val</span> <span class="n">widthStep</span> = <span class="n">size</span>.<span class="n">width</span> / (<span class="n">dataPoints</span>.<span class="n">size</span> - <span class="s">1</span>)
+
+        <span class="n">dataPoints</span>.<span class="n">forEachIndexed</span> { <span class="n">index</span>, <span class="n">value</span> ->
+            <span class="k">val</span> <span class="n">x</span> = <span class="n">index</span> * <span class="n">widthStep</span>
+            <span class="k">val</span> <span class="n">y</span> = <span class="n">size</span>.<span class="n">height</span> - (<span class="n">value</span> * <span class="n">size</span>.<span class="n">height</span>)
+
+            <span class="k">if</span> (<span class="n">index</span> == <span class="s">0</span>) {
+                <span class="n">path</span>.<span class="n">moveTo</span>(<span class="n">x</span>, <span class="n">y</span>)
+            } <span class="k">else</span> {
+                <span class="n">path</span>.<span class="n">lineTo</span>(<span class="n">x</span>, <span class="n">y</span>)
+            }
+        }
+
+        <span class="n">drawPath</span>(
+            <span class="n">path</span> = <span class="n">path</span>,
+            <span class="n">color</span> = <span class="n">Color</span>(<span class="s">0xFF4285F4</span>),
+            <span class="n">style</span> = <span class="n">Stroke</span>(<span class="n">width</span> = <span class="s">4f</span>)
+        )
+    }
+}</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">✨</div>
+                    Animation Framework
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الـ API</th>
+                                <th>المستوى</th>
+                                <th>الاستخدام</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="inline-code">animate*AsState</span></td>
+                                <td>عالي</td>
+                                <td>أبسط طريقة لتحريك قيمة واحدة (Float, Color, Offset)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">AnimatedVisibility</span></td>
+                                <td>عالي</td>
+                                <td>إظهار/إخفاء العناصر مع Animation</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">updateTransition</span></td>
+                                <td>متوسط</td>
+                                <td>تنسيق Animations متعددة لنفس الـ Target State</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">InfiniteTransition</span></td>
+                                <td>متوسط</td>
+                                <td>Animations تكرارية لا نهائية (Pulsing, Rotation)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">Animatable</span></td>
+                                <td>منخفض</td>
+                                <td>تحكم كامل في Animation مع Snap, AnimateTo</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">AnimationController</span></td>
+                                <td>منخفض</td>
+                                <td>أدنى مستوى - تحكم يدوي في كل Frame</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <pre><code><span class="c">// animate*AsState - High Level</span>
+<span class="k">val</span> <span class="n">alpha</span> <span class="k">by</span> <span class="n">animateFloatAsState</span>(
+    <span class="n">targetValue</span> = <span class="k">if</span> (<span class="n">visible</span>) <span class="s">1f</span> <span class="k">else</span> <span class="s">0f</span>,
+    <span class="n">animationSpec</span> = <span class="n">tween</span>(<span class="n">durationMillis</span> = <span class="s">300</span>)
+)
+
+<span class="c">// updateTransition - Coordinated Animations</span>
+<span class="k">val</span> <span class="n">transition</span> = <span class="n">updateTransition</span>(<span class="n">targetState</span> = <span class="n">expanded</span>, <span class="n">label</span> = <span class="s">"card"</span>)
+<span class="k">val</span> <span class="n">width</span> <span class="k">by</span> <span class="n">transition</span>.<span class="n">animateDp</span>(<span class="n">label</span> = <span class="s">"width"</span>) { <span class="n">state</span> ->
+    <span class="k">if</span> (<span class="n">state</span>) <span class="s">300.dp</span> <span class="k">else</span> <span class="s">100.dp</span>
+}
+<span class="k">val</span> <span class="n">cornerRadius</span> <span class="k">by</span> <span class="n">transition</span>.<span class="n">animateDp</span>(<span class="n">label</span> = <span class="s">"radius"</span>) { <span class="n">state</span> ->
+    <span class="k">if</span> (<span class="n">state</span>) <span class="s">0.dp</span> <span class="k">else</span> <span class="s">16.dp</span>
+}
+
+<span class="c">// Animatable - Low Level Control</span>
+<span class="k">val</span> <span class="n">offset</span> = <span class="n">remember</span> { <span class="n">Animatable</span>(<span class="n">Offset</span>.<span class="n">Zero</span>, <span class="n">Offset</span>.<span class="n">VectorConverter</span>) }
+
+<span class="n">LaunchedEffect</span>(<span class="n">target</span>) {
+    <span class="n">offset</span>.<span class="n">animateTo</span>(
+        <span class="n">targetValue</span> = <span class="n">target</span>,
+        <span class="n">animationSpec</span> = <span class="n">spring</span>(<span class="n">dampingRatio</span> = <span class="n">Spring</span>.<span class="n">DampingRatioMediumBouncy</span>)
+    )
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="decision-matrix" class="section">
+            <div class="section-header">
+                <div class="section-number">6</div>
+                <div>
+                    <h2 class="section-title">مصفوفة الأدوات واتخاذ القرار</h2>
+                    <div class="section-title-en">Compose Decision Matrix & Best Practices</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">🎯</div>
+                    Decision Matrix
+                </div>
+                <p style="margin-bottom: 20px;">
+                    المصفوفة التالية تُساعدك في اختيار الـ API المناسب لكل سيناريو، مع فهم التأثير الداخلي (Under-the-Hood Impact) لكل اختيار.
+                </p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="min-width: 200px;">السيناريو / الهدف</th>
+                                <th style="min-width: 220px;">الـ API / الاستراتيجية الموصى بها</th>
+                                <th>التأثير الداخلي (Under-the-Hood)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>حساب قيمة مشتقة من State</strong><br><span style="font-size: 0.85rem; color: var(--text-secondary);">مثال: isEmpty من list كبير</span></td>
+                                <td><span class="inline-code">derivedStateOf { ... }</span></td>
+                                <td>يقلل Recomposition عن طريق فصل Scope القراءة. يتخطى الـ Composition إذا لم تتغير القيمة المشتقة.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>الاستماع لتغييرات State خارج Compose</strong><br><span style="font-size: 0.85rem; color: var(--text-secondary);">مثال: Network, Location, Sensors</span></td>
+                                <td><span class="inline-code">produceState</span> أو <span class="inline-code">snapshotFlow</span></td>
+                                <td>يدير Coroutine lifecycle تلقائياً. يتكامل مع Slot Table عبر Snapshot System.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>تأجيل قراءة State لـ Scroll Animations</strong><br><span style="font-size: 0.85rem; color: var(--text-secondary);">مثال: Parallax, Collapsing Toolbar</span></td>
+                                <td>Lambda-based Modifiers<br><span class="inline-code">Modifier.offset { ... }</span></td>
+                                <td>يتجاوز Composition Phase بالكامل. يقرأ State في Layout أو Draw Phase مباشرة.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Data Models غير مستقرة عبر Modules</strong><br><span style="font-size: 0.85rem; color: var(--text-secondary);">مشكلة الـ Compiler لا يرى الأنواع</span></td>
+                                <td><span class="inline-code">@Stable</span> / <span class="inline-code">@Immutable</span><br>أو <span class="inline-code">strongSkipping</span> mode</td>
+                                <td>يُعلم Compiler باستقرار النوع. يُمكّن Skippable Recomposition للمكونات التي تستخدمه.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>إدارة Lifecycle Resources</strong><br><span style="font-size: 0.85rem; color: var(--text-secondary);">مثال: Listeners, Subscriptions</span></td>
+                                <td><span class="inline-code">DisposableEffect</span> مع <span class="inline-code">onDispose</span></td>
+                                <td>يُربط Lifecycle بالـ Composition. يُنظف الموارد تلقائياً عند تغيير الـ key أو الإزالة.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>تشغيل Coroutine مرتبط بـ Composable</strong><br><span style="font-size: 0.85rem; color: var(--text-secondary);">مثال: جلب بيانات، Animation</span></td>
+                                <td><span class="inline-code">LaunchedEffect(key)</span></td>
+                                <td>يُلغى ويُعاد تشغيله عند تغيير الـ key. يُدار بواسطة Composition Coroutine Context.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>تحسين Lazy Lists الكبيرة</strong><br><span style="font-size: 0.85rem; color: var(--text-secondary);">قائمة بآلاف العناصر</span></td>
+                                <td><span class="inline-code">key</span> + <span class="inline-code">contentType</span><br>+ Stable Data Models</td>
+                                <td>يحافظ على State عبر Gap Buffer. يُقلل إنشاء LayoutNodes عبر إعادة الاستخدام.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>تحريك قيمة واحدة بسيطة</strong><br><span style="font-size: 0.85rem; color: var(--text-secondary);">مثال: Alpha, Scale, Position</span></td>
+                                <td><span class="inline-code">animate*AsState</span></td>
+                                <td>يُدير Animation في Render Thread. يستخدم Deferred State Reading لتجنب Recomposition.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>تنسيق Animations متعددة معاً</strong><br><span style="font-size: 0.85rem; color: var(--text-secondary);">مثال: توسيع بطاقة مع تغيير لون ورنين</span></td>
+                                <td><span class="inline-code">updateTransition</span></td>
+                                <td>يُنشئ Transition Manager واحداً يُنسق بين Animations متعددة بشكل ذري (Atomic).</td>
+                            </tr>
+                            <tr>
+                                <td><strong>تخصيص تخطيط معقد</strong><br><span style="font-size: 0.85rem; color: var(--text-secondary);">مثال: Grid ديناميكي، Waterfall</span></td>
+                                <td><span class="inline-code">Layout { measurables, constraints -> ... }</span></td>
+                                <td>يتكامل مباشرة مع LayoutNode Tree. يتبع قواعد القياس الأحادي لضمان O(n).</td>
+                            </tr>
+                            <tr>
+                                <td><strong>رسم UI مخصص</strong><br><span style="font-size: 0.85rem; color: var(--text-secondary);">مثال: Charts, Graphs, Shapes</span></td>
+                                <td><span class="inline-code">Canvas</span> + <span class="inline-code">DrawScope</span></td>
+                                <td>يُرسم مباشرة على RenderNode Canvas. يتجاوز LayoutNode creation للعناصر البسيطة.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>الوصول إلى أحدث Lambda داخل Effect</strong><br><span style="font-size: 0.85rem; color: var(--text-secondary);">Callback يتغير عبر Recompositions</span></td>
+                                <td><span class="inline-code">rememberUpdatedState</span></td>
+                                <td>يُخزن مرجعاً قابلاً للتغيير في Slot Table دون إعادة تشغيل الـ Effect.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <div class="card-icon">📋</div>
+                    Best Practices Checklist
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h4 style="color: var(--mint-green); margin-bottom: 12px;">✅ افعل</h4>
+                        <ul class="styled-list">
+                            <li>ارفع الـ State (State Hoisting) قدر الإمكان</li>
+                            <li>استخدم <span class="inline-code">derivedStateOf</span> للقيم المشتقة</li>
+                            <li>استخدم <span class="inline-code">key</span> و <span class="inline-code">contentType</span> في Lazy Lists</li>
+                            <li>استخدم Lambda-based Modifiers للـ Animations</li>
+                            <li>أضف <span class="inline-code">@Stable</span> / <span class="inline-code">@Immutable</span> لـ Data Models</li>
+                            <li>استخدم <span class="inline-code">DisposableEffect</span> للتنظيف</li>
+                            <li>فعل تقارير الـ Compiler لتحليل الأداء</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--danger-red); margin-bottom: 12px;">❌ لا تفعل</h4>
+                        <ul class="styled-list">
+                            <li>لا تُمرر State غير مستقر إلى Composables</li>
+                            <li>لا تستخدم <span class="inline-code">remember</span> مع Objects متغيرة</li>
+                            <li>لا تُجري Side Effects مباشرة في Composable Body</li>
+                            <li>لا تقس Child مرتين في Custom Layout</li>
+                            <li>لا تستخدم <span class="inline-code">mutableStateOf</span> في غير Composable</li>
+                            <li>لا تُنشئ Objects جديدة في Modifiers Chain</li>
+                            <li>لا تهمل معامل <span class="inline-code">key</span> في Dynamic Lists</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-content">
+                    <div class="summary-title">
+                        <span>🏛️</span>
+                        توجيهات معمارية للمستوى Senior
+                    </div>
+                    <p style="margin-bottom: 16px; line-height: 1.9;">
+                        يُعد Jetpack Compose ليس مجرد مكتبة UI، بل هو نظام Declarative Runtime كامل. لبناء تطبيقات قابلة للتطوير (Scalable) وأداءً عالياً:
+                    </p>
+                    <ul style="list-style: none; padding: 0; line-height: 2.2;">
+                        <li style="padding-right: 28px; position: relative;">
+                            <span style="position: absolute; right: 0; color: var(--mint-green); font-weight: 700;">1.</span>
+                            <strong>افهم الـ Three-Phase Pipeline:</strong> Composition → Layout → Drawing. كل مرحلة لها تكلفتها، ومهمتك تقليل الـ Work غير الضروري في كل مرحلة.
+                        </li>
+                        <li style="padding-right: 28px; position: relative;">
+                            <span style="position: absolute; right: 0; color: var(--mint-green); font-weight: 700;">2.</span>
+                            <strong>احترم Stability Contracts:</strong> الأنواع غير المستقرة (Unstable) هي السبب الرئيسي لـ Recompositions غير الضرورية. استخدم <span class="inline-code">@Immutable</span> و <span class="inline-code">@Stable</span> بشكل واعٍ.
+                        </li>
+                        <li style="padding-right: 28px; position: relative;">
+                            <span style="position: absolute; right: 0; color: var(--mint-green); font-weight: 700;">3.</span>
+                            <strong>استثمر في Deferred State Reading:</strong> في Animations والـ Gestures، استخدم Lambda-based Modifiers لتجاوز Composition Phase بالكامل.
+                        </li>
+                        <li style="padding-right: 28px; position: relative;">
+                            <span style="position: absolute; right: 0; color: var(--mint-green); font-weight: 700;">4.</span>
+                            <strong>عالج Multi-Module Boundaries:</strong> في المشاريع الكبيرة، استخدم <span class="inline-code">strongSkipping</span> mode أو عرّف Stability Contracts واضحة عبر الحدود.
+                        </li>
+                        <li style="padding-right: 28px; position: relative;">
+                            <span style="position: absolute; right: 0; color: var(--mint-green); font-weight: 700;">5.</span>
+                            <strong>راقب باستمرار:</strong> استخدم Compiler Reports و Layout Inspector لتحديد نقاط الضعف قبل أن تُصبح مشاكل أداء حقيقية.
+                        </li>
+                    </ul>
+                    <div style="margin-top: 24px; padding: 16px; background: rgba(255,255,255,0.1); border-radius: 12px; border-right: 4px solid var(--mint-green);">
+                        <p style="font-style: italic; opacity: 0.9;">
+                            "Compose ليس عن كتابة UI أقل، بل عن كتابة UI أكثر وعياً — كل Composable هو قرار معماري، وكل State Read هو تكلفة يجب تبريرها."
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <footer class="footer">
+        <p>الدليل الشامل لـ Jetpack Compose — من واجهة المستخدم إلى العمق الداخلي</p>
+        <p style="margin-top: 8px; font-size: 0.85rem; opacity: 0.7;">
+            يغطي Compose Compiler Plugin, Slot Table, Recomposition Mechanics, Stability System, Performance Optimization, و Architectural Best Practices
+        </p>
+    </footer>
+
+</body>
+</html>

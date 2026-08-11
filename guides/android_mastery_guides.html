@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android Mastery Guides</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --accent: #10b981; /* Android Green accent */
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 2rem;
+            background-attachment: fixed;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #34d399, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        p.subtitle {
+            color: #94a3b8;
+            font-size: 1.2rem;
+        }
+        
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 2rem;
+        }
+        
+        .category-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.8s ease-out backwards;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px -5px rgba(0, 0, 0, 0.5);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        
+        .category-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .file-list {
+            list-style: none;
+            flex-grow: 1;
+        }
+        
+        .file-item {
+            margin-bottom: 0.75rem;
+        }
+        
+        .file-link {
+            display: flex;
+            align-items: center;
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .file-link:hover {
+            background: rgba(16, 185, 129, 0.1);
+            color: white;
+            border-left: 3px solid #10b981;
+            transform: translateX(4px);
+        }
+        
+        .file-icon {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+        
+        .stats {
+            text-align: center;
+            margin-top: 4rem;
+            color: #64748b;
+            font-size: 0.95rem;
+            background: rgba(0,0,0,0.2);
+            padding: 1rem;
+            border-radius: 12px;
+            display: inline-block;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>Android Mastery Guides</h1>
+        <p class="subtitle">Your comprehensive learning library</p>
+    </header>
+    
+    <div class="container">
+
+        <div class="category-card" style="animation-delay: 0.1s;">
+            <div class="category-title">🚀 Advanced Topics</div>
+            <ul class="file-list">
+                <li class="file-item">
+                    <a href="di_masterclass%20%281%29.html" class="file-link" title="di_masterclass (1).html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Di Masterclass</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="fintech_android_masterclass.html" class="file-link" title="fintech_android_masterclass.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Fintech Android Masterclass</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="category-card" style="animation-delay: 0.2s;">
+            <div class="category-title">🏗️ Architecture & System Design</div>
+            <ul class="file-list">
+                <li class="file-item">
+                    <a href="android_architecture_guide.html" class="file-link" title="android_architecture_guide.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Android Architecture Guide</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="android_system_design_guide%20%281%29.html" class="file-link" title="android_system_design_guide (1).html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Android System Design Guide</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="aosp_aaos_comprehensive_guide_ar.html" class="file-link" title="aosp_aaos_comprehensive_guide_ar.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Aosp Aaos Comprehensive Guide Ar</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="aosp_custom_system_service_guide.html" class="file-link" title="aosp_custom_system_service_guide.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Aosp Custom System Service Guide</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="mobile_system_design_guide%20%283%29.html" class="file-link" title="mobile_system_design_guide (3).html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Mobile System Design Guide</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="mobile_system_design_guide%20%284%29.html" class="file-link" title="mobile_system_design_guide (4).html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Mobile System Design Guide</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="mobile_system_design_guide%20%285%29.html" class="file-link" title="mobile_system_design_guide (5).html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Mobile System Design Guide</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="category-card" style="animation-delay: 0.30000000000000004s;">
+            <div class="category-title">🧩 Core Components & Lifecycle</div>
+            <ul class="file-list">
+                <li class="file-item">
+                    <a href="android_components_masterclass.html" class="file-link" title="android_components_masterclass.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Android Components Masterclass</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="android_lifecycle_masterclass.html" class="file-link" title="android_lifecycle_masterclass.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Android Lifecycle Masterclass</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="category-card" style="animation-delay: 0.4s;">
+            <div class="category-title">🔌 IPC & Binder</div>
+            <ul class="file-list">
+                <li class="file-item">
+                    <a href="aidl_guide.html" class="file-link" title="aidl_guide.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Aidl Guide</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="android_aidl_hal_guide.html" class="file-link" title="android_aidl_hal_guide.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Android Aidl Hal Guide</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="binder_ipc_guide_part1.html" class="file-link" title="binder_ipc_guide_part1.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Binder Ipc Guide Part1</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="category-card" style="animation-delay: 0.5s;">
+            <div class="category-title">☕ Languages (Java & Kotlin)</div>
+            <ul class="file-list">
+                <li class="file-item">
+                    <a href="java_master_guide%20%283%29.html" class="file-link" title="java_master_guide (3).html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Java Master Guide</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="kotlin_guide%20%281%29.html" class="file-link" title="kotlin_guide (1).html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Kotlin Guide</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="oop_kotlin_guide.html" class="file-link" title="oop_kotlin_guide.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Oop Kotlin Guide</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="oop_masterclass%20%281%29.html" class="file-link" title="oop_masterclass (1).html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Oop Masterclass</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="oop_masterclass.html" class="file-link" title="oop_masterclass.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Oop Masterclass</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="polymorphism_abstraction_guide.html" class="file-link" title="polymorphism_abstraction_guide.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Polymorphism Abstraction Guide</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="category-card" style="animation-delay: 0.6s;">
+            <div class="category-title">⚙️ Native Development (C++ & JNI)</div>
+            <ul class="file-list">
+                <li class="file-item">
+                    <a href="android_cpp_jni_master_guide%20%281%29.html" class="file-link" title="android_cpp_jni_master_guide (1).html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Android Cpp Jni Master Guide</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="jni_guide.html" class="file-link" title="jni_guide.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Jni Guide</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="ndk_jni_masterclass.html" class="file-link" title="ndk_jni_masterclass.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Ndk Jni Masterclass</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="category-card" style="animation-delay: 0.7s;">
+            <div class="category-title">📚 Other Guides</div>
+            <ul class="file-list">
+                <li class="file-item">
+                    <a href="android_system_services_guide.html" class="file-link" title="android_system_services_guide.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Android System Services Guide</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="selinux_android_guide.html" class="file-link" title="selinux_android_guide.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Selinux Android Guide</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="category-card" style="animation-delay: 0.7999999999999999s;">
+            <div class="category-title">🛡️ Testing & Security</div>
+            <ul class="file-list">
+                <li class="file-item">
+                    <a href="android_security_masterclass.html" class="file-link" title="android_security_masterclass.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Android Security Masterclass</span>
+                    </a>
+                </li>
+                <li class="file-item">
+                    <a href="android_testing_master_guide.html" class="file-link" title="android_testing_master_guide.html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Android Testing Master Guide</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="category-card" style="animation-delay: 0.8999999999999999s;">
+            <div class="category-title">🎨 UI & Jetpack Compose</div>
+            <ul class="file-list">
+                <li class="file-item">
+                    <a href="jetpack_compose_master_guide%20%281%29.html" class="file-link" title="jetpack_compose_master_guide (1).html">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">Jetpack Compose Master Guide</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="stats">
+        <p><strong>28</strong> Guides Indexed • <strong>0</strong> Duplicates Cleaned</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدليل الشامل لطبقة العتاد ومعمارية AIDL HAL في أندرويد</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 16mm 14mm;
+            background-color: #f8fafc;
+            @top-center {
+                content: "الدليل الشامل لطبقة العتاد ومعمارية AIDL HAL في أندرويد";
+                font-size: 9pt;
+                color: #64748b;
+            }
+            @bottom-center {
+                content: "صفحة " counter(page) " من " counter(pages);
+                font-size: 9pt;
+                color: #64748b;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.8;
+            font-size: 11pt;
+        }
+
+        .container {
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Banner */
+        .header-banner {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            padding: 40px 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(15, 23, 42, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(5, 150, 105, 0.1);
+            border-radius: 50%;
+        }
+
+        .header-banner h1 {
+            font-size: 22pt;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-banner .subtitle {
+            font-size: 12pt;
+            color: #94a3b8;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-banner .badge {
+            display: inline-block;
+            background: #059669;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 9pt;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        /* Section Styling */
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-right: 4px solid #059669;
+        }
+
+        .section h2 {
+            color: #0f172a;
+            font-size: 16pt;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .section h3 {
+            color: #1e293b;
+            font-size: 13pt;
+            margin: 20px 0 10px 0;
+        }
+
+        .section p, .section li {
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        .section ul, .section ol {
+            margin-right: 25px;
+            margin-bottom: 15px;
+        }
+
+        /* Code Blocks - STRICTLY LTR */
+        pre {
+            direction: ltr;
+            text-align: left;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 9pt;
+            line-height: 1.5;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        code {
+            direction: ltr;
+            text-align: left;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: #f1f5f9;
+            color: #0f172a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10pt;
+        }
+
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            font-size: 9pt;
+        }
+
+        /* Syntax Highlighting */
+        .keyword { color: #c084fc; }
+        .string { color: #86efac; }
+        .comment { color: #64748b; font-style: italic; }
+        .type { color: #60a5fa; }
+        .function { color: #fbbf24; }
+        .path { color: #f472b6; }
+        .xml-tag { color: #f472b6; }
+        .xml-attr { color: #fbbf24; }
+        .xml-val { color: #86efac; }
+
+        /* Warning/Security Cards */
+        .warning-card {
+            background: #fff1f2;
+            border-right: 4px solid #e11d48;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .warning-card h4 {
+            color: #e11d48;
+            margin-bottom: 8px;
+            font-size: 11pt;
+        }
+
+        .info-card {
+            background: #f0fdf4;
+            border-right: 4px solid #059669;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .info-card h4 {
+            color: #059669;
+            margin-bottom: 8px;
+            font-size: 11pt;
+        }
+
+        /* ASCII Diagrams */
+        .diagram {
+            direction: ltr;
+            text-align: center;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Consolas', monospace;
+            font-size: 9pt;
+            line-height: 1.6;
+            overflow-x: auto;
+            color: #334155;
+        }
+
+        .diagram .sys-box {
+            color: #059669;
+            font-weight: bold;
+        }
+
+        .diagram .ven-box {
+            color: #e11d48;
+            font-weight: bold;
+        }
+
+        .diagram .binder {
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            direction: rtl;
+        }
+
+        th {
+            background: #0f172a;
+            color: white;
+            padding: 10px;
+            text-align: right;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: right;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        /* File Path Box */
+        .file-path {
+            direction: ltr;
+            text-align: left;
+            background: #1e293b;
+            color: #86efac;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 9pt;
+            margin: 10px 0;
+            border-left: 3px solid #059669;
+        }
+
+        /* Step Boxes */
+        .step-box {
+            background: linear-gradient(to right, #f0fdf4, white);
+            border: 1px solid #059669;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: #059669;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12pt;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-right: 30px;
+            margin: 20px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            right: 8px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #059669;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding-right: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            right: -26px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: #059669;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #059669;
+        }
+
+        .timeline-item.legacy::before { background: #64748b; box-shadow: 0 0 0 3px #64748b; }
+        .timeline-item.hidl::before { background: #2563eb; box-shadow: 0 0 0 3px #2563eb; }
+        .timeline-item.aidl::before { background: #059669; box-shadow: 0 0 0 3px #059669; }
+
+        .timeline-item h4 {
+            font-size: 12pt;
+            margin-bottom: 5px;
+        }
+
+        .timeline-item.legacy h4 { color: #64748b; }
+        .timeline-item.hidl h4 { color: #2563eb; }
+        .timeline-item.aidl h4 { color: #059669; }
+
+        /* Print Styles */
+        @media print {
+            body { background: white; }
+            .section { box-shadow: none; break-inside: avoid; }
+            .header-banner { break-inside: avoid; }
+            pre { break-inside: avoid; page-break-inside: avoid; }
+            .warning-card, .info-card { break-inside: avoid; }
+        }
+
+        /* Footer */
+        .page-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #64748b;
+            font-size: 9pt;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Banner -->
+        <div class="header-banner">
+            <h1>الدليل الشامل لطبقة العتاد ومعمارية AIDL HAL في أندرويد</h1>
+            <div class="subtitle">البلوك 10: اليوم 19-20 — من معمارية النظام إلى تنفيذ خدمات العتاد</div>
+            <div class="badge">Principal Android OS Architect & HAL Specialist</div>
+        </div>
+
+        <!-- Section 1: HAL Evolution -->
+        <div class="section">
+            <h2>1. تطور طبقة العتاد في أندرويد (The Evolution of Android HAL)</h2>
+
+            <p>تمثل طبقة تجريد العتاد (Hardware Abstraction Layer) الحاجز البرمجي الفاصل بين نواة نظام التشغيل (Kernel) والفريمورك العلوي (Android Framework). تطورت هذه الطبقة عبر ثلاث مراحل رئيسية لتحقيق فصل كامل بين نظام Google والتعديلات الخاصة بمصنعي الأجهزة (OEMs).</p>
+
+            <div class="timeline">
+                <div class="timeline-item legacy">
+                    <h4>Legacy HAL (ما قبل Android 8.0)</h4>
+                    <p>كانت مكتبات مشتركة (Shared Libraries بصيغة <code>.so</code>) يتم تحميلها مباشرة داخل عملية System Server عبر <code>dlopen()</code>. هذا الرابط المباشر أدى إلى:</p>
+                    <ul>
+                        <li>ترابط شديد (Tight Coupling) بين نظام Google والتعديلات الخاصة بالمُصنّع.</li>
+                        <li>استحالة تحديث النظام (OTA) دون إعادة بناء كامل لل Vendor Partition.</li>
+                        <li>تعارضات في رموز الكيرنيل (Kernel Symbol Collisions) عبر تحديثات النظام.</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item hidl">
+                    <h4>Project Treble & HIDL (Android 8.0+)</h4>
+                    <p>أطلقت Google مشروع Treble لإعادة هيكلة HAL بالكامل باستخدام لغة HIDL (HAL Interface Definition Language) ونقلها إلى Binderized HALs:</p>
+                    <ul>
+                        <li>فصل System Partition عن Vendor Partition عبر واجهات Binder IPC.</li>
+                        <li>تشغيل HALs كخدمات مستقلة في عمليات Vendor.</li>
+                        <li>إدخال VINTF (Vendor Interface) لضمان التوافقية بين النظام والمُصنّع.</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item aidl">
+                    <h4>Stable AIDL HAL (Android 11+)</h4>
+                    <p>المرحلة الحالية والمستقبلية: توحيد آلية IPC بين Framework وHAL باستخدام AIDL (Android Interface Definition Language) بدلاً من HIDL:</p>
+                    <ul>
+                        <li>استخدام نفس آلية IPC للفريمورك والعتاد (Unified IPC).</li>
+                        <li>دعم أصلي للغات Java وC++ وRust عبر Backend واحد.</li>
+                        <li>تقليل التعقيد: ملف AIDL واحد يولد Java Stub وC++ Backend.</li>
+                        <li>الاستقرار عبر <code>@VintfStability</code> لضمان عدم تغيير الواجهة عبر التحديثات.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="diagram">
+┌─────────────────────────────────────────────────────────────────────┐
+│                        معمارية AIDL HAL الحديثة                    │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌─────────────────┐         ┌─────────────────┐                   │
+│  │  System Server  │         │  Vendor Service │                   │
+│  │  (Java/C++)     │◄───────►│  (C++ Native)   │                   │
+│  │                 │  Binder │                 │                   │
+│  │  ServiceManager │  IPC    │  AServiceManager│                   │
+│  │  waitForService │         │  addService     │                   │
+│  └────────┬────────┘         └─────────────────┘                   │
+│           │                                                         │
+│  ┌────────▼────────┐                                               │
+│  │  VINTF Object   │                                               │
+│  │  manifest.xml   │                                               │
+│  │  compatibility  │                                               │
+│  │  _matrix.xml    │                                               │
+│  └─────────────────┘                                               │
+│                                                                     │
+│  ═══════════════════════════════════════════                        │
+│  الحدود بين System (أخضر) و Vendor (أحمر)                         │
+└─────────────────────────────────────────────────────────────────────┘
+            </div>
+        </div>
+
+        <!-- Section 2: VINTF -->
+        <div class="section">
+            <h2>2. معمارية VINTF وفصل النظام عن المُصنّع (VINTF & The Vendor Boundary)</h2>
+
+            <h3>ما هو VINTF؟</h3>
+            <p>يُعدّ VINTF (Vendor Interface Object) آلية التحقق من التوافقية بين قسم النظام (System Partition) وقسم المُصنّع (Vendor Partition) في وقت الإقلاع (Boot Time) وعند تثبيت تحديثات OTA.</p>
+
+            <div class="info-card">
+                <h4>🔧 الغرض من VINTF</h4>
+                <p>ضمان أن النظام المحدّث (System Image) يستطيع التواصل مع HALs الموجودة في Vendor Image دون حدوث أعطال في IPC أو عدم تطابق في إصدارات الواجهات.</p>
+            </div>
+
+            <h3>ملفات VINTF الأساسية</h3>
+
+            <div class="file-path">device/&lt;vendor&gt;/&lt;device&gt;/manifest.xml</div>
+            <p>يُعلن المُصنّع في هذا الملف عن جميع HALs التي يوفرها في Vendor Partition، بما في ذلك إصدار الواجهة واسم المثيل (Instance Name).</p>
+
+            <pre dir="ltr"><code class="language-xml"><span class="comment">&lt;!-- VINTF Manifest: إعلان خدمة AIDL HAL --&gt;</span>
+<span class="xml-tag">&lt;manifest</span> <span class="xml-attr">type</span>=<span class="xml-val">"device"</span> <span class="xml-attr">version</span>=<span class="xml-val">"6.0"</span><span class="xml-tag">&gt;</span>
+    <span class="xml-tag">&lt;hal</span> <span class="xml-attr">format</span>=<span class="xml-val">"aidl"</span><span class="xml-tag">&gt;</span>
+        <span class="xml-tag">&lt;name&gt;</span>android.hardware.custom<span class="xml-tag">&lt;/name&gt;</span>
+        <span class="xml-tag">&lt;version&gt;</span>1<span class="xml-tag">&lt;/version&gt;</span>
+        <span class="xml-tag">&lt;fqname&gt;</span>ICustomHardware/default<span class="xml-tag">&lt;/fqname&gt;</span>
+    <span class="xml-tag">&lt;/hal&gt;</span>
+<span class="xml-tag">&lt;/manifest&gt;</span></code></pre>
+
+            <div class="file-path">device/&lt;vendor&gt;/&lt;device&gt;/compatibility_matrix.xml</div>
+            <p>يحدد هذا الملف متطلبات النظام من HALs: أي واجهات يتطلب Framework وجودها في Vendor Partition للتمكن من الإقلاع.</p>
+
+            <pre dir="ltr"><code class="language-xml"><span class="comment">&lt;!-- Compatibility Matrix: متطلبات النظام من HALs --&gt;</span>
+<span class="xml-tag">&lt;compatibility-matrix</span> <span class="xml-attr">version</span>=<span class="xml-val">"6.0"</span> <span class="xml-attr">type</span>=<span class="xml-val">"framework"</span><span class="xml-tag">&gt;</span>
+    <span class="xml-tag">&lt;hal</span> <span class="xml-attr">format</span>=<span class="xml-val">"aidl"</span> <span class="xml-attr">optional</span>=<span class="xml-val">"false"</span><span class="xml-tag">&gt;</span>
+        <span class="xml-tag">&lt;name&gt;</span>android.hardware.custom<span class="xml-tag">&lt;/name&gt;</span>
+        <span class="xml-tag">&lt;version&gt;</span>1<span class="xml-tag">&lt;/version&gt;</span>
+        <span class="xml-tag">&lt;interface&gt;</span>
+            <span class="xml-tag">&lt;name&gt;</span>ICustomHardware<span class="xml-tag">&lt;/name&gt;</span>
+            <span class="xml-tag">&lt;instance&gt;</span>default<span class="xml-tag">&lt;/instance&gt;</span>
+        <span class="xml-tag">&lt;/interface&gt;</span>
+    <span class="xml-tag">&lt;/hal&gt;</span>
+<span class="xml-tag">&lt;/compatibility-matrix&gt;</span></code></pre>
+
+            <div class="warning-card">
+                <h4>⚠️ حدود System/Vendor و SELinux</h4>
+                <p>يُمنع SELinux بشكل افتراضي أي تواصل IPC بين عمليات System (domain: <code>system_server</code>) وعمليات Vendor (domain: <code>vendor_hal_custom_hw</code>). يجب تعريف Policy صريح في ملف <code>*.te</code> للسماح بـ <code>binder_call</code> بين المجالين.</p>
+            </div>
+        </div>
+
+        <!-- Section 3: Step 1 -->
+        <div class="section">
+            <h2>3. تعريف واجهة AIDL للعتاد (Step 1: Defining the AIDL HAL)</h2>
+
+            <div class="step-box">
+                <div class="step-number">1</div>
+                <h3>إنشاء بنية المجلدات في AOSP</h3>
+                <p>يتم وضع واجهات HAL المخصصة ضمن شجرة <code>hardware/interfaces/</code> وفقاً للتسلسل الهرمي التالي:</p>
+
+                <div class="file-path">hardware/interfaces/custom_hardware/aidl/Android.bp</div>
+                <div class="file-path">hardware/interfaces/custom_hardware/aidl/ICustomHardware.aidl</div>
+
+                <pre dir="ltr"><code class="language-cpp"><span class="comment">// ICustomHardware.aidl — واجهة العتاد المخصصة</span>
+<span class="comment">// يجب وضع التعليق التالي لضمان استقرار الواجهة عبر التحديثات</span>
+
+<span class="keyword">package</span> android.hardware.custom;
+
+<span class="keyword">import</span> android.hardware.custom.CustomResult;
+
+<span class="comment">// @VintfStability: يضمن أن هذه الواجهة لن تتغير وستُعرّف في VINTF</span>
+<span class="keyword">@VintfStability</span>
+<span class="keyword">interface</span> ICustomHardware {
+    <span class="comment">// العملية الأساسية: إرسال أمر إلى العتاد واستلام النتيجة</span>
+    CustomResult sendCommand(<span class="keyword">in</span> String command, <span class="keyword">in</span> <span class="type">int</span> param);
+
+    <span class="comment">// استعلام عن حالة العتاد</span>
+    <span class="type">boolean</span> isReady();
+
+    <span class="comment">// الحصول على معلومات إصدار العتاد</span>
+    String getHardwareVersion();
+}</code></pre>
+
+                <div class="file-path">hardware/interfaces/custom_hardware/aidl/CustomResult.aidl</div>
+                <pre dir="ltr"><code class="language-cpp"><span class="keyword">package</span> android.hardware.custom;
+
+<span class="keyword">@VintfStability</span>
+<span class="keyword">parcelable</span> CustomResult {
+    <span class="type">int</span> statusCode;
+    String data;
+    <span class="type">long</span> timestamp;
+}</code></pre>
+            </div>
+
+            <div class="step-box">
+                <div class="step-number">2</div>
+                <h3>ملف Android.bp — توليد الواجهة</h3>
+                <p>يستخدم <code>aidl_interface</code> module لبناء الواجهة وتوليد الأكواد للغات Java وC++ وRust.</p>
+
+                <pre dir="ltr"><code class="language-xml"><span class="comment">// hardware/interfaces/custom_hardware/aidl/Android.bp</span>
+
+aidl_interface {
+    name: <span class="string">"android.hardware.custom"</span>,
+    vendor: <span class="keyword">true</span>,  <span class="comment">// ضروري: يشير إلى أن هذه الواجهة تنتمي لـ Vendor Partition</span>
+    srcs: [<span class="string">"ICustomHardware.aidl"</span>, <span class="string">"CustomResult.aidl"</span>],
+    stability: <span class="string">"vintf"</span>,  <span class="comment">// يُفعّل @VintfStability</span>
+    imports: [<span class="string">"android.hardware.common"</span>],
+    backend: {
+        java: {
+            enabled: <span class="keyword">true</span>,
+            sdk_version: <span class="string">"module_current"</span>,
+        },
+        cpp: {
+            enabled: <span class="keyword">true</span>,
+        },
+        ndk: {
+            enabled: <span class="keyword">true</span>,  <span class="comment">// NDK Backend مُستحسن للـ Vendor Services</span>
+        },
+    },
+}</code></pre>
+
+                <div class="info-card">
+                    <h4>💡 ملاحظة هامة</h4>
+                    <p>عند استخدام <code>stability: "vintf"</code>، يقوم نظام البناء (Soong) بتوليد ملف <code>.vintf</code> يُدمج تلقائياً في <code>manifest.xml</code> النهائي للجهاز.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Step 2 -->
+        <div class="section">
+            <h2>4. برمجة خدمة العتاد بلغة C++ في قسم المُصنّع (Step 2: C++ Vendor Implementation)</h2>
+
+            <div class="step-box">
+                <div class="step-number">3</div>
+                <h3>تنفيذ الواجهة: BnCustomHardware</h3>
+                <p>تُنشّئ خدمة العتاد (Vendor Service) بامتداد الفئة الأساسية المولدة تلقائياً <code>BnCustomHardware</code> من AIDL Compiler.</p>
+
+                <div class="file-path">vendor/&lt;vendor&gt;/&lt;device&gt;/hardware/custom_hw/CustomHardware.cpp</div>
+                <pre dir="ltr"><code class="language-cpp"><span class="comment">// CustomHardware.cpp — تنفيذ خدمة العتاد في Vendor Partition</span>
+
+<span class="keyword">#include</span> <span class="string">"CustomHardware.h"</span>
+<span class="keyword">#include</span> <span class="string">&lt;android-base/logging.h&gt;</span>
+<span class="keyword">#include</span> <span class="string">&lt;android/binder_manager.h&gt;</span>
+<span class="keyword">#include</span> <span class="string">&lt;android/binder_process.h&gt;</span>
+
+<span class="keyword">namespace</span> aidl {
+<span class="keyword">namespace</span> android {
+<span class="keyword">namespace</span> hardware {
+<span class="keyword">namespace</span> custom {
+
+<span class="comment">// تنفيذ العملية: إرسال الأمر إلى العتاد الفعلي عبر sysfs أو ioctl</span>
+ndk::ScopedAStatus CustomHardware::sendCommand(
+        <span class="keyword">const</span> std::string& command,
+        <span class="type">int32_t</span> param,
+        CustomResult* result) {
+
+    <span class="comment">// التحقق من جاهزية العتاد</span>
+    <span class="keyword">if</span> (!mDeviceReady) {
+        <span class="keyword">return</span> ndk::ScopedAStatus::fromServiceSpecificError(<span class="type">-1</span>);
+    }
+
+    <span class="comment">// محاكاة تفاعل مع العتاد (في الواقع: كتابة على /dev/custom_hw)</span>
+    result->statusCode = <span class="type">0</span>;  <span class="comment">// SUCCESS</span>
+    result->data = <span class="string">"ACK: "</span> + command;
+    result->timestamp = <span class="function">time</span>(<span class="keyword">nullptr</span>);
+
+    <span class="keyword">return</span> ndk::ScopedAStatus::ok();
+}
+
+<span class="comment">// التحقق من حالة العتاد</span>
+ndk::ScopedAStatus CustomHardware::isReady(<span class="type">bool</span>* ready) {
+    *ready = mDeviceReady;
+    <span class="keyword">return</span> ndk::ScopedAStatus::ok();
+}
+
+<span class="comment">// الحصول على إصدار العتاد</span>
+ndk::ScopedAStatus CustomHardware::getHardwareVersion(std::string* version) {
+    *version = <span class="string">"Custom-HW-v2.1.0"</span>;
+    <span class="keyword">return</span> ndk::ScopedAStatus::ok();
+}
+
+} <span class="comment">// namespace custom</span>
+} <span class="comment">// namespace hardware</span>
+} <span class="comment">// namespace android</span>
+} <span class="comment">// namespace aidl</span></code></pre>
+            </div>
+
+            <div class="step-box">
+                <div class="step-number">4</div>
+                <h3>ملف الرأس: CustomHardware.h</h3>
+
+                <div class="file-path">vendor/&lt;vendor&gt;/&lt;device&gt;/hardware/custom_hw/CustomHardware.h</div>
+                <pre dir="ltr"><code class="language-cpp"><span class="comment">// CustomHardware.h</span>
+
+<span class="keyword">#pragma once</span>
+
+<span class="keyword">#include</span> <span class="string">&lt;aidl/android/hardware/custom/BnCustomHardware.h&gt;</span>
+
+<span class="keyword">namespace</span> aidl {
+<span class="keyword">namespace</span> android {
+<span class="keyword">namespace</span> hardware {
+<span class="keyword">namespace</span> custom {
+
+<span class="keyword">using</span> ndk::SharedRefBase;
+
+<span class="keyword">class</span> CustomHardware : <span class="keyword">public</span> BnCustomHardware {
+<span class="keyword">public</span>:
+    CustomHardware() : mDeviceReady(<span class="keyword">true</span>) {}
+
+    ndk::ScopedAStatus sendCommand(
+        <span class="keyword">const</span> std::string& command,
+        <span class="type">int32_t</span> param,
+        CustomResult* result) <span class="keyword">override</span>;
+
+    ndk::ScopedAStatus isReady(<span class="type">bool</span>* ready) <span class="keyword">override</span>;
+
+    ndk::ScopedAStatus getHardwareVersion(
+        std::string* version) <span class="keyword">override</span>;
+
+<span class="keyword">private</span>:
+    <span class="type">bool</span> mDeviceReady;
+};
+
+} <span class="comment">// namespace custom</span>
+} <span class="comment">// namespace hardware</span>
+} <span class="comment">// namespace android</span>
+} <span class="comment">// namespace aidl</span></code></pre>
+            </div>
+
+            <div class="step-box">
+                <div class="step-number">5</div>
+                <h3>نقطة الدخول: main.cpp وخدمة Vendor</h3>
+                <p>تُسجّل الخدمة في Service Manager عبر <code>AServiceManager_addService</code> وتُشغّل حلقة Binder Thread Pool.</p>
+
+                <div class="file-path">vendor/&lt;vendor&gt;/&lt;device&gt;/hardware/custom_hw/main.cpp</div>
+                <pre dir="ltr"><code class="language-cpp"><span class="comment">// main.cpp — نقطة إقلاع خدمة العتاد (Vendor Daemon)</span>
+
+<span class="keyword">#include</span> <span class="string">"CustomHardware.h"</span>
+<span class="keyword">#include</span> <span class="string">&lt;android-base/logging.h&gt;</span>
+<span class="keyword">#include</span> <span class="string">&lt;android/binder_manager.h&gt;</span>
+<span class="keyword">#include</span> <span class="string">&lt;android/binder_process.h&gt;</span>
+
+<span class="keyword">using</span> <span class="keyword">namespace</span> aidl::android::hardware::custom;
+
+<span class="type">int</span> <span class="function">main</span>() {
+    <span class="comment">// 1. إنشاء كائن الخدمة</span>
+    std::shared_ptr&lt;CustomHardware&gt; service = 
+        ndk::SharedRefBase::make&lt;CustomHardware&gt;();
+
+    <span class="comment">// 2. تسجيل الخدمة في AServiceManager</span>
+    <span class="comment">//    الاسم يجب أن يتطابق مع FQNAME في manifest.xml</span>
+    <span class="keyword">const</span> <span class="type">char</span>* instance = <span class="string">"android.hardware.custom.ICustomHardware/default"</span>;
+
+    binder_status_t status = AServiceManager_addService(
+        service->asBinder().get(),  <span class="comment">// IBinder object</span>
+        instance                     <span class="comment">// Instance name</span>
+    );
+
+    <span class="keyword">if</span> (status != STATUS_OK) {
+        LOG(FATAL) << <span class="string">"فشل في تسجيل خدمة العتاد: "</span> << status;
+        <span class="keyword">return</span> <span class="type">-1</span>;
+    }
+
+    LOG(INFO) << <span class="string">"تم تسجيل خدمة العتاد المخصصة بنجاح"</span>;
+
+    <span class="comment">// 3. تشغيل حلقة معالجة الطلبات (ThreadPool)</span>
+    <span class="comment">//    يبدأ 16 خيطاً (Threads) لمعالجة IPC الواردة</span>
+    ABinderProcess_setThreadPoolMaxThreadCount(<span class="type">16</span>);
+    ABinderProcess_startThreadPool();
+
+    <span class="comment">// 4. الانتظار إلى ما لانهاية</span>
+    ABinderProcess_joinThreadPool();
+
+    <span class="keyword">return</span> <span class="type">0</span>;  <span class="comment">// لا يُ reached أبداً</span>
+}</code></pre>
+            </div>
+
+            <div class="step-box">
+                <div class="step-number">6</div>
+                <h3>Android.bp — بناء الثنائية Vendor</h3>
+
+                <div class="file-path">vendor/&lt;vendor&gt;/&lt;device&gt;/hardware/custom_hw/Android.bp</div>
+                <pre dir="ltr"><code class="language-xml">cc_binary {
+    name: <span class="string">"vendor.custom.hardware.service"</span>,
+    vendor: <span class="keyword">true</span>,  <span class="comment">// ضروري: يضع الثنائية في Vendor Partition (/vendor/bin/)</span>
+    srcs: [
+        <span class="string">"main.cpp"</span>,
+        <span class="string">"CustomHardware.cpp"</span>,
+    ],
+    shared_libs: [
+        <span class="string">"libbase"</span>,           <span class="comment">// android-base (Logging)</span>
+        <span class="string">"libbinder_ndk"</span>,   <span class="comment">// NDK Binder (AIDL Stable)</span>
+        <span class="string">"android.hardware.custom"</span>,  <span class="comment">// واجهة AIDL المُعرّفة سابقاً</span>
+    ],
+    cflags: [
+        <span class="string">"-Wall"</span>,
+        <span class="string">"-Werror"</span>,
+        <span class="string">"-Wextra"</span>,
+    ],
+}</code></pre>
+
+                <div class="warning-card">
+                    <h4>⚠️ التحذير: vendor: true</h4>
+                    <p>بدون تحديد <code>vendor: true</code> في كل من <code>aidl_interface</code> و <code>cc_binary</code>، سيقوم النظام بوضع الملفات في System Partition، مما يُبطل الغرض من Project Treble ويؤدي إلى فشل SELinux في وقت التشغيل.</p>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <div class="step-number">7</div>
+                <h3>init.rc — تشغيل الخدمة عند الإقلاع</h3>
+
+                <div class="file-path">vendor/&lt;vendor&gt;/&lt;device&gt;/hardware/custom_hw/vendor.custom.hardware.rc</div>
+                <pre dir="ltr"><code class="language-xml">service vendor.custom.hardware /vendor/bin/vendor.custom.hardware.service
+    <span class="keyword">class</span> hal
+    user system
+    group system
+    seclabel u:r:vendor_hal_custom_hw:s0  <span class="comment">// SELinux Domain مخصص</span>
+    <span class="keyword">interface</span> android.hardware.custom.ICustomHardware default</code></pre>
+            </div>
+        </div>
+
+        <!-- Section 5: Step 3 -->
+        <div class="section">
+            <h2>5. تسجيل الخدمة في manifest.xml (Step 3: VINTF Registration)</h2>
+
+            <p>يجب إعلان الخدمة في <code>manifest.xml</code> الخاص بالجهاز لكي يتمكّن Framework من اكتشافها عبر <code>ServiceManager.waitForDeclaredService()</code>.</p>
+
+            <div class="file-path">device/&lt;vendor&gt;/&lt;device&gt;/manifest.xml</div>
+            <pre dir="ltr"><code class="language-xml"><span class="xml-tag">&lt;manifest</span> <span class="xml-attr">version</span>=<span class="xml-val">"6.0"</span> <span class="xml-attr">type</span>=<span class="xml-val">"device"</span><span class="xml-tag">&gt;</span>
+
+    <span class="comment">&lt;!-- HALs الأخرى... --&gt;</span>
+
+    <span class="xml-tag">&lt;hal</span> <span class="xml-attr">format</span>=<span class="xml-val">"aidl"</span><span class="xml-tag">&gt;</span>
+        <span class="xml-tag">&lt;name&gt;</span>android.hardware.custom<span class="xml-tag">&lt;/name&gt;</span>
+        <span class="xml-tag">&lt;transport&gt;</span>hwbinder<span class="xml-tag">&lt;/transport&gt;</span>
+        <span class="xml-tag">&lt;version&gt;</span>1<span class="xml-tag">&lt;/version&gt;</span>
+        <span class="xml-tag">&lt;interface&gt;</span>
+            <span class="xml-tag">&lt;name&gt;</span>ICustomHardware<span class="xml-tag">&lt;/name&gt;</span>
+            <span class="xml-tag">&lt;instance&gt;</span>default<span class="xml-tag">&lt;/instance&gt;</span>
+        <span class="xml-tag">&lt;/interface&gt;</span>
+    <span class="xml-tag">&lt;/hal&gt;</span>
+
+<span class="xml-tag">&lt;/manifest&gt;</span></code></pre>
+
+            <div class="info-card">
+                <h4>🔗 ربط manifest مع البناء</h4>
+                <p>تأكد من تضمين الملف في <code>DEVICE_MANIFEST_FILE</code> داخل <code>BoardConfig.mk</code>:</p>
+                <pre dir="ltr" style="background:#f1f5f9; color:#0f172a; padding:10px; margin-top:10px;"><code>DEVICE_MANIFEST_FILE += $(LOCAL_PATH)/manifest.xml</code></pre>
+            </div>
+
+            <h3>SELinux Policy — السماح بالتواصل</h3>
+            <p>بدون سياسات SELinux صحيحة، سيتم رفض اتصال Binder بين System Server و Vendor Service.</p>
+
+            <div class="file-path">device/&lt;vendor&gt;/&lt;device&gt;/sepolicy/vendor/vendor_hal_custom_hw.te</div>
+            <pre dir="ltr"><code class="language-cpp"><span class="comment">// تعريف نوع (Type) جديد لخدمة العتاد المخصصة</span>
+<span class="keyword">type</span> vendor_hal_custom_hw, domain;
+<span class="keyword">type</span> vendor_hal_custom_hw_exec, exec_type, vendor_file_type, file_type;
+
+<span class="comment">// السماح للنظام بالاتصال بهذه الخدمة عبر Binder</span>
+binder_call(system_server, vendor_hal_custom_hw)
+
+<span class="comment">// السماح لخادم النظام باستخدام الواجهة</span>
+hal_client_domain(system_server, vendor_hal_custom_hw)
+
+<span class="comment">// السماح لخدمة العتاد بتسجيل نفسها كـ HAL</span>
+hal_server_domain(vendor_hal_custom_hw, vendor_hal)</code></pre>
+
+            <div class="file-path">device/&lt;vendor&gt;/&lt;device&gt;/sepolicy/vendor/file.te</div>
+            <pre dir="ltr"><code class="language-cpp"><span class="keyword">type</span> vendor_custom_hw_device, dev_type;</code></pre>
+
+            <div class="file-path">device/&lt;vendor&gt;/&lt;device&gt;/sepolicy/vendor/file_contexts</div>
+            <pre dir="ltr"><code>/vendor/bin/vendor\.custom\.hardware\.service   u:object_r:vendor_hal_custom_hw_exec:s0
+/dev/custom_hw                                 u:object_r:vendor_custom_hw_device:s0</code></pre>
+        </div>
+
+        <!-- Section 6: Step 4 -->
+        <div class="section">
+            <h2>6. الربط مع الفريمورك واستكشاف الأخطاء (Step 4: Framework Invocation & Diagnostics)</h2>
+
+            <div class="step-box">
+                <div class="step-number">8</div>
+                <h3>استدعاء HAL من System Service (Java)</h3>
+
+                <pre dir="ltr"><code class="language-cpp"><span class="comment">// CustomSystemService.java — خدمة النظام التي تستهلك HAL</span>
+
+<span class="keyword">package</span> com.android.server.custom;
+
+<span class="keyword">import</span> android.hardware.custom.ICustomHardware;
+<span class="keyword">import</span> android.hardware.custom.CustomResult;
+<span class="keyword">import</span> android.os.ServiceManager;
+<span class="keyword">import</span> android.os.IBinder;
+<span class="keyword">import</span> android.os.RemoteException;
+<span class="keyword">import</span> android.util.Slog;
+
+<span class="keyword">public class</span> CustomSystemService {
+    <span class="keyword">private static final</span> String TAG = <span class="string">"CustomSystemService"</span>;
+    <span class="keyword">private static final</span> String HAL_INSTANCE = 
+        <span class="string">"android.hardware.custom.ICustomHardware/default"</span>;
+
+    <span class="keyword">private</span> ICustomHardware mHal;
+
+    <span class="keyword">public void</span> <span class="function">connectToHal</span>() {
+        <span class="keyword">try</span> {
+            <span class="comment">// الانتظار حتى تكون الخدمة مسجلة في ServiceManager</span>
+            IBinder binder = ServiceManager.waitForDeclaredService(HAL_INSTANCE);
+
+            <span class="keyword">if</span> (binder == <span class="keyword">null</span>) {
+                <span class="keyword">throw new</span> IllegalStateException(<span class="string">"HAL غير متوفر"</span>);
+            }
+
+            <span class="comment">// ربط الواجهة</span>
+            mHal = ICustomHardware.Stub.asInterface(binder);
+
+            <span class="comment">// اختبار الاتصال</span>
+            CustomResult result = mHal.sendCommand(<span class="string">"INIT"</span>, <span class="type">0</span>);
+            Slog.i(TAG, <span class="string">"نتيجة العتاد: "</span> + result.data);
+
+        } <span class="keyword">catch</span> (RemoteException e) {
+            Slog.e(TAG, <span class="string">"فشل الاتصال بـ HAL"</span>, e);
+        }
+    }
+
+    <span class="keyword">public boolean</span> <span class="function">isHardwareReady</span>() {
+        <span class="keyword">try</span> {
+            <span class="keyword">return</span> mHal != <span class="keyword">null</span> && mHal.isReady();
+        } <span class="keyword">catch</span> (RemoteException e) {
+            <span class="keyword">return false</span>;
+        }
+    }
+}</code></pre>
+            </div>
+
+            <div class="step-box">
+                <div class="step-number">9</div>
+                <h3>الاستدعاء من System Service (C++)</h3>
+
+                <pre dir="ltr"><code class="language-cpp"><span class="comment">// CustomFrameworkClient.cpp</span>
+
+<span class="keyword">#include</span> <span class="string">&lt;android/hardware/custom/ICustomHardware.h&gt;</span>
+<span class="keyword">#include</span> <span class="string">&lt;android/binder_manager.h&gt;</span>
+<span class="keyword">#include</span> <span class="string">&lt;android-base/logging.h&gt;</span>
+
+<span class="keyword">using</span> <span class="keyword">namespace</span> android::hardware::custom;
+
+<span class="type">void</span> <span class="function">initializeHardware</span>() {
+    <span class="keyword">const</span> <span class="type">char</span>* instance = <span class="string">"android.hardware.custom.ICustomHardware/default"</span>;
+
+    <span class="comment">// الحصول على واجهة AIDL عبر NDK ServiceManager</span>
+    AIBinder* binder = AServiceManager_waitForService(instance);
+
+    <span class="keyword">if</span> (binder == <span class="keyword">nullptr</span>) {
+        LOG(ERROR) << <span class="string">"فشل في الحصول على خدمة العتاد"</span>;
+        <span class="keyword">return</span>;
+    }
+
+    <span class="comment">// تحويل IBinder إلى واجهة مكتوبة</span>
+    std::shared_ptr&lt;ICustomHardware&gt; hal = 
+        ICustomHardware::fromBinder(ndk::SpAIBinder(binder));
+
+    CustomResult result;
+    <span class="keyword">auto</span> status = hal->sendCommand(<span class="string">"TEST"</span>, <span class="type">42</span>, &result);
+
+    <span class="keyword">if</span> (status.isOk()) {
+        LOG(INFO) << <span class="string">"الحالة: "</span> << result.statusCode 
+                  << <span class="string">" البيانات: "</span> << result.data;
+    }
+}</code></pre>
+            </div>
+
+            <h3>أدوات التشخيص والفحص (CLI Diagnostics)</h3>
+
+            <table>
+                <tr>
+                    <th>الأمر</th>
+                    <th>الغرض</th>
+                    <th>مثال الناتج</th>
+                </tr>
+                <tr>
+                    <td><code>lshal</code></td>
+                    <td>عرض جميع HALs المسجلة (HIDL و AIDL)</td>
+                    <td>ICustomHardware/default (@1) — android.hardware.custom</td>
+                </tr>
+                <tr>
+                    <td><code>lshal --debug</code></td>
+                    <td>تفاصيل إضافية عن PID وعمليات الاتصال</td>
+                    <td>PID: 482 | Arch: 64-bit | Threads: 16</td>
+                </tr>
+                <tr>
+                    <td><code>service list</code></td>
+                    <td>عرض جميع الخدمات المسجلة في ServiceManager</td>
+                    <td>android.hardware.custom.ICustomHardware/default</td>
+                </tr>
+                <tr>
+                    <td><code>dumpsys binder</code></td>
+                    <td>إحصائيات عن حالة Binder IPC</td>
+                    <td>Transactions: 1524 | Errors: 0</td>
+                </tr>
+                <tr>
+                    <td><code>logcat -b events | grep hal</code></td>
+                    <td>مراقبة أحداث HAL في الوقت الفعلي</td>
+                    <td>I/custom_hw: Service registered</td>
+                </tr>
+            </table>
+
+            <div class="warning-card">
+                <h4>🔍 تشخيص SELinux Denials</h4>
+                <p>إذا فشل الاتصال بصمت (Silent Failure) أو تلقيت <code>SecurityException</code>، افحص سجلات SELinux:</p>
+                <pre dir="ltr" style="margin-top:10px;"><code>adb shell dmesg | grep avc          <span class="comment"># Kernel denials</span>
+adb shell logcat | grep audit       <span class="comment"># Userspace audit</span></code></pre>
+                <p style="margin-top:10px;">مثال على خطأ شائع: <code>avc: denied { call } for pid=1234 comm="system_server" scontext=u:r:system_server:s0 tcontext=u:r:vendor_hal_custom_hw:s0</code></p>
+                <p>الحل: إضافة <code>binder_call(system_server, vendor_hal_custom_hw)</code> في ملف <code>*.te</code>.</p>
+            </div>
+
+            <div class="info-card">
+                <h4>✅ قائمة التحقق قبل الإقلاع (Boot Checklist)</h4>
+                <ol>
+                    <li>تأكد من وجود <code>vendor: true</code> في <code>aidl_interface</code> و <code>cc_binary</code>.</li>
+                    <li>تحقق من تطابق FQNAME في الكود و <code>manifest.xml</code> و <code>init.rc</code>.</li>
+                    <li>تأكد من تضمين <code>compatibility_matrix.xml</code> في <code>DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE</code>.</li>
+                    <li>افحص SELinux Policy باستخدام <code>audit2allow</code> إذا ظهرت denials.</li>
+                    <li>تأكد من تشغيل الخدمة تلقائياً عبر <code>init.rc</code> ضمن <code>class hal</code>.</li>
+                    <li>استخدم <code>lshal</code> للتأكد من ظهور الواجهة بعد الإقلاع.</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Architecture Diagram -->
+        <div class="section">
+            <h2>7. الرسم المعماري الشامل (System vs Vendor Boundary)</h2>
+
+            <div class="diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           SYSTEM PARTITION                                  │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                        Android Framework                               │  │
+│  │  ┌──────────────┐    ┌──────────────┐    ┌──────────────────────┐   │  │
+│  │  │  System UI   │    │ SystemServer │    │   CustomSystemService │   │  │
+│  │  │   (Java)     │    │   (Java/C++) │    │      (Java/C++)       │   │  │
+│  │  └──────┬───────┘    └──────┬───────┘    └───────────┬──────────┘   │  │
+│  │         │                   │                        │                │  │
+│  │         └───────────────────┼────────────────────────┘                │  │
+│  │                             │                                         │  │
+│  │              ┌──────────────▼──────────────┐                        │  │
+│  │              │    ServiceManager (system)   │                        │  │
+│  │              │   waitForDeclaredService()   │                        │  │
+│  │              └──────────────┬──────────────┘                        │  │
+│  └─────────────────────────────┼───────────────────────────────────────┘  │
+│                                │                                            │
+│  ══════════════════════════════╪══════════════════════════════════════════  │
+│       VINTF BOUNDARY          │  Binder IPC (hwbinder)                   │
+│  ══════════════════════════════╪══════════════════════════════════════════  │
+│                                │                                            │
+│  ┌─────────────────────────────┼───────────────────────────────────────┐  │
+│  │              VENDOR PARTITION │                                       │  │
+│  │  ┌──────────────────────────▼────────────────────────────────────┐  │  │
+│  │  │              AServiceManager_addService()                       │  │  │
+│  │  │                         │                                     │  │  │
+│  │  │  ┌──────────────────────▼────────────────────────────────┐   │  │  │
+│  │  │  │           vendor.custom.hardware.service               │   │  │  │
+│  │  │  │              (C++ Vendor Daemon)                       │   │  │  │
+│  │  │  │  ┌────────────────────────────────────────────────┐   │   │  │  │
+│  │  │  │  │  CustomHardware extends BnCustomHardware       │   │   │  │  │
+│  │  │  │  │  - sendCommand()  → /dev/custom_hw (ioctl)    │   │   │  │  │
+│  │  │  │  │  - isReady()      → sysfs state check         │   │   │  │  │
+│  │  │  │  │  - getHardwareVersion()                       │   │   │  │  │
+│  │  │  │  └────────────────────────────────────────────────┘   │   │  │  │
+│  │  │  │                    │                                 │   │  │  │
+│  │  │  │         ┌──────────▼──────────┐                    │   │  │  │
+│  │  │  │         │   Kernel Driver     │                    │   │  │  │
+│  │  │  │         │   (/dev/custom_hw)  │                    │   │  │  │
+│  │  │  │         └─────────────────────┘                    │   │  │  │
+│  │  │  └────────────────────────────────────────────────────┘   │  │  │
+│  │  └───────────────────────────────────────────────────────────┘  │  │
+│  │                                                                 │  │
+│  │  manifest.xml ─────────► VINTF Object ◄───────── init.rc       │  │
+│  │  (Declaration)              (Validation)         (Launch)       │  │
+│  └─────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+الألوان المعمارية:
+<span class="sys-box">■ System Domain (Green)</span>  |  <span class="ven-box">■ Vendor Domain (Red)</span>  |  <span class="binder">■ Binder IPC (Blue)</span>
+            </div>
+        </div>
+
+        <!-- Best Practices -->
+        <div class="section">
+            <h2>8. أفضل الممارسات والتوصيات الإنتاجية</h2>
+
+            <h3>🔒 الأمان و SELinux</h3>
+            <ul>
+                <li>لا تُسند أبداً Domain <code>system_server</code> لعمليات Vendor — استخدم <code>vendor_hal_&lt;name&gt;</code> منفصلاً.</li>
+                <li>استخدم <code>neverallow</code> Rules لمنع Vendor من الوصول المباشر إلى System Data.</li>
+                <li>جميع ملفات العتاد في <code>/dev/</code> يجب أن تحمل تسمية SELinux (<code>dev_type</code>) صريحة.</li>
+            </ul>
+
+            <h3>⚡ الأداء والاستقرار</h3>
+            <ul>
+                <li>لا تنفّذ عمليات حجب (Blocking Operations) داخل دوال Binder مباشرة — استخدم Thread Pool منفصل.</li>
+                <li>حدد <code>ABinderProcess_setThreadPoolMaxThreadCount()</code> بما يتناسب مع الحمل المتوقع (الافتراضي: 16).</li>
+                <li>استخدم <code>@VintfStability</code> فقط للواجهات التي لن تتغير؛ للتجارب استخدم <code>@JavaDerive</code> أو غير مستقر.</li>
+            </ul>
+
+            <h3>🔧 البناء والصيانة</h3>
+            <ul>
+                <li>احتفظ بـ AIDL Interface في <code>hardware/interfaces/</code> وليس في <code>vendor/</code> لضمان مراجعته من Google.</li>
+                <li>استخدم <code>aidl_api/</code> Snapshots لقفل إصدارات الواجهة عند إصدار النظام.</li>
+                <li>أضف <code>api_levels</code> في <code>Android.bp</code> إذا كنت تدعم إصدارات AOSP متعددة.</li>
+            </ul>
+
+            <h3>📋 التوافقية عبر التحديثات</h3>
+            <table>
+                <tr>
+                    <th>السيناريو</th>
+                    <th>System Image</th>
+                    <th>Vendor Image</th>
+                    <th>النتيجة</th>
+                </tr>
+                <tr>
+                    <td>OTA System فقط</td>
+                    <td>مُحدّث</td>
+                    <td>قديم</td>
+                    <td>✅ يعمل إذا كانت الواجهة متوافقة في VINTF</td>
+                </tr>
+                <tr>
+                    <td>OTA Vendor فقط</td>
+                    <td>قديم</td>
+                    <td>مُحدّث</td>
+                    <td>⚠️ يتطلب توافقية خلفية (Backward Compatibility)</td>
+                </tr>
+                <tr>
+                    <td>تغيير واجهة AIDL</td>
+                    <td>جديد</td>
+                    <td>قديم</td>
+                    <td>❌ فشل VINTF — يجب رفع رقم الإصدار</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="page-footer">
+            <p>تم إعداد هذا الدليل كمرجع تقني شامل لمعمارية AIDL HAL في Android Open Source Project (AOSP)</p>
+            <p>البلوك 10: اليوم 19-20 | Principal Android OS Architect & HAL Specialist</p>
+        </div>
+    </div>
+</body>
+</html>

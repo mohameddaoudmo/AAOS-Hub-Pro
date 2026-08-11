@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدليل الشامل لاختبارات أندرويد — Android Testing Master Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-navy: #0B192C;
+            --accent-green: #00E676;
+            --fail-red: #FF5252;
+            --warning-orange: #FF9100;
+            --kotlin-purple: #7F52FF;
+            --off-white: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text-primary: #1A1C24;
+            --text-secondary: #5A6270;
+            --border-light: #E2E8F0;
+            --code-bg: #1A1C24;
+            --gradient-hero: linear-gradient(135deg, #0B192C 0%, #1A2B4A 50%, #0B192C 100%);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Tajawal', 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--off-white);
+            color: var(--text-primary);
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--off-white); }
+        ::-webkit-scrollbar-thumb { background: var(--primary-navy); border-radius: 4px; }
+        .hero {
+            background: var(--gradient-hero);
+            color: white;
+            padding: 80px 20px 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0,230,118,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(0,230,118,0.15);
+            color: var(--accent-green);
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            border: 1px solid rgba(0,230,118,0.3);
+            letter-spacing: 1px;
+        }
+        .hero h1 { font-size: 3.2rem; font-weight: 900; margin-bottom: 16px; line-height: 1.3; }
+        .hero h1 span { color: var(--accent-green); }
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: rgba(255,255,255,0.75);
+            max-width: 700px;
+            margin: 0 auto 30px;
+            font-weight: 400;
+        }
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        .hero-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            color: rgba(255,255,255,0.7);
+        }
+        .hero-meta-item svg { width: 18px; height: 18px; fill: var(--accent-green); }
+        .nav-container {
+            background: var(--primary-navy);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(11,25,44,0.3);
+        }
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            overflow-x: auto;
+            padding: 0 20px;
+            scrollbar-width: none;
+        }
+        .nav::-webkit-scrollbar { display: none; }
+        .nav a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 15px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        .nav a:hover, .nav a.active {
+            color: var(--accent-green);
+            border-bottom-color: var(--accent-green);
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+        .section {
+            background: var(--card-bg);
+            margin: 40px 0;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .section-header {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, #1A2B4A 100%);
+            color: white;
+            padding: 28px 36px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .section-number {
+            width: 48px; height: 48px;
+            background: var(--accent-green);
+            color: var(--primary-navy);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .section-header h2 { font-size: 1.6rem; font-weight: 800; }
+        .section-body { padding: 36px; }
+        .section-body h3 {
+            color: var(--primary-navy);
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin: 32px 0 16px;
+            padding-right: 16px;
+            border-right: 4px solid var(--accent-green);
+        }
+        .section-body h3:first-child { margin-top: 0; }
+        .section-body p {
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+            text-align: justify;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            margin: 2px;
+        }
+        .badge-green { background: rgba(0,230,118,0.12); color: #00C853; }
+        .badge-red { background: rgba(255,82,82,0.12); color: #D32F2F; }
+        .badge-orange { background: rgba(255,145,0,0.12); color: #E65100; }
+        .badge-purple { background: rgba(127,82,255,0.12); color: #7F52FF; }
+        .badge-navy { background: rgba(11,25,44,0.08); color: var(--primary-navy); }
+        .callout {
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .callout-icon {
+            width: 32px; height: 32px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+        .callout-green { background: rgba(0,230,118,0.08); border: 1px solid rgba(0,230,118,0.2); }
+        .callout-green .callout-icon { background: rgba(0,230,118,0.15); color: var(--accent-green); }
+        .callout-red { background: rgba(255,82,82,0.08); border: 1px solid rgba(255,82,82,0.2); }
+        .callout-red .callout-icon { background: rgba(255,82,82,0.15); color: var(--fail-red); }
+        .callout-orange { background: rgba(255,145,0,0.08); border: 1px solid rgba(255,145,0,0.2); }
+        .callout-orange .callout-icon { background: rgba(255,145,0,0.15); color: var(--warning-orange); }
+        .callout-purple { background: rgba(127,82,255,0.08); border: 1px solid rgba(127,82,255,0.2); }
+        .callout-purple .callout-icon { background: rgba(127,82,255,0.15); color: var(--kotlin-purple); }
+        .callout-title { font-weight: 800; margin-bottom: 6px; font-size: 1.05rem; }
+        .callout-green .callout-title { color: #00C853; }
+        .callout-red .callout-title { color: #D32F2F; }
+        .callout-orange .callout-title { color: #E65100; }
+        .callout-purple .callout-title { color: var(--kotlin-purple); }
+        .callout p { margin: 0; }
+        pre {
+            background: var(--code-bg);
+            border-radius: 12px;
+            padding: 24px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 1px solid #2D3142;
+            position: relative;
+        }
+        pre::before {
+            content: 'KOTLIN';
+            position: absolute;
+            top: 8px;
+            left: 16px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--kotlin-purple);
+            letter-spacing: 1px;
+            font-family: 'Fira Code', monospace;
+        }
+        code {
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            color: #E2E8F0;
+        }
+        .code-keyword { color: #FF79C6; }
+        .code-fun { color: #50FA7B; }
+        .code-string { color: #F1FA8C; }
+        .code-comment { color: #6272A4; }
+        .code-type { color: #8BE9FD; }
+        .code-annotation { color: #FFB86C; }
+        .code-number { color: #BD93F9; }
+        p code, li code, td code {
+            background: rgba(11,25,44,0.06);
+            color: var(--primary-navy);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Fira Code', monospace;
+        }
+        ul, ol { margin: 16px 0; padding-right: 24px; }
+        li { margin-bottom: 10px; color: var(--text-secondary); }
+        li strong { color: var(--text-primary); }
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 24px 0;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 15px;
+            min-width: 600px;
+        }
+        th {
+            background: var(--primary-navy);
+            color: white;
+            padding: 16px;
+            text-align: right;
+            font-weight: 700;
+            font-size: 15px;
+        }
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            vertical-align: top;
+        }
+        tr:nth-child(even) { background: rgba(11,25,44,0.02); }
+        tr:hover { background: rgba(0,230,118,0.04); }
+        .pyramid-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin: 32px 0;
+            padding: 32px;
+            background: linear-gradient(180deg, rgba(11,25,44,0.03) 0%, transparent 100%);
+            border-radius: 16px;
+        }
+        .pyramid-level {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+        .pyramid-level:hover { transform: scale(1.02); }
+        .pyramid-level-1 {
+            width: 80%; height: 70px;
+            background: linear-gradient(135deg, var(--accent-green), #00C853);
+            clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+        }
+        .pyramid-level-2 {
+            width: 55%; height: 70px;
+            background: linear-gradient(135deg, var(--warning-orange), #FF6D00);
+            clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+        }
+        .pyramid-level-3 {
+            width: 30%; height: 70px;
+            background: linear-gradient(135deg, var(--fail-red), #D32F2F);
+            clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+        }
+        .pyramid-label {
+            text-align: center;
+            margin-top: 24px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            width: 100%;
+            max-width: 600px;
+        }
+        .pyramid-label-item {
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            background: white;
+            border: 1px solid var(--border-light);
+        }
+        .pyramid-label-item .percent { font-size: 1.5rem; font-weight: 900; display: block; }
+        .pyramid-label-item .desc { font-size: 13px; color: var(--text-secondary); }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+        .card {
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            box-shadow: 0 8px 24px rgba(11,25,44,0.08);
+            transform: translateY(-2px);
+        }
+        .card-icon {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 14px;
+        }
+        .card h4 { font-size: 1.1rem; font-weight: 800; margin-bottom: 8px; color: var(--text-primary); }
+        .card p { font-size: 15px; margin: 0; }
+        .comparison-table th { background: var(--kotlin-purple); }
+        .footer {
+            background: var(--primary-navy);
+            color: white;
+            text-align: center;
+            padding: 48px 24px;
+            margin-top: 60px;
+        }
+        .footer h3 { font-size: 1.4rem; margin-bottom: 12px; }
+        .footer p { color: rgba(255,255,255,0.6); max-width: 600px; margin: 0 auto; }
+        .back-to-top {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            width: 48px; height: 48px;
+            background: var(--accent-green);
+            color: var(--primary-navy);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: 900;
+            box-shadow: 0 4px 16px rgba(0,230,118,0.3);
+            transition: all 0.3s ease;
+            z-index: 99;
+        }
+        .back-to-top:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,230,118,0.4);
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .section-body { padding: 24px; }
+            .section-header { padding: 20px 24px; }
+            .section-header h2 { font-size: 1.3rem; }
+            .pyramid-label { grid-template-columns: 1fr; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+        }
+        html { scroll-behavior: smooth; }
+        .section { scroll-margin-top: 60px; }
+    </style>
+</head>
+<body>
+
+    <div class="hero" id="top">
+        <div class="hero-badge">📘 ULTIMATE MASTER GUIDE</div>
+        <h1>الدليل الشامل لـ <span>Android Testing</span></h1>
+        <p class="hero-subtitle">
+            مرجعك الكامل لبناء استراتيجية اختبار احترافية في تطبيقات أندرويد، من اختبارات الوحدات (Unit Tests) حتى اختبارات واجهة المستخدم (UI Tests) والتكامل المستمر (CI/CD)
+        </p>
+        <div class="hero-meta">
+            <div class="hero-meta-item">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                JUnit 5 · MockK · Turbine · Espresso · Compose
+            </div>
+            <div class="hero-meta-item">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                7 أقسام شاملة
+            </div>
+            <div class="hero-meta-item">
+                <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                Architecture for Testability
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-container">
+        <nav class="nav">
+            <a href="#sec1" class="active">الفلسفة والاستراتيجية</a>
+            <a href="#sec2">Unit Testing</a>
+            <a href="#sec3">Data Layer</a>
+            <a href="#sec4">UI Testing</a>
+            <a href="#sec5">Advanced</a>
+            <a href="#sec6">Coverage & CI</a>
+            <a href="#sec7">Decision Matrix</a>
+        </nav>
+    </div>
+
+    <div class="container">
+
+        <div class="section" id="sec1">
+            <div class="section-header">
+                <div class="section-number">1</div>
+                <h2>فلسفة وهرم الاختبارات في أندرويد (Android Test Pyramid & Strategy)</h2>
+            </div>
+            <div class="section-body">
+                <h3>مبدأ الهرم الاختباري (The Android Test Pyramid)</h3>
+                <p>
+                    يُعد هرم الاختبارات (Test Pyramid) الإطار الاستراتيجي الأساسي لتحديد توزيع الاختبارات في مشروعك. يقوم المبدأ على توزيع الاختبارات بحيث تكون الأكثر سرعةً واستقراراً في القاعدة، والأكثر تكلفةً في القمة.
+                </p>
+
+                <div class="pyramid-container">
+                    <div class="pyramid-level pyramid-level-1">Unit Tests</div>
+                    <div class="pyramid-level pyramid-level-2">Integration Tests</div>
+                    <div class="pyramid-level pyramid-level-3">End-to-End / UI Tests</div>
+                    <div class="pyramid-label">
+                        <div class="pyramid-label-item">
+                            <span class="percent" style="color: var(--accent-green);">70%</span>
+                            <span class="desc">Unit Tests — سريعة، منخفضة التكلفة، عالية الاستقرار</span>
+                        </div>
+                        <div class="pyramid-label-item">
+                            <span class="percent" style="color: var(--warning-orange);">20%</span>
+                            <span class="desc">Integration Tests — متوسطة السرعة، تتحقق من التفاعل بين المكونات</span>
+                        </div>
+                        <div class="pyramid-label-item">
+                            <span class="percent" style="color: var(--fail-red);">10%</span>
+                            <span class="desc">E2E / UI Tests — بطيئة، مكلفة، عرضة للـ Flakiness</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="callout callout-green">
+                    <div class="callout-icon">💡</div>
+                    <div>
+                        <div class="callout-title">القاعدة الذهبية</div>
+                        <p>كلما صعدت في الهرم، زادت تكلفة الصيانة (Maintenance Cost) وقلت السرعة (Execution Speed) وزاد احتمال الفشل العشوائي (Flakiness). لذلك، اجعل غالبية اختباراتك في طبقة Unit Tests.</p>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <tr>
+                            <th>نوع الاختبار</th>
+                            <th>السرعة</th>
+                            <th>التكلفة</th>
+                            <th>الاعتمادية</th>
+                            <th>Flakiness</th>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-green">Unit Tests</span></td>
+                            <td>مللي ثوانٍ</td>
+                            <td>منخفضة جداً</td>
+                            <td>عالية جداً</td>
+                            <td>نادر</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-orange">Integration Tests</span></td>
+                            <td>ثوانٍ</td>
+                            <td>متوسطة</td>
+                            <td>عالية</td>
+                            <td>منخفض</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-red">E2E / UI Tests</span></td>
+                            <td>دقائق</td>
+                            <td>عالية</td>
+                            <td>متوسطة</td>
+                            <td>شائع</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h3>Architecture for Testability</h3>
+                <p>
+                    لا يمكن بناء اختبارات نظيفة دون بنية نظيفة. يتيح لك <strong>Clean Architecture</strong> و <strong>Dependency Injection</strong> (عبر Hilt أو Koin) فصل منطق الأعمال (Business Logic) عن واجهات برمجة تطبيقات إطار عمل أندرويد (Android Framework APIs)، مما يجعل اختبار الوحدات ممكناً دون الحاجة إلى Emulator أو Device.
+                </p>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(0,230,118,0.1); color: var(--accent-green);">🏗️</div>
+                        <h4>Clean Architecture</h4>
+                        <p>فصل الطبقات إلى Domain و Data و Presentation يضمن أن منطق الأعمال خالٍ من أي تبعية لـ Android SDK.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(127,82,255,0.1); color: var(--kotlin-purple);">💉</div>
+                        <h4>Dependency Injection</h4>
+                        <p>استخدام Hilt أو Koin لحقن التبعيات (Dependencies) يتيح لك استبدال Implementations الحقيقية بـ Test Doubles بسهولة.</p>
+                    </div>
+                </div>
+
+                <h3>Test Doubles Taxonomy</h3>
+                <p>
+                    عند اختبار وحدة معزولة، نحتاج إلى استبدال تعاونياتها (Collaborators) بكائنات وهمية. يُعد فهم الفرق بين أنواع Test Doubles أمراً حاسماً لكتابة اختبارات نظيفة وغير هشة (Non-Brittle).
+                </p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <tr>
+                            <th>النوع</th>
+                            <th>الوصف</th>
+                            <th>متى تستخدمه</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Dummy</strong></td>
+                            <td>كائن يُمرر فقط لإرضاء التوقيع (Signature) دون استخدامه فعلياً</td>
+                            <td>عندما يتطلب المُنشئ parameter لا يُستخدم في الاختبار</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Stub</strong></td>
+                            <td>يوفر رداً جاهزاً مُبرمج مسبقاً على استدعاء معين</td>
+                            <td>عندما تحتاج إلى تحكم في القيم المُرجعة (Return Values)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Spy</strong></td>
+                            <td>يسجل استدعاءات الطرق (Method Calls) للتحقق لاحقاً</td>
+                            <td>عندما تحتاج إلى التحقق من Side Effects الداخلية</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mock</strong></td>
+                            <td>كائن وهمي يُحقق التوقعات (Expectations) على التفاعلات</td>
+                            <td>عندما تحتاج إلى التحقق من أن تفاعلاً محدداً قد حدث</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Fake</strong></td>
+                            <td>تنفيذ حقيقي مُبسط (In-Memory DB، Fake Server)</td>
+                            <td><span class="badge badge-green">يُفضل</span> في طبقة البيانات بدلاً من Mocks</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="callout callout-orange">
+                    <div class="callout-icon">⚠️</div>
+                    <div>
+                        <div class="callout-title">تفضيل Fakes على Mocks في طبقة البيانات</div>
+                        <p>في طبقة البيانات (Data Layer)، يُفضل دائماً استخدام Fake Implementations (مثل In-Memory Room Database أو Fake Retrofit Service) بدلاً من Mocks. الفيكس يُحاكي السلوك الحقيقي بشكل أقرب، ويقلل من هشاشة الاختبارات (Brittleness) عند تغيير التفاصيل الداخلية للتنفيذ.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="sec2">
+            <div class="section-header">
+                <div class="section-number">2</div>
+                <h2>اختبارات الوحدات والـ Coroutines والـ Flows (Unit Testing & Coroutines/Flows)</h2>
+            </div>
+            <div class="section-body">
+                <h3>JUnit 4 vs JUnit 5 في أندرويد</h3>
+                <p>
+                    على الرغم من أن JUnit 4 لا يزال المستخدم افتراضياً في مشاريع أندرويد، إلا أن JUnit 5 (Jupiter) يوفر ميزات متقدمة مثل Nested Tests و Dynamic Tests و Extension Model الأكثر مرونة. يمكن دمج JUnit 5 في مشروعك عبر <code>android-junit5</code> plugin.
+                </p>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(11,25,44,0.08); color: var(--primary-navy);">4️⃣</div>
+                        <h4>JUnit 4</h4>
+                        <p><code>@Test</code> · <code>@Before</code> · <code>@After</code> · <code>@Rule</code> · <code>@RunWith</code><br>النموذج القديم المبني على Annotations و Rules.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(0,230,118,0.1); color: var(--accent-green);">5️⃣</div>
+                        <h4>JUnit 5 (Jupiter)</h4>
+                        <p><code>@Test</code> · <code>@BeforeEach</code> · <code>@AfterEach</code> · <code>@ParameterizedTest</code> · <code>@ExtendWith</code><br>Extension Model مرن ودعم Nested Tests.</p>
+                    </div>
+                </div>
+
+                <pre dir="ltr"><code><span class="code-annotation">@ExtendWith</span>(MainDispatcherExtension::<span class="code-keyword">class</span>)
+<span class="code-keyword">class</span> <span class="code-type">UserViewModelTest</span> {
+
+    <span class="code-annotation">@BeforeEach</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">setUp</span>() {
+        <span class="code-comment">// Initialize test dependencies</span>
+    }
+
+    <span class="code-annotation">@ParameterizedTest</span>
+    <span class="code-annotation">@ValueSource</span>(strings = [<span class="code-string">"user1"</span>, <span class="code-string">"user2"</span>])
+    <span class="code-keyword">fun</span> <span class="code-fun">`should validate username`</span>(username: <span class="code-type">String</span>) {
+        <span class="code-comment">// Test logic</span>
+    }
+}</code></pre>
+
+                <h3>Mocking مع MockK</h3>
+                <p>
+                    MockK هو إطار العمل الأفضل لمحاكاة الكائنات في Kotlin. يدعم Coroutines بشكل أصلي ويوفر DSL نظيفاً وقوياً.
+                </p>
+
+                <pre dir="ltr"><code><span class="code-keyword">val</span> repository = <span class="code-fun">mockk</span>&lt;<span class="code-type">UserRepository</span>&gt;()
+
+<span class="code-comment">// Mocking regular functions</span>
+<span class="code-fun">every</span> { repository.<span class="code-fun">getUser</span>(<span class="code-string">"123"</span>) } <span class="code-keyword">returns</span> mockUser
+
+<span class="code-comment">// Mocking suspend functions</span>
+<span class="code-fun">coEvery</span> { repository.<span class="code-fun">fetchUserAsync</span>(<span class="code-string">"123"</span>) } <span class="code-keyword">returns</span> mockUser
+
+<span class="code-comment">// Verification</span>
+<span class="code-fun">verify</span>(exactly = <span class="code-number">1</span>) { repository.<span class="code-fun">getUser</span>(<span class="code-string">"123"</span>) }
+
+<span class="code-comment">// Capturing arguments with slot</span>
+<span class="code-keyword">val</span> slot = <span class="code-fun">slot</span>&lt;<span class="code-type">String</span>&gt;()
+<span class="code-fun">verify</span> { repository.<span class="code-fun">getUser</span>(<span class="code-fun">capture</span>(slot)) }
+<span class="code-fun">assertEquals</span>(<span class="code-string">"123"</span>, slot.captured)
+
+<span class="code-comment">// Mocking static / singleton (object)</span>
+<span class="code-fun">mockkObject</span>(NetworkUtils)
+<span class="code-fun">every</span> { NetworkUtils.<span class="code-fun">isConnected</span>() } <span class="code-keyword">returns</span> <span class="code-keyword">true</span></code></pre>
+
+                <div class="callout callout-purple">
+                    <div class="callout-icon">🎯</div>
+                    <div>
+                        <div class="callout-title">نصيحة MockK</div>
+                        <p>استخدم <code>relaxed = true</code> عند إنشاء Mock إذا كنت لا تهتم بالقيم المُرجعة لبعض الطرق. استخدم <code>relaxedUnitFun = true</code> للدوال التي تُرجع Unit.</p>
+                    </div>
+                </div>
+
+                <h3>Testing Coroutines</h3>
+                <p>
+                    اختبار الكوروتينات يتطلب التحكم في المُجدول (Dispatcher) لتجنب التنفيذ غير المتزامن في الاختبارات. يوفر kotlinx-coroutines-test الأدوات اللازمة.
+                </p>
+
+                <pre dir="ltr"><code><span class="code-keyword">class</span> <span class="code-type">MainDispatcherRule</span>(
+    <span class="code-keyword">val</span> testDispatcher: <span class="code-type">TestDispatcher</span> = <span class="code-type">StandardTestDispatcher</span>()
+) : <span class="code-type">TestWatcher</span>() {
+    <span class="code-keyword">override fun</span> <span class="code-fun">starting</span>(description: <span class="code-type">Description</span>) {
+        <span class="code-type">Dispatchers</span>.<span class="code-fun">setMain</span>(testDispatcher)
+    }
+    <span class="code-keyword">override fun</span> <span class="code-fun">finished</span>(description: <span class="code-type">Description</span>) {
+        <span class="code-type">Dispatchers</span>.<span class="code-fun">resetMain</span>()
+    }
+}
+
+<span class="code-comment">// Usage in test</span>
+<span class="code-annotation">@get:Rule</span>
+<span class="code-keyword">val</span> mainDispatcherRule = <span class="code-type">MainDispatcherRule</span>()
+
+<span class="code-annotation">@Test</span>
+<span class="code-keyword">fun</span> <span class="code-fun">`should emit loading then success`</span>() = <span class="code-fun">runTest</span> {
+    viewModel.<span class="code-fun">loadData</span>()
+    mainDispatcherRule.testDispatcher.<span class="code-type">scheduler</span>.<span class="code-fun">advanceUntilIdle</span>()
+    <span class="code-comment">// Assert state</span>
+}</code></pre>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(0,230,118,0.1); color: var(--accent-green);">⚡</div>
+                        <h4>StandardTestDispatcher</h4>
+                        <p>يتطلب <code>advanceUntilIdle()</code> أو <code>runCurrent()</code> لتنفيذ المهام المعلقة. يمنحك تحكماً كاملاً في التوقيت.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(255,145,0,0.1); color: var(--warning-orange);">🌊</div>
+                        <h4>UnconfinedTestDispatcher</h4>
+                        <p>ينفذ المهام فوراً دون الحاجة إلى تقديم الوقت (Time Advancement). سريع لكن أقل تحكماً في التسلسل الزمني.</p>
+                    </div>
+                </div>
+
+                <h3>Testing Kotlin Flows مع Turbine</h3>
+                <p>
+                    Turbine هي مكتبة من Square تُبسط اختبار Flows بشكل متزامن (Synchronous). تتيح لك استهلاك القيم (Emissions) واحدة تلو الأخرى والتحقق من حالات الإكمال والأخطاء.
+                </p>
+
+                <pre dir="ltr"><code><span class="code-annotation">@Test</span>
+<span class="code-keyword">fun</span> <span class="code-fun">`should emit states in correct order`</span>() = <span class="code-fun">runTest</span> {
+    viewModel.uiState.<span class="code-fun">test</span> {
+        <span class="code-comment">// Initial state</span>
+        <span class="code-fun">assertEquals</span>(<span class="code-type">UiState</span>.Idle, <span class="code-fun">awaitItem</span>())
+
+        <span class="code-comment">// Trigger action</span>
+        viewModel.<span class="code-fun">fetchUser</span>(<span class="code-string">"123"</span>)
+
+        <span class="code-comment">// Loading state</span>
+        <span class="code-fun">assertEquals</span>(<span class="code-type">UiState</span>.Loading, <span class="code-fun">awaitItem</span>())
+
+        <span class="code-comment">// Success state</span>
+        <span class="code-fun">assertEquals</span>(<span class="code-type">UiState</span>.Success(user), <span class="code-fun">awaitItem</span>())
+
+        <span class="code-comment">// Ensure no more emissions</span>
+        <span class="code-fun">awaitComplete</span>()
+    }
+}
+
+<span class="code-comment">// Testing SharedFlow events (One-time events)</span>
+viewModel.events.<span class="code-fun">test</span> {
+    viewModel.<span class="code-fun">showError</span>()
+    <span class="code-fun">assertEquals</span>(<span class="code-type">Event</span>.ShowError, <span class="code-fun">awaitItem</span>())
+    <span class="code-fun">cancelAndConsumeRemainingEvents</span>()
+}</code></pre>
+
+                <h3>ViewModel Unit Testing — خطوة بخطوة</h3>
+                <p>
+                    يُعد ViewModel حجر الزاوية في طبقة Presentation. يجب اختبار تحديثات حالة واجهة المستخدم (UI State Updates) والتأثيرات الجانبية (Side Effects) بشكل منفصل وواضح.
+                </p>
+
+                <pre dir="ltr"><code><span class="code-keyword">class</span> <span class="code-type">LoginViewModelTest</span> {
+
+    <span class="code-annotation">@get:Rule</span>
+    <span class="code-keyword">val</span> mainDispatcherRule = <span class="code-type">MainDispatcherRule</span>()
+
+    <span class="code-keyword">private val</span> loginUseCase = <span class="code-fun">mockk</span>&lt;<span class="code-type">LoginUseCase</span>&gt;()
+    <span class="code-keyword">private lateinit var</span> viewModel: <span class="code-type">LoginViewModel</span>
+
+    <span class="code-annotation">@Before</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">setUp</span>() {
+        viewModel = <span class="code-type">LoginViewModel</span>(loginUseCase)
+    }
+
+    <span class="code-annotation">@Test</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">`should update state to success on valid login`</span>() = <span class="code-fun">runTest</span> {
+        <span class="code-comment">// Given</span>
+        <span class="code-fun">coEvery</span> { loginUseCase.<span class="code-fun">invoke</span>(<span class="code-string">"user"</span>, <span class="code-string">"pass"</span>) } <span class="code-keyword">returns</span> <span class="code-type">Result</span>.Success
+
+        <span class="code-comment">// When</span>
+        viewModel.<span class="code-fun">login</span>(<span class="code-string">"user"</span>, <span class="code-string">"pass"</span>)
+        <span class="code-fun">advanceUntilIdle</span>()
+
+        <span class="code-comment">// Then</span>
+        <span class="code-fun">assertEquals</span>(<span class="code-type">LoginUiState</span>.Success, viewModel.uiState.value)
+    }
+}</code></pre>
+            </div>
+        </div>
+
+        <div class="section" id="sec3">
+            <div class="section-header">
+                <div class="section-number">3</div>
+                <h2>اختبار طبقة البيانات والـ Room (Data Layer & Integration Testing)</h2>
+            </div>
+            <div class="section-body">
+                <h3>Testing Room Database</h3>
+                <p>
+                    يُعد Room جزءاً أساسياً من طبقة البيانات المحلية. يمكن اختباره باستخدام قاعدة بيانات In-Memory تُنشأ وتُدمَّر مع كل اختبار، مما يضمن عزل الاختبارات (Test Isolation).
+                </p>
+
+                <pre dir="ltr"><code><span class="code-annotation">@RunWith</span>(<span class="code-type">AndroidJUnit4</span>::<span class="code-keyword">class</span>)
+<span class="code-keyword">class</span> <span class="code-type">UserDaoTest</span> {
+
+    <span class="code-keyword">private lateinit var</span> database: <span class="code-type">AppDatabase</span>
+    <span class="code-keyword">private lateinit var</span> userDao: <span class="code-type">UserDao</span>
+
+    <span class="code-annotation">@Before</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">createDb</span>() {
+        <span class="code-keyword">val</span> context = <span class="code-type">ApplicationProvider</span>.<span class="code-fun">getApplicationContext</span>&lt;<span class="code-type">Context</span>&gt;()
+        database = <span class="code-type">Room</span>.<span class="code-fun">inMemoryDatabaseBuilder</span>(
+            context, <span class="code-type">AppDatabase</span>::<span class="code-keyword">class</span>.java
+        ).<span class="code-fun">build</span>()
+        userDao = database.<span class="code-fun">userDao</span>()
+    }
+
+    <span class="code-annotation">@After</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">closeDb</span>() {
+        database.<span class="code-fun">close</span>()
+    }
+
+    <span class="code-annotation">@Test</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">`should insert and retrieve user`</span>() = <span class="code-fun">runTest</span> {
+        <span class="code-keyword">val</span> user = <span class="code-type">UserEntity</span>(id = <span class="code-number">1</span>, name = <span class="code-string">"Ahmed"</span>)
+        userDao.<span class="code-fun">insertUser</span>(user)
+
+        <span class="code-keyword">val</span> result = userDao.<span class="code-fun">getUserById</span>(<span class="code-number">1</span>).<span class="code-fun">first</span>()
+        <span class="code-fun">assertEquals</span>(<span class="code-string">"Ahmed"</span>, result.name)
+    }
+
+    <span class="code-annotation">@Test</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">`should emit flow updates on insert`</span>() = <span class="code-fun">runTest</span> {
+        userDao.<span class="code-fun">getAllUsers</span>().<span class="code-fun">test</span> {
+            <span class="code-fun">assertEquals</span>(emptyList&lt;<span class="code-type">UserEntity</span>&gt;(), <span class="code-fun">awaitItem</span>())
+
+            userDao.<span class="code-fun">insertUser</span>(<span class="code-type">UserEntity</span>(<span class="code-number">1</span>, <span class="code-string">"Ahmed"</span>))
+            <span class="code-fun">assertEquals</span>(<span class="code-number">1</span>, <span class="code-fun">awaitItem</span>().size)
+
+            <span class="code-fun">cancelAndIgnoreRemainingEvents</span>()
+        }
+    }
+}</code></pre>
+
+                <div class="callout callout-green">
+                    <div class="callout-icon">✅</div>
+                    <div>
+                        <div class="callout-title">أفضل ممارسة Room Testing</div>
+                        <p>استخدم <code>inMemoryDatabaseBuilder</code> دائماً لاختبارات DAO. لا تستخدم قاعدة البيانات الحقيقية على القرص (Disk) لأنها تُبطئ الاختبارات وتُسبب تبعيات بينها.</p>
+                    </div>
+                </div>
+
+                <h3>Testing Repository Pattern</h3>
+                <p>
+                    يجب اختبار Repository باستخدام Fake Data Sources (Remote و Local) للتحقق من منطق التنسيق بين المصادر (Single Source of Truth) دون الاعتماد على الشبكة أو قاعدة البيانات الحقيقية.
+                </p>
+
+                <pre dir="ltr"><code><span class="code-keyword">class</span> <span class="code-type">FakeLocalDataSource</span> : <span class="code-type">LocalDataSource</span> {
+    <span class="code-keyword">private val</span> users = <span class="code-type">MutableStateFlow</span>&lt;<span class="code-type">List</span>&lt;<span class="code-type">User</span>&gt;&gt;(emptyList())
+    <span class="code-keyword">override fun</span> <span class="code-fun">getUsers</span>() = users.<span class="code-keyword">asStateFlow</span>()
+    <span class="code-keyword">override suspend fun</span> <span class="code-fun">saveUsers</span>(list: <span class="code-type">List</span>&lt;<span class="code-type">User</span>&gt;) { users.value = list }
+}
+
+<span class="code-keyword">class</span> <span class="code-type">FakeRemoteDataSource</span> : <span class="code-type">RemoteDataSource</span> {
+    <span class="code-keyword">var</span> usersToReturn: <span class="code-type">List</span>&lt;<span class="code-type">User</span>&gt; = emptyList()
+    <span class="code-keyword">var</span> shouldThrowError = <span class="code-keyword">false</span>
+
+    <span class="code-keyword">override suspend fun</span> <span class="code-fun">fetchUsers</span>(): <span class="code-type">List</span>&lt;<span class="code-type">User</span>&gt; {
+        <span class="code-keyword">if</span> (shouldThrowError) <span class="code-keyword">throw</span> <span class="code-type">IOException</span>(<span class="code-string">"Network error"</span>)
+        <span class="code-keyword">return</span> usersToReturn
+    }
+}
+
+<span class="code-comment">// Test: Repository should fetch from remote and cache locally</span>
+<span class="code-annotation">@Test</span>
+<span class="code-keyword">fun</span> <span class="code-fun">`should cache remote data locally`</span>() = <span class="code-fun">runTest</span> {
+    <span class="code-keyword">val</span> remote = <span class="code-type">FakeRemoteDataSource</span>().<span class="code-fun">apply</span> { 
+        usersToReturn = <span class="code-fun">listOf</span>(<span class="code-type">User</span>(<span class="code-string">"1"</span>, <span class="code-string">"Ahmed"</span>)) 
+    }
+    <span class="code-keyword">val</span> local = <span class="code-type">FakeLocalDataSource</span>()
+    <span class="code-keyword">val</span> repo = <span class="code-type">UserRepository</span>(remote, local)
+
+    repo.<span class="code-fun">syncUsers</span>()
+
+    <span class="code-fun">assertEquals</span>(<span class="code-string">"Ahmed"</span>, local.<span class="code-fun">getUsers</span>().value.<span class="code-fun">first</span>().name)
+}</code></pre>
+
+                <h3>Testing Network Requests مع MockWebServer</h3>
+                <p>
+                    MockWebServer من OkHttp يتيح لك اختبار Retrofit APIs بشكل حقيقي دون الحاجة إلى الإنترنت. يُنشئ خادماً وهمياً (Local HTTP Server) يستجيب للطلبات بردود مُبرمجة.
+                </p>
+
+                <pre dir="ltr"><code><span class="code-keyword">class</span> <span class="code-type">UserApiTest</span> {
+    <span class="code-keyword">private val</span> mockWebServer = <span class="code-type">MockWebServer</span>()
+    <span class="code-keyword">private lateinit var</span> api: <span class="code-type">UserApi</span>
+
+    <span class="code-annotation">@Before</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">setUp</span>() {
+        mockWebServer.<span class="code-fun">start</span>()
+        <span class="code-keyword">val</span> retrofit = <span class="code-type">Retrofit</span>.<span class="code-type">Builder</span>()
+            .<span class="code-fun">baseUrl</span>(mockWebServer.<span class="code-fun">url</span>(<span class="code-string">"/"</span>))
+            .<span class="code-fun">addConverterFactory</span>(<span class="code-type">GsonConverterFactory</span>.<span class="code-fun">create</span>())
+            .<span class="code-fun">build</span>()
+        api = retrofit.<span class="code-fun">create</span>(<span class="code-type">UserApi</span>::<span class="code-keyword">class</span>.java)
+    }
+
+    <span class="code-annotation">@After</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">tearDown</span>() {
+        mockWebServer.<span class="code-fun">shutdown</span>()
+    }
+
+    <span class="code-annotation">@Test</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">`should parse user response correctly`</span>() = <span class="code-fun">runTest</span> {
+        <span class="code-keyword">val</span> response = <span class="code-type">MockResponse</span>()
+            .<span class="code-fun">setBody</span>(<span class="code-string">"""{"id":"1","name":"Ahmed"}"""</span>)
+            .<span class="code-fun">setResponseCode</span>(<span class="code-number">200</span>)
+        mockWebServer.<span class="code-fun">enqueue</span>(response)
+
+        <span class="code-keyword">val</span> user = api.<span class="code-fun">getUser</span>(<span class="code-string">"1"</span>)
+        <span class="code-fun">assertEquals</span>(<span class="code-string">"Ahmed"</span>, user.name)
+    }
+
+    <span class="code-annotation">@Test</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">`should throw on 500 error`</span>() = <span class="code-fun">runTest</span> {
+        mockWebServer.<span class="code-fun">enqueue</span>(<span class="code-type">MockResponse</span>().<span class="code-fun">setResponseCode</span>(<span class="code-number">500</span>))
+
+        <span class="code-fun">assertThrows</span>&lt;<span class="code-type">HttpException</span>&gt; {
+            api.<span class="code-fun">getUser</span>(<span class="code-string">"1"</span>)
+        }
+    }
+}</code></pre>
+            </div>
+        </div>
+
+        <div class="section" id="sec4">
+            <div class="section-header">
+                <div class="section-number">4</div>
+                <h2>اختبار واجهات المستخدم والـ Compose (UI & Instrumentation Testing)</h2>
+            </div>
+            <div class="section-body">
+                <h3>Espresso UI Testing (Legacy View System)</h3>
+                <p>
+                    Espresso هو إطار العمل الرسمي لاختبار واجهات المستخدم المبنية على نظام العرض التقليدي (View System). يعتمد على ثلاثة مكونات أساسية: ViewMatchers للعثور على العناصر، وViewActions للتفاعل معها، وViewAssertions للتحقق من حالتها.
+                </p>
+
+                <pre dir="ltr"><code><span class="code-annotation">@Test</span>
+<span class="code-keyword">fun</span> <span class="code-fun">`should navigate to detail on item click`</span>() {
+    <span class="code-comment">// Match</span>
+    <span class="code-type">Espresso</span>.<span class="code-fun">onView</span>(<span class="code-type">ViewMatchers</span>.<span class="code-fun">withId</span>(R.id.recyclerView))
+        .<span class="code-fun">perform</span>(<span class="code-type">RecyclerViewActions</span>.<span class="code-fun">actionOnItemAtPosition</span>&lt;<span class="code-type">RecyclerView</span>.<span class="code-type">ViewHolder</span>&gt;(
+            <span class="code-number">0</span>, <span class="code-type">ViewActions</span>.<span class="code-fun">click</span>()
+        ))
+
+    <span class="code-comment">// Assert</span>
+    <span class="code-type">Espresso</span>.<span class="code-fun">onView</span>(<span class="code-type">ViewMatchers</span>.<span class="code-fun">withId</span>(R.id.detailTitle))
+        .<span class="code-fun">check</span>(<span class="code-type">ViewAssertions</span>.<span class="code-fun">matches</span>(<span class="code-type">ViewMatchers</span>.<span class="code-fun">isDisplayed</span>()))
+}
+
+<span class="code-comment">// Custom Matcher</span>
+<span class="code-keyword">fun</span> <span class="code-fun">withDrawable</span>(@DrawableRes id: <span class="code-type">Int</span>): <span class="code-type">Matcher</span>&lt;<span class="code-type">View</span>&gt; {
+    <span class="code-keyword">return</span> <span class="code-type">object</span> : <span class="code-type">BoundedMatcher</span>&lt;<span class="code-type">View</span>, <span class="code-type">ImageView</span>&gt;(<span class="code-type">ImageView</span>::<span class="code-keyword">class</span>.java) {
+        <span class="code-keyword">override fun</span> <span class="code-fun">describeTo</span>(description: <span class="code-type">Description</span>) {
+            description.<span class="code-fun">appendText</span>(<span class="code-string">"with drawable: $id"</span>)
+        }
+        <span class="code-keyword">override fun</span> <span class="code-fun">matchesSafely</span>(view: <span class="code-type">ImageView</span>): <span class="code-type">Boolean</span> {
+            <span class="code-keyword">return</span> view.drawable != <span class="code-keyword">null</span>
+        }
+    }
+}</code></pre>
+
+                <div class="callout callout-orange">
+                    <div class="callout-icon">⏳</div>
+                    <div>
+                        <div class="callout-title">IdlingResource للعمليات غير المتزامنة</div>
+                        <p>عندما يحتوي تطبيقك على عمليات غير متزامنة (Network, Database, Animations)، استخدم <code>IdlingResource</code> لإبلاغ Espresso بأن التطبيق في حالة خمول (Idle) قبل المتابعة. هذا يمنع Flaky Tests الناتجة عن Race Conditions.</p>
+                    </div>
+                </div>
+
+                <h3>Jetpack Compose UI Testing (Modern UI)</h3>
+                <p>
+                    يقدم Jetpack Compose نظام اختبار خاصاً به يعتمد على Semantics Tree بدلاً من View Hierarchy. يتيح لك <code>ComposeTestRule</code> إنشاء واجهات Compose في عزلة (Isolation) والتفاعل معها.
+                </p>
+
+                <pre dir="ltr"><code><span class="code-keyword">class</span> <span class="code-type">LoginScreenTest</span> {
+
+    <span class="code-annotation">@get:Rule</span>
+    <span class="code-keyword">val</span> composeTestRule = <span class="code-fun">createComposeRule</span>()
+
+    <span class="code-annotation">@Test</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">`should show error when fields are empty`</span>() {
+        composeTestRule.<span class="code-fun">setContent</span> {
+            <span class="code-type">LoginScreen</span>(viewModel = fakeViewModel)
+        }
+
+        <span class="code-comment">// Find and interact</span>
+        composeTestRule.<span class="code-fun">onNodeWithText</span>(<span class="code-string">"Login"</span>)
+            .<span class="code-fun">performClick</span>()
+
+        <span class="code-comment">// Assert</span>
+        composeTestRule.<span class="code-fun">onNodeWithText</span>(<span class="code-string">"Fields cannot be empty"</span>)
+            .<span class="code-fun">assertIsDisplayed</span>()
+    }
+
+    <span class="code-annotation">@Test</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">`should navigate on successful login`</span>() {
+        composeTestRule.<span class="code-fun">setContent</span> {
+            <span class="code-keyword">val</span> navController = <span class="code-fun">rememberNavController</span>()
+            <span class="code-type">LoginScreen</span>(navController = navController)
+        }
+
+        composeTestRule.<span class="code-fun">onNodeWithTag</span>(<span class="code-string">"email_field"</span>)
+            .<span class="code-fun">performTextInput</span>(<span class="code-string">"user@example.com"</span>)
+
+        composeTestRule.<span class="code-fun">onNodeWithTag</span>(<span class="code-string">"password_field"</span>)
+            .<span class="code-fun">performTextInput</span>(<span class="code-string">"password123"</span>)
+
+        composeTestRule.<span class="code-fun">onNodeWithText</span>(<span class="code-string">"Login"</span>)
+            .<span class="code-fun">performClick</span>()
+
+        <span class="code-comment">// Verify navigation occurred</span>
+        <span class="code-fun">assertEquals</span>(<span class="code-string">"home_route"</span>, navController.<span class="code-fun">currentBackStackEntry</span>?.destination?.route)
+    }
+}</code></pre>
+
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(0,230,118,0.1); color: var(--accent-green);">🔍</div>
+                        <h4>Semantics</h4>
+                        <p><code>onNodeWithText()</code> · <code>onNodeWithTag()</code> · <code>onNodeWithContentDescription()</code></p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(255,145,0,0.1); color: var(--warning-orange);">👆</div>
+                        <h4>Actions</h4>
+                        <p><code>performClick()</code> · <code>performTextInput()</code> · <code>performScrollTo()</code></p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(255,82,82,0.1); color: var(--fail-red);">✓</div>
+                        <h4>Assertions</h4>
+                        <p><code>assertIsDisplayed()</code> · <code>assertHasClickAction()</code> · <code>assertTextContains()</code></p>
+                    </div>
+                </div>
+
+                <h3>State Restoration Testing</h3>
+                <p>
+                    عند تغيير إعدادات الجهاز (مثل تدوير الشاشة Screen Rotation)، يجب أن يحتفظ Compose UI بحالته. يوفر <code>StateRestorationTester</code> أداة لمحاكاة هذه العملية في الاختبارات.
+                </p>
+
+                <pre dir="ltr"><code><span class="code-annotation">@Test</span>
+<span class="code-keyword">fun</span> <span class="code-fun">`should restore state after configuration change`</span>() {
+    <span class="code-keyword">val</span> restorationTester = <span class="code-type">StateRestorationTester</span>(composeTestRule)
+
+    restorationTester.<span class="code-fun">setContent</span> { <span class="code-type">CounterScreen</span>() }
+
+    <span class="code-comment">// Increment counter</span>
+    composeTestRule.<span class="code-fun">onNodeWithText</span>(<span class="code-string">"+"</span>).<span class="code-fun">performClick</span>()
+    composeTestRule.<span class="code-fun">onNodeWithText</span>(<span class="code-string">"Count: 1"</span>).<span class="code-fun">assertIsDisplayed</span>()
+
+    <span class="code-comment">// Simulate configuration change</span>
+    restorationTester.<span class="code-fun">emulateSavedInstanceStateRestore</span>()
+
+    <span class="code-comment">// Verify state persisted</span>
+    composeTestRule.<span class="code-fun">onNodeWithText</span>(<span class="code-string">"Count: 1"</span>).<span class="code-fun">assertIsDisplayed</span>()
+}</code></pre>
+
+                <h3>UI Automator</h3>
+                <p>
+                    UI Automator هو إطار عمل لاختبار التفاعلات عبر التطبيقات (Cross-App Interactions) والحوارات النظامية (System Dialogs) مثل حوارات الأذونات (Permission Dialogs) والإشعارات.
+                </p>
+
+                <pre dir="ltr"><code><span class="code-keyword">val</span> device = <span class="code-type">UiDevice</span>.<span class="code-fun">getInstance</span>(<span class="code-type">InstrumentationRegistry</span>.<span class="code-fun">getInstrumentation</span>())
+
+<span class="code-comment">// Grant permission via system dialog</span>
+<span class="code-keyword">val</span> allowButton = device.<span class="code-fun">findObject</span>(<span class="code-type">UiSelector</span>().<span class="code-fun">text</span>(<span class="code-string">"Allow"</span>))
+<span class="code-keyword">if</span> (allowButton.<span class="code-fun">exists</span>()) {
+    allowButton.<span class="code-fun">click</span>()
+}
+
+<span class="code-comment">// Open notification shade</span>
+device.<span class="code-fun">openNotification</span>()
+<span class="code-keyword">val</span> notification = device.<span class="code-fun">findObject</span>(<span class="code-type">UiSelector</span>().<span class="code-fun">textContains</span>(<span class="code-string">"New message"</span>))
+notification.<span class="code-fun">click</span>()</code></pre>
+            </div>
+        </div>
+
+        <div class="section" id="sec5">
+            <div class="section-header">
+                <div class="section-number">5</div>
+                <h2>تقنيات الاختبار المتقدمة (Advanced Testing Paradigms)</h2>
+            </div>
+            <div class="section-body">
+                <h3>Robolectric — اختبارات Android على JVM</h3>
+                <p>
+                    Robolectric يسمح بتشغيل اختبارات تعتمد على Android Framework APIs مباشرة على JVM دون الحاجة إلى Emulator أو جهاز حقيقي. هذا يُسرع الاختبارات بشكل كبير، لكنه قد يفتقر إلى بعض الدقة (Fidelity) مقارنةً بالأجهزة الحقيقية.
+                </p>
+
+                <pre dir="ltr"><code><span class="code-annotation">@RunWith</span>(<span class="code-type">RobolectricTestRunner</span>::<span class="code-keyword">class</span>)
+<span class="code-annotation">@Config</span>(sdk = [<span class="code-number">33</span>], manifest = <span class="code-type">Config</span>.NONE)
+<span class="code-keyword">class</span> <span class="code-type">MainActivityTest</span> {
+
+    <span class="code-annotation">@Test</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">`should show correct title`</span>() {
+        <span class="code-keyword">val</span> activity = <span class="code-type">Robolectric</span>.<span class="code-fun">buildActivity</span>(<span class="code-type">MainActivity</span>::<span class="code-keyword">class</span>.java)
+            .<span class="code-fun">create</span>()
+            .<span class="code-fun">resume</span>()
+            .<span class="code-fun">get</span>()
+
+        <span class="code-keyword">val</span> title = activity.<span class="code-fun">findViewById</span>&lt;<span class="code-type">TextView</span>&gt;(R.id.title)
+        <span class="code-fun">assertEquals</span>(<span class="code-string">"Welcome"</span>, title.text)
+    }
+}</code></pre>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(0,230,118,0.1); color: var(--accent-green);">⚡</div>
+                        <h4>Speed</h4>
+                        <p>تشغيل على JVM بدون Emulator. اختبارات أسرع بمئات المرات مقارنةً بـ Instrumented Tests.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(255,82,82,0.1); color: var(--fail-red);">⚠️</div>
+                        <h4>Fidelity</h4>
+                        <p>قد تختلف سلوكيات Robolectric قليلاً عن الجهاز الحقيقي. استخدمه للاختبارات السريعة، وتحقق من السلوكيات الحرجة على أجهزة حقيقية.</p>
+                    </div>
+                </div>
+
+                <h3>Hilt in Integration Tests</h3>
+                <p>
+                    عند اختبار المكونات التي تستخدم Hilt للحقن، يمكنك استبدال الوحدات (Modules) باختباراتها باستخدام <code>@UninstallModules</code> و <code>@BindValue</code>.
+                </p>
+
+                <pre dir="ltr"><code><span class="code-annotation">@HiltAndroidTest</span>
+<span class="code-keyword">class</span> <span class="code-type">ProfileFragmentTest</span> {
+
+    <span class="code-annotation">@get:Rule</span>
+    <span class="code-keyword">val</span> hiltRule = <span class="code-type">HiltAndroidRule</span>(<span class="code-keyword">this</span>)
+
+    <span class="code-annotation">@get:Rule</span>
+    <span class="code-keyword">val</span> composeTestRule = <span class="code-fun">createAndroidComposeRule</span>&lt;<span class="code-type">MainActivity</span>&gt;()
+
+    <span class="code-annotation">@BindValue</span>
+    <span class="code-annotation">@JvmField</span>
+    <span class="code-keyword">val</span> fakeRepository: <span class="code-type">UserRepository</span> = <span class="code-type">FakeUserRepository</span>()
+
+    <span class="code-annotation">@Test</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">`should display user profile`</span>() {
+        fakeRepository.<span class="code-fun">setUser</span>(<span class="code-type">User</span>(<span class="code-string">"1"</span>, <span class="code-string">"Ahmed"</span>))
+
+        composeTestRule.<span class="code-fun">onNodeWithText</span>(<span class="code-string">"Ahmed"</span>)
+            .<span class="code-fun">assertIsDisplayed</span>()
+    }
+}</code></pre>
+
+                <h3>Screenshot Testing — Roborazzi & Paparazzi</h3>
+                <p>
+                    اختبار لقطات الشاشة (Screenshot Testing) يُكتشف تغييرات واجهة المستخدم على مستوى البكسل (Pixel-Level). أدوات حديثة مثل Roborazzi و Paparazzi تُبسط هذه العملية بشكل كبير.
+                </p>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(0,230,118,0.1); color: var(--accent-green);">📸</div>
+                        <h4>Roborazzi</h4>
+                        <p>يعمل مع Compose Test Rule و Robolectric. يلتقط لقطات من الاختبارات البرمجية ويقارنها مع المرجع (Reference).</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(127,82,255,0.1); color: var(--kotlin-purple);">🎨</div>
+                        <h4>Paparazzi</h4>
+                        <p>يعمل على JVM بدون Emulator. يُقدم Layoutlib مُحسَّناً لالتقاط لقطات دقيقة بسرعة عالية.</p>
+                    </div>
+                </div>
+
+                <pre dir="ltr"><code><span class="code-comment">// Roborazzi Example</span>
+<span class="code-annotation">@Test</span>
+<span class="code-keyword">fun</span> <span class="code-fun">`capture login screen`</span>() {
+    composeTestRule.<span class="code-fun">setContent</span> { <span class="code-type">LoginScreen</span>() }
+    composeTestRule.<span class="code-fun">onRoot</span>().<span class="code-fun">captureRoboImage</span>(<span class="code-string">"login_screen.png"</span>)
+}
+
+<span class="code-comment">// Paparazzi Example</span>
+<span class="code-keyword">class</span> <span class="code-type">LoginViewTest</span> {
+    <span class="code-annotation">@get:Rule</span>
+    <span class="code-keyword">val</span> paparazzi = <span class="code-type">Paparazzi</span>()
+
+    <span class="code-annotation">@Test</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">`login screen snapshot`</span>() {
+        paparazzi.<span class="code-fun">snapshot</span> { <span class="code-type">LoginScreen</span>() }
+    }
+}</code></pre>
+
+                <h3>Test Driven Development (TDD) Workflow</h3>
+                <p>
+                    TDD هو نهج تطوير يعتمد على كتابة الاختبار أولاً قبل كتابة الكود الإنتاجي. يتبع دورة Red-Green-Refactor.
+                </p>
+
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(255,82,82,0.1); color: var(--fail-red);">🔴</div>
+                        <h4>Red</h4>
+                        <p>اكتب اختباراً يفشل (Failing Test) يُحدد السلوك المطلوب. يجب أن يفشل لأن الكود غير موجود بعد.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(0,230,118,0.1); color: var(--accent-green);">🟢</div>
+                        <h4>Green</h4>
+                        <p>اكتب أقل كود ممكن لإجبار الاختبار على النجاح (Pass). لا تُبالغ في التصميم.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(255,145,0,0.1); color: var(--warning-orange);">🔵</div>
+                        <h4>Refactor</h4>
+                        <p>حسّن الكود مع الحفاظ على اجتياز الاختبارات. أعد تسمية المتغيرات، واستخرج الدوال، وحسّن الأداء.</p>
+                    </div>
+                </div>
+
+                <h3>Flaky Tests Mitigation</h3>
+                <p>
+                    الاختبارات غير المستقرة (Flaky Tests) هي التي تنجح أحياناً وتفشل أحياناً دون تغيير في الكود. إنها عدو الاعتمادية (Reliability) في CI/CD.
+                </p>
+
+                <ul>
+                    <li><strong>عزل التبعيات الخارجية:</strong> استخدم Fake Implementations بدلاً من Network/Database الحقيقية.</li>
+                    <li><strong>تجنب Race Conditions:</strong> استخدم <code>IdlingResource</code> في UI Tests و <code>TestDispatcher</code> في Unit Tests.</li>
+                    <li><strong>تجنب الاعتماد على الوقت:</strong> لا تستخدم <code>Thread.sleep()</code> أبداً. استخدم آليات التزامن (Synchronization) بدلاً منها.</li>
+                    <li><strong>تجنب Shared State:</strong> كل اختبار يجب أن يكون مستقلاً تماماً. لا تشارك Mutable State بين الاختبارات.</li>
+                    <li><strong>Retry Mechanism:</strong> في CI، يمكن تفعيل إعادة تشغيل الاختبارات الفاشلة مرة واحدة فقط للتمييز بين Flakiness و Failures الحقيقية.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section" id="sec6">
+            <div class="section-header">
+                <div class="section-number">6</div>
+                <h2>قياس التغطية والـ CI/CD (Code Coverage & CI Integration)</h2>
+            </div>
+            <div class="section-body">
+                <h3>Code Coverage Tools: Jacoco vs Kover</h3>
+                <p>
+                    قياس تغطية الكود (Code Coverage) يُظهر النسبة المئوية من الكود الذي يتم اختباره. يُعد مؤشراً مفيداً لكنه ليس المقياس الوحيد لجودة الاختبارات.
+                </p>
+
+                <div class="table-wrapper">
+                    <table class="comparison-table">
+                        <tr>
+                            <th>المعيار</th>
+                            <th>Jacoco</th>
+                            <th>Kover</th>
+                        </tr>
+                        <tr>
+                            <td>اللغة</td>
+                            <td>Java-first، يدعم Kotlin عبر Agent</td>
+                            <td>Kotlin-native، مُصمم خصيصاً لـ Kotlin</td>
+                        </tr>
+                        <tr>
+                            <td>Compose Coverage</td>
+                            <td>دعم محدود لـ Composable Functions</td>
+                            <td>دعم ممتاز لـ Compose و Inline Functions</td>
+                        </tr>
+                        <tr>
+                            <td>Gradle Integration</td>
+                            <td>Plugin تقليدي</td>
+                            <td>Plugin رسمي من JetBrains</td>
+                        </tr>
+                        <tr>
+                            <td>HTML Reports</td>
+                            <td>✅ متاح</td>
+                            <td>✅ متاح مع تنسيق XML/IC</td>
+                        </tr>
+                        <tr>
+                            <td>Line vs Branch Coverage</td>
+                            <td>يدعم Line و Branch و Instruction</td>
+                            <td>يدعم Line و Branch و Declaration</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <pre dir="ltr"><code><span class="code-comment">// build.gradle.kts — Kover setup</span>
+plugins {
+    id(<span class="code-string">"org.jetbrains.kotlinx.kover"</span>) version <span class="code-string">"0.7.0"</span>
+}
+
+kover {
+    reports {
+        total {
+            xml { <span class="code-fun">onCheck</span> = <span class="code-keyword">true</span> }
+            html { <span class="code-fun">onCheck</span> = <span class="code-keyword">true</span> }
+        }
+    }
+}
+
+<span class="code-comment">// Set minimum coverage threshold</span>
+kover {
+    verify {
+        rule(<span class="code-string">"Minimum Line Coverage"</span>) {
+            bound {
+                minValue = <span class="code-number">80</span>
+                metric = <span class="code-type">MetricType</span>.LINE
+            }
+        }
+    }
+}</code></pre>
+
+                <h3>CI/CD Integration</h3>
+                <p>
+                    يجب أن يتم تشغيل الاختبارات تلقائياً عند كل Pull Request. يوفر GitHub Actions و GitLab CI pipelines آليات قوية لذلك.
+                </p>
+
+                <pre dir="ltr"><code><span class="code-comment">// .github/workflows/android-test.yml</span>
+name: Android Tests
+
+on: [push, pull_request]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: <span class="code-string">'17'</span>
+          distribution: <span class="code-string">'temurin'</span>
+      - name: Run Unit Tests
+        run: ./gradlew testDebugUnitTest
+      - name: Generate Coverage Report
+        run: ./gradlew koverXmlReport
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: build/reports/kover/report.xml
+
+  instrumentation-tests:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Instrumented Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: <span class="code-number">33</span>
+          script: ./gradlew connectedCheck</code></pre>
+
+                <div class="callout callout-green">
+                    <div class="callout-icon">🚀</div>
+                    <div>
+                        <div class="callout-title">أفضل ممارسة CI</div>
+                        <p>افصل Unit Tests (سريعة) عن Instrumented Tests (بطيئة) في Pipeline منفصلة. اجعل Unit Tests شرطاً إلزامياً (Required) لدمج PR، بينما اجعل Instrumented Tests اختيارية أو تتم في الليل (Nightly Builds).</p>
+                    </div>
+                </div>
+
+                <h3>Test Reporting & Thresholds</h3>
+                <p>
+                    يجب أن يتضمن كل Pull Request تقريراً واضحاً بتغطية الكود. يمكن استخدام أدوات مثل Codecov أو SonarQube لعرض التغطية بشكل مرئي ومنع دمج PRs التي تقل تغطيتها عن الحد الأدنى.
+                </p>
+
+                <ul>
+                    <li><strong>الحد الأدنى العام:</strong> 70-80% Line Coverage كهدف أولي.</li>
+                    <li><strong>Branch Coverage:</strong> لا تقل عن 60% للتأكد من اختبار جميع مسارات الشرط (Condition Paths).</li>
+                    <li><strong>Diff Coverage:</strong> يجب أن تغطي كل PR 100% من الأسطر المُضافة (New Lines).</li>
+                    <li><strong>Fail on Drop:</strong> إذا انخفضت التغطية عن PR السابق، يجب منع الدمج.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section" id="sec7">
+            <div class="section-header">
+                <div class="section-number">7</div>
+                <h2>مصفوفة اتخاذ القرار وأفضل الممارسات (Android Testing Decision Matrix)</h2>
+            </div>
+            <div class="section-body">
+                <p>
+                    يُعد اختيار الأداة والنهج المناسبين لكل سيناريو اختبار أمراً حاسماً لبناء استراتيجية فعالة. الجدول التالي يُلخّص التوصيات بناءً على ما تريد اختباره.
+                </p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <tr>
+                            <th>ما تريد اختباره</th>
+                            <th>نوع الاختبار وموقعه</th>
+                            <th>الأدوات الرئيسية</th>
+                            <th>السرعة / جهد الصيانة</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Business Logic في UseCase</strong></td>
+                            <td><span class="badge badge-green">Unit Test</span> Local JVM</td>
+                            <td>JUnit 5 + MockK</td>
+                            <td>⚡ سريع جداً / 📉 صيانة منخفضة</td>
+                        </tr>
+                        <tr>
+                            <td><strong>UI State في ViewModel</strong></td>
+                            <td><span class="badge badge-green">Unit Test</span> Local JVM</td>
+                            <td>JUnit 5 + MockK + Turbine</td>
+                            <td>⚡ سريع جداً / 📉 صيانة منخفضة</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Database DAO Queries</strong></td>
+                            <td><span class="badge badge-orange">Integration Test</span> Local JVM / AndroidTest</td>
+                            <td>Room In-Memory + Turbine</td>
+                            <td>⚡ سريع / 📊 صيانة متوسطة</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Repository Pattern (Remote + Local)</strong></td>
+                            <td><span class="badge badge-orange">Integration Test</span> Local JVM</td>
+                            <td>Fake Data Sources + MockWebServer</td>
+                            <td>⚡ سريع / 📊 صيانة متوسطة</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Retrofit API Responses</strong></td>
+                            <td><span class="badge badge-green">Unit Test</span> Local JVM</td>
+                            <td>MockWebServer + OkHttp</td>
+                            <td>⚡ سريع / 📉 صيانة منخفضة</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Jetpack Compose Screen</strong></td>
+                            <td><span class="badge badge-red">UI Test</span> AndroidTest</td>
+                            <td>ComposeTestRule + Semantics</td>
+                            <td>🐢 متوسط / 📈 صيانة عالية</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Legacy View (XML) Screen</strong></td>
+                            <td><span class="badge badge-red">UI Test</span> AndroidTest</td>
+                            <td>Espresso + ViewMatchers</td>
+                            <td>🐢 متوسط / 📈 صيانة عالية</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Navigation Flow</strong></td>
+                            <td><span class="badge badge-red">UI Test</span> AndroidTest</td>
+                            <td>Espresso + Navigation Testing</td>
+                            <td>🐢 بطيء / 📈 صيانة عالية</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cross-App Permission Dialog</strong></td>
+                            <td><span class="badge badge-red">UI Test</span> AndroidTest</td>
+                            <td>UI Automator</td>
+                            <td>🐢 بطيء / 📈 صيانة عالية</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Visual Regression (Screenshot)</strong></td>
+                            <td><span class="badge badge-purple">Screenshot Test</span> Local JVM</td>
+                            <td>Paparazzi أو Roborazzi</td>
+                            <td>⚡ سريع / 📊 صيانة متوسطة</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hilt Integration</strong></td>
+                            <td><span class="badge badge-orange">Integration Test</span> AndroidTest</td>
+                            <td>@HiltAndroidTest + @UninstallModules</td>
+                            <td>🐢 متوسط / 📊 صيانة متوسطة</td>
+                        </tr>
+                        <tr>
+                            <td><strong>State Restoration (Config Change)</strong></td>
+                            <td><span class="badge badge-red">UI Test</span> AndroidTest</td>
+                            <td>StateRestorationTester (Compose)</td>
+                            <td>⚡ سريع / 📉 صيانة منخفضة</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="callout callout-green" style="margin-top: 36px;">
+                    <div class="callout-icon">🧭</div>
+                    <div>
+                        <div class="callout-title">توجيهات معمارية Senior QA / Architecture</div>
+                        <p style="margin-bottom: 12px;"><strong>اختبر السلوك، لا التفاصيل التنفيذية (Test Behavior, Not Implementation Details).</strong></p>
+                        <p>الاختبارات التي تتحقق من كيفية عمل الكود (How) بدلاً من ما يفعله (What) تصبح هشة (Brittle) بسرعة. عند إعادة هيكلة الكود (Refactoring)، يجب ألا تفشل الاختبارات ما دام السلوك الخارجي لم يتغير.</p>
+                        <ul style="margin-top: 12px;">
+                            <li>تجنب التحقق من استدعاءات الطرق الداخلية (Private Methods) — اختبر الواجهة العامة (Public API).</li>
+                            <li>استخدم Fakes في طبقة البيانات و Mocks في طبقة Presentation.</li>
+                            <li>اجعل أسماء الاختبارات وصفية: <code>shouldDoSomethingWhenCondition</code>.</li>
+                            <li>اتبع ترتيب Given-When-Then في كل اختبار لزيادة القراءة.</li>
+                            <li>لا تختبر Framework Code — لا تختبر Retrofit أو Room أو Hilt نفسها.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <h3>🎯 اختبر السلوك، لا التنفيذ</h3>
+        <p>
+            الدليل الشامل لاختبارات أندرويد — من الفلسفة إلى التنفيذ.<br>
+            Test Behavior, Not Implementation Details.
+        </p>
+    </div>
+
+    <a href="#top" class="back-to-top">↑</a>
+
+    <script>
+        // Active nav highlighting on scroll
+        const sections = document.querySelectorAll('.section');
+        const navLinks = document.querySelectorAll('.nav a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

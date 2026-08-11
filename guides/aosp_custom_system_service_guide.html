@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الدليل الشامل لبناء خدمة نظام مخصصة Custom System Service في AOSP</title>
+<style>
+/* ==================== BASE & PRINT ==================== */
+@page {
+  size: A4;
+  margin: 16mm 14mm;
+  background-color: #f8fafc;
+  @top-center { content: "الدليل الشامل لبناء خدمة نظام مخصصة في AOSP — البلوك 9: اليوم 17-18"; font-size: 9pt; color: #64748b; }
+  @bottom-center { content: "صفحة " counter(page) " من " counter(pages); font-size: 9pt; color: #64748b; }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Segoe UI", "Tahoma", "Arial", sans-serif;
+  background: #f8fafc;
+  color: #1e293b;
+  line-height: 1.85;
+  font-size: 11.5pt;
+  direction: rtl;
+  text-align: right;
+}
+
+/* ==================== HEADER BANNER ==================== */
+.header-banner {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%);
+  color: #f8fafc;
+  padding: 40px 30px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(15, 23, 42, 0.25);
+}
+.header-banner::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(91,33,182,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.header-banner h1 {
+  font-size: 22pt;
+  font-weight: 800;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 1;
+  letter-spacing: -0.5px;
+}
+.header-banner .subtitle {
+  font-size: 13pt;
+  color: #94a3b8;
+  position: relative;
+  z-index: 1;
+}
+.header-banner .badge {
+  display: inline-block;
+  background: #5b21b6;
+  color: #fff;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 9pt;
+  font-weight: 700;
+  margin-top: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ==================== SECTIONS ==================== */
+.section {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 28px 26px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  border: 1px solid #e2e8f0;
+}
+.section-title {
+  font-size: 16pt;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #5b21b6;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title .num {
+  background: #5b21b6;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13pt;
+  flex-shrink: 0;
+}
+
+h3 {
+  font-size: 13pt;
+  color: #334155;
+  margin: 20px 0 10px 0;
+  font-weight: 700;
+}
+
+p {
+  margin-bottom: 14px;
+  text-align: justify;
+  color: #334155;
+}
+
+ul, ol {
+  margin: 12px 24px 16px 0;
+  padding-right: 18px;
+}
+li {
+  margin-bottom: 8px;
+  color: #334155;
+}
+
+/* ==================== CODE BLOCKS (LTR) ==================== */
+pre {
+  direction: ltr;
+  text-align: left;
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 18px 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
+  font-size: 9.5pt;
+  line-height: 1.7;
+  margin: 16px 0;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.3);
+  position: relative;
+}
+pre::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 6px;
+  left: 14px;
+  font-size: 8pt;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+code {
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
+  direction: ltr;
+  text-align: left;
+}
+.inline-code {
+  background: #f1f5f9;
+  color: #5b21b6;
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-size: 10pt;
+  direction: ltr;
+  display: inline-block;
+  unicode-bidi: embed;
+}
+
+/* Syntax highlighting colors */
+.keyword { color: #c084fc; }
+.type    { color: #38bdf8; }
+.string  { color: #a3e635; }
+.comment { color: #64748b; font-style: italic; }
+.number  { color: #fb923c; }
+.func    { color: #f472b6; }
+
+/* ==================== PATH BOX ==================== */
+.path-box {
+  direction: ltr;
+  text-align: left;
+  background: #1e293b;
+  color: #94a3b8;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-family: "Consolas", monospace;
+  font-size: 9.5pt;
+  margin: 10px 0 16px 0;
+  border-right: 4px solid #5b21b6;
+  unicode-bidi: embed;
+}
+
+/* ==================== WARNING / SECURITY CARDS ==================== */
+.warning-card {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-right: 5px solid #e11d48;
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin: 18px 0;
+}
+.warning-card .warn-title {
+  color: #e11d48;
+  font-weight: 800;
+  font-size: 12pt;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.warning-card p { color: #881337; margin-bottom: 6px; }
+
+.info-card {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-right: 5px solid #2563eb;
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin: 18px 0;
+}
+.info-card .info-title {
+  color: #1d4ed8;
+  font-weight: 800;
+  font-size: 12pt;
+  margin-bottom: 8px;
+}
+.info-card p { color: #1e3a8a; margin-bottom: 6px; }
+
+.tip-card {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-right: 5px solid #16a34a;
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin: 18px 0;
+}
+.tip-card .tip-title {
+  color: #15803d;
+  font-weight: 800;
+  font-size: 12pt;
+  margin-bottom: 8px;
+}
+.tip-card p { color: #14532d; margin-bottom: 6px; }
+
+/* ==================== ASCII DIAGRAM ==================== */
+.diagram-box {
+  direction: ltr;
+  text-align: left;
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 20px;
+  font-family: "Consolas", monospace;
+  font-size: 9pt;
+  line-height: 1.6;
+  color: #334155;
+  margin: 18px 0;
+  overflow-x: auto;
+  unicode-bidi: embed;
+}
+
+/* ==================== STEP CARDS ==================== */
+.step-card {
+  background: #faf5ff;
+  border: 1px solid #e9d5ff;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 16px 0;
+}
+.step-card h4 {
+  color: #5b21b6;
+  font-size: 12pt;
+  margin-bottom: 10px;
+  font-weight: 800;
+}
+
+/* ==================== TABLE ==================== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 10.5pt;
+}
+th {
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 12px 14px;
+  text-align: right;
+  font-weight: 700;
+}
+td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #334155;
+}
+tr:nth-child(even) { background: #f8fafc; }
+
+/* ==================== FOOTER ==================== */
+.page-footer {
+  margin-top: 40px;
+  padding: 20px;
+  text-align: center;
+  color: #64748b;
+  font-size: 9pt;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media print {
+  body { background: #fff; }
+  .section { box-shadow: none; border: 1px solid #e2e8f0; }
+  .header-banner { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== HEADER BANNER ==================== -->
+<div class="header-banner">
+  <h1>الدليل الشامل لبناء خدمة نظام مخصصة<br>Custom System Service في AOSP</h1>
+  <div class="subtitle">البلوك 9: اليوم 17-18 — من الصفر إلى الإنتاج</div>
+  <div class="badge">Android 13 / 14 — AOSP</div>
+</div>
+
+<!-- ==================== SECTION 1: ARCHITECTURE ==================== -->
+<div class="section">
+  <div class="section-title"><span class="num">١</span> معمارية خدمات النظام المخصصة</div>
+
+  <h3>لماذا نبني خدمة نظام مخصصة بدلاً من Bound Service عادي؟</h3>
+  <p>
+    عند العمل على منصة AOSP (Android Open Source Project)، قد تحتاج إلى توفير واجهة برمجية (API) تتيح للتطبيقات الوصول إلى موارد نظامية أو عتاد (Hardware) لا يمكن الوصول إليه عبر واجهات Android العامة. في هذه الحالة، الحل الأمثل هو بناء <strong>Custom System Service</strong> تعمل ضمن عملية <span class="inline-code">system_server</span> وليس كـ Service عادي داخل تطبيق.
+  </p>
+
+  <div class="info-card">
+    <div class="info-title">🔷 الفرق الجوهري</div>
+    <p>الـ Bound Service العادي يعمل ضمن <span class="inline-code">Application Process</span> ويُقتل عندما يُغلق التطبيق. أما الـ System Service فتعمل ضمن <span class="inline-code">system_server</span> وتبقى حية طوال عمر النظام، مما يوفر:</p>
+    <ul>
+      <li>وصولاً مميزاً (Privileged Access) إلى HAL و Kernel Drivers.</li>
+      <li>استمرارية (Persistence) بغض النظر عن دورة حياة التطبيقات.</li>
+      <li>حماية عبر SELinux على مستوى النظام بالكامل.</li>
+    </ul>
+  </div>
+
+  <h3>الأعمدة الخمسة لإضافة خدمة نظام</h3>
+  <p>تتكون عملية إضافة خدمة نظام مخصصة من خمسة أعمدة أساسية، يجب تنفيذها بالترتيب:</p>
+
+  <div class="diagram-box">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    معمارية Custom System Service في AOSP                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌──────────────┐     ┌──────────────┐     ┌──────────────┐               │
+│   │  AIDL        │────▶│  Manager     │────▶│  Service     │               │
+│   │  Interface   │     │  Wrapper     │     │  Impl        │               │
+│   └──────────────┘     └──────────────┘     └──────────────┘               │
+│          │                    │                    │                        │
+│          │                    │                    │                        │
+│          ▼                    ▼                    ▼                        │
+│   ┌──────────────────────────────────────────────────────────────┐         │
+│   │              Framework Registration (الخطوة 4)                │         │
+│   │  • SystemServer.java  →  startService()                      │         │
+│   │  • SystemServiceRegistry.java  →  CachedServiceFetcher       │         │
+│   └──────────────────────────────────────────────────────────────┘         │
+│                              │                                              │
+│                              ▼                                              │
+│   ┌──────────────────────────────────────────────────────────────┐         │
+│   │              SELinux & Build System (الخطوة 5)                │         │
+│   │  • service_contexts  • sepolicy  • Android.bp  • make        │         │
+│   └──────────────────────────────────────────────────────────────┘         │
+│                              │                                              │
+│                              ▼                                              │
+│   ┌──────────────────────────────────────────────────────────────┐         │
+│   │              Application Usage (الخطوة 6)                     │         │
+│   │  context.getSystemService(Context.CUSTOM_HARDWARE_SERVICE)   │         │
+│   └──────────────────────────────────────────────────────────────┘         │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+  </div>
+
+  <table>
+    <tr>
+      <th>العمود</th>
+      <th>الملف / المكون</th>
+      <th>الوظيفة</th>
+    </tr>
+    <tr>
+      <td>١. AIDL Interface</td>
+      <td><span class="inline-code">ICustomHardwareService.aidl</span></td>
+      <td>تعريف العقد (Contract) بين العميل والخادم عبر Binder IPC</td>
+    </tr>
+    <tr>
+      <td>٢. Manager Wrapper</td>
+      <td><span class="inline-code">CustomHardwareManager.java</span></td>
+      <td>غلاف برمجي يخفي تعقيد Binder عن التطبيقات</td>
+    </tr>
+    <tr>
+      <td>٣. Service Implementation</td>
+      <td><span class="inline-code">CustomHardwareService.java</span></td>
+      <td>التنفيذ الفعلي للخدمة داخل <span class="inline-code">system_server</span></td>
+    </tr>
+    <tr>
+      <td>٤. Framework Registration</td>
+      <td><span class="inline-code">SystemServer.java</span> + <span class="inline-code">SystemServiceRegistry.java</span></td>
+      <td>تسجيل الخدمة وربطها بـ Context</td>
+    </tr>
+    <tr>
+      <td>٥. SELinux & Build</td>
+      <td><span class="inline-code">service_contexts</span> + <span class="inline-code">sepolicy</span> + <span class="inline-code">Android.bp</span></td>
+      <td>سياسات الأمان ونظام البناء</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ==================== SECTION 2: AIDL + MANAGER ==================== -->
+<div class="section">
+  <div class="section-title"><span class="num">٢</span> تعريف الواجهة وبناء الـ Manager</div>
+
+  <h3>الخطوة ٢.١: إنشاء ملف AIDL</h3>
+  <p>
+    يبدأ كل شيء بتعريف الواجهة عبر AIDL (Android Interface Definition Language). هذا الملف هو العقد الرسمي بين العميل (التطبيق) والخادم (System Service). يجب وضعه في المسار الصحيح ضمن <span class="inline-code">frameworks/base/</span> ليتم بناؤه كجزء من الـ SDK الداخلي.
+  </p>
+
+  <div class="path-box">frameworks/base/core/java/android/os/ICustomHardwareService.aidl</div>
+
+  <pre data-lang="AIDL"><code><span class="comment">// ICustomHardwareService.aidl</span>
+<span class="comment">// واجهة AIDL للوصول إلى العتاد المخصص عبر System Service</span>
+
+<span class="keyword">package</span> android.os;
+
+<span class="comment">// واجهة Binder IPC لتفعيل إجراءات العتاد المخصص</span>
+<span class="keyword">interface</span> <span class="type">ICustomHardwareService</span> {
+
+    <span class="comment">// تفعيل إجراء على العتاد وإرجاع حالة التنفيذ</span>
+    <span class="keyword">boolean</span> <span class="func">triggerHardwareAction</span>(<span class="keyword">int</span> actionId);
+
+    <span class="comment">// قراءة قيمة استشعار (Sensor) مخصص</span>
+    <span class="keyword">int</span> <span class="func">readSensorValue</span>(<span class="keyword">int</span> sensorType);
+
+    <span class="comment">// تعيين معامل تشغيلي للعتاد</span>
+    <span class="keyword">void</span> <span class="func">setHardwareParameter</span>(<span class="keyword">in</span> String key, <span class="keyword">int</span> value);
+
+    <span class="comment">// الحصول على إصدار البرنامج الثابت للعتاد</span>
+    String <span class="func">getFirmwareVersion</span>();
+}</code></pre>
+
+  <div class="tip-card">
+    <div class="tip-title">💡 نصيحة هامة</div>
+    <p>يجب التأكد من أن الـ Package Name يبدأ بـ <span class="inline-code">android.os</span> أو <span class="inline-code">android.app</span> ليتم تضمينه تلقائياً في الـ Stubs التي يولدها AIDL Compiler ضمن بنية الـ Framework.</p>
+  </div>
+
+  <h3>الخطوة ٢.٢: إنشاء الـ Manager Wrapper</h3>
+  <p>
+    الـ <span class="inline-code">CustomHardwareManager</span> هو الغلاف البرمجي (Proxy Wrapper) الذي تتعامل معه التطبيقات. يخفي هذا المدير تعقيدات استدعاءات Binder المباشرة ويوفر واجهة برمجية نظيفة وآمنة. يعمل كنمط <strong>Manager Pattern</strong> المعتاد في Android (مثل <span class="inline-code">LocationManager</span>، <span class="inline-code">SensorManager</span>).
+  </p>
+
+  <div class="path-box">frameworks/base/core/java/android/app/CustomHardwareManager.java</div>
+
+  <pre data-lang="Java"><code><span class="comment">// CustomHardwareManager.java</span>
+<span class="comment">// الغلاف البرمجي العام (Public API) للتطبيقات للوصول إلى خدمة العتاد المخصص</span>
+
+<span class="keyword">package</span> android.app;
+
+<span class="keyword">import</span> android.annotation.SystemApi;
+<span class="keyword">import</span> android.content.Context;
+<span class="keyword">import</span> android.os.ICustomHardwareService;
+<span class="keyword">import</span> android.os.RemoteException;
+<span class="keyword">import</span> android.util.Log;
+
+<span class="comment">/**
+ * CustomHardwareManager - مدير الوصول إلى العتاد المخصص
+ *
+ * يتم إنشاء هذا الكائن عبر SystemServiceRegistry ويتم تمريره
+ * للتطبيقات عند استدعاء context.getSystemService().
+ */</span>
+<span class="keyword">public class</span> <span class="type">CustomHardwareManager</span> {
+
+    <span class="keyword">private static final</span> String <span class="type">TAG</span> = <span class="string">"CustomHardwareManager"</span>;
+
+    <span class="comment">// مرجع إلى الـ Binder Interface (AIDL Stub Proxy)</span>
+    <span class="keyword">private final</span> ICustomHardwareService <span class="type">mService</span>;
+
+    <span class="comment">// يتم استدعاء هذا المنشئ داخلياً من SystemServiceRegistry</span>
+    <span class="func">CustomHardwareManager</span>(Context context, ICustomHardwareService service) {
+        <span class="type">mService</span> = service;
+    }
+
+    <span class="comment">/**
+     * تفعيل إجراء على العتاد المخصص.
+     *
+     * @param actionId معرف الإجراء المراد تنفيذه
+     * @return true إذا نجح التنفيذ، false خلاف ذلك
+     */</span>
+    <span class="keyword">public boolean</span> <span class="func">triggerHardwareAction</span>(<span class="keyword">int</span> actionId) {
+        <span class="keyword">try</span> {
+            <span class="keyword">return</span> <span class="type">mService</span>.<span class="func">triggerHardwareAction</span>(actionId);
+        } <span class="keyword">catch</span> (RemoteException e) {
+            Log.<span class="func">e</span>(<span class="type">TAG</span>, <span class="string">"فشل استدعاء triggerHardwareAction عبر Binder"</span>, e);
+            <span class="keyword">return</span> <span class="keyword">false</span>;
+        }
+    }
+
+    <span class="comment">/**
+     * قراءة قيمة استشعار مخصص.
+     */</span>
+    <span class="keyword">public int</span> <span class="func">readSensorValue</span>(<span class="keyword">int</span> sensorType) {
+        <span class="keyword">try</span> {
+            <span class="keyword">return</span> <span class="type">mService</span>.<span class="func">readSensorValue</span>(sensorType);
+        } <span class="keyword">catch</span> (RemoteException e) {
+            Log.<span class="func">e</span>(<span class="type">TAG</span>, <span class="string">"فشل قراءة قيمة الاستشعار"</span>, e);
+            <span class="keyword">return</span> -<span class="number">1</span>;
+        }
+    }
+
+    <span class="comment">/**
+     * تعيين معامل تشغيلي للعتاد.
+     */</span>
+    <span class="keyword">public void</span> <span class="func">setHardwareParameter</span>(String key, <span class="keyword">int</span> value) {
+        <span class="keyword">try</span> {
+            <span class="type">mService</span>.<span class="func">setHardwareParameter</span>(key, value);
+        } <span class="keyword">catch</span> (RemoteException e) {
+            Log.<span class="func">e</span>(<span class="type">TAG</span>, <span class="string">"فشل تعيين المعامل التشغيلي"</span>, e);
+        }
+    }
+
+    <span class="comment">/**
+     * الحصول على إصدار البرنامج الثابت للعتاد.
+     */</span>
+    <span class="keyword">public</span> String <span class="func">getFirmwareVersion</span>() {
+        <span class="keyword">try</span> {
+            <span class="keyword">return</span> <span class="type">mService</span>.<span class="func">getFirmwareVersion</span>();
+        } <span class="keyword">catch</span> (RemoteException e) {
+            Log.<span class="func">e</span>(<span class="type">TAG</span>, <span class="string">"فشل الحصول على إصدار البرنامج الثابت"</span>, e);
+            <span class="keyword">return</span> <span class="string">"unknown"</span>;
+        }
+    }
+}</code></pre>
+
+  <h3>الخطوة ٢.٣: إضافة الثابت إلى Context.java</h3>
+  <p>
+    لكي تتمكن التطبيقات من استدعاء الخدمة عبر <span class="inline-code">getSystemService()</span>، يجب تعريف ثابت فريد (Service Constant) داخل صنف <span class="inline-code">Context</span>. هذا الثابت هو المفتاح الذي يستخدمه <span class="inline-code">SystemServiceRegistry</span> لربط الاسم بكائن الـ Manager.
+  </p>
+
+  <div class="path-box">frameworks/base/core/java/android/content/Context.java</div>
+
+  <pre data-lang="Java"><code><span class="keyword">public abstract class</span> <span class="type">Context</span> {
+
+    <span class="comment">// ... الأثبات الموجودة مسبقاً ...</span>
+
+    <span class="comment">/**
+     * Use with {@link #getSystemService} to retrieve a
+     * {@link android.app.CustomHardwareManager} for accessing custom hardware.
+     *
+     * @see #getSystemService
+     * @see android.app.CustomHardwareManager
+     */</span>
+    <span class="keyword">public static final</span> String <span class="type">CUSTOM_HARDWARE_SERVICE</span> = <span class="string">"custom_hardware"</span>;
+
+    <span class="comment">// ... باقي الأثبات ...</span>
+}</code></pre>
+
+  <div class="warning-card">
+    <div class="warn-title">⚠️ تحذير أمني</div>
+    <p>يجب أن يكون اسم الخدمة (مثل <span class="inline-code">"custom_hardware"</span>) فريداً عالمياً ولا يتعارض مع أي خدمة نظام أخرى. يُفضل استخدام بادئة تحدد الشركة المصنعة (OEM) لتجنب التعارضات في التحديثات المستقبلية.</p>
+  </div>
+</div>
+
+<!-- ==================== SECTION 3: SERVICE IMPLEMENTATION ==================== -->
+<div class="section">
+  <div class="section-title"><span class="num">٣</span> برمجة الخدمة داخل الخادم</div>
+
+  <h3>الخطوة ٣.١: تنفيذ SystemService</h3>
+  <p>
+    الآن نصل إلى القلب النابض للعملية: تنفيذ الخدمة الفعلية التي تعمل داخل عملية <span class="inline-code">system_server</span>. يجب أن يمتد هذا الصنف من <span class="inline-code">SystemService</span> ويُسجّل نفسه كـ Binder Service عبر <span class="inline-code">publishBinderService()</span>.
+  </p>
+
+  <div class="path-box">frameworks/base/services/core/java/com/android/server/CustomHardwareService.java</div>
+
+  <pre data-lang="Java"><code><span class="comment">// CustomHardwareService.java</span>
+<span class="comment">// التنفيذ الداخلي لخدمة العتاد المخصص داخل system_server</span>
+
+<span class="keyword">package</span> com.android.server;
+
+<span class="keyword">import</span> android.app.CustomHardwareManager;
+<span class="keyword">import</span> android.content.Context;
+<span class="keyword">import</span> android.os.Binder;
+<span class="keyword">import</span> android.os.ICustomHardwareService;
+<span class="keyword">import</span> android.os.RemoteException;
+<span class="keyword">import</span> android.util.Log;
+
+<span class="keyword">import</span> com.android.server.SystemService;
+
+<span class="comment">/**
+ * CustomHardwareService - خدمة النظام المخصصة للعتاد
+ *
+ * تعمل هذه الخدمة داخل عملية system_server وتتولى:
+ * 1. التسجيل كـ Binder Service عبر ServiceManager
+ * 2. التحقق من صلاحيات التطبيقات (Permission Checks)
+ * 3. التواصل مع HAL أو Kernel Driver للوصول الفعلي إلى العتاد
+ */</span>
+<span class="keyword">public class</span> <span class="type">CustomHardwareService</span> <span class="keyword">extends</span> SystemService {
+
+    <span class="keyword">private static final</span> String <span class="type">TAG</span> = <span class="string">"CustomHardwareService"</span>;
+    <span class="keyword">private static final</span> String <span class="type">PERMISSION_ACCESS_CUSTOM_HW</span>
+            = <span class="string">"android.permission.ACCESS_CUSTOM_HARDWARE"</span>;
+
+    <span class="keyword">private final</span> Context <span class="type">mContext</span>;
+
+    <span class="comment">// Binder Stub - التنفيذ الفعلي لواجهة AIDL</span>
+    <span class="keyword">private final</span> ICustomHardwareService.Stub <span class="type">mBinder</span> = <span class="keyword">new</span> ICustomHardwareService.Stub() {
+
+        <span class="keyword">@Override</span>
+        <span class="keyword">public boolean</span> <span class="func">triggerHardwareAction</span>(<span class="keyword">int</span> actionId) <span class="keyword">throws</span> RemoteException {
+            <span class="func">enforceCustomHardwarePermission</span>();
+            Log.<span class="func">i</span>(<span class="type">TAG</span>, <span class="string">"تفعيل الإجراء: "</span> + actionId);
+
+            <span class="comment">// TODO: استدعاء HAL أو Kernel Driver هنا</span>
+            <span class="comment">// مثال: mHal.triggerAction(actionId);</span>
+
+            <span class="keyword">return</span> <span class="keyword">true</span>;
+        }
+
+        <span class="keyword">@Override</span>
+        <span class="keyword">public int</span> <span class="func">readSensorValue</span>(<span class="keyword">int</span> sensorType) <span class="keyword">throws</span> RemoteException {
+            <span class="func">enforceCustomHardwarePermission</span>();
+            Log.<span class="func">i</span>(<span class="type">TAG</span>, <span class="string">"قراءة الاستشعار: "</span> + sensorType);
+
+            <span class="comment">// TODO: قراءة القيمة من العتاد</span>
+            <span class="keyword">return</span> <span class="number">42</span>; <span class="comment">// قيمة تجريبية</span>
+        }
+
+        <span class="keyword">@Override</span>
+        <span class="keyword">public void</span> <span class="func">setHardwareParameter</span>(String key, <span class="keyword">int</span> value) <span class="keyword">throws</span> RemoteException {
+            <span class="func">enforceCustomHardwarePermission</span>();
+            Log.<span class="func">i</span>(<span class="type">TAG</span>, <span class="string">"تعيين المعامل: "</span> + key + <span class="string">" = "</span> + value);
+
+            <span class="comment">// TODO: تطبيق المعامل على العتاد</span>
+        }
+
+        <span class="keyword">@Override</span>
+        <span class="keyword">public</span> String <span class="func">getFirmwareVersion</span>() <span class="keyword">throws</span> RemoteException {
+            <span class="func">enforceCustomHardwarePermission</span>();
+
+            <span class="comment">// TODO: قراءة الإصدار من العتاد</span>
+            <span class="keyword">return</span> <span class="string">"v1.2.3-custom"</span>;
+        }
+    };
+
+    <span class="comment">// ───────────────────────────────────────────────</span>
+    <span class="comment">// منشئ الخدمة - يتم استدعاؤه من SystemServer</span>
+    <span class="comment">// ───────────────────────────────────────────────</span>
+    <span class="keyword">public</span> <span class="func">CustomHardwareService</span>(Context context) {
+        <span class="keyword">super</span>(context);
+        <span class="type">mContext</span> = context;
+    }
+
+    <span class="comment">// ───────────────────────────────────────────────</span>
+    <span class="comment">// onStart() - نقطة البداية عند تشغيل الخدمة</span>
+    <span class="comment">// ───────────────────────────────────────────────</span>
+    <span class="keyword">@Override</span>
+    <span class="keyword">public void</span> <span class="func">onStart</span>() {
+        Log.<span class="func">i</span>(<span class="type">TAG</span>, <span class="string">"بدء تشغيل CustomHardwareService..."</span>);
+
+        <span class="comment">// نشر الـ Binder Service في ServiceManager</span>
+        <span class="comment">// الاسم هنا يجب أن يطابق Context.CUSTOM_HARDWARE_SERVICE</span>
+        <span class="func">publishBinderService</span>(Context.<span class="type">CUSTOM_HARDWARE_SERVICE</span>, <span class="type">mBinder</span>);
+
+        Log.<span class="func">i</span>(<span class="type">TAG</span>, <span class="string">"CustomHardwareService تم تسجيله بنجاح في ServiceManager"</span>);
+    }
+
+    <span class="comment">// ───────────────────────────────────────────────</span>
+    <span class="comment">// التحقق من صلاحيات الوصول إلى العتاد المخصص</span>
+    <span class="comment">// ───────────────────────────────────────────────</span>
+    <span class="keyword">private void</span> <span class="func">enforceCustomHardwarePermission</span>() {
+        <span class="type">mContext</span>.<span class="func">enforceCallingOrSelfPermission</span>(
+                <span class="type">PERMISSION_ACCESS_CUSTOM_HW</span>,
+                <span class="string">"يتطلب إذن ACCESS_CUSTOM_HARDWARE"</span>
+        );
+    }
+}</code></pre>
+
+  <div class="info-card">
+    <div class="info-title">🔷 آلية Permission Check</div>
+    <p>تستخدم <span class="inline-code">enforceCallingOrSelfPermission()</span> للتحقق من أن التطبيق الذي يستدعي الخدمة يملك الإذن المطلوب. هذا الإذن يجب تعريفه في <span class="inline-code">frameworks/base/core/res/AndroidManifest.xml</span> كـ <span class="inline-code">&lt;permission&gt;</span> على مستوى النظام (signature أو system).</p>
+  </div>
+
+  <h3>الخطوة ٣.٢: تعريف الإذن في AndroidManifest.xml</h3>
+
+  <div class="path-box">frameworks/base/core/res/AndroidManifest.xml</div>
+
+  <pre data-lang="XML"><code><span class="comment">&lt;!-- إذن الوصول إلى العتاد المخصص - يقتصر على تطبيقات النظام --&gt;</span>
+&lt;<span class="keyword">permission</span> <span class="type">android:name</span>=<span class="string">"android.permission.ACCESS_CUSTOM_HARDWARE"</span>
+    <span class="type">android:label</span>=<span class="string">"@string/permlab_accessCustomHardware"</span>
+    <span class="type">android:description</span>=<span class="string">"@string/permdesc_accessCustomHardware"</span>
+    <span class="type">android:protectionLevel</span>=<span class="string">"signature|privileged"</span> /&gt;</code></pre>
+
+  <div class="warning-card">
+    <div class="warn-title">⚠️ مستوى الحماية (Protection Level)</div>
+    <p>استخدام <span class="inline-code">signature|privileged</span> يضمن أن فقط التطبيقات الموقعة بنفس شهادة النظام أو الموجودة في <span class="inline-code">/system/priv-app</span> يمكنها الحصول على هذا الإذن. لا تستخدم <span class="inline-code">normal</span> أبداً لخدمات النظام الحساسة.</p>
+  </div>
+</div>
+
+<!-- ==================== SECTION 4: FRAMEWORK REGISTRATION ==================== -->
+<div class="section">
+  <div class="section-title"><span class="num">٤</span> تسجيل الخدمة في الفريمورك</div>
+
+  <h3>الخطوة ٤.١: تعديل SystemServer.java</h3>
+  <p>
+    ملف <span class="inline-code">SystemServer.java</span> هو نقطة انطلاق جميع خدمات النظام. يجب إضافة سطر لبدء خدمتنا ضمن الدالة الرئيسية <span class="inline-code">startOtherServices()</span> أو أي قسم مناسب حسب تبعيات الخدمة.
+  </p>
+
+  <div class="path-box">frameworks/base/services/java/com/android/server/SystemServer.java</div>
+
+  <pre data-lang="Java"><code><span class="keyword">private void</span> <span class="func">startOtherServices</span>(<span class="keyword">@NonNull</span> TimingsTraceAndSlog t) {
+    <span class="comment">// ... الخدمات الأخرى ...</span>
+
+    <span class="comment">// ───────────────────────────────────────────────</span>
+    <span class="comment">// تشغيل خدمة العتاد المخصصة</span>
+    <span class="comment">// ───────────────────────────────────────────────</span>
+    t.<span class="func">traceBegin</span>(<span class="string">"StartCustomHardwareService"</span>);
+    <span class="keyword">try</span> {
+        mSystemServiceManager.<span class="func">startService</span>(CustomHardwareService.<span class="keyword">class</span>);
+    } <span class="keyword">catch</span> (Throwable e) {
+        Slog.<span class="func">e</span>(<span class="string">"System"</span>, <span class="string">"فشل تشغيل CustomHardwareService"</span>, e);
+    }
+    t.<span class="func">traceEnd</span>();
+
+    <span class="comment">// ... باقي الخدمات ...</span>
+}</code></pre>
+
+  <div class="tip-card">
+    <div class="tip-title">💡 ترتيب التشغيل</div>
+    <p>ضع خدمتك في الترتيب المناسب. إذا كانت خدمتك تعتمد على <span class="inline-code">ActivityManagerService</span> أو <span class="inline-code">PackageManagerService</span>، تأكد من تشغيلها بعد هذه الخدمات. يمكنك أيضاً استخدام <span class="inline-code">startService(..., /* dependencies */)</span> إذا كنت تستخدم إصداراً يدعم ذلك.</p>
+  </div>
+
+  <h3>الخطوة ٤.٢: تعديل SystemServiceRegistry.java</h3>
+  <p>
+    هذا الملف هو "الجسر" الذي يربط بين اسم الخدمة (مثل <span class="inline-code">Context.CUSTOM_HARDWARE_SERVICE</span>) والكائن الفعلي (<span class="inline-code">CustomHardwareManager</span>). يستخدم نمط <span class="inline-code">CachedServiceFetcher</span> لإعادة استخدام نفس كائن الـ Manager لكل سياق (Context).
+  </p>
+
+  <div class="path-box">frameworks/base/core/java/android/app/SystemServiceRegistry.java</div>
+
+  <pre data-lang="Java"><code><span class="keyword">final class</span> <span class="type">SystemServiceRegistry</span> {
+
+    <span class="comment">// ... التسجيلات الموجودة مسبقاً ...</span>
+
+    <span class="keyword">static</span> {
+        <span class="comment">// ... الخدمات الأخرى ...</span>
+
+        <span class="comment">// ───────────────────────────────────────────────</span>
+        <span class="comment">// تسجيل خدمة العتاد المخصصة</span>
+        <span class="comment">// ───────────────────────────────────────────────</span>
+        <span class="func">registerService</span>(Context.<span class="type">CUSTOM_HARDWARE_SERVICE</span>,
+                CustomHardwareManager.<span class="keyword">class</span>,
+                <span class="keyword">new</span> CachedServiceFetcher&lt;CustomHardwareManager&gt;() {
+            <span class="keyword">@Override</span>
+            <span class="keyword">public</span> CustomHardwareManager <span class="func">createService</span>(ContextImpl ctx)
+                    <span class="keyword">throws</span> ServiceNotFoundException {
+
+                <span class="comment">// الحصول على الـ Binder Interface من ServiceManager</span>
+                IBinder b = ServiceManager.<span class="func">getServiceOrThrow</span>(
+                        Context.<span class="type">CUSTOM_HARDWARE_SERVICE</span>);
+
+                <span class="comment">// إنشاء الـ Manager وتمرير الـ Proxy</span>
+                ICustomHardwareService service =
+                        ICustomHardwareService.Stub.<span class="func">asInterface</span>(b);
+
+                <span class="keyword">return new</span> CustomHardwareManager(ctx, service);
+            }
+        });
+
+        <span class="comment">// ... باقي التسجيلات ...</span>
+    }
+}</code></pre>
+
+  <div class="diagram-box">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│               تدفق البيانات: من التطبيق إلى العتاد                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   [التطبيق]                                                                 │
+│       │                                                                     │
+│       │  context.getSystemService(Context.CUSTOM_HARDWARE_SERVICE)          │
+│       ▼                                                                     │
+│   [SystemServiceRegistry] ──▶ [CachedServiceFetcher]                        │
+│       │                                                                     │
+│       │  ServiceManager.getService("custom_hardware")                       │
+│       ▼                                                                     │
+│   [ServiceManager] ──▶ Binder Lookup in service_contexts                   │
+│       │                                                                     │
+│       ▼                                                                     │
+│   [CustomHardwareService] (داخل system_server)                              │
+│       │                                                                     │
+│       │  triggerHardwareAction()                                            │
+│       ▼                                                                     │
+│   [HAL / Kernel Driver] ──▶ [العتاد الفعلي]                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+  </div>
+</div>
+
+<!-- ==================== SECTION 5: SELINUX & BUILD ==================== -->
+<div class="section">
+  <div class="section-title"><span class="num">٥</span> سياسات الأمان SELinux ونظام البناء</div>
+
+  <h3>الخطوة ٥.١: إضافة الخدمة إلى service_contexts</h3>
+  <p>
+    ملف <span class="inline-code">service_contexts</span> يُخبر <span class="inline-code">servicemanager</span> بأنواع SELinux المرتبطة بكل خدمة Binder. بدون هذا التسجيل، سيرفض SELinux الوصول إلى الخدمة.
+  </p>
+
+  <div class="path-box">frameworks/base/core/java/android/content/Context.java</div>
+  <p style="color:#64748b; font-size:10pt;">(أو device-specific: device/&lt;vendor&gt;/&lt;board&gt;/sepolicy/vendor/service_contexts)</p>
+
+  <pre data-lang="TE"><code><span class="comment"># service_contexts - تعيين أنواع SELinux لخدمات Binder</span>
+<span class="comment"># يجب إضافة السطر التالي:</span>
+
+custom_hardware    u:object_r:custom_hardware_service:s0</code></pre>
+
+  <h3>الخطوة ٥.٢: تعريف النوع (Type) في SELinux</h3>
+
+  <div class="path-box">device/&lt;vendor&gt;/&lt;board&gt;/sepolicy/vendor/service.te</div>
+
+  <pre data-lang="TE"><code><span class="comment"># تعريف نوع الخدمة المخصصة</span>
+<span class="keyword">type</span> custom_hardware_service, <span class="type">service_manager_type</span>;</code></pre>
+
+  <h3>الخطوة ٥.٣: منح الصلاحيات (Permissions)</h3>
+
+  <div class="path-box">device/&lt;vendor&gt;/&lt;board&gt;/sepolicy/vendor/system_server.te</div>
+
+  <pre data-lang="TE"><code><span class="comment"># السماح لـ system_server بإضافة (add) وإيجاد (find) الخدمة</span>
+<span class="keyword">allow</span> system_server custom_hardware_service:<span class="type">service_manager</span> { <span class="func">add find</span> };</code></pre>
+
+  <div class="path-box">device/&lt;vendor&gt;/&lt;board&gt;/sepolicy/vendor/app.te</div>
+
+  <pre data-lang="TE"><code><span class="comment"># السماح للتطبيقات (المميزة) بالعثور على الخدمة</span>
+<span class="keyword">allow</span> untrusted_app custom_hardware_service:<span class="type">service_manager</span> <span class="func">find</span>;
+<span class="keyword">allow</span> system_app custom_hardware_service:<span class="type">service_manager</span> <span class="func">find</span>;</code></pre>
+
+  <div class="warning-card">
+    <div class="warn-title">⚠️ أخطاء SELinux الشائعة</div>
+    <p>إذا نسيت أي من الخطوات السابقة، ستواجه أحد الأخطاء التالية في <span class="inline-code">logcat</span>:</p>
+    <ul>
+      <li><strong>avc: denied { add }</strong> — system_server لا يملك صلاحية إضافة الخدمة.</li>
+      <li><strong>avc: denied { find }</strong> — التطبيق لا يملك صلاحية العثور على الخدمة.</li>
+      <li><strong>ServiceManager: Permission failure</strong> — الخدمة غير مسجلة في <span class="inline-code">service_contexts</span>.</li>
+    </ul>
+  </div>
+
+  <h3>الخطوة ٥.٤: تحديث Android.bp</h3>
+  <p>
+    تأكد من تضمين ملفات AIDL في قواعد البناء. في Android 13/14، يتم ذلك عادةً تلقائياً إذا كان الملف في المسار الصحيح ضمن <span class="inline-code">frameworks/base/</span>، لكن قد تحتاج إلى تحديث <span class="inline-code">Android.bp</span> إذا كنت تستخدم مساراً مخصصاً.
+  </p>
+
+  <div class="path-box">frameworks/base/Android.bp (أو Android.mk للإصدارات القديمة)</div>
+
+  <pre data-lang="Blueprint"><code><span class="comment">// التأكد من تضمين ملفات AIDL في srcs</span>
+java_defaults {
+    name: <span class="string">"framework-defaults"</span>,
+    srcs: [
+        <span class="string">"core/java/android/os/ICustomHardwareService.aidl"</span>,
+        <span class="comment">// ... الملفات الأخرى ...</span>
+    ],
+}</code></pre>
+
+  <h3>الخطوة ٥.٥: أوامر البناء</h3>
+
+  <pre data-lang="Bash"><code><span class="comment"># 1. تحديث واجهات برمجة التطبيقات (API Stubs)</span>
+$ make update-api
+
+<span class="comment"># 2. بناء الـ Framework بأكمله</span>
+$ make framework -j$(nproc)
+
+<span class="comment"># 3. بناء خدمات النظام</span>
+$ make services -j$(nproc)
+
+<span class="comment"># 4. بناء SELinux Policies</span>
+$ make sepolicy -j$(nproc)
+
+<span class="comment"># 5. تثبيت النتيجة على الجهاز (اختياري)</span>
+$ adb root && adb remount
+$ adb sync
+$ adb reboot</code></pre>
+
+  <div class="tip-card">
+    <div class="tip-title">💡 تلميح للبناء السريع</div>
+    <p>للتطوير السريع، يمكنك بناء فقط <span class="inline-code">framework.jar</span> و <span class="inline-code">services.jar</span> ثم دفعهما عبر <span class="inline-code">adb sync</span> دون إعادة بناء النظام بالكامل. لكن تذكر أن تغييرات AIDL تتطلب إعادة بناء كاملة.</p>
+  </div>
+</div>
+
+<!-- ==================== SECTION 6: APP USAGE ==================== -->
+<div class="section">
+  <div class="section-title"><span class="num">٦</span> استدعاء الخدمة من التطبيقات</div>
+
+  <h3>كيفية استخدام الخدمة في تطبيق Android</h3>
+  <p>
+    بعد بناء النظام وإعادة تشغيله، يمكن لأي تطبيق يملك الإذن <span class="inline-code">android.permission.ACCESS_CUSTOM_HARDWARE</span> الوصول إلى الخدمة بنفس طريقة الوصول إلى أي خدمة نظام أخرى.
+  </p>
+
+  <div class="path-box">MyApplication.java (تطبيق النظام في /system/priv-app)</div>
+
+  <pre data-lang="Java"><code><span class="keyword">package</span> com.example.myapp;
+
+<span class="keyword">import</span> android.app.Activity;
+<span class="keyword">import</span> android.app.CustomHardwareManager;
+<span class="keyword">import</span> android.content.Context;
+<span class="keyword">import</span> android.os.Bundle;
+<span class="keyword">import</span> android.util.Log;
+
+<span class="keyword">public class</span> <span class="type">MainActivity</span> <span class="keyword">extends</span> Activity {
+
+    <span class="keyword">private static final</span> String <span class="type">TAG</span> = <span class="string">"MyApp"</span>;
+
+    <span class="keyword">@Override</span>
+    <span class="keyword">protected void</span> <span class="func">onCreate</span>(Bundle savedInstanceState) {
+        <span class="keyword">super</span>.<span class="func">onCreate</span>(savedInstanceState);
+        <span class="func">setContentView</span>(R.layout.activity_main);
+
+        <span class="comment">// ───────────────────────────────────────────────</span>
+        <span class="comment">// الحصول على CustomHardwareManager عبر Context</span>
+        <span class="comment">// ───────────────────────────────────────────────</span>
+        CustomHardwareManager manager =
+                (CustomHardwareManager) <span class="func">getSystemService</span>(
+                        Context.<span class="type">CUSTOM_HARDWARE_SERVICE</span>);
+
+        <span class="keyword">if</span> (manager != <span class="keyword">null</span>) {
+            <span class="comment">// تفعيل إجراء على العتاد</span>
+            <span class="keyword">boolean</span> success = manager.<span class="func">triggerHardwareAction</span>(<span class="number">1</span>);
+            Log.<span class="func">d</span>(<span class="type">TAG</span>, <span class="string">"نتيجة التفعيل: "</span> + success);
+
+            <span class="comment">// قراءة قيمة استشعار</span>
+            <span class="keyword">int</span> sensorValue = manager.<span class="func">readSensorValue</span>(<span class="number">0</span>);
+            Log.<span class="func">d</span>(<span class="type">TAG</span>, <span class="string">"قيمة الاستشعار: "</span> + sensorValue);
+
+            <span class="comment">// تعيين معامل</span>
+            manager.<span class="func">setHardwareParameter</span>(<span class="string">"brightness"</span>, <span class="number">80</span>);
+
+            <span class="comment">// الحصول على إصدار البرنامج الثابت</span>
+            String version = manager.<span class="func">getFirmwareVersion</span>();
+            Log.<span class="func">d</span>(<span class="type">TAG</span>, <span class="string">"إصدار البرنامج الثابت: "</span> + version);
+        } <span class="keyword">else</span> {
+            Log.<span class="func">e</span>(<span class="type">TAG</span>, <span class="string">"CustomHardwareManager غير متوفر!"</span>);
+        }
+    }
+}</code></pre>
+
+  <h3>تسجيل الإذن في AndroidManifest.xml للتطبيق</h3>
+
+  <pre data-lang="XML"><code>&lt;<span class="keyword">manifest</span> ...&gt;
+
+    <span class="comment">&lt;!-- طلب إذن الوصول إلى العتاد المخصص --&gt;</span>
+    &lt;<span class="keyword">uses-permission</span> <span class="type">android:name</span>=<span class="string">"android.permission.ACCESS_CUSTOM_HARDWARE"</span> /&gt;
+
+    &lt;<span class="keyword">application</span> ...&gt;
+        &lt;<span class="keyword">activity</span> <span class="type">android:name</span>=<span class="string">".MainActivity"</span>&gt;
+            &lt;<span class="keyword">intent-filter</span>&gt;
+                &lt;<span class="keyword">action</span> <span class="type">android:name</span>=<span class="string">"android.intent.action.MAIN"</span> /&gt;
+                &lt;<span class="keyword">category</span> <span class="type">android:name</span>=<span class="string">"android.intent.category.LAUNCHER"</span> /&gt;
+            &lt;/<span class="keyword">intent-filter</span>&gt;
+        &lt;/<span class="keyword">activity</span>&gt;
+    &lt;/<span class="keyword">application</span>&gt;
+
+&lt;/<span class="keyword">manifest</span>&gt;</code></pre>
+</div>
+
+<!-- ==================== SECTION 7: DIAGNOSTICS ==================== -->
+<div class="section">
+  <div class="section-title"><span class="num">٧</span> التشخيص واستكشاف الأخطاء</div>
+
+  <h3>أوامر التشخيص الأساسية</h3>
+
+  <pre data-lang="Bash"><code><span class="comment"># التحقق من تسجيل الخدمة في ServiceManager</span>
+$ adb shell service list | grep custom_hardware
+
+<span class="comment"># مراقبة سجلات system_server عند بدء التشغيل</span>
+$ adb logcat -s CustomHardwareService:SystemServer *:S
+
+<span class="comment"># فحص أخطاء SELinux (AVC Denials)</span>
+$ adb shell dmesg | grep avc
+$ adb shell logcat -b events | grep avc
+
+<span class="comment"># التحقق من أن الـ Context Constant متاح</span>
+$ adb shell cmd activity service custom_hardware
+
+<span class="comment"># إعادة تحميل SELinux Policies (للتطوير فقط)</span>
+$ adb shell setenforce 0  <span class="comment"># وضع Permissive (غير آمن للإنتاج)</span></code></pre>
+
+  <h3>جدول الأخطاء الشائعة والحلول</h3>
+
+  <table>
+    <tr>
+      <th>الخطأ</th>
+      <th>السبب المحتمل</th>
+      <th>الحل</th>
+    </tr>
+    <tr>
+      <td><span class="inline-code">ServiceNotFoundException</span></td>
+      <td>الخدمة غير مسجلة في <span class="inline-code">SystemServiceRegistry</span></td>
+      <td>تحقق من تسجيل <span class="inline-code">CachedServiceFetcher</span></td>
+    </tr>
+    <tr>
+      <td><span class="inline-code">SecurityException</span></td>
+      <td>التطبيق لا يملك الإذن المطلوب</td>
+      <td>تأكد من <span class="inline-code">protectionLevel</span> وموقع التطبيق في <span class="inline-code">/system/priv-app</span></td>
+    </tr>
+    <tr>
+      <td><span class="inline-code">avc: denied { add }</span></td>
+      <td>SELinux يرفض إضافة الخدمة</td>
+      <td>أضف القاعدة في <span class="inline-code">system_server.te</span></td>
+    </tr>
+    <tr>
+      <td><span class="inline-code">ServiceManager: Permission failure</span></td>
+      <td>الخدمة غير موجودة في <span class="inline-code">service_contexts</span></td>
+      <td>أضف التعيين في <span class="inline-code">service_contexts</span></td>
+    </tr>
+    <tr>
+      <td>الـ Manager يُرجع <span class="inline-code">null</span></td>
+      <td>الـ AIDL لم يُبنَ بشكل صحيح</td>
+      <td>شغّل <span class="inline-code">make update-api</span> ثم أعد البناء</td>
+    </tr>
+  </table>
+
+  <div class="info-card">
+    <div class="info-title">🔷 أدوات متقدمة</div>
+    <p>لتصحيح أخطاء Binder IPC المعقدة، استخدم:</p>
+    <ul>
+      <li><span class="inline-code">adb shell dumpsys binder</span> — لعرض إحصائيات Binder.</li>
+      <li><span class="inline-code">adb shell lshal</span> — للتحقق من HALs المسجلة (إذا كنت تستخدم HAL).</li>
+      <li><span class="inline-code">adb shell service check custom_hardware</span> — للتحقق السريع من توفر الخدمة.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================== SECTION 8: SUMMARY ==================== -->
+<div class="section">
+  <div class="section-title"><span class="num">٨</span> ملخص سريع (Quick Reference)</div>
+
+  <div class="diagram-box">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        قائمة الملفات المعدلة بالكامل                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  1. frameworks/base/core/java/android/os/ICustomHardwareService.aidl        │
+│  2. frameworks/base/core/java/android/app/CustomHardwareManager.java        │
+│  3. frameworks/base/core/java/android/content/Context.java                  │
+│  4. frameworks/base/services/core/java/com/android/server/                  │
+│     CustomHardwareService.java                                              │
+│  5. frameworks/base/services/java/com/android/server/SystemServer.java      │
+│  6. frameworks/base/core/java/android/app/SystemServiceRegistry.java        │
+│  7. frameworks/base/core/res/AndroidManifest.xml                            │
+│  8. device/<vendor>/<board>/sepolicy/vendor/service_contexts                │
+│  9. device/<vendor>/<board>/sepolicy/vendor/service.te                      │
+│  10. device/<vendor>/<board>/sepolicy/vendor/system_server.te               │
+│  11. device/<vendor>/<board>/sepolicy/vendor/app.te                         │
+│  12. frameworks/base/Android.bp (اختياري)                                   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+  </div>
+
+  <div class="step-card">
+    <h4>📝 خطوات البناء النهائية</h4>
+    <ol>
+      <li>تعديل جميع الملفات المذكورة أعلاه.</li>
+      <li>تشغيل <span class="inline-code">make update-api</span> لتحديث واجهات البرمجة.</li>
+      <li>تشغيل <span class="inline-code">make framework services sepolicy -j$(nproc)</span>.</li>
+      <li>تثبيت النتيجة عبر <span class="inline-code">adb sync</span> وإعادة التشغيل.</li>
+      <li>التحقق من <span class="inline-code">adb shell service list | grep custom_hardware</span>.</li>
+      <li>اختبار التطبيق والتحقق من SELinux عبر <span class="inline-code">adb shell dmesg | grep avc</span>.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<div class="page-footer">
+  <p>تم إعداد هذا الدليل كمرجع تقني شامل لبناء Custom System Services في AOSP</p>
+  <p>البلوك 9: اليوم 17-18 | Android 13 / 14 | AOSP Architecture</p>
+</div>
+
+</body>
+</html>

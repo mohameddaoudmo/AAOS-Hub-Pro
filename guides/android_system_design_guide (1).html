@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدليل الشامل لتصميم أنظمة أندرويد | Android System Design Master Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@300;400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-slate: #0B192C;
+            --vibrant-blue: #1E88E5;
+            --emerald-green: #00E676;
+            --coral-red: #FF5252;
+            --off-white: #F8F9FA;
+            --soft-gray: #E9ECEF;
+            --text-dark: #1A1A2E;
+            --text-muted: #6C757D;
+            --code-bg: #101820;
+            --card-shadow: 0 4px 20px rgba(11, 25, 44, 0.08);
+            --card-hover: 0 8px 30px rgba(11, 25, 44, 0.15);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Tajawal', 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--off-white);
+            color: var(--text-dark);
+            line-height: 1.9;
+            font-size: 17px;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--off-white); }
+        ::-webkit-scrollbar-thumb { background: var(--vibrant-blue); border-radius: 4px; }
+        .hero {
+            background: linear-gradient(135deg, var(--deep-slate) 0%, #1a3a5c 100%);
+            color: white;
+            padding: 80px 20px 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(30,136,229,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero h1 { font-size: 2.8rem; font-weight: 900; margin-bottom: 15px; position: relative; z-index: 1; }
+        .hero .subtitle { font-size: 1.2rem; opacity: 0.85; max-width: 700px; margin: 0 auto; position: relative; z-index: 1; }
+        .hero .badge-row { margin-top: 30px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; position: relative; z-index: 1; }
+        .badge { background: rgba(255,255,255,0.12); backdrop-filter: blur(10px); padding: 8px 18px; border-radius: 50px; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.2); }
+        .nav-container { background: white; box-shadow: 0 2px 15px rgba(0,0,0,0.06); position: sticky; top: 0; z-index: 100; }
+        .nav { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+        .nav::-webkit-scrollbar { display: none; }
+        .nav a { color: var(--text-dark); text-decoration: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; white-space: nowrap; transition: all 0.3s; }
+        .nav a:hover, .nav a.active { background: var(--vibrant-blue); color: white; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        .section { margin-bottom: 60px; scroll-margin-top: 80px; }
+        .section-header { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 3px solid var(--soft-gray); }
+        .section-number { background: var(--deep-slate); color: white; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 800; flex-shrink: 0; }
+        .section-title { font-size: 1.7rem; font-weight: 800; color: var(--deep-slate); }
+        .card { background: white; border-radius: 16px; padding: 30px; margin-bottom: 25px; box-shadow: var(--card-shadow); transition: transform 0.3s, box-shadow 0.3s; border-right: 4px solid var(--vibrant-blue); }
+        .card:hover { transform: translateY(-3px); box-shadow: var(--card-hover); }
+        .card.green { border-right-color: var(--emerald-green); }
+        .card.red { border-right-color: var(--coral-red); }
+        .card-title { font-size: 1.3rem; font-weight: 700; color: var(--deep-slate); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .card-icon { font-size: 1.5rem; }
+        .callout { background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); border-radius: 12px; padding: 20px 25px; margin: 20px 0; border-right: 4px solid var(--vibrant-blue); position: relative; }
+        .callout.warning { background: linear-gradient(135deg, #fff3e0 0%, #fce4ec 100%); border-right-color: var(--coral-red); }
+        .callout.success { background: linear-gradient(135deg, #e8f5e9 0%, #e0f7fa 100%); border-right-color: var(--emerald-green); }
+        .callout-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; color: var(--deep-slate); }
+        pre { background: var(--code-bg); border-radius: 12px; padding: 20px; overflow-x: auto; margin: 20px 0; border: 1px solid #1a3a5c; position: relative; }
+        pre::before { content: 'KOTLIN'; position: absolute; top: 8px; left: 15px; font-size: 0.7rem; color: var(--vibrant-blue); font-weight: 700; letter-spacing: 1px; }
+        code { font-family: 'Fira Code', 'Consolas', monospace; font-size: 0.9rem; line-height: 1.7; color: #e0e0e0; }
+        .code-keyword { color: #ff79c6; }
+        .code-fun { color: #8be9fd; }
+        .code-string { color: #f1fa8c; }
+        .code-comment { color: #6272a4; }
+        .code-class { color: #50fa7b; }
+        .table-wrap { overflow-x: auto; border-radius: 12px; box-shadow: var(--card-shadow); margin: 25px 0; }
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 0.95rem; }
+        th { background: var(--deep-slate); color: white; padding: 16px; text-align: right; font-weight: 700; font-size: 1rem; }
+        td { padding: 14px 16px; border-bottom: 1px solid var(--soft-gray); vertical-align: top; }
+        tr:hover { background: #f8f9ff; }
+        tr:last-child td { border-bottom: none; }
+        .tag { display: inline-block; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; margin: 2px; }
+        .tag-blue { background: #e3f2fd; color: #1565c0; }
+        .tag-green { background: #e8f5e9; color: #2e7d32; }
+        .tag-red { background: #ffebee; color: #c62828; }
+        .tag-orange { background: #fff3e0; color: #ef6c00; }
+        .diagram { background: white; border-radius: 16px; padding: 30px; margin: 25px 0; box-shadow: var(--card-shadow); text-align: center; }
+        .flow-box { display: inline-flex; align-items: center; justify-content: center; padding: 14px 24px; border-radius: 10px; font-weight: 700; margin: 8px; min-width: 140px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .flow-layer { background: #e3f2fd; color: #1565c0; border: 2px solid #90caf9; }
+        .flow-core { background: #e8f5e9; color: #2e7d32; border: 2px solid #a5d6a7; }
+        .flow-feature { background: #fff3e0; color: #ef6c00; border: 2px solid #ffcc80; }
+        .flow-data { background: #f3e5f5; color: #6a1b9a; border: 2px solid #ce93d8; }
+        .flow-arrow { font-size: 1.5rem; color: var(--vibrant-blue); margin: 0 5px; font-weight: 900; }
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; margin: 10px 0; }
+        .scenario { background: linear-gradient(135deg, #0B192C 0%, #1a3a5c 100%); color: white; border-radius: 16px; padding: 30px; margin: 30px 0; position: relative; overflow: hidden; }
+        .scenario::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--vibrant-blue), var(--emerald-green), var(--coral-red)); }
+        .scenario-header { font-size: 1.4rem; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .scenario-step { background: rgba(255,255,255,0.08); border-radius: 10px; padding: 18px; margin: 12px 0; border-right: 3px solid var(--emerald-green); }
+        .scenario-step-title { font-weight: 700; color: var(--emerald-green); margin-bottom: 8px; font-size: 1.05rem; }
+        .matrix-table th { background: linear-gradient(135deg, var(--deep-slate), #1a3a5c); }
+        .matrix-table td:first-child { font-weight: 700; color: var(--deep-slate); background: #f8f9ff; }
+        ul, ol { padding-right: 25px; margin: 15px 0; }
+        li { margin-bottom: 10px; }
+        li::marker { color: var(--vibrant-blue); }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0; }
+        .footer { background: var(--deep-slate); color: white; text-align: center; padding: 40px 20px; margin-top: 60px; }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.8rem; }
+            .section-title { font-size: 1.3rem; }
+            .card { padding: 20px; }
+            .flow-box { min-width: 100px; padding: 10px 16px; font-size: 0.9rem; }
+        }
+        html { scroll-behavior: smooth; }
+        @keyframes pulse-border {
+            0% { border-right-color: var(--vibrant-blue); }
+            50% { border-right-color: var(--emerald-green); }
+            100% { border-right-color: var(--vibrant-blue); }
+        }
+        .highlight-card { animation: pulse-border 3s infinite; }
+    </style>
+</head>
+<body>
+
+<!-- Hero Section -->
+<div class="hero">
+    <h1>الدليل الشامل لتصميم أنظمة أندرويد</h1>
+    <p class="subtitle">Android System Design Master Guide — من المبادئ المعمارية إلى سيناريوهات المقابلات الواقعية</p>
+    <div class="badge-row">
+        <span class="badge">🔧 Architecture</span>
+        <span class="badge">⚡ Performance</span>
+        <span class="badge">🔒 Security</span>
+        <span class="badge">📡 Networking</span>
+        <span class="badge">💾 Offline-First</span>
+    </div>
+</div>
+
+<!-- Navigation -->
+<div class="nav-container">
+    <nav class="nav">
+        <a href="#pillars">أركان التصميم</a>
+        <a href="#modularization">النمطية</a>
+        <a href="#offline">دون إنترنت</a>
+        <a href="#performance">الأداء</a>
+        <a href="#security">الأمان</a>
+        <a href="#observability">التحليلات</a>
+        <a href="#interviews">المقابلات</a>
+        <a href="#tradeoffs">التوازنات</a>
+    </nav>
+</div>
+
+<div class="container">
+
+<!-- SECTION 1: Mobile System Design Pillars -->
+<section class="section" id="pillars">
+    <div class="section-header">
+        <div class="section-number">1</div>
+        <h2 class="section-title">أركان تصميم الأنظمة للهواتف (Mobile System Design Pillars)</h2>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><span class="card-icon">📐</span> المتطلبات الوظيفية وغير الوظيفية (Functional vs Non-Functional Requirements)</div>
+        <p>عند تصميم أي نظام جوال، يجب التفريق بين <strong>المتطلبات الوظيفية (Functional Requirements)</strong> التي تحدد <em>ما</em> يفعله التطبيق، و<strong>المتطلبات غير الوظيفية (Non-Functional Requirements)</strong> التي تحدد <em>كيف</em> يؤدي التطبيق عمله.</p>
+
+        <div class="grid-2">
+            <div class="callout">
+                <div class="callout-title">✅ المتطلبات الوظيفية</div>
+                <ul>
+                    <li>تسجيل الدخول عبر البريد الإلكتروني أو OAuth</li>
+                    <li>عرض قائمة المنتجات مع الفلترة والبحث</li>
+                    <li>إرسال واستقبال الرسائل الفورية</li>
+                    <li>معالجة المدفوعات داخل التطبيق</li>
+                </ul>
+            </div>
+            <div class="callout warning">
+                <div class="callout-title">⚠️ المتطلبات غير الوظيفية</div>
+                <ul>
+                    <li><strong>Scalability:</strong> دعم مليون مستخدم متزامن</li>
+                    <li><strong>Reliability:</strong> uptime بنسبة 99.9%</li>
+                    <li><strong>Battery Efficiency:</strong> استهلاك بطارية منخفض (&lt; 5% في الساعة)</li>
+                    <li><strong>Network Optimization:</strong> تقليل حجم البيانات المنقولة</li>
+                    <li><strong>Security:</strong> تشفير البيانات في الراحة والنقل</li>
+                    <li><strong>Offline Capabilities:</strong> العمل بدون إنترنت لمدة 24 ساعة</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="card green">
+        <div class="card-title"><span class="card-icon">🌐</span> بروتوكولات التواصل بين العميل والخادم (Client-Server Communication Protocols)</div>
+        <p>اختيار البروتوكول المناسب يؤثر مباشرة على أداء التطبيق واستهلاك البطارية. إليك المقارنة الشاملة:</p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>البروتوكول</th>
+                        <th>نمط الاتصال</th>
+                        <th>استهلاك البطارية</th>
+                        <th>حزمة البيانات</th>
+                        <th>أفضل استخدام</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>REST APIs</strong></td>
+                        <td>Request/Response</td>
+                        <td><span class="tag tag-green">منخفض</span></td>
+                        <td>JSON/XML (ثقيل)</td>
+                        <td>العمليات CRUD التقليدية، جلب البيانات الأولية</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GraphQL</strong></td>
+                        <td>Query/Response</td>
+                        <td><span class="tag tag-green">منخفض</span></td>
+                        <td>JSON (دقيق — Overfetching مُلغى)</td>
+                        <td>شاشات معقدة تحتاج بيانات متعددة المصادر</td>
+                    </tr>
+                    <tr>
+                        <td><strong>WebSockets</strong></td>
+                        <td>Full-Duplex Persistent</td>
+                        <td><span class="tag tag-orange">متوسط-عالي</span></td>
+                        <td>Binary/Text (خفيف)</td>
+                        <td>الدردشة الفورية، التحديثات اللحظية</td>
+                    </tr>
+                    <tr>
+                        <td><strong>gRPC</strong></td>
+                        <td>HTTP/2 + Protocol Buffers</td>
+                        <td><span class="tag tag-green">منخفض</span></td>
+                        <td>Protobuf (مضغوط جداً)</td>
+                        <td>التواصل بين الخدمات الداخلية (Microservices)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SSE (Server-Sent Events)</strong></td>
+                        <td>Server → Client Push</td>
+                        <td><span class="tag tag-green">منخفض</span></td>
+                        <td>Text/Event-Stream</td>
+                        <td>إشعارات خفيفة من الخادم، Live Updates أحادية الاتجاه</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout">
+            <div class="callout-title">💡 توصية معمارية</div>
+            <p>في التطبيقات الحديثة، استخدم <strong>REST/GraphQL</strong> للطلبات الأولية و<strong>WebSockets</strong> للتحديثات اللحظية. يمكن دمج <strong>SSE</strong> كبديل أخف للـ WebSockets في سيناريوهات الإشعارات البسيطة.</p>
+        </div>
+    </div>
+
+    <div class="card red">
+        <div class="card-title"><span class="card-icon">📄</span> استراتيجيات تصميم الـ API والتصفح (Pagination Strategies)</div>
+        <p>اختيار استراتيجية التصفح يؤثر على تجربة المستخدم واتساق البيانات في التطبيقات التي تحتوي على feeds ديناميكية.</p>
+
+        <div class="grid-2">
+            <div>
+                <h4 style="color: var(--coral-red); margin-bottom: 10px;">❌ Offset-based Pagination</h4>
+                <pre dir="ltr"><code><span class="code-comment">// GET /api/feed?offset=20&limit=20</span>
+<span class="code-keyword">interface</span> <span class="code-class">FeedApi</span> {
+    <span class="code-fun">@GET</span>(<span class="code-string">"feed"</span>)
+    <span class="code-keyword">suspend fun</span> <span class="code-fun">getFeed</span>(
+        <span class="code-fun">@Query</span>(<span class="code-string">"offset"</span>) offset: <span class="code-class">Int</span>,
+        <span class="code-fun">@Query</span>(<span class="code-string">"limit"</span>) limit: <span class="code-class">Int</span> = <span class="code-string">20</span>
+    ): <span class="code-class">FeedResponse</span>
+}</code></pre>
+                <ul>
+                    <li>مشكلة <strong>Data Drift</strong>: إذا أُضيف عنصر جديد أثناء التصفح، تتكرر العناصر أو تُفقد</li>
+                    <li>أداء قاعدة البيانات يتدهور مع زيادة الـ offset</li>
+                    <li>غير مناسب للـ feeds الحية (Real-time)</li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="color: var(--emerald-green); margin-bottom: 10px;">✅ Cursor-based Pagination</h4>
+                <pre dir="ltr"><code><span class="code-comment">// GET /api/feed?cursor=abc123&limit=20</span>
+<span class="code-keyword">data class</span> <span class="code-class">FeedResponse</span>(
+    <span class="code-keyword">val</span> items: <span class="code-class">List</span>&lt;<span class="code-class">Post</span>&gt;,
+    <span class="code-keyword">val</span> nextCursor: <span class="code-class">String</span>?, <span class="code-comment">// Encoded timestamp + ID</span>
+    <span class="code-keyword">val</span> hasMore: <span class="code-class">Boolean</span>
+)
+
+<span class="code-keyword">interface</span> <span class="code-class">FeedApi</span> {
+    <span class="code-fun">@GET</span>(<span class="code-string">"feed"</span>)
+    <span class="code-keyword">suspend fun</span> <span class="code-fun">getFeed</span>(
+        <span class="code-fun">@Query</span>(<span class="code-string">"cursor"</span>) cursor: <span class="code-class">String</span>?,
+        <span class="code-fun">@Query</span>(<span class="code-string">"limit"</span>) limit: <span class="code-class">Int</span> = <span class="code-string">20</span>
+    ): <span class="code-class">FeedResponse</span>
+}</code></pre>
+                <ul>
+                    <li>ثبات البيانات — لا يتأثر بإضافة/حذف عناصر</li>
+                    <li>أداء ثابت O(1) بغض النظر عن عمق التصفح</li>
+                    <li>إلزامي للـ feeds الحية (Instagram, TikTok, Twitter)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 2: Modularization -->
+<section class="section" id="modularization">
+    <div class="section-header">
+        <div class="section-number">2</div>
+        <h2 class="section-title">الهندسة النمطية والتسلسل الهيكلي (Modularization & App Scalability)</h2>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><span class="card-icon">🧩</span> هندسة متعددة الوحدات (Multi-Module Architecture)</div>
+        <p>مع نمو فريق التطوير (20+ مطور)، تصبح الهندسة الطبقية (Layered) عائقاً بدلاً من مساعد. الحل هو <strong>Feature-by-Module</strong> (العزل حسب الميزة).</p>
+
+        <div class="grid-2">
+            <div class="callout warning">
+                <div class="callout-title">❌ Layered Architecture (يفشل عند التوسع)</div>
+                <pre dir="ltr"><code>app/
+├── ui/
+├── data/
+├── domain/
+├── di/
+└── utils/</code></pre>
+                <ul>
+                    <li>تضارب الـ PRs باستمرار</li>
+                    <li>زمن البناء يتضاعف (Build Time ↑)</li>
+                    <li>Coupling عالي بين الميزات</li>
+                    <li>صعوبة في الـ Code Ownership</li>
+                </ul>
+            </div>
+            <div class="callout success">
+                <div class="callout-title">✅ Feature-by-Module (مُوصى به)</div>
+                <pre dir="ltr"><code>:app
+:core:network
+:core:database
+:core:ui
+:core:common
+:feature:auth
+:feature:feed
+:feature:profile
+:feature:settings</code></pre>
+                <ul>
+                    <li>عزل الـ Build — تغيير ميزة لا يعيد بناء الكل</li>
+                    <li>تطوير متوازي (Parallel Development)</li>
+                    <li>إمكانية On-Demand Delivery عبر DFMs</li>
+                    <li>اختبار منعزل لكل ميزة</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="diagram">
+        <div class="card-title" style="justify-content: center; margin-bottom: 20px;">🗺️ هيكل الوحدات النمطية (Module Topology)</div>
+        <div class="flow-row">
+            <div class="flow-box flow-layer">:app<br><small>Application Module</small></div>
+        </div>
+        <div class="flow-row">
+            <span class="flow-arrow">↓</span>
+        </div>
+        <div class="flow-row">
+            <div class="flow-box flow-core">:core:common</div>
+            <div class="flow-box flow-core">:core:network</div>
+            <div class="flow-box flow-core">:core:database</div>
+            <div class="flow-box flow-core">:core:ui</div>
+        </div>
+        <div class="flow-row">
+            <span class="flow-arrow">↓</span>
+        </div>
+        <div class="flow-row">
+            <div class="flow-box flow-feature">:feature:auth</div>
+            <div class="flow-box flow-feature">:feature:feed</div>
+            <div class="flow-box flow-feature">:feature:profile</div>
+            <div class="flow-box flow-feature">:feature:settings</div>
+            <div class="flow-box flow-feature">:feature:chat</div>
+        </div>
+        <p style="margin-top: 15px; color: var(--text-muted); font-size: 0.9rem;">القاعدة الذهبية: <strong>الـ Feature Modules تعتمد على الـ Core Modules</strong>، وليس العكس.</p>
+    </div>
+
+    <div class="card green">
+        <div class="card-title"><span class="card-icon">📦</span> الوحدات الديناميكية والتسليم عند الطلب (Dynamic Feature Modules & On-Demand Delivery)</div>
+        <p>تقليل حجم الـ APK/AAB الأولي أمر حاسم لتحسين معدلات التثبيت. <strong>Dynamic Feature Modules (DFMs)</strong> تتيح تقسيم التطبيق إلى وحدات يمكن تحميلها عند الحاجة.</p>
+
+        <pre dir="ltr"><code><span class="code-comment">// build.gradle.kts (:feature:ar)</span>
+<span class="code-fun">plugins</span> {
+    <span class="code-class">id</span>(<span class="code-string">"com.android.dynamic-feature"</span>)
+}
+
+<span class="code-fun">android</span> {
+    <span class="code-class">dynamicFeatures</span> = <span class="code-class">setOf</span>(<span class="code-string">":feature:ar"</span>, <span class="code-string">":feature:premium"</span>)
+}
+
+<span class="code-comment">// Runtime installation via Play Feature Delivery API</span>
+<span class="code-keyword">val</span> manager = <span class="code-class">SplitInstallManagerFactory</span>.<span class="code-fun">create</span>(context)
+<span class="code-keyword">val</span> request = <span class="code-class">SplitInstallRequest</span>.<span class="code-class">newBuilder</span>()
+    .<span class="code-fun">addModule</span>(<span class="code-string">"feature_ar"</span>)
+    .<span class="code-fun">build</span>()
+
+manager.<span class="code-fun">startInstall</span>(request)
+    .<span class="code-fun">addOnSuccessListener</span> { <span class="code-comment">/* Launch AR Activity */</span> }</code></pre>
+
+        <div class="callout">
+            <div class="callout-title">📊 تأثير حجم التطبيق على معدل التثبيت</div>
+            <p>كل 6 MB إضافية تُقلل معدل التثبيت بنسبة <strong>1%</strong>. باستخدام DFMs، يمكن تقليل حجم التثبيت الأولي بنسبة تصل إلى <strong>60-70%</strong>.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><span class="card-icon">⚡</span> تحسين زمن البناء (Build Time Optimization)</div>
+        <div class="grid-3">
+            <div class="callout">
+                <div class="callout-title">KSP over KAPT</div>
+                <p>استبدل <strong>KAPT</strong> بـ <strong>KSP (Kotlin Symbol Processing)</strong> لتقليل زمن البناء بنسبة 25-30% عند استخدام Room, Moshi, أو Dagger.</p>
+            </div>
+            <div class="callout">
+                <div class="callout-title">Configuration Avoidance</div>
+                <p>استخدم <code>tasks.withType&lt;JavaCompile&gt;().configureEach { }</code> بدلاً من <code>all { }</code> لتجنب تكوين المهام غير الضرورية.</p>
+            </div>
+            <div class="callout">
+                <div class="callout-title">Remote Build Cache</div>
+                <p>إعداد <strong>Gradle Remote Build Cache</strong> (عبر Gradle Enterprise أو Bazel) يُقلل زمن البناء الجماعي بشكل كبير.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 3: Offline-First -->
+<section class="section" id="offline">
+    <div class="section-header">
+        <div class="section-number">3</div>
+        <h2 class="section-title">إدارة البيانات والعمل دون إنترنت (Offline-First, Caching & Data Sync)</h2>
+    </div>
+
+    <div class="card highlight-card">
+        <div class="card-title"><span class="card-icon">🎯</span> مصدر الحقيقة الواحد (Single Source of Truth — SSOT)</div>
+        <p>في هندسة <strong>Offline-First</strong>، يجب أن تكون قاعدة البيانات المحلية (Room) هي المصدر الوحيد للحقيقة. الشبكة مجرد مصدر بيانات ثانوي.</p>
+
+        <div class="diagram">
+            <div class="flow-row">
+                <div class="flow-box flow-data">UI Layer<br><small>Compose / XML</small></div>
+                <span class="flow-arrow">←</span>
+                <div class="flow-box flow-core">ViewModel<br><small>StateFlow</small></div>
+                <span class="flow-arrow">←</span>
+                <div class="flow-box flow-core">Repository<br><small>SSOT</small></div>
+            </div>
+            <div class="flow-row">
+                <span class="flow-arrow">↑</span>
+                <div class="flow-box flow-feature">Room DB<br><small>Local Cache</small></div>
+                <span class="flow-arrow">←</span>
+                <div class="flow-box flow-layer">Retrofit<br><small>Network</small></div>
+                <span class="flow-arrow">←</span>
+                <div class="flow-box flow-layer">Backend API</div>
+            </div>
+        </div>
+
+        <pre dir="ltr"><code><span class="code-keyword">class</span> <span class="code-class">FeedRepository</span> @<span class="code-class">Inject</span> <span class="code-keyword">constructor</span>(
+    <span class="code-keyword">private val</span> api: <span class="code-class">FeedApi</span>,
+    <span class="code-keyword">private val</span> dao: <span class="code-class">PostDao</span>
+) {
+    <span class="code-comment">// SSOT: Room is the single source of truth</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">getFeed</span>(): <span class="code-class">Flow</span>&lt;<span class="code-class">List</span>&lt;<span class="code-class">Post</span>&gt;&gt; = 
+        dao.<span class="code-fun">getAllPosts</span>()
+            .<span class="code-fun">onStart</span> { <span class="code-fun">syncFromNetwork</span>() }
+            .<span class="code-fun">flowOn</span>(Dispatchers.IO)
+
+    <span class="code-keyword">private suspend fun</span> <span class="code-fun">syncFromNetwork</span>() {
+        <span class="code-keyword">try</span> {
+            <span class="code-keyword">val</span> response = api.<span class="code-fun">getFeed</span>(cursor = <span class="code-keyword">null</span>)
+            dao.<span class="code-fun">insertAll</span>(response.items)
+        } <span class="code-keyword">catch</span> (e: <span class="code-class">IOException</span>) {
+            <span class="code-comment">// Silently fail — local data is still valid</span>
+            <span class="code-class">Timber</span>.<span class="code-fun">w</span>(e, <span class="code-string">"Network unavailable, serving cached data"</span>)
+        }
+    }
+}</code></pre>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><span class="card-icon">🔄</span> استراتيجيات مزامنة البيانات (Data Synchronization Strategies)</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>الاستراتيجية</th>
+                        <th>الآلية</th>
+                        <th>استهلاك البطارية</th>
+                        <th>ملاءمة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Periodic Sync</strong></td>
+                        <td>WorkManager مع <code>PeriodicWorkRequest</code> (كل 15 دقيقة كحد أدنى)</td>
+                        <td><span class="tag tag-orange">متوسط</span></td>
+                        <td>بيانات نسبياً ثابتة (News, Catalog)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Push-driven Sync</strong></td>
+                        <td>FCM trigger يستدعي مزامنة فورية</td>
+                        <td><span class="tag tag-green">منخفض</span></td>
+                        <td>بيانات حساسة للوقت (Chat, Orders)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>On-demand Sync</strong></td>
+                        <td>سحب للتحديث (Pull-to-Refresh) أو عند فتح الشاشة</td>
+                        <td><span class="tag tag-green">منخفض</span></td>
+                        <td>تجربة مستخدم تفاعلية</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card red">
+        <div class="card-title"><span class="card-icon">⚔️</span> استراتيجيات حل التعارض (Conflict Resolution Strategies)</div>
+        <p>عندما يُعدل المستخدم بيانات بدون إنترنت ثم يُعدلها مستخدم آخر على الخادم، نحتاج آلية حل تعارض واضحة.</p>
+
+        <div class="grid-2">
+            <div class="callout warning">
+                <div class="callout-title">Last-Write-Wins (LWW)</div>
+                <p>الكتابة الأخيرة تفوز بناءً على الطابع الزمني. <strong>بسيط لكنه يفقد البيانات.</strong></p>
+            </div>
+            <div class="callout success">
+                <div class="callout-title">Server-Wins / Client-Wins</div>
+                <p>أحدهما يأخذ الأولوية دائماً. مناسب للأنظمة ذات التسلسل الهرمي الواضح.</p>
+            </div>
+        </div>
+
+        <div class="callout" style="margin-top: 15px;">
+            <div class="callout-title">🧠 Operational Transformation / CRDTs</div>
+            <p>للتطبيقات التعاونية (Google Docs, Figma)، استخدم <strong>CRDTs (Conflict-free Replicated Data Types)</strong> أو <strong>Operational Transformation</strong> لضمان اتساق البيانات دون Locking مركزي.</p>
+            <pre dir="ltr"><code><span class="code-comment">// CRDT Example: LWW-Element-Set for collaborative editing</span>
+<span class="code-keyword">data class</span> <span class="code-class">LWWElementSet</span>&lt;<span class="code-class">T</span>&gt;(
+    <span class="code-keyword">val</span> addSet: <span class="code-class">Map</span>&lt;<span class="code-class">T</span>, <span class="code-class">Long</span>&gt; = <span class="code-class">emptyMap</span>(),
+    <span class="code-keyword">val</span> removeSet: <span class="code-class">Map</span>&lt;<span class="code-class">T</span>, <span class="code-class">Long</span>&gt; = <span class="code-class">emptyMap</span>()
+) {
+    <span class="code-keyword">fun</span> <span class="code-fun">add</span>(element: <span class="code-class">T</span>, timestamp: <span class="code-class">Long</span>) = 
+        <span class="code-class">copy</span>(addSet = addSet + (element to timestamp))
+
+    <span class="code-keyword">fun</span> <span class="code-fun">lookup</span>(element: <span class="code-class">T</span>): <span class="code-class">Boolean</span> {
+        <span class="code-keyword">val</span> addTime = addSet[element] ?: <span class="code-keyword">return</span> <span class="code-keyword">false</span>
+        <span class="code-keyword">val</span> removeTime = removeSet[element] ?: <span class="code-keyword">return</span> <span class="code-keyword">true</span>
+        <span class="code-keyword">return</span> addTime > removeTime
+    }
+}</code></pre>
+        </div>
+    </div>
+
+    <div class="card green">
+        <div class="card-title"><span class="card-icon">💾</span> هندسة التخزين المؤقت (Caching Architecture)</div>
+        <p>التخزين المؤقت متعدد المستويات (Multi-tier) هو العمود الفقري لأي تطبيق أندرويد عالي الأداء.</p>
+
+        <div class="diagram">
+            <div class="flow-row">
+                <div class="flow-box" style="background: #fff3e0; border-color: #ffcc80;">L1: Memory Cache<br><small>LruCache (Bitmaps)</small></div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box" style="background: #e3f2fd; border-color: #90caf9;">L2: Disk Cache<br><small>OkHttp Cache / Room</small></div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box" style="background: #e8f5e9; border-color: #a5d6a7;">L3: Network<br><small>Retrofit + Cache-Control</small></div>
+            </div>
+        </div>
+
+        <pre dir="ltr"><code><span class="code-comment">// OkHttp Cache with Cache-Control strategy</span>
+<span class="code-keyword">val</span> cache = <span class="code-class">Cache</span>(context.cacheDir, <span class="code-string">50</span> * <span class="code-string">1024</span> * <span class="code-string">1024</span>) <span class="code-comment">// 50 MB</span>
+
+<span class="code-keyword">val</span> client = <span class="code-class">OkHttpClient</span>.<span class="code-class">Builder</span>()
+    .<span class="code-fun">cache</span>(cache)
+    .<span class="code-fun">addInterceptor</span> { chain ->
+        <span class="code-keyword">var</span> request = chain.<span class="code-fun">request</span>()
+        <span class="code-keyword">val</span> cacheControl = <span class="code-keyword">if</span> (<span class="code-fun">hasNetwork</span>()) 
+            <span class="code-string">"public, max-age="</span> + <span class="code-string">60</span> <span class="code-comment">// 1 min fresh</span>
+        <span class="code-keyword">else</span> 
+            <span class="code-string">"public, only-if-cached, max-stale="</span> + <span class="code-string">86400</span> <span class="code-comment">// 1 day stale</span>
+        request = request.<span class="code-fun">newBuilder</span>()
+            .<span class="code-fun">header</span>(<span class="code-string">"Cache-Control"</span>, cacheControl)
+            .<span class="code-fun">build</span>()
+        chain.<span class="code-fun">proceed</span>(request)
+    }
+    .<span class="code-fun">build</span>()</code></pre>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><span class="card-icon">🛡️</span> مرونة الشبكة (Network Resiliency)</div>
+        <div class="grid-2">
+            <div>
+                <h4 style="margin-bottom: 10px; color: var(--vibrant-blue);">Exponential Backoff + Jitter</h4>
+                <pre dir="ltr"><code><span class="code-keyword">suspend fun</span> &lt;<span class="code-class">T</span>&gt; <span class="code-fun">retryWithExponentialBackoff</span>(
+    times: <span class="code-class">Int</span> = <span class="code-string">3</span>,
+    initialDelay: <span class="code-class">Long</span> = <span class="code-string">1000</span>,
+    factor: <span class="code-class">Double</span> = <span class="code-string">2.0</span>,
+    block: <span class="code-keyword">suspend</span> () -> <span class="code-class">T</span>
+): <span class="code-class">T</span> {
+    <span class="code-keyword">var</span> currentDelay = initialDelay
+    <span class="code-keyword">repeat</span>(times - <span class="code-string">1</span>) {
+        <span class="code-keyword">try</span> { <span class="code-keyword">return</span> <span class="code-fun">block</span>() }
+        <span class="code-keyword">catch</span> (e: <span class="code-class">IOException</span>) { <span class="code-comment">/* retry */</span> }
+        <span class="code-comment">// Jitter: add randomness to prevent thundering herd</span>
+        <span class="code-class">delay</span>(currentDelay + <span class="code-class">Random</span>.<span class="code-fun">nextLong</span>(<span class="code-string">0</span>, currentDelay / <span class="code-string">2</span>))
+        currentDelay = (currentDelay * factor).<span class="code-fun">toLong</span>().<span class="code-fun">coerceAtMost</span>(<span class="code-string">60000</span>)
+    }
+    <span class="code-keyword">return</span> <span class="code-fun">block</span>() <span class="code-comment">// Last attempt</span>
+}</code></pre>
+            </div>
+            <div>
+                <h4 style="margin-bottom: 10px; color: var(--coral-red);">Circuit Breaker Pattern</h4>
+                <pre dir="ltr"><code><span class="code-keyword">class</span> <span class="code-class">CircuitBreaker</span>(
+    <span class="code-keyword">private val</span> failureThreshold: <span class="code-class">Int</span> = <span class="code-string">5</span>,
+    <span class="code-keyword">private val</span> resetTimeout: <span class="code-class">Long</span> = <span class="code-string">30000</span>
+) {
+    <span class="code-keyword">private val</span> state = <span class="code-class">AtomicReference</span>(<span class="code-class">State</span>.<span class="code-class">CLOSED</span>)
+    <span class="code-keyword">private val</span> failures = <span class="code-class">AtomicInteger</span>(<span class="code-string">0</span>)
+
+    <span class="code-keyword">enum class</span> <span class="code-class">State</span> { <span class="code-class">CLOSED</span>, <span class="code-class">OPEN</span>, <span class="code-class">HALF_OPEN</span> }
+
+    <span class="code-keyword">fun</span> <span class="code-fun">canExecute</span>(): <span class="code-class">Boolean</span> = <span class="code-keyword">when</span> (state.<span class="code-fun">get</span>()) {
+        <span class="code-class">State</span>.<span class="code-class">CLOSED</span> -> <span class="code-keyword">true</span>
+        <span class="code-class">State</span>.<span class="code-class">OPEN</span> -> {
+            <span class="code-keyword">if</span> (<span class="code-class">System</span>.<span class="code-fun">currentTimeMillis</span>() > lastFailure + resetTimeout) {
+                state.<span class="code-fun">set</span>(<span class="code-class">State</span>.<span class="code-class">HALF_OPEN</span>); <span class="code-keyword">true</span>
+            } <span class="code-keyword">else</span> <span class="code-keyword">false</span>
+        }
+        <span class="code-class">State</span>.<span class="code-class">HALF_OPEN</span> -> <span class="code-keyword">true</span>
+    }
+}</code></pre>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 4: Performance, Battery & Memory -->
+<section class="section" id="performance">
+    <div class="section-header">
+        <div class="section-number">4</div>
+        <h2 class="section-title">الأداء، الذاكرة وإدارة البطارية (Performance, Battery & Memory Optimization)</h2>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><span class="card-icon">🧠</span> إدارة الذاكرة (Memory Management)</div>
+        <p>تسرب الذاكرة (Memory Leaks) هو السبب الرئيسي لـ ANRs وعمليات القتل (OOM) في أندرويد. إليك الأنماط الأكثر شيوعاً والحلول.</p>
+
+        <div class="grid-2">
+            <div class="callout warning">
+                <div class="callout-title">❌ Common Memory Leak Patterns</div>
+                <ul>
+                    <li><strong>Static References:</strong> الاحتفاظ بـ <code>Context</code> في متغير <code>static</code></li>
+                    <li><strong>Context Leaks:</strong> تمرير <code>Activity Context</code> إلى Singleton</li>
+                    <li><strong>Handler Leaks:</strong> استخدام <code>Handler()</code> بدون <code>WeakReference</code></li>
+                    <li><strong>Listener Leaks:</strong> عدم إلغاء تسجيل الـ Listeners في <code>onDestroy()</code></li>
+                    <li><strong>Bitmap Leaks:</strong> عدم إعادة تدوير Bitmaps في RecyclerView</li>
+                </ul>
+            </div>
+            <div class="callout success">
+                <div class="callout-title">✅ Best Practices</div>
+                <ul>
+                    <li>استخدم <strong>LeakCanary</strong> في الـ Debug builds</li>
+                    <li>استخدم <code>WeakReference&lt;Activity&gt;</code> دائماً</li>
+                    <li>استخدم <strong>ViewBinding</strong> بدلاً من <code>findViewById</code></li>
+                    <li>ألغِ تسجيل الـ Observers في <code>onDestroyView()</code></li>
+                    <li>استخدم <strong>Bitmap Pooling</strong> مع Glide</li>
+                </ul>
+            </div>
+        </div>
+
+        <pre dir="ltr"><code><span class="code-comment">// ❌ BAD: Static reference to Activity</span>
+<span class="code-keyword">object</span> <span class="code-class">BadSingleton</span> {
+    <span class="code-keyword">var</span> activity: <span class="code-class">Activity</span>? = <span class="code-keyword">null</span> <span class="code-comment">// LEAK!</span>
+}
+
+<span class="code-comment">// ✅ GOOD: Application-scoped context + WeakReference</span>
+<span class="code-keyword">class</span> <span class="code-class">SafeRepository</span> @<span class="code-class">Inject</span> <span class="code-keyword">constructor</span>(
+    <span class="code-keyword">@ApplicationContext</span> <span class="code-keyword">private val</span> context: <span class="code-class">Context</span>
+) {
+    <span class="code-keyword">private val</span> activityRef = <span class="code-class">WeakReference</span>&lt;<span class="code-class">Activity</span>&gt;(<span class="code-keyword">null</span>)
+
+    <span class="code-keyword">fun</span> <span class="code-fun">attachActivity</span>(activity: <span class="code-class">Activity</span>) {
+        activityRef.<span class="code-fun">clear</span>()
+        activityRef = <span class="code-class">WeakReference</span>(activity)
+    }
+}</code></pre>
+
+        <div class="callout">
+            <div class="callout-title">📊 Allocation Tracking & Memory Profiling</div>
+            <p>استخدم <strong>Android Studio Memory Profiler</strong> للكشف عن:</p>
+            <ul>
+                <li>Java Heap allocations — ابحث عن ارتفاعات مفاجئة</li>
+                <li>Native Heap — خاصة مع Bitmaps الكبيرة</li>
+                <li>Heap Dumps — استخدم <strong>MAT (Memory Analyzer Tool)</strong> لتحليل Dominator Tree</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card green">
+        <div class="card-title"><span class="card-icon">🔋</span> البطارية والتنفيذ في الخلفية (Battery & Background Execution)</div>
+        <p>أندرويد يفرض قيوداً متزايدة على التنفيذ في الخلفية. فهم <strong>Doze Mode</strong> و<strong>App Standby</strong> أمر حاسم.</p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>الوضع</th>
+                        <th>التأثير</th>
+                        <th>الاستجابة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Doze Mode</strong></td>
+                        <td>تأجيل الـ Network Access و Wake Locks عندما يكون الجهاز ساكناً وغير موصول بالشاحن</td>
+                        <td>استخدم <strong>WorkManager</strong> مع <code>setRequiresBatteryNotLow()</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>App Standby</strong></td>
+                        <td>تقييد الوصول للشبكة للتطبيقات غير النشطة</td>
+                        <td>استخدم <strong>FCM High Priority</strong> لإشعارات مهمة</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Background Location Limits</strong></td>
+                        <td>تقييد تحديثات الموقع في الخلفية (Android 8+)</td>
+                        <td>استخدم <strong>FusedLocationProvider</strong> مع <code>PRIORITY_BALANCED_POWER_ACCURACY</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="grid-2">
+            <div>
+                <h4 style="color: var(--emerald-green); margin-bottom: 10px;">WorkManager (المهام المؤجلة)</h4>
+                <pre dir="ltr"><code><span class="code-keyword">val</span> uploadWork = <span class="code-class">PeriodicWorkRequestBuilder</span>&lt;<span class="code-class">SyncWorker</span>&gt;(
+    <span class="code-string">15</span>, <span class="code-class">TimeUnit</span>.<span class="code-class">MINUTES</span>
+).<span class="code-fun">setConstraints</span>(
+    <span class="code-class">Constraints</span>.<span class="code-class">Builder</span>()
+        .<span class="code-fun">setRequiredNetworkType</span>(<span class="code-class">NetworkType</span>.<span class="code-class">CONNECTED</span>)
+        .<span class="code-fun">setRequiresBatteryNotLow</span>(<span class="code-keyword">true</span>)
+        .<span class="code-fun">setRequiresStorageNotLow</span>(<span class="code-keyword">true</span>)
+        .<span class="code-fun">build</span>()
+).<span class="code-fun">build</span>()
+
+<span class="code-class">WorkManager</span>.<span class="code-fun">getInstance</span>(context)
+    .<span class="code-fun">enqueueUniquePeriodicWork</span>(
+        <span class="code-string">"sync_work"</span>,
+        <span class="code-class">ExistingPeriodicWorkPolicy</span>.<span class="code-class">KEEP</span>,
+        uploadWork
+    )</code></pre>
+            </div>
+            <div>
+                <h4 style="color: var(--coral-red); margin-bottom: 10px;">Foreground Service (التنفيذ الفوري)</h4>
+                <pre dir="ltr"><code><span class="code-comment">// For immediate execution with user-visible notification</span>
+<span class="code-keyword">class</span> <span class="code-class">LocationTrackingService</span> : <span class="code-class">ForegroundService</span>() {
+    <span class="code-keyword">override fun</span> <span class="code-fun">onStartCommand</span>(intent: <span class="code-class">Intent</span>?, flags: <span class="code-class">Int</span>, startId: <span class="code-class">Int</span>): <span class="code-class">Int</span> {
+        <span class="code-keyword">val</span> notification = <span class="code-class">NotificationCompat</span>.<span class="code-class">Builder</span>(<span class="code-keyword">this</span>, <span class="code-string">"location_channel"</span>)
+            .<span class="code-fun">setContentTitle</span>(<span class="code-string">"Tracking location..."</span>)
+            .<span class="code-fun">setSmallIcon</span>(R.drawable.ic_location)
+            .<span class="code-fun">build</span>()
+
+        <span class="code-fun">startForeground</span>(<span class="code-string">1</span>, notification)
+        <span class="code-keyword">return</span> <span class="code-class">START_STICKY</span>
+    }
+}</code></pre>
+                <div class="callout warning" style="margin-top: 10px;">
+                    <p><strong>تحذير:</strong> استخدم Foreground Services فقط للمهام التي يجب أن تراها المستخدم (مثل تتبع الموقع أو تشغيل الصوت). الاستخدام الخاطئ يؤدي إلى <strong>Background Service Limitations</strong> وقد يُزيل Google Play تطبيقك.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><span class="card-icon">🖼️</span> خطوط تحميل الوسائط والصور (Media & Image Loading Pipelines)</div>
+        <p>الصور تمثل أكبر مستهلك للذاكرة في تطبيقات أندرويد. فهم خطوط تحميل الصور أمر أساسي.</p>
+
+        <div class="grid-2">
+            <div class="callout">
+                <div class="callout-title">Bitmap Downsampling (O(1) Scaling)</div>
+                <p>بدلاً من تحميل الصورة بالحجم الكامل ثم تصغيرها (O(n²))، استخدم <strong>inSampleSize</strong> لتحميلها بحجم مُخفض مباشرة (O(1)).</p>
+                <pre dir="ltr"><code><span class="code-keyword">fun</span> <span class="code-fun">decodeSampledBitmap</span>(
+    options: <span class="code-class">BitmapFactory.Options</span>,
+    reqWidth: <span class="code-class">Int</span>, reqHeight: <span class="code-class">Int</span>
+): <span class="code-class">Bitmap</span> {
+    options.<span class="code-fun">inJustDecodeBounds</span> = <span class="code-keyword">true</span>
+    <span class="code-class">BitmapFactory</span>.<span class="code-fun">decodeResource</span>(resources, resId, options)
+
+    options.<span class="code-fun">inSampleSize</span> = <span class="code-fun">calculateInSampleSize</span>(options, reqWidth, reqHeight)
+    options.<span class="code-fun">inJustDecodeBounds</span> = <span class="code-keyword">false</span>
+    <span class="code-keyword">return</span> <span class="code-class">BitmapFactory</span>.<span class="code-fun">decodeResource</span>(resources, resId, options)
+}</code></pre>
+            </div>
+            <div class="callout success">
+                <div class="callout-title">تنسيقات الصور: WebP vs PNG/JPEG</div>
+                <table style="font-size: 0.85rem; margin-top: 10px;">
+                    <tr><th>التنسيق</th><th>الضغط</th><th>الشفافية</th><th>التوصية</th></tr>
+                    <tr><td><strong>WebP</strong></td><td>25-35% أصغر</td><td>✅ نعم</td><td>🟢 الافتراضي</td></tr>
+                    <tr><td><strong>PNG</strong></td><td>Lossless</td><td>✅ نعم</td><td>🟡 الأيقونات فقط</td></tr>
+                    <tr><td><strong>JPEG</strong></td><td>Lossy</td><td>❌ لا</td><td>🟡 الصور الكبيرة</td></tr>
+                    <tr><td><strong>AVIF</strong></td><td>50% أصغر من WebP</td><td>✅ نعم</td><td>🔵 Android 12+</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 5: Security -->
+<section class="section" id="security">
+    <div class="section-header">
+        <div class="section-number">5</div>
+        <h2 class="section-title">أمان حماية النظام (Mobile Security Architecture)</h2>
+    </div>
+
+    <div class="card red">
+        <div class="card-title"><span class="card-icon">🔐</span> أمان البيانات في الراحة (Data at Rest Security)</div>
+        <p>حماية البيانات المخزنة على الجهاز أولوية قصوى. استخدم Android Keystore System لتأمين المفاتيح التشفيرية.</p>
+
+        <div class="grid-2">
+            <div class="callout">
+                <div class="callout-title">Android Keystore System</div>
+                <pre dir="ltr"><code><span class="code-keyword">val</span> keyStore = <span class="code-class">KeyStore</span>.<span class="code-fun">getInstance</span>(<span class="code-string">"AndroidKeyStore"</span>)
+keyStore.<span class="code-fun">load</span>(<span class="code-keyword">null</span>)
+
+<span class="code-keyword">val</span> keyGen = <span class="code-class">KeyGenerator</span>.<span class="code-fun">getInstance</span>(
+    <span class="code-class">KeyProperties</span>.<span class="code-class">KEY_ALGORITHM_AES</span>, 
+    <span class="code-string">"AndroidKeyStore"</span>
+)
+<span class="code-keyword">val</span> spec = <span class="code-class">KeyGenParameterSpec</span>.<span class="code-class">Builder</span>(
+    <span class="code-string">"my_key_alias"</span>,
+    <span class="code-class">KeyProperties</span>.<span class="code-class">PURPOSE_ENCRYPT</span> or 
+    <span class="code-class">KeyProperties</span>.<span class="code-class">PURPOSE_DECRYPT</span>
+).<span class="code-fun">setBlockModes</span>(<span class="code-class">KeyProperties</span>.<span class="code-class">BLOCK_MODE_GCM</span>)
+ .<span class="code-fun">setEncryptionPaddings</span>(<span class="code-class">KeyProperties</span>.<span class="code-class">ENCRYPTION_PADDING_NONE</span>)
+ .<span class="code-fun">setUserAuthenticationRequired</span>(<span class="code-keyword">true</span>)
+ .<span class="code-fun">setInvalidatedByBiometricEnrollment</span>(<span class="code-keyword">true</span>)
+ .<span class="code-fun">build</span>()
+
+keyGen.<span class="code-fun">init</span>(spec)
+<span class="code-keyword">val</span> secretKey = keyGen.<span class="code-fun">generateKey</span>()</code></pre>
+            </div>
+            <div class="callout success">
+                <div class="callout-title">EncryptedSharedPreferences & Room Encryption</div>
+                <pre dir="ltr"><code><span class="code-comment">// EncryptedSharedPreferences</span>
+<span class="code-keyword">val</span> masterKey = <span class="code-class">MasterKey</span>.<span class="code-class">Builder</span>(context)
+    .<span class="code-fun">setKeyScheme</span>(<span class="code-class">MasterKey.KeyScheme</span>.<span class="code-class">AES256_GCM</span>)
+    .<span class="code-fun">build</span>()
+
+<span class="code-keyword">val</span> prefs = <span class="code-class">EncryptedSharedPreferences</span>.<span class="code-fun">create</span>(
+    context, <span class="code-string">"secret_prefs"</span>, masterKey,
+    <span class="code-class">AES256_SIV</span>, <span class="code-class">AES256_GCM</span>
+)
+
+<span class="code-comment">// SQLCipher for Room</span>
+<span class="code-keyword">val</span> factory = <span class="code-class">SupportFactory</span>(<span class="code-class">SQLiteDatabase</span>.<span class="code-fun">getBytes</span>(passphrase))
+<span class="code-keyword">val</span> db = <span class="code-class">Room</span>.<span class="code-fun">databaseBuilder</span>(context, <span class="code-class">AppDatabase</span>::<span class="code-class">class</span>.java, <span class="code-string">"app.db"</span>)
+    .<span class="code-fun">openHelperFactory</span>(factory)
+    .<span class="code-fun">build</span>()</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><span class="card-icon">🔒</span> أمان البيانات أثناء النقل (Data in Transit Security)</div>
+        <p>حماية الاتصال بين التطبيق والخادم يتطلب أكثر من HTTPS فقط. <strong>SSL Pinning</strong> و<strong>Certificate Transparency</strong> ضروريان.</p>
+
+        <div class="grid-2">
+            <div>
+                <h4 style="color: var(--vibrant-blue); margin-bottom: 10px;">SSL/TLS Pinning</h4>
+                <pre dir="ltr"><code><span class="code-keyword">val</span> certificatePinner = <span class="code-class">CertificatePinner</span>.<span class="code-class">Builder</span>()
+    .<span class="code-fun">add</span>(<span class="code-string">"api.example.com"</span>, 
+         <span class="code-string">"sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="</span>)
+    .<span class="code-fun">build</span>()
+
+<span class="code-keyword">val</span> client = <span class="code-class">OkHttpClient</span>.<span class="code-class">Builder</span>()
+    .<span class="code-fun">certificatePinner</span>(certificatePinner)
+    .<span class="code-fun">build</span>()
+
+<span class="code-comment">// ⚠️ Risk: Certificate rotation requires app update</span>
+<span class="code-comment">// Mitigation: Pin intermediate CA + backup pins</span></code></pre>
+            </div>
+            <div>
+                <h4 style="color: var(--coral-red); margin-bottom: 10px;">Public Key Pinning Risks</h4>
+                <div class="callout warning">
+                    <ul>
+                        <li><strong>Rotation Risk:</strong> إذا انتهت صلاحية الشهادة ولم يُحدّث التطبيق، يتوقف عن العمل</li>
+                        <li><strong>Backup Pins:</strong> دائماً أضف شهادة احتياطية (Backup Pin)</li>
+                        <li><strong>Certificate Transparency:</strong> تحقق من سجل الشهادات العام</li>
+                    </ul>
+                </div>
+                <div class="callout success">
+                    <div class="callout-title">🛡️ Network Security Config (Android 7+)</div>
+                    <pre dir="ltr"><code><span class="code-comment">&lt;!-- res/xml/network_security_config.xml --&gt;</span>
+&lt;<span class="code-class">network-security-config</span>&gt;
+    &lt;<span class="code-class">domain-config</span> <span class="code-fun">cleartextTrafficPermitted</span>=<span class="code-string">"false"</span>&gt;
+        &lt;<span class="code-class">domain</span> <span class="code-fun">includeSubdomains</span>=<span class="code-string">"true"</span>&gt;api.example.com&lt;/<span class="code-class">domain</span>&gt;
+        &lt;<span class="code-class">pin-set</span> <span class="code-fun">expiration</span>=<span class="code-string">"2025-01-01"</span>&gt;
+            &lt;<span class="code-class">pin</span> <span class="code-fun">digest</span>=<span class="code-string">"SHA-256"</span>&gt;...&lt;/<span class="code-class">pin</span>&gt;
+        &lt;/<span class="code-class">pin-set</span>&gt;
+    &lt;/<span class="code-class">domain-config</span>&gt;
+&lt;/<span class="code-class">network-security-config</span>&gt;</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card green">
+        <div class="card-title"><span class="card-icon">🛡️</span> سلامة التطبيق والكود (Code & App Integrity)</div>
+        <div class="grid-2">
+            <div class="callout">
+                <div class="callout-title">R8 / ProGuard Obfuscation</div>
+                <pre dir="ltr"><code><span class="code-comment">// proguard-rules.pro</span>
+<span class="code-comment"># Keep API models</span>
+-<span class="code-fun">keepclassmembers</span> <span class="code-keyword">class</span> <span class="code-class">com.example.api.**</span> {
+    <span class="code-keyword">public</span> <span class="code-class">*;</span>
+}
+
+<span class="code-comment"># Obfuscate everything else</span>
+-<span class="code-fun">repackageclasses</span> <span class="code-string">'a'</span>
+-<span class="code-fun">allowaccessmodification</span></code></pre>
+            </div>
+            <div class="callout success">
+                <div class="callout-title">Play Integrity API (replaces SafetyNet)</div>
+                <pre dir="ltr"><code><span class="code-keyword">val</span> integrityManager = <span class="code-class">IntegrityManagerFactory</span>.<span class="code-fun">create</span>(context)
+
+<span class="code-keyword">val</span> request = <span class="code-class">IntegrityTokenRequest</span>.<span class="code-class">Builder</span>()
+    .<span class="code-fun">setNonce</span>(<span class="code-fun">generateNonce</span>())
+    .<span class="code-fun">build</span>()
+
+integrityManager.<span class="code-fun">requestIntegrityToken</span>(request)
+    .<span class="code-fun">addOnSuccessListener</span> { tokenResponse ->
+        <span class="code-comment">// Verify token server-side</span>
+        <span class="code-fun">verifyTokenOnServer</span>(tokenResponse.token())
+    }</code></pre>
+            </div>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">⚠️ Root Detection & Anti-Tampering</div>
+            <p>لا تعتمد على Root Detection وحده كحماية أمنية — يمكن تجاوزه بسهولة. استخدمه كطبقة إضافية:</p>
+            <ul>
+                <li>تحقق من توقيع التطبيق (Signature Verification)</li>
+                <li>تحقق من <strong>Play Integrity API</strong> server-side</li>
+                <li>استخدم <strong>Native Code (JNI)</strong> لتخزين المنطق الحساس</li>
+                <li>تجنب تخزين Secrets في الكود — استخدم <strong>Remote Config</strong> أو <strong>Server-side</strong></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 6: Observability -->
+<section class="section" id="observability">
+    <div class="section-header">
+        <div class="section-number">6</div>
+        <h2 class="section-title">العمليات والتحليلات (Observability, Telemetry & Feature Toggles)</h2>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><span class="card-icon">📊</span> خط أنابيب التحليلات غير المحجوب (Non-blocking Analytics Pipeline)</div>
+        <p>لا يجب أن يتأثر أداء التطبيق بإرسال الأحداث التحليلية. استخدم خط أنابيب غير متزامن مع تخزين محلي.</p>
+
+        <div class="diagram">
+            <div class="flow-row">
+                <div class="flow-box flow-feature">Event Occurs<br><small>User Action</small></div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box flow-core">Local Queue<br><small>Room DB</small></div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box flow-core">Batch Worker<br><small>WorkManager</small></div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box flow-layer">Analytics Server<br><small>Firebase / Mixpanel</small></div>
+            </div>
+        </div>
+
+        <pre dir="ltr"><code><span class="code-comment">// Local queue with Room + WorkManager batching</span>
+<span class="code-keyword">@Entity</span>(tableName = <span class="code-string">"analytics_events"</span>)
+<span class="code-keyword">data class</span> <span class="code-class">AnalyticsEvent</span>(
+    <span class="code-keyword">@PrimaryKey</span> <span class="code-keyword">val</span> id: <span class="code-class">String</span> = <span class="code-class">UUID</span>.<span class="code-fun">randomUUID</span>().<span class="code-fun">toString</span>(),
+    <span class="code-keyword">val</span> eventName: <span class="code-class">String</span>,
+    <span class="code-keyword">val</span> payload: <span class="code-class">String</span>, <span class="code-comment">// JSON</span>
+    <span class="code-keyword">val</span> timestamp: <span class="code-class">Long</span> = <span class="code-class">System</span>.<span class="code-fun">currentTimeMillis</span>(),
+    <span class="code-keyword">val</span> synced: <span class="code-class">Boolean</span> = <span class="code-keyword">false</span>
+)
+
+<span class="code-keyword">class</span> <span class="code-class">AnalyticsBatchWorker</span>(ctx: <span class="code-class">Context</span>, params: <span class="code-class">WorkerParameters</span>) : 
+    <span class="code-class">CoroutineWorker</span>(ctx, params) {
+
+    <span class="code-keyword">override suspend fun</span> <span class="code-fun">doWork</span>(): <span class="code-class">Result</span> {
+        <span class="code-keyword">val</span> events = dao.<span class="code-fun">getUnsyncedEvents</span>(limit = <span class="code-string">100</span>)
+        <span class="code-keyword">if</span> (events.<span class="code-fun">isEmpty</span>()) <span class="code-keyword">return</span> <span class="code-class">Result</span>.<span class="code-class">success</span>()
+
+        <span class="code-keyword">return</span> <span class="code-keyword">try</span> {
+            api.<span class="code-fun">batchUpload</span>(events)
+            dao.<span class="code-fun">markAsSynced</span>(events.<span class="code-fun">map</span> { it.id })
+            <span class="code-class">Result</span>.<span class="code-class">success</span>()
+        } <span class="code-keyword">catch</span> (e: <span class="code-class">Exception</span>) {
+            <span class="code-class">Result</span>.<span class="code-class">retry</span>()
+        }
+    }
+}</code></pre>
+
+        <div class="callout">
+            <div class="callout-title">🔋 Power-Friendly Upload Strategy</div>
+            <ul>
+                <li>تجميع الأحداث في دفعات (Batching) — لا ترسل حدث واحد في كل مرة</li>
+                <li>استخدم <strong>WorkManager</strong> مع <code>setRequiresBatteryNotLow()</code></li>
+                <li>تجنب الرفع أثناء Doze Mode</li>
+                <li>حد أقصى 100 حدث لكل دفعة</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card green">
+        <div class="card-title"><span class="card-icon">🐛</span> تقارير الأعطال وفُتات الخبز (Crash Reporting & Breadcrumbs)</div>
+        <p>التقاط الاستثناءات غير المميتة (Non-fatal exceptions) وإضافة Breadcrumbs قبل الانهيار يُسرّع تشخيص المشاكل.</p>
+
+        <pre dir="ltr"><code><span class="code-keyword">class</span> <span class="code-class">CrashReportingTree</span> : <span class="code-class">Timber</span>.<span class="code-class">Tree</span>() {
+    <span class="code-keyword">override fun</span> <span class="code-fun">log</span>(priority: <span class="code-class">Int</span>, tag: <span class="code-class">String</span>?, message: <span class="code-class">String</span>, t: <span class="code-class">Throwable</span>?) {
+        <span class="code-keyword">if</span> (priority == <span class="code-class">Log</span>.<span class="code-class">ERROR</span> || priority == <span class="code-class">Log</span>.<span class="code-class">WARN</span>) {
+            <span class="code-comment">// Non-fatal exception logging</span>
+            <span class="code-class">FirebaseCrashlytics</span>.<span class="code-fun">getInstance</span>().<span class="code-fun">recordException</span>(
+                t ?: <span class="code-class">RuntimeException</span>(message)
+            )
+        }
+
+        <span class="code-comment">// Add breadcrumb for every significant action</span>
+        <span class="code-class">FirebaseCrashlytics</span>.<span class="code-fun">getInstance</span>().<span class="code-fun">log</span>(<span class="code-string">"[$tag] $message"</span>)
+    }
+}
+
+<span class="code-comment">// Usage in ViewModel</span>
+<span class="code-keyword">fun</span> <span class="code-fun">onUserAction</span>(action: <span class="code-class">String</span>) {
+    <span class="code-class">Timber</span>.<span class="code-fun">d</span>(<span class="code-string">"User performed: $action"</span>)
+    <span class="code-class">FirebaseCrashlytics</span>.<span class="code-fun">getInstance</span>().<span class="code-fun">setCustomKey</span>(<span class="code-string">"last_action"</span>, action)
+}</code></pre>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><span class="card-icon">🎛️</span> التكوين عن بُعد والمفاتيح الديناميكية (Remote Config & Feature Toggles)</div>
+        <p>تفعيل/تعطيل الميزات دون تحديث التطبيق أمر حيوي للـ A/B Testing وللتحكم في الميزات التجريبية.</p>
+
+        <pre dir="ltr"><code><span class="code-keyword">class</span> <span class="code-class">FeatureToggleManager</span> @<span class="code-class">Inject</span> <span class="code-keyword">constructor</span>(
+    <span class="code-keyword">private val</span> remoteConfig: <span class="code-class">FirebaseRemoteConfig</span>,
+    <span class="code-keyword">private val</span> localCache: <span class="code-class">FeatureToggleCache</span>
+) {
+    <span class="code-keyword">fun</span> <span class="code-fun">isEnabled</span>(feature: <span class="code-class">Feature</span>): <span class="code-class">Boolean</span> {
+        <span class="code-comment">// Local cache for instant availability</span>
+        <span class="code-keyword">return</span> localCache.<span class="code-fun">get</span>(feature.key) 
+            ?: remoteConfig.<span class="code-fun">getBoolean</span>(feature.key)
+    }
+
+    <span class="code-keyword">suspend fun</span> <span class="code-fun">fetchAndActivate</span>() {
+        <span class="code-keyword">try</span> {
+            remoteConfig.<span class="code-fun">fetchAndActivate</span>().<span class="code-fun">await</span>()
+            <span class="code-comment">// Cache locally for offline use</span>
+            <span class="code-class">Feature</span>.<span class="code-fun">values</span>().<span class="code-fun">forEach</span> { feature ->
+                localCache.<span class="code-fun">put</span>(feature.key, remoteConfig.<span class="code-fun">getBoolean</span>(feature.key))
+            }
+        } <span class="code-keyword">catch</span> (e: <span class="code-class">Exception</span>) {
+            <span class="code-class">Timber</span>.<span class="code-fun">w</span>(e, <span class="code-string">"Remote config fetch failed, using cached values"</span>)
+        }
+    }
+}
+
+<span class="code-keyword">enum class</span> <span class="code-class">Feature</span>(<span class="code-keyword">val</span> key: <span class="code-class">String</span>) {
+    <span class="code-class">NEW_CHECKOUT_FLOW</span>(<span class="code-string">"new_checkout_flow"</span>),
+    <span class="code-class">DARK_MODE</span>(<span class="code-string">"dark_mode_enabled"</span>),
+    <span class="code-class">BIOMETRIC_PAYMENT</span>(<span class="code-string">"biometric_payment"</span>)
+}</code></pre>
+
+        <div class="callout success">
+            <div class="callout-title">✅ Feature Toggle Best Practices</div>
+            <ul>
+                <li>دائماً استخدم <strong>default value</strong> محافظ (false) لتجنب كسر التطبيق</li>
+                <li>خزّن القيم محلياً للعمل بدون إنترنت</li>
+                <li>استخدم Feature Toggles كـ <strong>Kill Switches</strong> للميزات الجديدة</li>
+                <li>لا تُخزّن منطق أعمال حاسم في Remote Config</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 7: Interview Q&A -->
+<section class="section" id="interviews">
+    <div class="section-header">
+        <div class="section-number">7</div>
+        <h2 class="section-title">أسئلة وسيناريوهات مقابلات تصميم الأنظمة (Android System Design Interview Q&A)</h2>
+    </div>
+
+    <!-- Scenario 1: Messaging -->
+    <div class="scenario">
+        <div class="scenario-header">💬 السيناريو الأول: تصميم تطبيق رسائل فورية بدون إنترنت (WhatsApp / Telegram style)</div>
+
+        <div class="scenario-step">
+            <div class="scenario-step-title">1. تحديد المتطلبات (Requirements)</div>
+            <div class="grid-2">
+                <div>
+                    <strong>Functional:</strong>
+                    <ul>
+                        <li>إرسال/استقبال نصوص ووسائط</li>
+                        <li>حالات الرسائل: Sent → Delivered → Read</li>
+                        <li>دردشات فردية وجماعية</li>
+                        <li>مزامنة عبر أجهزة</li>
+                    </ul>
+                </div>
+                <div>
+                    <strong>Non-Functional:</strong>
+                    <ul>
+                        <li>Latency &lt; 200ms للرسائل</li>
+                        <li>Offline mode لمدة 7 أيام</li>
+                        <li>End-to-End Encryption</li>
+                        <li>Battery efficiency</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="scenario-step">
+            <div class="scenario-step-title">2. تدفق البيانات (Data Flow)</div>
+            <div class="diagram" style="background: rgba(255,255,255,0.05);">
+                <div class="flow-row">
+                    <div class="flow-box" style="background: rgba(30,136,229,0.2); color: white; border-color: #1E88E5;">User A</div>
+                    <span class="flow-arrow" style="color: white;">→</span>
+                    <div class="flow-box" style="background: rgba(0,230,118,0.2); color: white; border-color: #00E676;">WebSocket</div>
+                    <span class="flow-arrow" style="color: white;">→</span>
+                    <div class="flow-box" style="background: rgba(255,82,82,0.2); color: white; border-color: #FF5252;">Message Queue</div>
+                    <span class="flow-arrow" style="color: white;">→</span>
+                    <div class="flow-box" style="background: rgba(30,136,229,0.2); color: white; border-color: #1E88E5;">User B</div>
+                </div>
+                <div class="flow-row" style="margin-top: 10px;">
+                    <div class="flow-box" style="background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.3);">FCM Fallback</div>
+                    <span class="flow-arrow" style="color: white;">↔</span>
+                    <div class="flow-box" style="background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.3);">Room DB (SSOT)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scenario-step">
+            <div class="scenario-step-title">3. مخطط قاعدة البيانات (Database Schema)</div>
+            <pre dir="ltr"><code><span class="code-keyword">@Entity</span>(tableName = <span class="code-string">"messages"</span>)
+<span class="code-keyword">data class</span> <span class="code-class">MessageEntity</span>(
+    <span class="code-keyword">@PrimaryKey</span> <span class="code-keyword">val</span> id: <span class="code-class">String</span>,
+    <span class="code-keyword">val</span> conversationId: <span class="code-class">String</span>,
+    <span class="code-keyword">val</span> senderId: <span class="code-class">String</span>,
+    <span class="code-keyword">val</span> content: <span class="code-class">String</span>,
+    <span class="code-keyword">val</span> contentType: <span class="code-class">ContentType</span>, <span class="code-comment">// TEXT, IMAGE, VIDEO, FILE</span>
+    <span class="code-keyword">val</span> status: <span class="code-class">MessageStatus</span>, <span class="code-comment">// SENT, DELIVERED, READ, FAILED</span>
+    <span class="code-keyword">val</span> timestamp: <span class="code-class">Long</span>,
+    <span class="code-keyword">val</span> serverTimestamp: <span class="code-class">Long</span>?,
+    <span class="code-keyword">val</span> isFromMe: <span class="code-class">Boolean</span>,
+    <span class="code-keyword">val</span> mediaUrl: <span class="code-class">String</span>?,
+    <span class="code-keyword">val</span> localMediaPath: <span class="code-class">String</span>?,
+    <span class="code-keyword">val</span> syncState: <span class="code-class">SyncState</span> <span class="code-comment">// PENDING, SYNCED, FAILED</span>
+)
+
+<span class="code-keyword">enum class</span> <span class="code-class">MessageStatus</span> { <span class="code-class">SENDING</span>, <span class="code-class">SENT</span>, <span class="code-class">DELIVERED</span>, <span class="code-class">READ</span>, <span class="code-class">FAILED</span> }
+<span class="code-keyword">enum class</span> <span class="code-class">SyncState</span> { <span class="code-class">PENDING</span>, <span class="code-class">SYNCED</span>, <span class="code-class">FAILED</span> }</code></pre>
+        </div>
+
+        <div class="scenario-step">
+            <div class="scenario-step-title">4. WebSocket + FCM Fallback Strategy</div>
+            <pre dir="ltr"><code><span class="code-keyword">class</span> <span class="code-class">MessageSyncManager</span> @<span class="code-class">Inject</span> <span class="code-keyword">constructor</span>(
+    <span class="code-keyword">private val</span> webSocketClient: <span class="code-class">WebSocketClient</span>,
+    <span class="code-keyword">private val</span> fcmService: <span class="code-class">FCMService</span>,
+    <span class="code-keyword">private val</span> messageDao: <span class="code-class">MessageDao</span>
+) {
+    <span class="code-keyword">fun</span> <span class="code-fun">sendMessage</span>(message: <span class="code-class">MessageEntity</span>) {
+        <span class="code-comment">// 1. Save locally with PENDING status</span>
+        messageDao.<span class="code-fun">insert</span>(message.<span class="code-fun">copy</span>(status = <span class="code-class">MessageStatus</span>.<span class="code-class">SENDING</span>))
+
+        <span class="code-comment">// 2. Try WebSocket first</span>
+        <span class="code-keyword">if</span> (webSocketClient.<span class="code-fun">isConnected</span>()) {
+            webSocketClient.<span class="code-fun">send</span>(message)
+        } <span class="code-keyword">else</span> {
+            <span class="code-comment">// 3. Queue for background sync</span>
+            <span class="code-class">WorkManager</span>.<span class="code-fun">getInstance</span>()
+                .<span class="code-fun">enqueue</span>(<span class="code-class">OneTimeWorkRequest</span>.<span class="code-class">Builder</span>(<span class="code-class">MessageSyncWorker</span>::<span class="code-class">class</span>.java)
+                    .<span class="code-fun">setConstraints</span>(<span class="code-class">Constraints</span>.<span class="code-class">Builder</span>()
+                        .<span class="code-fun">setRequiredNetworkType</span>(<span class="code-class">NetworkType</span>.<span class="code-class">CONNECTED</span>)
+                        .<span class="code-fun">build</span>())
+                    .<span class="code-fun">build</span>())
+        }
+    }
+
+    <span class="code-comment">// FCM fallback for push when app is backgrounded</span>
+    <span class="code-keyword">fun</span> <span class="code-fun">onFCMMessageReceived</span>(data: <span class="code-class">Map</span>&lt;<span class="code-class">String</span>, <span class="code-class">String</span>&gt;) {
+        <span class="code-keyword">val</span> message = <span class="code-class">MessageEntity</span>.<span class="code-fun">fromFCM</span>(data)
+        messageDao.<span class="code-fun">insert</span>(message)
+        <span class="code-comment">// Acknowledge receipt to server</span>
+        <span class="code-fun">sendDeliveryReceipt</span>(message.id)
+    }
+}</code></pre>
+        </div>
+
+        <div class="scenario-step">
+            <div class="scenario-step-title">5. Media Upload Pipeline</div>
+            <div class="grid-2">
+                <div>
+                    <ul>
+                        <li><strong>Compression:</strong> Compress media before upload (Image: WebP, Video: H.264)</li>
+                        <li><strong>Chunked Upload:</strong> تقسيم الملفات الكبيرة إلى chunks لاستئناف الرفع</li>
+                        <li><strong>Background Upload:</strong> استخدم Foreground Service مع إشعار تقدم</li>
+                        <li><strong>CDN:</strong> رفع مباشر إلى S3/CloudFront مع presigned URLs</li>
+                    </ul>
+                </div>
+                <div class="callout" style="background: rgba(255,255,255,0.08); border-color: var(--emerald-green);">
+                    <div class="callout-title" style="color: var(--emerald-green);">🔑 Key Design Decisions</div>
+                    <ul style="color: white;">
+                        <li>WebSocket للاتصال الفوري + FCM للـ Push عندما التطبيق مغلق</li>
+                        <li>Room DB كـ SSOT مع Flow للـ Reactivity</li>
+                        <li>Exponential Backoff لإعادة إرسال الرسائل الفاشلة</li>
+                        <li>End-to-End Encryption قبل إرسال أي بيانات</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scenario 2: Ride-Sharing -->
+    <div class="scenario">
+        <div class="scenario-header">🚗 السيناريو الثاني: تطبيق مشاركة الرحلات في الوقت الفعلي (Uber / Careem style)</div>
+
+        <div class="scenario-step">
+            <div class="scenario-step-title">1. تتبع الموقع بكفاءة بطارية (Battery-Efficient Location Tracking)</div>
+            <pre dir="ltr"><code><span class="code-keyword">class</span> <span class="code-class">LocationTrackingService</span> : <span class="code-class">LifecycleService</span>() {
+
+    <span class="code-keyword">private val</span> fusedClient = <span class="code-class">LocationServices</span>.<span class="code-fun">getFusedLocationProviderClient</span>(<span class="code-keyword">this</span>)
+
+    <span class="code-keyword">private val</span> locationRequest = <span class="code-class">LocationRequest</span>.<span class="code-class">Builder</span>(
+        <span class="code-class">Priority</span>.<span class="code-class">PRIORITY_BALANCED_POWER_ACCURACY</span>,
+        <span class="code-string">5000</span> <span class="code-comment">// 5 seconds interval</span>
+    ).<span class="code-fun">setWaitForAccurateLocation</span>(<span class="code-keyword">false</span>)
+     .<span class="code-fun">setMinUpdateIntervalMillis</span>(<span class="code-string">2000</span>)
+     .<span class="code-fun">build</span>()
+
+    <span class="code-keyword">override fun</span> <span class="code-fun">onCreate</span>() {
+        <span class="code-keyword">super</span>.<span class="code-fun">onCreate</span>()
+        fusedClient.<span class="code-fun">requestLocationUpdates</span>(
+            locationRequest,
+            locationCallback,
+            Looper.<span class="code-fun">getMainLooper</span>()
+        )
+    }
+
+    <span class="code-keyword">private val</span> locationCallback = <span class="code-keyword">object</span> : <span class="code-class">LocationCallback</span>() {
+        <span class="code-keyword">override fun</span> <span class="code-fun">onLocationResult</span>(result: <span class="code-class">LocationResult</span>) {
+            <span class="code-keyword">val</span> location = result.<span class="code-fun">lastLocation</span> ?: <span class="code-keyword">return</span>
+            <span class="code-comment">// Batch locations before sending</span>
+            <span class="code-fun">batchAndSend</span>(location)
+        }
+    }
+
+    <span class="code-keyword">private fun</span> <span class="code-fun">batchAndSend</span>(location: <span class="code-class">Location</span>) {
+        <span class="code-comment">// Buffer 5 locations then send via WebSocket</span>
+        locationBuffer.<span class="code-fun">add</span>(location)
+        <span class="code-keyword">if</span> (locationBuffer.<span class="code-fun">size</span> >= <span class="code-string">5</span>) {
+            webSocketClient.<span class="code-fun">sendLocationBatch</span>(locationBuffer)
+            locationBuffer.<span class="code-fun">clear</span>()
+        }
+    }
+}</code></pre>
+
+            <div class="callout" style="background: rgba(255,255,255,0.05); margin-top: 15px;">
+                <div class="callout-title" style="color: var(--emerald-green);">🔋 Battery Optimization Strategy</div>
+                <ul style="color: white;">
+                    <li>استخدم <strong>PRIORITY_BALANCED_POWER_ACCURACY</strong> بدلاً من HIGH_ACCURACY</li>
+                    <li>Batch location updates (إرسال 5 مواقع معاً بدلاً من واحد)</li>
+                    <li>تقليل تردد التحديث عندما يكون السائق متوقفاً</li>
+                    <li>استخدم <strong>Geofencing</strong> لتفعيل التتبع فقط عند دخول منطقة الرحلة</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="scenario-step">
+            <div class="scenario-step-title">2. تحديثات الوقت الفعلي (Real-time Updates)</div>
+            <div class="grid-2">
+                <div>
+                    <h4 style="color: var(--emerald-green); margin-bottom: 10px;">WebSocket / MQTT</h4>
+                    <ul style="color: white;">
+                        <li>WebSocket للـ Rider App (ثنائي الاتجاه)</li>
+                        <li>MQTT للـ Driver App (خفيف، battery-friendly)</li>
+                        <li>Connection pooling مع heartbeat كل 30 ثانية</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--vibrant-blue); margin-bottom: 10px;">Map Rendering Optimization</h4>
+                    <ul style="color: white;">
+                        <li>Clustering للـ markers القريبة</li>
+                        <li>Tile-based map loading</li>
+                        <li>Debouncing لتحديثات الموقع (max 1 update/sec)</li>
+                        <li>Offline map tiles للمناطق الشائعة</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="scenario-step">
+            <div class="scenario-step-title">3. Offline Driver State</div>
+            <p style="color: white; opacity: 0.9;">عند فقدان الاتصال، يجب أن يستمر السائق في العمل:</p>
+            <pre dir="ltr"><code><span class="code-comment">// Queue ride status updates locally</span>
+<span class="code-keyword">@Entity</span>(tableName = <span class="code-string">"ride_events"</span>)
+<span class="code-keyword">data class</span> <span class="code-class">RideEvent</span>(
+    <span class="code-keyword">val</span> rideId: <span class="code-class">String</span>,
+    <span class="code-keyword">val</span> eventType: <span class="code-class">RideEventType</span>, <span class="code-comment">// ACCEPTED, ARRIVED, STARTED, COMPLETED</span>
+    <span class="code-keyword">val</span> timestamp: <span class="code-class">Long</span>,
+    <span class="code-keyword">val</span> location: <span class="code-class">LatLng</span>,
+    <span class="code-keyword">val</span> synced: <span class="code-class">Boolean</span> = <span class="code-keyword">false</span>
+)
+
+<span class="code-comment">// Sync when connection restored</span>
+<span class="code-keyword">class</span> <span class="code-class">RideEventSyncWorker</span> : <span class="code-class">CoroutineWorker</span>() {
+    <span class="code-keyword">override suspend fun</span> <span class="code-fun">doWork</span>(): <span class="code-class">Result</span> {
+        <span class="code-keyword">val</span> unsynced = dao.<span class="code-fun">getUnsyncedEvents</span>()
+        <span class="code-keyword">return</span> <span class="code-keyword">try</span> {
+            api.<span class="code-fun">batchSyncRideEvents</span>(unsynced)
+            dao.<span class="code-fun">markAsSynced</span>(unsynced.<span class="code-fun">map</span> { it.id })
+            <span class="code-class">Result</span>.<span class="code-class">success</span>()
+        } <span class="code-keyword">catch</span> (e: <span class="code-class">Exception</span>) {
+            <span class="code-class">Result</span>.<span class="code-class">retry</span>()
+        }
+    }
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- Scenario 3: Newsfeed -->
+    <div class="scenario">
+        <div class="scenario-header">📰 السيناريو الثالث: تطبيق Newsfeed عالي الأداء (Instagram / TikTok style)</div>
+
+        <div class="scenario-step">
+            <div class="scenario-step-title">1. تحديد المتطلبات والتحديات</div>
+            <div class="grid-2">
+                <div>
+                    <strong>المتطلبات:</strong>
+                    <ul>
+                        <li>Scroll سلس 60fps مع آلاف العناصر</li>
+                        <li>تحميل فوري للصور والفيديو</li>
+                        <li>Prefetching ذكي للمحتوى القادم</li>
+                        <li>منع تسرب الذاكرة أثناء التمرير السريع</li>
+                    </ul>
+                </div>
+                <div>
+                    <strong>التحديات:</strong>
+                    <ul>
+                        <li>RecyclerView مع ViewHolders معقدة (صور + فيديو + نص)</li>
+                        <li>Video pre-rendering يستهلك ذاكرة كبيرة</li>
+                        <li>التمرير السريع يُنشئ/يُلغي Views بكثافة</li>
+                        <li>Network requests متزامنة قد تُرهق الخادم</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="scenario-step">
+            <div class="scenario-step-title">2. Cursor-based Pagination + Prefetching</div>
+            <pre dir="ltr"><code><span class="code-keyword">class</span> <span class="code-class">FeedPagingSource</span>(
+    <span class="code-keyword">private val</span> api: <span class="code-class">FeedApi</span>,
+    <span class="code-keyword">private val</span> dao: <span class="code-class">PostDao</span>
+) : <span class="code-class">PagingSource</span>&lt;<span class="code-class">String</span>, <span class="code-class">Post</span>&gt;() {
+
+    <span class="code-keyword">override suspend fun</span> <span class="code-fun">load</span>(params: <span class="code-class">LoadParams</span>&lt;<span class="code-class">String</span>&gt;): <span class="code-class">LoadResult</span>&lt;<span class="code-class">String</span>, <span class="code-class">Post</span>&gt; {
+        <span class="code-keyword">val</span> cursor = params.key
+        <span class="code-keyword">return</span> <span class="code-keyword">try</span> {
+            <span class="code-keyword">val</span> response = api.<span class="code-fun">getFeed</span>(cursor = cursor, limit = <span class="code-string">20</span>)
+
+            <span class="code-comment">// Cache to Room for offline</span>
+            dao.<span class="code-fun">insertAll</span>(response.items)
+
+            <span class="code-class">LoadResult.Page</span>(
+                data = response.items,
+                prevKey = <span class="code-keyword">null</span>,
+                nextKey = response.nextCursor
+            )
+        } <span class="code-keyword">catch</span> (e: <span class="code-class">Exception</span>) {
+            <span class="code-comment">// Return cached data if network fails</span>
+            <span class="code-keyword">val</span> cached = dao.<span class="code-fun">getPostsAfter</span>(cursor ?: <span class="code-string">""</span>, limit = params.loadSize)
+            <span class="code-keyword">if</span> (cached.<span class="code-fun">isNotEmpty</span>()) {
+                <span class="code-class">LoadResult.Page</span>(data = cached, prevKey = <span class="code-keyword">null</span>, nextKey = <span class="code-keyword">null</span>)
+            } <span class="code-keyword">else</span> {
+                <span class="code-class">LoadResult.Error</span>(e)
+            }
+        }
+    }
+}
+
+<span class="code-comment">// Prefetch distance: load next page when 5 items remain</span>
+<span class="code-keyword">val</span> pager = <span class="code-class">Pager</span>(
+    config = <span class="code-class">PagingConfig</span>(
+        pageSize = <span class="code-string">20</span>,
+        prefetchDistance = <span class="code-string">5</span>,
+        enablePlaceholders = <span class="code-keyword">false</span>
+    ),
+    pagingSourceFactory = { <span class="code-class">FeedPagingSource</span>(api, dao) }
+).<span class="code-fun">flow</span></code></pre>
+        </div>
+
+        <div class="scenario-step">
+            <div class="scenario-step-title">3. Dual Caching: Memory + Disk</div>
+            <div class="diagram" style="background: rgba(255,255,255,0.05);">
+                <div class="flow-row">
+                    <div class="flow-box" style="background: rgba(0,230,118,0.2); color: white; border-color: #00E676;">L1: LruCache<br><small>Bitmaps (50MB)</small></div>
+                    <span class="flow-arrow" style="color: white;">→</span>
+                    <div class="flow-box" style="background: rgba(30,136,229,0.2); color: white; border-color: #1E88E5;">L2: Disk Cache<br><small>Glide/OkHttp (200MB)</small></div>
+                    <span class="flow-arrow" style="color: white;">→</span>
+                    <div class="flow-box" style="background: rgba(255,82,82,0.2); color: white; border-color: #FF5252;">L3: Room DB<br><small>Post Metadata</small></div>
+                </div>
+            </div>
+
+            <pre dir="ltr"><code><span class="code-comment">// Glide configuration with custom cache</span>
+<span class="code-keyword">@GlideModule</span>
+<span class="code-keyword">class</span> <span class="code-class">AppGlideModule</span> : <span class="code-class">AppGlideModule</span>() {
+    <span class="code-keyword">override fun</span> <span class="code-fun">applyOptions</span>(context: <span class="code-class">Context</span>, builder: <span class="code-class">GlideBuilder</span>) {
+        <span class="code-keyword">val</span> memoryCacheSize = <span class="code-string">50</span> * <span class="code-string">1024</span> * <span class="code-string">1024</span>L <span class="code-comment">// 50 MB</span>
+        <span class="code-keyword">val</span> diskCacheSize = <span class="code-string">200</span> * <span class="code-string">1024</span> * <span class="code-string">1024</span>L <span class="code-comment">// 200 MB</span>
+
+        builder.<span class="code-fun">setMemoryCache</span>(<span class="code-class">LruResourceCache</span>(memoryCacheSize))
+               .<span class="code-fun">setDiskCache</span>(<span class="code-class">InternalCacheDiskCacheFactory</span>(context, diskCacheSize))
+    }
+}
+
+<span class="code-comment">// Usage with downsampling</span>
+<span class="code-class">Glide</span>.<span class="code-fun">with</span>(imageView)
+    .<span class="code-fun">load</span>(post.imageUrl)
+    .<span class="code-fun">override</span>(<span class="code-string">1080</span>, <span class="code-string">1080</span>) <span class="code-comment">// Match view size exactly</span>
+    .<span class="code-fun">centerCrop</span>()
+    .<span class="code-fun">placeholder</span>(R.drawable.placeholder)
+    .<span class="code-fun">into</span>(imageView)</code></pre>
+        </div>
+
+        <div class="scenario-step">
+            <div class="scenario-step-title">4. Video/Image Pre-rendering & Memory Leak Prevention</div>
+            <pre dir="ltr"><code><span class="code-keyword">class</span> <span class="code-class">FeedViewHolder</span>(
+    <span class="code-keyword">private val</span> binding: <span class="code-class">ItemPostBinding</span>
+) : <span class="code-class">RecyclerView.ViewHolder</span>(binding.root) {
+
+    <span class="code-keyword">private var</span> videoPlayer: <span class="code-class">ExoPlayer</span>? = <span class="code-keyword">null</span>
+
+    <span class="code-keyword">fun</span> <span class="code-fun">bind</span>(post: <span class="code-class">Post</span>) {
+        <span class="code-comment">// Cancel previous load to prevent cross-contamination</span>
+        <span class="code-class">Glide</span>.<span class="code-fun">with</span>(binding.imageView).<span class="code-fun">clear</span>(binding.imageView)
+
+        <span class="code-keyword">when</span> (post.type) {
+            <span class="code-class">PostType</span>.<span class="code-class">IMAGE</span> -> <span class="code-fun">bindImage</span>(post)
+            <span class="code-class">PostType</span>.<span class="code-class">VIDEO</span> -> <span class="code-fun">bindVideo</span>(post)
+        }
+    }
+
+    <span class="code-keyword">private fun</span> <span class="code-fun">bindVideo</span>(post: <span class="code-class">Post</span>) {
+        <span class="code-comment">// Release previous player</span>
+        videoPlayer?.<span class="code-fun">release</span>()
+        videoPlayer = <span class="code-class">ExoPlayer</span>.<span class="code-class">Builder</span>(binding.root.context).<span class="code-fun">build</span>().<span class="code-fun">apply</span> {
+            <span class="code-fun">setMediaItem</span>(<span class="code-class">MediaItem</span>.<span class="code-fun">fromUri</span>(post.videoUrl))
+            <span class="code-fun">prepare</span>()
+            <span class="code-fun">playWhenReady</span> = <span class="code-keyword">false</span> <span class="code-comment">// Auto-play only when visible</span>
+        }
+        binding.playerView.player = videoPlayer
+    }
+
+    <span class="code-keyword">fun</span> <span class="code-fun">recycle</span>() {
+        <span class="code-comment">// CRITICAL: Release resources when view is recycled</span>
+        videoPlayer?.<span class="code-fun">release</span>()
+        videoPlayer = <span class="code-keyword">null</span>
+        <span class="code-class">Glide</span>.<span class="code-fun">with</span>(binding.imageView).<span class="code-fun">clear</span>(binding.imageView)
+    }
+}
+
+<span class="code-comment">// In Adapter</span>
+<span class="code-keyword">override fun</span> <span class="code-fun">onViewRecycled</span>(holder: <span class="code-class">FeedViewHolder</span>) {
+    <span class="code-keyword">super</span>.<span class="code-fun">onViewRecycled</span>(holder)
+    holder.<span class="code-fun">recycle</span>()
+}</code></pre>
+
+            <div class="callout" style="background: rgba(255,82,82,0.15); border-color: var(--coral-red); margin-top: 15px;">
+                <div class="callout-title" style="color: var(--coral-red);">⚠️ Memory Leak Prevention Checklist</div>
+                <ul style="color: white;">
+                    <li>ألغِ <strong>Glide requests</strong> في <code>onViewRecycled()</code></li>
+                    <li>أطلق <strong>ExoPlayer</strong> عند إعادة التدوير</li>
+                    <li>استخدم <strong>ViewBinding</strong> ولا تُبقي references في ViewHolder</li>
+                    <li>حدد <strong>max pool size</strong> للـ RecyclerView: <code>recyclerView.setRecycledViewPool(ViewPool())</code></li>
+                    <li>استخدم <strong>LeakCanary</strong> للكشف عن التسربات أثناء التمرير السريع</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scenario 4: Payment -->
+    <div class="scenario">
+        <div class="scenario-header">💳 السيناريو الرابع: نظام مدفوعات ومحفظة رقمية (In-App Payment & Digital Wallet)</div>
+
+        <div class="scenario-step">
+            <div class="scenario-step-title">1. المتطلبات الحرجة (Critical Requirements)</div>
+            <div class="grid-2">
+                <div>
+                    <strong>Functional:</strong>
+                    <ul>
+                        <li>معالجة المدفوعات عبر بطاقات وبنوك</li>
+                        <li>محفظة رقمية (Wallet) للرصيد</li>
+                        <li>سجل المعاملات (Transaction History)</li>
+                        <li>المصادقة البيومترية (Biometric Auth)</li>
+                    </ul>
+                </div>
+                <div>
+                    <strong>Non-Functional (Zero-Tolerance):</strong>
+                    <ul>
+                        <li><strong>Zero Data Loss:</strong> لا يمكن فقدان أي معاملة</li>
+                        <li><strong>Idempotency:</strong> نفس الطلب لا يُنفذ مرتين</li>
+                        <li><strong>PCI DSS Compliance:</strong> لا تخزن بيانات البطاقة أبداً</li>
+                        <li><strong>Audit Trail:</strong> سجل كامل لكل خطوة</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="scenario-step">
+            <div class="scenario-step-title">2. ضمان عدم فقدان البيانات (Zero-Data-Loss Guarantee)</div>
+            <div class="diagram" style="background: rgba(255,255,255,0.05);">
+                <div class="flow-row">
+                    <div class="flow-box" style="background: rgba(0,230,118,0.2); color: white; border-color: #00E676;">User Action<br><small>Payment Initiated</small></div>
+                    <span class="flow-arrow" style="color: white;">→</span>
+                    <div class="flow-box" style="background: rgba(30,136,229,0.2); color: white; border-color: #1E88E5;">Local Tx Log<br><small>Room DB (PENDING)</small></div>
+                    <span class="flow-arrow" style="color: white;">→</span>
+                    <div class="flow-box" style="background: rgba(255,82,82,0.2); color: white; border-color: #FF5252;">Server Process<br><small>Idempotency Check</small></div>
+                    <span class="flow-arrow" style="color: white;">→</span>
+                    <div class="flow-box" style="background: rgba(0,230,118,0.2); color: white; border-color: #00E676;">Confirmation<br><small>Local + Server</small></div>
+                </div>
+            </div>
+
+            <pre dir="ltr"><code><span class="code-keyword">@Entity</span>(tableName = <span class="code-string">"transactions"</span>)
+<span class="code-keyword">data class</span> <span class="code-class">TransactionEntity</span>(
+    <span class="code-keyword">@PrimaryKey</span> <span class="code-keyword">val</span> id: <span class="code-class">String</span>, <span class="code-comment">// UUID generated client-side</span>
+    <span class="code-keyword">val</span> idempotencyKey: <span class="code-class">String</span>, <span class="code-comment">// CRITICAL for duplicate prevention</span>
+    <span class="code-keyword">val</span> amount: <span class="code-class">BigDecimal</span>,
+    <span class="code-keyword">val</span> currency: <span class="code-class">String</span>,
+    <span class="code-keyword">val</span> status: <span class="code-class">TransactionStatus</span>, <span class="code-comment">// PENDING, PROCESSING, COMPLETED, FAILED</span>
+    <span class="code-keyword">val</span> timestamp: <span class="code-class">Long</span>,
+    <span class="code-keyword">val</span> retryCount: <span class="code-class">Int</span> = <span class="code-string">0</span>,
+    <span class="code-keyword">val</span> synced: <span class="code-class">Boolean</span> = <span class="code-keyword">false</span>
+)
+
+<span class="code-keyword">enum class</span> <span class="code-class">TransactionStatus</span> { <span class="code-class">PENDING</span>, <span class="code-class">PROCESSING</span>, <span class="code-class">COMPLETED</span>, <span class="code-class">FAILED</span>, <span class="code-class">REVERSED</span> }</code></pre>
+        </div>
+
+        <div class="scenario-step">
+            <div class="scenario-step-title">3. مفاتيح التكرار (Idempotency Keys)</div>
+            <pre dir="ltr"><code><span class="code-keyword">class</span> <span class="code-class">PaymentRepository</span> @<span class="code-class">Inject</span> <span class="code-keyword">constructor</span>(
+    <span class="code-keyword">private val</span> api: <span class="code-class">PaymentApi</span>,
+    <span class="code-keyword">private val</span> dao: <span class="code-class">TransactionDao</span>,
+    <span class="code-keyword">private val</span> keystoreManager: <span class="code-class">KeystoreManager</span>
+) {
+    <span class="code-keyword">suspend fun</span> <span class="code-fun">processPayment</span>(
+        amount: <span class="code-class">BigDecimal</span>, 
+        paymentMethod: <span class="code-class">PaymentMethod</span>
+    ): <span class="code-class">Result</span>&lt;<span class="code-class">Transaction</span>&gt; {
+        <span class="code-comment">// 1. Generate idempotency key BEFORE anything else</span>
+        <span class="code-keyword">val</span> idempotencyKey = <span class="code-class">UUID</span>.<span class="code-fun">randomUUID</span>().<span class="code-fun">toString</span>()
+        <span class="code-keyword">val</span> txId = <span class="code-class">UUID</span>.<span class="code-fun">randomUUID</span>().<span class="code-fun">toString</span>()
+
+        <span class="code-comment">// 2. Save locally as PENDING (zero-data-loss)</span>
+        <span class="code-keyword">val</span> tx = <span class="code-class">TransactionEntity</span>(
+            id = txId,
+            idempotencyKey = idempotencyKey,
+            amount = amount,
+            status = <span class="code-class">TransactionStatus</span>.<span class="code-class">PENDING</span>
+        )
+        dao.<span class="code-fun">insert</span>(tx)
+
+        <span class="code-comment">// 3. Attempt server processing with idempotency key</span>
+        <span class="code-keyword">return</span> <span class="code-keyword">try</span> {
+            <span class="code-keyword">val</span> response = api.<span class="code-fun">charge</span>(
+                <span class="code-class">ChargeRequest</span>(
+                    amount = amount,
+                    paymentMethod = paymentMethod,
+                    idempotencyKey = idempotencyKey <span class="code-comment">// Server deduplicates on this</span>
+                )
+            )
+
+            <span class="code-comment">// 4. Update local state</span>
+            dao.<span class="code-fun">updateStatus</span>(txId, <span class="code-class">TransactionStatus</span>.<span class="code-class">COMPLETED</span>)
+            <span class="code-class">Result</span>.<span class="code-class">success</span>(response.transaction)
+
+        } <span class="code-keyword">catch</span> (e: <span class="code-class">Exception</span>) {
+            <span class="code-comment">// 5. If network fails, retry later via WorkManager</span>
+            <span class="code-class">WorkManager</span>.<span class="code-fun">getInstance</span>().<span class="code-fun">enqueue</span>(
+                <span class="code-class">OneTimeWorkRequestBuilder</span>&lt;<span class="code-class">PaymentRetryWorker</span>&gt;()
+                    .<span class="code-fun">setInputData</span>(<span class="code-class">workDataOf</span>(<span class="code-string">"tx_id"</span> to txId))
+                    .<span class="code-fun">setBackoffCriteria</span>(
+                        <span class="code-class">BackoffPolicy</span>.<span class="code-class">EXPONENTIAL</span>,
+                        <span class="code-string">10</span>, <span class="code-class">TimeUnit</span>.<span class="code-class">SECONDS</span>
+                    )
+                    .<span class="code-fun">build</span>()
+            )
+            <span class="code-class">Result</span>.<span class="code-class">failure</span>(e)
+        }
+    }
+}</code></pre>
+
+            <div class="callout" style="background: rgba(255,255,255,0.05); margin-top: 15px;">
+                <div class="callout-title" style="color: var(--emerald-green);">🔑 Idempotency Key Rules</div>
+                <ul style="color: white;">
+                    <li>يُولد <strong>مرة واحدة</strong> عند بدء المعاملة ولا يتغير أبداً</li>
+                    <li>يُخزن في الـ Server لمدة 24 ساعة على الأقل</li>
+                    <li>إذا تلقى الخادم نفس المفتاح مرتين، يُرجع نفس الاستجابة</li>
+                    <li>لا تُعيد توليد المفتاح عند إعادة المحاولة</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="scenario-step">
+            <div class="scenario-step-title">4. التعامل الآمن مع Keystore والمصادقة البيومترية</div>
+            <pre dir="ltr"><code><span class="code-keyword">class</span> <span class="code-class">SecurePaymentManager</span> @<span class="code-class">Inject</span> <span class="code-keyword">constructor</span>(
+    <span class="code-keyword">private val</span> biometricPrompt: <span class="code-class">BiometricPrompt</span>,
+    <span class="code-keyword">private val</span> keystoreManager: <span class="code-class">KeystoreManager</span>
+) {
+    <span class="code-keyword">fun</span> <span class="code-fun">authenticateAndPay</span>(
+        activity: <span class="code-class">FragmentActivity</span>,
+        amount: <span class="code-class">BigDecimal</span>,
+        onSuccess: () -> <span class="code-class">Unit</span>
+    ) {
+        <span class="code-keyword">val</span> promptInfo = <span class="code-class">BiometricPrompt.PromptInfo</span>.<span class="code-class">Builder</span>()
+            .<span class="code-fun">setTitle</span>(<span class="code-string">"Confirm Payment"</span>)
+            .<span class="code-fun">setSubtitle</span>(<span class="code-string">"$${amount}"</span>)
+            .<span class="code-fun">setAllowedAuthenticators</span>(
+                <span class="code-class">BIOMETRIC_STRONG</span> or <span class="code-class">DEVICE_CREDENTIAL</span>
+            )
+            .<span class="code-fun">build</span>()
+
+        <span class="code-keyword">val</span> callback = <span class="code-keyword">object</span> : <span class="code-class">BiometricPrompt.AuthenticationCallback</span>() {
+            <span class="code-keyword">override fun</span> <span class="code-fun">onAuthenticationSucceeded</span>(
+                result: <span class="code-class">AuthenticationResult</span>
+            ) {
+                <span class="code-comment">// Use cryptoObject for additional security</span>
+                <span class="code-keyword">val</span> cryptoObject = result.cryptoObject
+                <span class="code-fun">processSecurePayment</span>(cryptoObject)
+                <span class="code-fun">onSuccess</span>()
+            }
+        }
+
+        <span class="code-class">BiometricPrompt</span>(activity, executor, callback)
+            .<span class="code-fun">authenticate</span>(promptInfo, keystoreManager.<span class="code-fun">getCryptoObject</span>())
+    }
+}</code></pre>
+
+            <div class="callout" style="background: rgba(255,82,82,0.15); border-color: var(--coral-red); margin-top: 15px;">
+                <div class="callout-title" style="color: var(--coral-red);">⚠️ PCI DSS Compliance — NEVER Do This</div>
+                <ul style="color: white;">
+                    <li>❌ لا تخزن رقم البطاقة (PAN) أبداً على الجهاز</li>
+                    <li>❌ لا تخزن CVV حتى بشكل مؤقت</li>
+                    <li>❌ لا ترسل بيانات البطاقة عبر HTTP</li>
+                    <li>✅ استخدم <strong>Tokenization</strong> (Stripe, Braintree)</li>
+                    <li>✅ استخدم <strong>3D Secure</strong> للمصادقة الإضافية</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 8: Trade-off Matrix -->
+<section class="section" id="tradeoffs">
+    <div class="section-header">
+        <div class="section-number">8</div>
+        <h2 class="section-title">مصفوفة المقارنات والتوازنات (System Design Trade-off Matrix)</h2>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><span class="card-icon">⚖️</span> مصفوفة شاملة للتوازنات المعمارية</div>
+        <p>كل قرار معماري له ثمن. إليك المصفوفة الشاملة لأكثر التحديات شيوعاً في تصميم أنظمة أندرويد.</p>
+
+        <div class="table-wrap">
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">التحدي المعماري</th>
+                        <th style="width: 25%;">الحل المُوصى به</th>
+                        <th style="width: 25%;">المميزات (Pros)</th>
+                        <th style="width: 25%;">التوازنات (Trade-offs)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>تحديثات عالية التردد في الوقت الفعلي<br><span class="tag tag-red">High-frequency real-time</span></td>
+                        <td><strong>WebSockets</strong> مع <strong>FCM fallback</strong> + <strong>Exponential Backoff</strong></td>
+                        <td>
+                            <span class="tag tag-green">Latency منخفض</span><br>
+                            <span class="tag tag-green">Bi-directional</span><br>
+                            <span class="tag tag-green">Reliable delivery</span>
+                        </td>
+                        <td>
+                            <span class="tag tag-orange">Battery ↑</span><br>
+                            <span class="tag tag-orange">Complexity ↑</span><br>
+                            <span class="tag tag-orange">Connection mgmt</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>تنزيل وسائط كبيرة على اتصال ضعيف<br><span class="tag tag-red">Large media on poor network</span></td>
+                        <td><strong>Chunked Download</strong> + <strong>Resumable</strong> + <strong>Adaptive Bitrate</strong></td>
+                        <td>
+                            <span class="tag tag-green">Resume capable</span><br>
+                            <span class="tag tag-green">User experience ↑</span><br>
+                            <span class="tag tag-green">Bandwidth adaptive</span>
+                        </td>
+                        <td>
+                            <span class="tag tag-orange">Storage ↑</span><br>
+                            <span class="tag tag-orange">Server complexity ↑</span><br>
+                            <span class="tag tag-orange">Implementation time ↑</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>توسيع قاعدة الكود مع 20+ مطور<br><span class="tag tag-red">Scaling codebase</span></td>
+                        <td><strong>Feature-by-Module</strong> + <strong>Dynamic Feature Modules</strong> + <strong>Remote Build Cache</strong></td>
+                        <td>
+                            <span class="tag tag-green">Build time ↓</span><br>
+                            <span class="tag tag-green">Parallel dev</span><br>
+                            <span class="tag tag-green">Ownership clear</span>
+                        </td>
+                        <td>
+                            <span class="tag tag-orange">Initial setup ↑</span><br>
+                            <span class="tag tag-orange">DI complexity ↑</span><br>
+                            <span class="tag tag-orange">Navigation mgmt</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>العمل بدون إنترنت لمدة طويلة<br><span class="tag tag-red">Extended offline mode</span></td>
+                        <td><strong>Room SSOT</strong> + <strong>CRDTs</strong> + <strong>Periodic Sync</strong> via WorkManager</td>
+                        <td>
+                            <span class="tag tag-green">Full offline UX</span><br>
+                            <span class="tag tag-green">Conflict resolution</span><br>
+                            <span class="tag tag-green">Data consistency</span>
+                        </td>
+                        <td>
+                            <span class="tag tag-orange">Storage ↑</span><br>
+                            <span class="tag tag-orange">Sync logic complex</span><br>
+                            <span class="tag tag-orange">Conflict UX needed</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>أمان البيانات الحساسة<br><span class="tag tag-red">Sensitive data security</span></td>
+                        <td><strong>Android Keystore</strong> + <strong>EncryptedSharedPreferences</strong> + <strong>SQLCipher</strong> + <strong>SSL Pinning</strong></td>
+                        <td>
+                            <span class="tag tag-green">Hardware-backed keys</span><br>
+                            <span class="tag tag-green">Tamper resistant</span><br>
+                            <span class="tag tag-green">Compliance ready</span>
+                        </td>
+                        <td>
+                            <span class="tag tag-orange">Performance ↓</span><br>
+                            <span class="tag tag-orange">Certificate mgmt</span><br>
+                            <span class="tag tag-orange">Key rotation risk</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>تقليل استهلاك البطارية<br><span class="tag tag-red">Battery optimization</span></td>
+                        <td><strong>WorkManager</strong> + <strong>FusedLocationProvider</strong> + <strong>Batching</strong> + <strong>Doze-aware</strong></td>
+                        <td>
+                            <span class="tag tag-green">Battery ↓↓</span><br>
+                            <span class="tag tag-green">OS compliant</span><br>
+                            <span class="tag tag-green">User trust ↑</span>
+                        </td>
+                        <td>
+                            <span class="tag tag-orange">Real-time ↓</span><br>
+                            <span class="tag tag-orange">Latency ↑</span><br>
+                            <span class="tag tag-orange">Background limits</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>تحميل Feed سريع مع صور وفيديو<br><span class="tag tag-red">High-performance feed</span></td>
+                        <td><strong>Cursor Pagination</strong> + <strong>Glide</strong> + <strong>ExoPlayer pooling</strong> + <strong>View recycling</strong></td>
+                        <td>
+                            <span class="tag tag-green">60fps scroll</span><br>
+                            <span class="tag tag-green">Memory efficient</span><br>
+                            <span class="tag tag-green">Instant load</span>
+                        </td>
+                        <td>
+                            <span class="tag tag-orange">Memory mgmt</span><br>
+                            <span class="tag tag-orange">Player lifecycle</span><br>
+                            <span class="tag tag-orange">Thumbnail gen</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>توسيع فريق Android (20+ devs)<br><span class="tag tag-red">Team scaling</span></td>
+                        <td><strong>Multi-module</strong> + <strong>Feature APIs</strong> + <strong>Contract modules</strong> + <strong>CI/CD per module</strong></td>
+                        <td>
+                            <span class="tag tag-green">Parallel builds</span><br>
+                            <span class="tag tag-green">Clear boundaries</span><br>
+                            <span class="tag tag-green">Independent deploy</span>
+                        </td>
+                        <td>
+                            <span class="tag tag-orange">Setup cost ↑</span><br>
+                            <span class="tag tag-orange">Gradle config</span><br>
+                            <span class="tag tag-orange">Version alignment</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card highlight-card">
+        <div class="card-title"><span class="card-icon">🎓</span> نصائح كبير مهندس معماري للمقابلات (Senior Mobile Architect Interview Tips)</div>
+
+        <div class="grid-2">
+            <div class="callout success">
+                <div class="callout-title">✅ افعل</div>
+                <ul>
+                    <li><strong>اطرح أسئلة توضيحية:</strong> لا تبدأ التصميم قبل فهم النطاق (Scope) والقيود</li>
+                    <li><strong>حدد النطاق:</strong> "سأركز على Android Client-side، هل نحتاج Backend أيضاً؟"</li>
+                    <li><strong>ناقش التوازنات:</strong> "هذا الحل يُحسّن X لكن يُكلف Y — هل هذا مقبول؟"</li>
+                    <li><strong>ادفع بالمتطلبات غير الواقعية:</strong> "مليون مستخدم متزامن على جهاز واحد؟ دعنا نُحدد المقياس"</li>
+                    <li><strong>ابدأ بسيطاً ثم طوّر:</strong> MVP أولاً، ثم Scale</li>
+                </ul>
+            </div>
+            <div class="callout warning">
+                <div class="callout-title">❌ لا تفعل</div>
+                <ul>
+                    <li>لا تبدأ بكتابة الكود مباشرة</li>
+                    <li>لا تفترض متطلبات لم تُذكر</li>
+                    <li>لا تتجاهل Non-Functional Requirements</li>
+                    <li>لا تُقدّم حلاً واحداً دون مناقشة البدائل</li>
+                    <li>لا تُبالغ في التعقيد — Keep It Simple</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="callout" style="margin-top: 20px;">
+            <div class="callout-title">📋 Framework للإجابة على أسئلة System Design</div>
+            <ol>
+                <li><strong>Clarify (5 min):</strong> اسأل عن Functional/Non-Functional Requirements، Scale، Platform</li>
+                <li><strong>High-Level Design (10 min):</strong> ارسم Architecture Diagram على الورق/السبورة</li>
+                <li><strong>Deep Dive (15 min):</strong> اختر 2-3 مكونات وناقشها بتفصيل (Data Flow, Caching, Sync)</li>
+                <li><strong>Trade-offs (5 min):</strong> ناقش البدائل ولماذا اخترت هذا الحل</li>
+                <li><strong>Bottlenecks (5 min):</strong> ما هي نقاط الضعف؟ كيف تُحسّنها؟</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+</div><!-- end container -->
+
+<!-- Footer -->
+<div class="footer">
+    <h3 style="font-size: 1.5rem; margin-bottom: 15px;">الدليل الشامل لتصميم أنظمة أندرويد</h3>
+    <p style="opacity: 0.8; margin-bottom: 10px;">Android System Design Master Guide</p>
+    <p style="opacity: 0.6; font-size: 0.9rem;">يغطي: Architecture · Performance · Security · Offline-First · Scalability · Interview Prep</p>
+    <div style="margin-top: 25px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+        <span class="badge" style="background: rgba(255,255,255,0.1);">Kotlin</span>
+        <span class="badge" style="background: rgba(255,255,255,0.1);">Jetpack</span>
+        <span class="badge" style="background: rgba(255,255,255,0.1);">Clean Architecture</span>
+        <span class="badge" style="background: rgba(255,255,255,0.1);">MVVM</span>
+        <span class="badge" style="background: rgba(255,255,255,0.1);">Coroutines</span>
+        <span class="badge" style="background: rgba(255,255,255,0.1);">Flow</span>
+    </div>
+    <p style="margin-top: 30px; opacity: 0.5; font-size: 0.85rem;">تم إعداد هذا الدليل كمرجع شامل لمهندسي أندرويد Senior وArchitects</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,2227 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المرجع الهندسي الشامل لـ AOSP و Android Automotive OS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/kotlin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #7F52FF;
+            --primary-dark: #6B3FD4;
+            --secondary-color: #00E1C6;
+            --accent-color: #FF6B6B;
+            --accent-2: #F59E0B;
+            --bg-dark: #0F0F1A;
+            --bg-card: #1A1A2E;
+            --bg-code: #16161E;
+            --text-primary: #E8E8F0;
+            --text-secondary: #A0A0B8;
+            --text-muted: #6B6B8A;
+            --border-color: #2A2A40;
+            --success-color: #4ADE80;
+            --warning-color: #FBBF24;
+            --danger-color: #F87171;
+            --info-color: #60A5FA;
+            --aosp-color: #3B82F6;
+            --aaos-color: #10B981;
+            --hal-color: #F59E0B;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'IBM Plex Sans Arabic', 'Cairo', 'Noto Kufi Arabic', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 5px; }
+        .hero {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1a3e 50%, var(--bg-dark) 100%);
+            padding: 80px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(127, 82, 255, 0.1) 0%, transparent 70%);
+            animation: pulse 15s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        .hero-content { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+        .hero h1 {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--aosp-color), var(--aaos-color), var(--hal-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .hero .subtitle {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            font-weight: 400;
+        }
+        .hero .badge {
+            display: inline-block;
+            background: rgba(127, 82, 255, 0.2);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 5px;
+        }
+        .nav-container {
+            background: rgba(15, 15, 26, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-logo {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+        .nav-links a:hover { color: var(--primary-color); }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+        }
+        .sidebar {
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 100px);
+            overflow-y: auto;
+            padding-left: 20px;
+        }
+        .sidebar-title {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        .toc { list-style: none; }
+        .toc li { margin-bottom: 8px; }
+        .toc a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            border-right: 3px solid transparent;
+        }
+        .toc a:hover, .toc a.active {
+            background: rgba(127, 82, 255, 0.1);
+            color: var(--primary-color);
+            border-right-color: var(--primary-color);
+        }
+        .toc .toc-h2 { font-weight: 600; color: var(--text-primary); }
+        .toc .toc-h3 { padding-right: 25px; font-size: 0.85rem; }
+        .content { min-width: 0; }
+        .section { margin-bottom: 60px; scroll-margin-top: 80px; }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .section-number {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .section h2 {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .section h3 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 40px 0 20px;
+            padding-right: 15px;
+            border-right: 4px solid var(--secondary-color);
+        }
+        .section h4 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin: 25px 0 15px;
+        }
+        .section p {
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            text-align: justify;
+        }
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 25px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+        .card-title {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-icon { font-size: 1.5rem; }
+        .analogy {
+            background: linear-gradient(135deg, rgba(0, 225, 198, 0.1), rgba(127, 82, 255, 0.1));
+            border: 1px solid rgba(0, 225, 198, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            margin: 25px 0;
+            position: relative;
+        }
+        .analogy::before {
+            content: '💡';
+            position: absolute;
+            top: -15px; right: 20px;
+            background: var(--bg-dark);
+            padding: 5px 10px;
+            font-size: 1.2rem;
+        }
+        .analogy-title {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        .analogy p { color: var(--text-primary); }
+        .warning {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid var(--warning-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        .warning-icon { font-size: 1.5rem; flex-shrink: 0; }
+        .warning-content { flex: 1; }
+        .warning-title { font-weight: 700; color: var(--warning-color); margin-bottom: 5px; }
+        .danger {
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid var(--danger-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        .danger-title { font-weight: 700; color: var(--danger-color); margin-bottom: 5px; }
+        .info-box {
+            background: rgba(96, 165, 250, 0.1);
+            border: 1px solid var(--info-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        .info-title { font-weight: 700; color: var(--info-color); margin-bottom: 5px; }
+        pre {
+            background: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 20px 0;
+            direction: ltr;
+            text-align: left;
+        }
+        pre code {
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            direction: ltr;
+            display: block;
+        }
+        code {
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            background: rgba(127, 82, 255, 0.15);
+            color: var(--secondary-color);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            direction: ltr;
+            display: inline-block;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin: 25px 0;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+        }
+        th {
+            background: rgba(127, 82, 255, 0.2);
+            color: var(--text-primary);
+            font-weight: 700;
+            padding: 15px;
+            text-align: right;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        tr:hover { background: rgba(127, 82, 255, 0.05); }
+        ul, ol { margin: 15px 0; padding-right: 25px; }
+        li { margin-bottom: 10px; color: var(--text-secondary); }
+        li::marker { color: var(--primary-color); }
+        .interview-q {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            margin: 20px 0;
+            border-right: 4px solid var(--accent-color);
+        }
+        .interview-q h4 { color: var(--accent-color); margin-top: 0; }
+        .interview-a {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+        }
+        .interview-tag {
+            display: inline-block;
+            background: rgba(255, 107, 107, 0.2);
+            color: var(--accent-color);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .diagram {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .diagram-title {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        footer {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 60px;
+        }
+        footer p { color: var(--text-muted); font-size: 0.9rem; }
+        @media (max-width: 1024px) {
+            .container { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .hero h1 { font-size: 2rem; }
+        }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero h1 { font-size: 1.5rem; }
+            .hero .subtitle { font-size: 1rem; }
+        }
+        .fade-in { animation: fadeIn 0.8s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .highlight {
+            background: linear-gradient(120deg, rgba(127, 82, 255, 0.3) 0%, rgba(0, 225, 198, 0.3) 100%);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .step {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+        .aosp-badge {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid var(--aosp-color);
+            color: var(--aosp-color);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .aaos-badge {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--aaos-color);
+            color: var(--aaos-color);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .hal-badge {
+            display: inline-block;
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid var(--hal-color);
+            color: var(--hal-color);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <header class="hero">
+        <div class="hero-content">
+            <h1>المرجع الهندسي الشامل لـ AOSP و Android Automotive OS</h1>
+            <p class="subtitle">من نواة لينكس إلى لوحة القيادة: دليلك العميق لبنية نظام أندرويد المفتوح المصدر ونظام أندرويد للسيارات</p>
+            <div>
+                <span class="badge">AOSP Architecture</span>
+                <span class="badge">Binder IPC</span>
+                <span class="badge">VHAL</span>
+                <span class="badge">Car Service</span>
+                <span class="badge">CAN Bus</span>
+                <span class="badge">Power Management</span>
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav-container">
+        <div class="nav">
+            <div class="nav-logo">AOSP & AAOS المرجع الهندسي</div>
+            <ul class="nav-links">
+                <li><a href="#intro">المقدمة</a></li>
+                <li><a href="#layers">طبقات AOSP</a></li>
+                <li><a href="#binder">Binder IPC</a></li>
+                <li><a href="#aaos">AAOS</a></li>
+                <li><a href="#carservice">Car Service</a></li>
+                <li><a href="#vhal">VHAL</a></li>
+                <li><a href="#power">الطاقة</a></li>
+                <li><a href="#comparison">المقارنة</a></li>
+                <li><a href="#interview">المقابلات</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-title">المحتويات</div>
+            <ul class="toc">
+                <li><a href="#intro" class="toc-h2">١. المقدمة والفلسفة</a></li>
+                <li><a href="#aosp-vs-gms" class="toc-h3">AOSP vs GMS</a></li>
+                <li><a href="#layers" class="toc-h2">٢. طبقات AOSP الداخلية</a></li>
+                <li><a href="#kernel" class="toc-h3">Linux Kernel</a></li>
+                <li><a href="#hal" class="toc-h3">HAL</a></li>
+                <li><a href="#binder" class="toc-h3">Binder IPC</a></li>
+                <li><a href="#aaos" class="toc-h2">٣. Android Automotive OS</a></li>
+                <li><a href="#aaos-vs-auto" class="toc-h3">AAOS vs Android Auto</a></li>
+                <li><a href="#carservice" class="toc-h2">٤. Car Service Layer</a></li>
+                <li><a href="#cabin" class="toc-h3">CarCabinManager</a></li>
+                <li><a href="#hvac" class="toc-h3">CarHvacManager</a></li>
+                <li><a href="#sensor" class="toc-h3">CarSensorManager</a></li>
+                <li><a href="#audio" class="toc-h3">CarAudio</a></li>
+                <li><a href="#vhal" class="toc-h2">٥. VHAL</a></li>
+                <li><a href="#canbus" class="toc-h3">CAN Bus / Ethernet</a></li>
+                <li><a href="#properties" class="toc-h3">Vehicle Properties</a></li>
+                <li><a href="#power" class="toc-h2">٦. الطاقة والأمان</a></li>
+                <li><a href="#garage" class="toc-h3">Garage Mode</a></li>
+                <li><a href="#distraction" class="toc-h3">Driver Distraction</a></li>
+                <li><a href="#comparison" class="toc-h2">٧. الجدول المقارن</a></li>
+                <li><a href="#interview" class="toc-h2">٨. أسئلة المقابلات</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+
+            <!-- Section 1: Introduction -->
+            <section class="section fade-in" id="intro">
+                <div class="section-header">
+                    <div class="section-number">١</div>
+                    <h2>المقدمة: فلسفة بنية AOSP والفرق الجوهري مع أندرويد التجاري</h2>
+                </div>
+
+                <p>
+                    عندما نتحدث عن <code>AOSP</code> (Android Open Source Project)، نتحدث عن <strong>المصدر المفتوح</strong> لنظام التشغيل أندرويد. لكن ما يجهله الكثيرون هو أن <span class="highlight">أندرويد التجاري</span> الذي يعمل على هاتفك الذكي ليس مجرد AOSP خام - بل هو <strong>AOSP مُعدّل ومُغلّف</strong> بخدمات Google (GMS). هذا الفرق الجوهري هو البوابة التي تفصل بين "مبرمج التطبيقات" و"مهندس المنصة".
+                </p>
+
+                <h3 id="aosp-vs-gms">AOSP vs GMS: المصدر المفتوح مقابل النظام التجاري</h3>
+
+                <p>
+                    <code>AOSP</code> هو <strong>المشروع المفتوح المصدر</strong> الذي تديره Google وتُساهم فيه شركات أخرى (Samsung, Qualcomm, Sony, إلخ). يتضمن: نواة لينكس، مكتبات C/C++، Android Runtime (ART)، Framework APIs، وتطبيقات النظام الأساسية (Dialer, Contacts, Messaging). لكنه <strong>لا يتضمن</strong> تطبيقات Google (Gmail, Maps, Play Store) ولا خدمات Google Play Services.
+                </p>
+
+                <p>
+                    <code>GMS</code> (Google Mobile Services) هو <strong>الطبقة التجارية</strong> التي تضيفها Google فوق AOSP. يتضمن: Google Play Store، Google Play Services (Push Notifications, Location, Maps API)، Google Apps (Gmail, YouTube, Drive)، وشهادات Google للأمان. بدون GMS، لا يمكنك تحميل التطبيقات من Play Store ولا استخدام خرائط Google.
+                </p>
+
+                <div class="analogy">
+                    <div class="analogy-title">التمثيل الحياتي: السيارة الأساسية مقابل السيارة الفاخرة</div>
+                    <p>
+                        <strong>AOSP</strong> كهيكل سيارة أساسي: يحتوي على المحرك، الهيكل، العجلات، والمقاعد. يمكنك قيادتها والتنقل بها. لكنها لا تحتوي على نظام تكييف، نظام ملاحة، راديو فاخر، أو مساعد ذكي.
+                    </p>
+                    <p>
+                        <strong>GMS</strong> كالإضافات الفاخرة: نظام الملاحة (Google Maps)، المساعد الصوتي (Google Assistant)، متجر التطبيقات (Play Store)، والخدمات السحابية. هذه الإضافات تجعل السيارة "مريحة" لكنها <strong>ليست ضرورية للعمل</strong>.
+                    </p>
+                    <p>
+                        <strong>الشركات المصنعة</strong> (Samsung, Xiaomi, Huawei) تأخذ هيكل AOSP، تضيف GMS (إذا كان لديهم ترخيص)، ثم تضيف طبقاتهم الخاصة (One UI, MIUI, HarmonyOS).
+                    </p>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>المكون</th>
+                                <th>AOSP (مفتوح المصدر)</th>
+                                <th>GMS (تجاري)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Linux Kernel</strong></td>
+                                <td>✅ متضمن</td>
+                                <td>❌ لا يُضاف</td>
+                            </tr>
+                            <tr>
+                                <td><strong>HAL (Hardware Abstraction Layer)</strong></td>
+                                <td>✅ متضمن</td>
+                                <td>❌ لا يُضاف</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Android Framework</strong></td>
+                                <td>✅ متضمن</td>
+                                <td>❌ لا يُضاف</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Google Play Store</strong></td>
+                                <td>❌ غير متضمن</td>
+                                <td>✅ مُضاف</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Google Play Services</strong></td>
+                                <td>❌ غير متضمن</td>
+                                <td>✅ مُضاف</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Google Apps</strong></td>
+                                <td>❌ غير متضمن</td>
+                                <td>✅ مُضاف</td>
+                            </tr>
+                            <tr>
+                                <td><strong>ترخيص الاستخدام</strong></td>
+                                <td>Apache 2.0 (مجاني)</td>
+                                <td>يتطلب اتفاقية مع Google</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">🏗️</span> لماذا يهمنا AOSP كمهندسين منصة؟</div>
+                    <p>
+                        فهم AOSP يعني فهم <strong>كيف يعمل أندرويد حقاً</strong> تحت الغطاء. عندما يتجمد تطبيقك (ANR)، أو يتسرب ذاكرة، أو يفشل في الاتصال بالشبكة - فهم Binder IPC و Zygote و SystemServer يمكّنك من تشخيص المشكلة على مستوى النظام، لا مجرد مستوى التطبيق.
+                    </p>
+                    <p>
+                        في عالم السيارات (AAOS)، يصبح هذا <strong>أكثر أهمية</strong> لأنك تتعامل مع: عتاد مخصص (CAN Bus، أجهزة استشعار، أنظمة تكييف)، متطلبات أمان صارمة (لا يمكن للسائق أن يتشتت)، وإدارة طاقة معقدة (السيارة تدخل وضع السكون).
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 2: AOSP Layers -->
+            <section class="section fade-in" id="layers">
+                <div class="section-header">
+                    <div class="section-number">٢</div>
+                    <h2>تشريح طبقات AOSP الداخلية بالكامل</h2>
+                </div>
+
+                <p>
+                    بنية AOSP تتكون من <strong>خمس طبقات رئيسية</strong>، كل منها مسؤول عن وظائف محددة. فهم هذه الطبقات هو المفتاح لفهم كيف يعمل أي جهاز أندرويد - سواء كان هاتفاً أو سيارة أو ساعة ذكية.
+                </p>
+
+                <div class="diagram">
+                    <div class="diagram-title">الهيكل الهرمي لطبقات AOSP</div>
+                    <pre style="background: transparent; border: none; text-align: center; color: var(--text-primary); font-size: 1rem;">
+┌─────────────────────────────────────────────────────────────┐
+│  التطبيقات (System Apps + Third-Party Apps)                 │
+├─────────────────────────────────────────────────────────────┤
+│  إطار العمل (Android Framework - ActivityManager, WindowManager) │
+├─────────────────────────────────────────────────────────────┤
+│  مكتبات النظام الأصلية (Native Libraries - SurfaceFlinger, Media) │
+├─────────────────────────────────────────────────────────────┤
+│  طبقة تجريد العتاد (HAL - Hardware Abstraction Layer)       │
+├─────────────────────────────────────────────────────────────┤
+│  نواة لينكس (Linux Kernel - Binder, Display, Audio Drivers)  │
+└─────────────────────────────────────────────────────────────┘
+                    </pre>
+                </div>
+
+                <h3 id="kernel">Linux Kernel: الأساس الذي يقوم عليه كل شيء</h3>
+
+                <p>
+                    في قلب كل جهاز أندرويد يوجد <strong>نواة لينكس مُعدّلة</strong>. لكن هذه ليست نواة لينكس قياسية. Google قامت بإضافة <span class="highlight">تعديلات جوهرية</span> تجعلها مناسبة للأجهزة المحمولة والسيارات.
+                </p>
+
+                <h4>Low Memory Killer (LMK): القاتل الذكي للذاكرة</h4>
+
+                <p>
+                    في أنظمة لينكس التقليدية، عندما تنفد الذاكرة، يُفعّل <code>Out-Of-Memory (OOM) Killer</code> الذي يقتل العمليات بشكل عشوائي. لكن في أندرويد، هذا غير مقبول - لا يمكنك قتل تطبيق الهاتف أثناء مكالمة طوارئ! لذا أضافت Google <code>Low Memory Killer (LMK)</code>.
+                </p>
+
+                <p>
+                    <code>LMK</code> يعمل على <strong>مستوى kernel space</strong> ويُراقب مستوى الذاكرة الحررة. عندما تنخفض الذاكرة، يبدأ في قتل العمليات حسب <strong>أولوية مُحددة مسبقاً</strong> (OomAdj Scores). العمليات غير المهمة (Background Apps) تُقتل أولاً، بينما العمليات الحيوية (System Server, Phone App) تُحفظ حتى النهاية.
+                </p>
+
+                <pre><code class="language-cpp">// المسار في شيفرة AOSP المصدرية
+// kernel/drivers/staging/android/lowmemorykiller.c
+
+// آلية LMK: تحقق من مستوى الذاكرة المتاحة
+static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc) {
+    int rem = 0;
+    int tasksize;
+    int i;
+    short min_score_adj = OOM_SCORE_ADJ_MAX + 1;
+
+    // تحديد الحد الأدنى لـ OomAdj بناءً على الذاكرة المتاحة
+    for (i = 0; i < array_size; i++) {
+        if (other_free < lowmem_minfree[i]) {
+            min_score_adj = lowmem_adj[i];
+            break;
+        }
+    }
+
+    // اجتياز جميع العمليات وإيجاد أفضل ضحية
+    // (العملية ذات OomAdj الأعلى = الأقل أهمية)
+    // ...
+}</code></pre>
+
+                <div class="analogy">
+                    <div class="analogy-title">التمثيل الحياتي: مدير طوارئ في مبنى مزدحم</div>
+                    <p>
+                        <code>LMK</code> كمدير طوارئ في مبنى مزدحم. عندما يمتلئ المبنى (تنفد الذاكرة)، لا يطلب من الجميع الخروج بشكل عشوائي. بدلاً من ذلك، يبدأ بطرد <strong>الزوار غير الضروريين</strong> (Background Apps) أولاً. إذا استمر الازدحام، يطرد <strong>الموظفين في الأقسام الثانوية</strong> (Cached Services). يبقى <strong>فريق الطوارئ والإدارة</strong> (System Server, Phone) حتى النهاية. هذا يضمن أن النظام <strong>يبقى مستقراً</strong> حتى في أسوأ الظروف.
+                    </p>
+                </div>
+
+                <h4>Wakelocks: منع النوم عند الحاجة</h4>
+
+                <p>
+                    في أنظمة لينكس التقليدية، عندما لا يكون هناك عمل، يدخل النظام في <strong>وضع السكون (Sleep/Suspend)</strong> لتوفير الطاقة. لكن في الهواتف، قد تحتاج إلى إبقاء WiFi نشطاً لتلقي رسائل Push، أو إبقاء الشاشة مضاءة أثناء مشاهدة فيديو.
+                </p>
+
+                <p>
+                    <code>Wakelocks</code> هي آلية أضافتها Google إلى نواة لينكس تسمح للعمليات (في kernel space) بـ <strong>"طلب الإبقاء على الاستيقاظ"</strong>. عندما يحتفظ برنامج تشغيل (Driver) بـ Wakelock، لا يستطيع النظام الدخول في وضع السكون العميق.
+                </p>
+
+                <pre><code class="language-cpp">// استخدام Wakelock في kernel driver
+#include &lt;linux/wakelock.h&gt;
+
+static struct wake_lock my_wakelock;
+
+void init_driver() {
+    wake_lock_init(&my_wakelock, WAKE_LOCK_SUSPEND, "my_driver_wakelock");
+}
+
+void start_important_operation() {
+    wake_lock(&my_wakelock); // منع النظام من النوم
+    // ... إجراء العملية الحرجة ...
+}
+
+void finish_operation() {
+    wake_unlock(&my_wakelock); // السماح بالنوم مرة أخرى
+}</code></pre>
+
+                <div class="warning">
+                    <div class="warning-icon">⚠️</div>
+                    <div class="warning-content">
+                        <div class="warning-title">مشكلة Wakelocks: تسريب الطاقة</div>
+                        <p>إذا نسي برنامج تشغيل (Driver) استدعاء <code>wake_unlock()</code>، فإن الجهاز <strong>لن يدخل في وضع السكون أبداً</strong>، مما يؤدي إلى استنزاف البطارية خلال ساعات. في Android Automotive، هذا يعني أن السيارة قد تفقد طاقة البطارية بالكامل بين عشية وضحاها. لذا، تُراقب Google Wakelocks بصرامة في تطبيقات النظام.</p>
+                    </div>
+                </div>
+
+                <h4>Binder Driver: القلب النابض للاتصال بين العمليات</h4>
+
+                <p>
+                    <code>Binder</code> هو <span class="highlight">أهم إضافة</span> قامت بها Google على نواة لينكس. في أنظمة لينكس التقليدية، العمليات تتواصل عبر <code>IPC (Inter-Process Communication)</code> باستخدام <code>Pipes</code> أو <code>Sockets</code> أو <code>Shared Memory</code>. لكن هذه الآليات <strong>بطيئة</strong> و<strong>معقدة</strong> للاستخدام اليومي.
+                </p>
+
+                <p>
+                    <code>Binder</code> يُقدّم <strong>آلية IPC خفيفة وفعالة</strong> مصممة خصيصاً لأندرويد. يسمح لعملية (Client) باستدعاء دوال في عملية أخرى (Server) <strong>كأنها دوال محلية</strong>. هذا يُعرف بـ <strong>Remote Procedure Call (RPC)</strong>.
+                </p>
+
+                <div class="analogy">
+                    <div class="analogy-title">التمثيل الحياتي: نظام الأنابيب في المبنى</div>
+                    <p>
+                        تخيل مبنىً به شقق متعددة (عمليات). كل شقة لديها أنابيب مياه خاصة (ذاكرة خاصة) لا يمكن للشقق الأخرى الوصول إليها. إذا أراد ساكن في الشقة 5 (تطبيقك) الحصول على ماء ساخن من الشقة 1 (System Server)، فإنه لا يذهب بنفسه. بدلاً من ذلك، يرسل <strong>رسالة</strong> عبر <strong>نظام أنابيب مركزي</strong> (Binder Driver) يديره حارس المبنى (Kernel). الحارس يأخذ الرسالة، يتحقق من هوية المرسل (Security)، يذهب إلى الشقة 1، يحضر الماء الساخن، ويعيده إلى الشقة 5. هذا النظام المركزي <strong>أسرع</strong> من أن يذهب كل ساكن بنفسه، و<strong>أكثر أماناً</strong> لأن الحارس يتحقق من الهويات.
+                    </p>
+                </div>
+
+                <pre><code class="language-cpp">// البنية الداخلية لـ Binder Transaction
+// kernel/drivers/android/binder.c
+
+struct binder_transaction_data {
+    // معرف العملية المستهدفة
+    union {
+        __u32 handle;       // معامل في العملية الحالية
+        binder_uintptr_t ptr; // مؤشر في العملية المستهدفة
+    } target;
+
+    // معرف الدالة المطلوب استدعاؤها
+    __u32 code;
+
+    // البيانات المرسلة
+    binder_uintptr_t buffer;
+
+    // حجم البيانات
+    binder_size_t data_size;
+};</code></pre>
+
+                <p>
+                    <strong>آلية عمل Binder:</strong>
+                </p>
+
+                <ol>
+                    <li><strong>التسجيل (Registration):</strong> الخدمة (مثلاً <code>ActivityManagerService</code>) تُسجّل نفسها مع <code>ServiceManager</code> عبر Binder.</li>
+                    <li><strong>البحث (Lookup):</strong> العميل (تطبيقك) يطلب من <code>ServiceManager</code> عنوان الخدمة.</li>
+                    <li><strong>الاستدعاء (Transaction):</strong> العميل يُرسل <code>Binder Transaction</code> يحتوي على: معرف الخدمة، معرف الدالة (code)، والبيانات (arguments).</li>
+                    <li><strong>التنفيذ:</strong> الـ Kernel ينسخ البيانات من مساحة العميل إلى مساحة الخادم، ويستدعي الدالة المطلوبة.</li>
+                    <li><strong>الإرجاع:</strong> النتيجة تُنسخ بالعكس عبر نفس الآلية.</li>
+                </ol>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">🔒</span> الأمان في Binder: التحقق من الهوية</div>
+                    <p>
+                        Binder لا ينقل البيانات فقط - بل ينقل <strong>هوية المرسل</strong> أيضاً. عندما يستدعي تطبيقك <code>ActivityManager</code>، يعرف <code>ActivityManager</code> <strong>بالضبط</strong> من هو التطبيق الذي يستدعيه (عبر <code>Binder.getCallingUid()</code>). هذا يمكّن النظام من:
+                    </p>
+                    <ul>
+                        <li>فرض <code>Permissions</code> على مستوى النظام.</li>
+                        <li>منع التطبيقات من انتحال هوية تطبيقات أخرى.</li>
+                        <li>تتبع أي عملية تستهلك موارد كثيرة.</li>
+                    </ul>
+                </div>
+
+                <h3 id="hal">HAL: طبقة تجريد العتاد (Hardware Abstraction Layer)</h3>
+
+                <p>
+                    <code>HAL</code> هي الطبقة التي <strong>تفصل إطار العمل (Framework) عن العتاد الفعلي</strong>. الفكرة: إطار العمل يتحدث لغة موحدة (Java APIs)، بينما HAL يترجم هذه اللغة إلى أوامر خاصة بكل جهاز.
+                </p>
+
+                <p>
+                    مثال: عندما تضغط على زر رفع الصوت في هاتفك، يحدث التالي:
+                </p>
+
+                <ol>
+                    <li>إطار العمل (Framework) يستدعي <code>AudioManager.setStreamVolume()</code>.</li>
+                    <li>Framework يتحدث إلى HAL عبر <code>JNI (Java Native Interface)</code>.</li>
+                    <li>HAL يستدعي برنامج تشغيل (Driver) خاص بشركة Qualcomm أو MediaTek.</li>
+                    <li>الـ Driver يتحدث إلى العتاد الفعلي (Audio Codec) عبر I2C أو SPI.</li>
+                </ol>
+
+                <pre><code class="language-cpp">// مثال: HAL للكاميرا (Camera HAL)
+// hardware/interfaces/camera/...
+
+// Camera HAL Interface (HIDL/AIDL)
+interface ICameraDevice {
+    // فتح الكاميرا
+    openDevice() generates (Status status);
+
+    // التقاط صورة
+    captureRequest(Request request) generates (Status status);
+
+    // إغلاق الكاميرا
+    closeDevice() generates (Status status);
+};
+
+// التنفيذ الفعلي يختلف بين الشركات المصنعة
+// Samsung قد تستخدم معالج Exynos
+// Qualcomm تستخدم Snapdragon ISP
+// لكن الواجهة (Interface) موحدة!</code></pre>
+
+                <div class="info-box">
+                    <div class="warning-icon">ℹ️</div>
+                    <div>
+                        <div class="info-title">HIDL vs AIDL: التحول في HAL</div>
+                        <p>في أندرويد 8 (Oreo)، قدمت Google <code>HIDL (HAL Interface Definition Language)</code> لفصل HAL عن Framework. لكن في أندرويد 11+، بدأ التحول إلى <code>AIDL (Android Interface Definition Language)</code> لأنه أبسط وأكثر أداءً. الفرق: HIDL يستخدم <code>hwbinder</code> (نسخة من Binder مخصصة للعتاد)، بينما AIDL يستخدم <code>binder</code> العادي. في AAOS الحديث، معظم HALs تستخدم AIDL.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Binder IPC Deep Dive -->
+            <section class="section fade-in" id="binder">
+                <div class="section-header">
+                    <div class="section-number">٣</div>
+                    <h2>الآلية الداخلية للاتصال بين العمليات عبر Binder IPC</h2>
+                </div>
+
+                <p>
+                    <code>Binder IPC</code> هو <strong>العمود الفقري</strong> لكل عملية اتصال في أندرويد. عندما تفتح تطبيقاً، أو تلتقط صورة، أو تستلم إشعاراً - فإن Binder يعمل في الخلفية. فهم هذه الآلية يفصل بين "مبرمج التطبيقات العادي" و"مهندس المنصة المتمرس".
+                </p>
+
+                <h3>Binder: لماذا لا نستخدم Sockets أو Pipes؟</h3>
+
+                <p>
+                    في أنظمة لينكس التقليدية، العمليات تتواصل عبر <code>Unix Domain Sockets</code> أو <code>Pipes</code>. لكن هذه الآليات <strong>بطيئة</strong> لأنها تتطلب:
+                </p>
+
+                <ul>
+                    <li><strong>نسخ البيانات مرتين:</strong> من مساحة العميل إلى Kernel Buffer، ثم من Kernel Buffer إلى مساحة الخادم.</li>
+                    <li><strong>تسلسل (Serialization) مكلف:</strong> يجب تحويل البيانات إلى بايتات ثم إعادة بنائها.</li>
+                    <li><strong>لا يوجد هوية:</strong> الخادم لا يعرف من هو العميل بدون آليات إضافية.</li>
+                </ul>
+
+                <p>
+                    <code>Binder</code> يحل هذه المشاكل عبر <strong>آلية مُحسّنة</strong>:
+                </p>
+
+                <ul>
+                    <li><strong>نسخ واحد فقط (One-Copy):</strong> Binder يستخدم <code>mmap()</code> لإنشاء ذاكرة مشتركة (Shared Memory) بين العمليات. البيانات تُنسخ مرة واحدة فقط من العميل إلى Kernel، ثم يُعطى الخادم <strong>مؤشراً</strong> (Pointer) إلى نفس البيانات دون نسخ إضافي.</li>
+                    <li><strong>تسلسل Parcellable:</strong> أندرويد يستخدم <code>Parcel</code> - تنسيق تسلسل مُحسّن يعرف بالضبط كيف يُرتّب البيانات في الذاكرة لتجنب إعادة الترتيب.</li>
+                    <li><strong>هوية مُدمجة:</strong> كل Transaction يحمل <code>UID</code> و <code>PID</code> للعميل تلقائياً.</li>
+                </ul>
+
+                <div class="analogy">
+                    <div class="analogy-title">التمثيل الحياتي: خدمة توصيل الطرود بين الشركات</div>
+                    <p>
+                        تخيل شركتين في مبنى واحد. الشركة أ (العميل) تريد إرسال مستندات إلى الشركة ب (الخادم).
+                    </p>
+                    <p>
+                        <strong>Socket (الطريقة القديمة):</strong> الشركة أ تضع المستندات في صندوق، تُغلّفه، تكتب عنوان الشركة ب، وتعطيه لساعي البريد (Kernel). الساعي يأخذ الصندوق إلى مستودع بريد مركزي، ثم يأخذه إلى الشركة ب. الشركة ب تفتح الصندوق، تُزيل التغليف، وتقرأ المستندات. <strong>بطيء</strong> لأن هناك تغليف وفك تغليف ونقل عبر مستودع مركزي.
+                    </p>
+                    <p>
+                        <strong>Binder (الطريقة الذكية):</strong> الشركة أ تضع المستندات في <strong>صندوق بريد مشترك</strong> (Shared Memory via mmap) في الردهة. الشركة أ تكتب رسالة قصيرة: "الشركة ب: مستنداتك في الصندوق رقم 7". الساعي (Kernel) يأخذ الرسالة القصيرة فقط (وليس المستندات!) ويُسلمها للشركة ب. الشركة ب تذهب إلى الصندوق رقم 7 وتقرأ المستندات <strong>مباشرة</strong> دون نسخ. <strong>أسرع بكثير</strong> لأن المستندات الثقيلة لم تُنقل أبداً.
+                    </p>
+                </div>
+
+                <h3>ServiceManager: دفتر عناوين النظام</h3>
+
+                <p>
+                    <code>ServiceManager</code> هو <strong>أول خدمة تعمل في النظام</strong> بعد إقلاع kernel. يعمل كـ <strong>دفتر عناوين مركزي</strong> (Registry). كل خدمة نظام (System Service) تُسجّل نفسها مع ServiceManager عند بدء التشغيل. عندما يحتاج تطبيق إلى خدمة، يسأل ServiceManager عن عنوانها (Handle).
+                </p>
+
+                <pre><code class="language-cpp">// ServiceManager في Native Code
+// frameworks/native/cmds/servicemanager/ServiceManager.cpp
+
+// تسجيل خدمة
+status_t ServiceManager::addService(const String16& name, 
+                                     const sp<IBinder>& service) {
+    // التحقق من الأذونات
+    // ...
+    mNameToService[name] = service;
+    return OK;
+}
+
+// البحث عن خدمة
+sp<IBinder> ServiceManager::getService(const String16& name) {
+    auto it = mNameToService.find(name);
+    if (it != mNameToService.end()) {
+        return it->second;
+    }
+    return nullptr;
+}</code></pre>
+
+                <h3>SystemServer: قلب النظام النابض</h3>
+
+                <p>
+                    <code>SystemServer</code> هو العملية <strong>الأهم</strong> في أندرويد. يُطلق بواسطة <code>Zygote</code> (عملية "الأم" التي تُنشأ جميع تطبيقات Java) أثناء إقلاع النظام. SystemServer يُطلق <strong>جميع خدمات النظام</strong>:
+                </p>
+
+                <ul>
+                    <li><code>ActivityManagerService</code> - إدارة دورة حياة التطبيقات</li>
+                    <li><code>WindowManagerService</code> - إدارة النوافذ والشاشات</li>
+                    <li><code>PackageManagerService</code> - إدارة التطبيقات المثبتة</li>
+                    <li><code>PowerManagerService</code> - إدارة الطاقة والشاشة</li>
+                    <li><code>InputManagerService</code> - معالجة اللمس والأزرار</li>
+                    <li><code>AudioService</code> - إدارة الصوت</li>
+                    <li><code>CarService</code> (في AAOS) - خدمات السيارة</li>
+                </ul>
+
+                <pre><code class="language-java">// SystemServer.java - تشغيل خدمات النظام
+// frameworks/base/services/java/com/android/server/SystemServer.java
+
+private void startBootstrapServices() {
+    // 1. تسجيل ServiceManager
+    ServiceManager.addService("package", mPackageManager);
+
+    // 2. تشغيل ActivityManager
+    mActivityManagerService = ActivityManagerService.Lifecycle.startService(
+        mSystemServiceManager, atm);
+    mActivityManagerService.setSystemProcess();
+
+    // 3. تشغيل PowerManager
+    mPowerManagerService = mSystemServiceManager.startService(
+        PowerManagerService.class);
+
+    // ... إلخ
+}
+
+private void startOtherServices() {
+    // تشغيل WindowManager
+    WindowManagerService wm = WindowManagerService.main(...);
+    ServiceManager.addService(Context.WINDOW_SERVICE, wm);
+
+    // تشغيل InputManager
+    inputManager = new InputManagerService(context);
+    ServiceManager.addService(Context.INPUT_SERVICE, inputManager);
+
+    // ... إلخ
+}</code></pre>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">🧬</span> Zygote: أمّ جميع التطبيقات</div>
+                    <p>
+                        <code>Zygote</code> هي عملية خاصة تُطلق أثناء إقلاع النظام. تقوم بتحميل <strong>جميع مكتبات Java الأساسية</strong> (Android Framework classes) في الذاكرة. عندما تُطلق تطبيقاً جديداً، لا يُنشأ من الصفر - بل يُنسخ (Fork) من Zygote. هذا يعني:
+                    </p>
+                    <ul>
+                        <li><strong>إقلاع سريع:</strong> التطبيقات تبدأ خلال مئات الميلي ثانية بدلاً من ثوانٍ.</li>
+                        <li><strong>توفير ذاكرة:</strong> مكتبات Framework تُشارك بين جميع التطبيقات عبر <code>Copy-On-Write (COW)</code>.</li>
+                    </ul>
+                    <p>
+                        في AAOS، Zygote يُحسّن بشكل خاص لـ <strong>سرعة الإقلاع البارد (Cold Boot)</strong> - السيارة يجب أن تُقلع خلال ثوانٍ معدودة، لا دقائق.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 4: Android Automotive OS -->
+            <section class="section fade-in" id="aaos">
+                <div class="section-header">
+                    <div class="section-number">٤</div>
+                    <h2>الدخول إلى عالم السيارات: Android Automotive OS</h2>
+                </div>
+
+                <p>
+                    <code>Android Automotive OS (AAOS)</code> هو <strong>نظام التشغيل الكامل</strong> الذي يعمل على وحدة المعلومات والترفيه في السيارة (IVI - In-Vehicle Infotainment). هذا يختلف تماماً عن <code>Android Auto</code> الذي يعمل على هاتفك الذكي ويُعرض على شاشة السيارة.
+                </p>
+
+                <h3 id="aaos-vs-auto">AAOS vs Android Auto: الفرق الجوهري</h3>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>البُعد</th>
+                                <th>Android Automotive OS (AAOS)</th>
+                                <th>Android Auto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>مكان التشغيل</strong></td>
+                                <td>على وحدة IVI في السيارة (مباشرة)</td>
+                                <td>على الهاتف الذكي (يتم عكس الشاشة)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>العتاد</strong></td>
+                                <td>SoC مخصص للسيارة (Qualcomm SA8155, Samsung Exynos Auto)</td>
+                                <td>معالج الهاتف (Snapdragon, Exynos)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>الوصول إلى عتاد السيارة</strong></td>
+                                <td>كامل (CAN Bus, HVAC, Sensors)</td>
+                                <td>محدود (عبر بروتوكولات Google)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>التحكم في النظام</strong></td>
+                                <td>الشركة المصنعة للسيارة تتحكم بالكامل</td>
+                                <td>Google تتحكم في التجربة</td>
+                            </tr>
+                            <tr>
+                                <td><strong>التخصيص</strong></td>
+                                <td>عالي (UI/UX خاص بكل شركة)</td>
+                                <td>محدود (قوالب Google)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>أمثلة</strong></td>
+                                <td>Volvo XC40, Polestar 2, GM Ultifi, Ford SYNC 4</td>
+                                <td>أي سيارة تدعم Android Auto</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="analogy">
+                    <div class="analogy-title">التمثيل الحياتي: التلفزيون المدمج مقابل Chromecast</div>
+                    <p>
+                        <strong>AAOS</strong> كالتلفزيون الذكي (Smart TV): نظام التشغيل <strong>موجود داخل التلفزيون</strong>. يمكنك تثبيت تطبيقات عليه مباشرة. الشركة المصنعة للتلفزيون تتحكم في الواجهة والميزات.
+                    </p>
+                    <p>
+                        <strong>Android Auto</strong> كـ <code>Chromecast</code>: الهاتف هو <strong>المصدر</strong>، والشاشة مجرد "مرآة". التلفزيون لا يفعل شيئاً - كل المعالجة تحدث على الهاتف. إذا فقدت الهاتف الإشارة، توقف كل شيء.
+                    </p>
+                </div>
+
+                <h3>هندسة AAOS: ما الذي يُضاف فوق AOSP؟</h3>
+
+                <p>
+                    AAOS ليس نظاماً منفصلاً - بل هو <strong>AOSP مُعدّل</strong> مع إضافات خاصة بالسيارات. هذه الإضافات تتركز في عدة مجالات:
+                </p>
+
+                <ol>
+                    <li><strong>Car Service Layer:</strong> خدمات جديدة في <code>SystemServer</code> تتعامل مع عتاد السيارة.</li>
+                    <li><strong>Vehicle HAL:</strong> طبقة تجريد جديدة تترجم بين إشارات CAN Bus وواجهات Java.</li>
+                    <li><strong>Car UI Toolkit:</strong> مكتبات واجهة مستخدم مُحسّنة للقيادة (أزرار كبيرة، تباين عالٍ، دعم عجلة القيادة).</li>
+                    <li><strong>Power Management:</strong> إدارة طاقة مُحسّنة للسيارات (Garage Mode, Suspend-to-RAM).</li>
+                    <li><strong>Security:</strong> نموذج أمان صارم يمنع تشتت السائق (Driver Distraction).</li>
+                    <li><strong>Multi-Display:</strong> دعم شاشات متعددة (Cluster, IVI, Rear Seat Entertainment).</li>
+                </ol>
+
+                <pre><code class="language-java">// AAOS يضيف CarService إلى SystemServer
+// packages/services/Car/service/src/com/android/car/ICarImpl.java
+
+public class ICarImpl extends ICar.Stub {
+    private final CarAudioService mCarAudioService;
+    private final CarHvacService mCarHvacService;
+    private final CarCabinService mCarCabinService;
+    private final CarSensorService mCarSensorService;
+    private final CarPowerManagementService mCarPowerManagementService;
+    private final CarPropertyService mCarPropertyService;
+
+    public ICarImpl(Context context, VehicleHal vehicleHal) {
+        // تهيئة جميع خدمات السيارة
+        mCarAudioService = new CarAudioService(context);
+        mCarHvacService = new CarHvacService(context, vehicleHal);
+        mCarCabinService = new CarCabinService(context, vehicleHal);
+        mCarSensorService = new CarSensorService(context, vehicleHal);
+        mCarPowerManagementService = new CarPowerManagementService(context, vehicleHal);
+        mCarPropertyService = new CarPropertyService(context, vehicleHal);
+    }
+}</code></pre>
+            </section>
+
+            <!-- Section 5: Car Service Layer -->
+            <section class="section fade-in" id="carservice">
+                <div class="section-header">
+                    <div class="section-number">٥</div>
+                    <h2>طبقة خدمات السيارة: Car Service Layer & Car API</h2>
+                </div>
+
+                <p>
+                    <code>Car Service Layer</code> هي <strong>البوابة الرئيسية</strong> التي تتيح لتطبيقات السيارة التواصل مع عتاد المركبة. تخيلها كـ "وزارة المواصلات" في حكومة أندرويد: جميع الطلبات المتعلقة بالسيارة (تكييف، أبواب، أضواء، حساسات) تمر عبر هذه الطبقة.
+                </p>
+
+                <h3 id="cabin">CarCabinManager: التحكم في مقصورة السيارة</h3>
+
+                <p>
+                    <code>CarCabinManager</code> يدير <strong>جميع وظائف المقصورة الداخلية</strong>: أقفال الأبواب، النوافذ، المرايا، مقاعد السائق، إضاءة الداخلية، خزانة القفازات (Glove Box)، والسقف الشمسي (Sunroof).
+                </p>
+
+                <pre><code class="language-java">// استخدام CarCabinManager في تطبيقك
+import android.car.Car;
+import android.car.hardware.cabin.CarCabinManager;
+
+public class CabinController {
+    private CarCabinManager mCabinManager;
+
+    public void init(Context context) {
+        Car car = Car.createCar(context);
+        mCabinManager = (CarCabinManager) car.getCarManager(Car.CABIN_SERVICE);
+
+        // الاستماع لتغييرات خاصية معينة
+        mCabinManager.registerCallback(new CarCabinManager.CarCabinEventCallback() {
+            @Override
+            public void onChangeEvent(CarPropertyValue value) {
+                int propertyId = value.getPropertyId();
+                if (propertyId == CarCabinManager.ID_DOOR_LOCK) {
+                    boolean isLocked = (Boolean) value.getValue();
+                    updateDoorLockUI(isLocked);
+                }
+            }
+        });
+    }
+
+    public void lockAllDoors() {
+        // كتابة قيمة إلى خاصية الباب
+        mCabinManager.setBooleanProperty(
+            CarCabinManager.ID_DOOR_LOCK, 
+            VehicleAreaDoor.ALL, 
+            true
+        );
+    }
+}</code></pre>
+
+                <div class="analogy">
+                    <div class="analogy-title">التمثيل الحياتي: لوحة التحكم المركزية في المنزل الذكي</div>
+                    <p>
+                        <code>CarCabinManager</code> كلوحة تحكم مركزية في منزل ذكي. عندما تضغط على زر "إغلاق جميع الأبواب" في التطبيق، لا يذهب التطبيق مباشرة إلى كل باب. بدلاً من ذلك، يرسل الطلب إلى <strong>المركز التحكمي</strong> (Car Service) الذي يعرف مكان كل جهاز وكيفية التواصل معه. المركز يُرسل الأوامر عبر <code>CAN Bus</code> إلى وحدات التحكم في الأبواب. عندما يغير أحد الركاب حالة نافذة يدوياً، ترسل وحدة التحكم إشارة عبر CAN Bus، يستلمها <code>VehicleHAL</code>، يُرسلها إلى <code>CarCabinManager</code>، ويُبلّغ التطبيقات المشتركة.
+                    </p>
+                </div>
+
+                <h3 id="hvac">CarHvacManager: التحكم في التكييف والتهوية</h3>
+
+                <p>
+                    <code>CarHvacManager</code> يدير <strong>نظام التدفئة والتهوية وتكييف الهواء (HVAC)</strong>. هذا يتضمن: درجة الحرارة المطلوبة، سرعة المروحة، وضع الهواء (وجه/قدمين/زجاج أمامي)، تدوير الهواء الداخلي/الخارجي، ومقاعد مُدفّأة/مُبردة.
+                </p>
+
+                <pre><code class="language-java">// التحكم في درجة الحرارة
+public class HvacController {
+    private CarHvacManager mHvacManager;
+
+    public void setDriverTemperature(float celsius) {
+        // خاصية درجة الحرارة للسائق
+        mHvacManager.setFloatProperty(
+            CarHvacManager.ID_TEMPERATURE_SET, 
+            VehicleAreaSeat.ROW_1_LEFT, 
+            celsius
+        );
+    }
+
+    public void setFanSpeed(int speed) {
+        // سرعة المروحة (0-7)
+        mHvacManager.setIntProperty(
+            CarHvacManager.ID_FAN_SPEED,
+            VehicleAreaSeat.ROW_1_LEFT,
+            speed
+        );
+    }
+
+    public void setAcMode(int mode) {
+        // وضع التكييف: وجه، قدمين، زجاج أمامي
+        mHvacManager.setIntProperty(
+            CarHvacManager.ID_FAN_DIRECTION,
+            VehicleAreaSeat.ROW_1_LEFT,
+            mode
+        );
+    }
+}</code></pre>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">🌡️</span> VehicleAreaSeat: التمييز بين المقاعد</div>
+                    <p>
+                        لاحظ استخدام <code>VehicleAreaSeat.ROW_1_LEFT</code>. في السيارات الحديثة، كل مقعد قد يكون له <strong>إعدادات منفصلة</strong> للحرارة والتهوية. <code>VehicleAreaSeat</code> يُعرّف:
+                    </p>
+                    <ul>
+                        <li><code>ROW_1_LEFT</code> - مقعد السائق</li>
+                        <li><code>ROW_1_RIGHT</code> - مقعد الراكب الأمامي</li>
+                        <li><code>ROW_2_LEFT</code> - مقعد خلفي يسار</li>
+                        <li><code>ROW_2_CENTER</code> - مقعد خلفي وسط</li>
+                        <li><code>ROW_2_RIGHT</code> - مقعد خلفي يمين</li>
+                    </ul>
+                    <p>
+                        هذا يعني أن تطبيق HVAC يجب أن يتعامل مع <strong>مناطق متعددة</strong>، كل منها لها خصائصها الخاصة.
+                    </p>
+                </div>
+
+                <h3 id="sensor">CarSensorManager: قراءة بيانات الحساسات</h3>
+
+                <p>
+                    <code>CarSensorManager</code> يوفر الوصول إلى <strong>جميع حساسات السيارة</strong>: سرعة العجلات، مستوى الوقود، ضغط الإطارات، درجة حرارة المحرك، موقع دواسة الوقود/الفرامل، زاوية توجيه العجلات، وحالة الوسائد الهوائية (Airbags).
+                </p>
+
+                <pre><code class="language-java">// قراءة بيانات الحساسات
+public class SensorReader {
+    private CarSensorManager mSensorManager;
+
+    public void registerListeners() {
+        // الاستماع لتغييرات السرعة
+        mSensorManager.registerListener(
+            mSensorListener,
+            CarSensorManager.SENSOR_TYPE_CAR_SPEED,
+            CarSensorManager.SENSOR_RATE_NORMAL
+        );
+
+        // الاستماع لمستوى الوقود
+        mSensorManager.registerListener(
+            mSensorListener,
+            CarSensorManager.SENSOR_TYPE_FUEL_LEVEL,
+            CarSensorManager.SENSOR_RATE_NORMAL
+        );
+    }
+
+    private final CarSensorManager.OnSensorChangedListener mSensorListener =
+        new CarSensorManager.OnSensorChangedListener() {
+            @Override
+            public void onSensorChanged(CarSensorEvent event) {
+                switch (event.sensorType) {
+                    case CarSensorManager.SENSOR_TYPE_CAR_SPEED:
+                        float speed = event.floatValues[0]; // km/h
+                        updateSpeedometer(speed);
+                        break;
+                    case CarSensorManager.SENSOR_TYPE_FUEL_LEVEL:
+                        float fuelPercent = event.floatValues[0];
+                        updateFuelGauge(fuelPercent);
+                        break;
+                }
+            }
+        };
+}</code></pre>
+
+                <div class="warning">
+                    <div class="warning-icon">⚠️</div>
+                    <div class="warning-content">
+                        <div class="warning-title">معدلات الاستماع (Sensor Rates) والأداء</div>
+                        <p>كل حساس يُرسل بيانات بمعدل مختلف عبر <code>CAN Bus</code>. مثلاً: سرعة العجلات قد تُرسل <strong>100 مرة في الثانية</strong> (100Hz)، بينما مستوى الوقود قد يُرسل <strong>مرة في الدقيقة</strong>. إذا سجّلت مستمعاً لجميع الحساسات بمعدل عالٍ، فإنك تُرهق <code>VehicleHAL</code> و <code>CarService</code> بمعالجة آلاف الأحداث غير الضرورية. دائماً اختر <code>SENSOR_RATE_NORMAL</code> أو <code>SENSOR_RATE_UI</code> إلا إذا كنت بحاجة إلى بيانات في الوقت الفعلي (مثال: نظام مساعدة السائق).</p>
+                    </div>
+                </div>
+
+                <h3 id="audio">CarAudio: إدارة الصوت في بيئة السيارة</h3>
+
+                <p>
+                    <code>CarAudio</code> هو <strong>أكثر أنظمة الصوت تعقيداً</strong> في أندرويد. في الهاتف، لديك مكبر صوت واحد (أو سماعات أذن). في السيارة، لديك <strong>12-20 مكبر صوت</strong> موزعة على مناطق متعددة، كل منها قد يُشغل مصدراً مختلفاً.
+                </p>
+
+                <pre><code class="language-java">// CarAudio يدير مصادر صوتية متعددة في مناطق مختلفة
+public class CarAudioManager {
+    // مصادر الصوت (Audio Contexts)
+    public static final int AUDIO_FEATURE_MUSIC = 0;
+    public static final int AUDIO_FEATURE_NAVIGATION = 1;
+    public static final int AUDIO_FEATURE_VOICE_COMMAND = 2;
+    public static final int AUDIO_FEATURE_CALL_RING = 3;
+    public static final int AUDIO_FEATURE_CALL = 4;
+    public static final int AUDIO_FEATURE_ALARM = 5;
+    public static final int AUDIO_FEATURE_NOTIFICATION = 6;
+    public static final int AUDIO_FEATURE_SYSTEM_SOUND = 7;
+
+    // مناطق الصوت (Audio Zones)
+    // Zone 0: مقصورة السائق (Driver Cabin)
+    // Zone 1: مقصورة الركاب (Passenger Cabin)
+    // Zone 2: الترفيه الخلفي (Rear Seat Entertainment)
+}
+
+// استخدام CarAudioManager
+CarAudioManager audioManager = (CarAudioManager) car.getCarManager(Car.AUDIO_SERVICE);
+
+// تعيين مستوى الصوت لمنطقة معينة
+audioManager.setGroupVolume(
+    zoneId,       // منطقة الصوت
+    groupId,      // مجموعة السماعات
+    index,        // مستوى الصوت (0-100)
+    flags         // أعلام التحكم
+);</code></pre>
+
+                <div class="analogy">
+                    <div class="analogy-title">التمثيل الحياتي: مسرح منزلي متعدد الغرف</div>
+                    <p>
+                        <code>CarAudio</code> كمسارح منزلية متعددة الغرف. في غرفة المعيشة (Driver Zone)، يستمع السائق إلى الموسيقى. في غرفة النوم (Passenger Zone)، يستمع الراكب إلى بودكاست مختلف. في غرفة الأطفال (Rear Zone)، يشاهدون فيلماً. <strong>التحدي:</strong> عندما يحتاج نظام الملاحة إلى إعطاء تعليمات صوتية، يجب أن <strong>يخفض</strong> موسيقى السائق مؤقتاً (Ducking) دون التأثير على صوت الأطفال. <code>CarAudio</code> يدير هذا التنسيق المعقد عبر <strong>أولويات الصوت (Audio Focus)</strong> و<strong>توجيه الصوت (Audio Routing)</strong>.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">🔊</span> Audio Focus في السيارة: Ducking vs Muting</div>
+                    <p>
+                        في AAOS، نظام Audio Focus أكثر تعقيداً من الهاتف:
+                    </p>
+                    <ul>
+                        <li><strong>Ducking:</strong> خفض مستوى مصدر صوتي (مثلاً الموسيقى) عند وصول مصدر أعلى أولوية (مثلاً الملاحة).</li>
+                        <li><strong>Muting:</strong> كتم مصدر صوتي بالكامل عند وصول مصدر حرج (مثلاً تحذير تصادم).</li>
+                        <li><strong>Parallel Playback:</strong> تشغيل مصدرين في آن واحد في مناطق مختلفة (موسيقى للسائق، فيلم للأطفال).</li>
+                    </ul>
+                    <p>
+                        <code>CarAudioService</code> يستخدم <code>AudioPolicy</code> و <code>AudioMix</code> في <code>AudioManager</code> لتحقيق هذا التوجيه المعقد.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 6: VHAL -->
+            <section class="section fade-in" id="vhal">
+                <div class="section-header">
+                    <div class="section-number">٦</div>
+                    <h2>القلب النابض للسيارة: Vehicle Hardware Abstraction Layer (VHAL)</h2>
+                </div>
+
+                <p>
+                    إذا كان <code>Car Service Layer</code> هو "وزارة المواصلات"، فإن <code>VHAL (Vehicle HAL)</code> هو <strong>شبكة الطرق والجسور</strong> التي تربط الوزارة بالمدن (عتاد السيارة). VHAL هو الطبقة التي <strong>تترجم بين لغة البرمجيات (Java/Kotlin) ولغة العتاد (CAN Bus frames, Ethernet packets)</strong>.
+                </p>
+
+                <h3 id="canbus">من CAN Bus إلى Java: رحلة الإشارة</h3>
+
+                <p>
+                    <code>CAN Bus (Controller Area Network)</code> هو <strong>الشبكة الداخلية</strong> للسيارة. جميع الأجهزة الإلكترونية في السيارة (ECUs - Electronic Control Units) تتواصل عبر CAN Bus باستخدام <strong>إطارات (Frames)</strong> صغيرة (8 بايتات كحد أقصى لكل رسالة).
+                </p>
+
+                <div class="analogy">
+                    <div class="analogy-title">التمثيل الحياتي: شبكة الهاتف الداخلي في المستشفى</div>
+                    <p>
+                        تخيل مستشفىً كبيراً. كل قسم (ECU) لديه هاتف داخلي (CAN Bus). عندما يحتاج قسم الطوارئ (Airbag ECU) إلى إبلاغ قسم الاستقبال (IVI System) بحادث، لا يتصل بهاتف خارجي - بل يستخدم <strong>شبكة الهاتف الداخلي</strong>. الرسالة قصيرة: "حادث في الطابق 3، سرعة 60 كم/س، رقم المريض 4729". هذه الرسالة <strong>صغيرة ومحددة</strong> - ليست مكالمة فيديو طويلة.
+                    </p>
+                    <p>
+                        <strong>CAN Bus Frame</strong> كرسالة قصيرة على الشبكة الداخلية:
+                    </p>
+                    <ul>
+                        <li><strong>ID (11 أو 29 بت):</strong> يُحدد نوع الرسالة (مثلاً: سرعة السيارة، درجة الحرارة).</li>
+                        <li><strong>Data (0-8 بايت):</strong> البيانات الفعلية (مثلاً: 0x00 0x3C = 60 كم/س).</li>
+                        <li><strong>CRC (15 بت):</strong> للتحقق من صحة الرسالة.</li>
+                        <li><strong>Ack (1 بت):</strong> تأكيد الاستلام.</li>
+                    </ul>
+                </div>
+
+                <pre><code class="language-cpp">// هيكل إطار CAN Bus
+struct can_frame {
+    canid_t can_id;  // 11-bit أو 29-bit ID
+    __u8    can_dlc; // ح length البيانات (0-8)
+    __u8    data[8]; // البيانات الفعلية (8 بايت كحد أقصى)
+};
+
+// مثال: إطار يحمل سرعة السيارة
+// can_id = 0x123 (معرف سرعة السيارة)
+// can_dlc = 2 (بايتان)
+// data[0] = 0x00, data[1] = 0x3C (60 كم/س)</code></pre>
+
+                <h3>VHAL: الترجمة بين CAN Bus و Android Properties</h3>
+
+                <p>
+                    <code>VHAL</code> يعمل كـ <strong>مترجم ثنائي الاتجاه</strong>:
+                </p>
+
+                <ol>
+                    <li><strong>من العتاد إلى البرمجيات (Read):</strong> يستلم إطارات CAN Bus، يفك تغليفها (Parse)، ويحولها إلى <code>VehiclePropertyValue</code> objects.</li>
+                    <li><strong>من البرمجيات إلى العتاد (Write):</strong> يستلم <code>VehiclePropertyValue</code> من Car Service، يُغلّفها في إطارات CAN Bus، ويُرسلها إلى ECU المناسب.</li>
+                </ol>
+
+                <pre><code class="language-cpp">// Vehicle HAL Interface (AIDL)
+// hardware/interfaces/automotive/vehicle/aidl/...
+
+interface IVehicle {
+    // الحصول على جميع الخصائص المدعومة
+    VehiclePropConfig[] getAllPropConfigs();
+
+    // قراءة خاصية معينة
+    VehiclePropValue get(in VehiclePropValue requestedProp);
+
+    // كتابة خاصية
+    StatusCode set(in VehiclePropValue propValue);
+
+    // الاشتراك في تغييرات خاصية
+    IVehicleCallback subscribe(in IVehicleCallback callback, 
+                               in SubscribeOptions[] options,
+                               int32_t maxSharedMemoryFileCount);
+
+    // إلغاء الاشتراك
+    void unsubscribe(in IVehicleCallback callback, 
+                     in int32_t[] propIds);
+}
+
+// VehiclePropValue: القيمة المُغلّفة
+parcelable VehiclePropValue {
+    int32_t prop;           // معرف الخاصية (مثلاً HVAC_TEMPERATURE_SET)
+    int32_t areaId;         // معرف المنطقة (مثلاً ROW_1_LEFT)
+    int64_t timestamp;      // الطابع الزمني (nanoseconds)
+    RawPropValues value;    // القيمة الفعلية
+}</code></pre>
+
+                <h3 id="properties">Vehicle Properties: لغة موحدة لعتاد السيارة</h3>
+
+                <p>
+                    <code>Vehicle Properties</code> هي <strong>قاموس موحد</strong> يُعرّف جميع الخصائص التي يمكن قراءتها أو كتابتها في السيارة. هذا القاموس يضمن أن <strong>جميع الشركات المصنعة</strong> تستخدم نفس الأسماء والأنواع للخصائص.
+                </p>
+
+                <pre><code class="language-java">// VehiclePropertyIds.java - بعض الخصائص الشائعة
+public final class VehiclePropertyIds {
+    // HVAC
+    public static final int HVAC_TEMPERATURE_SET = 0x0901;
+    public static final int HVAC_FAN_SPEED = 0x0902;
+    public static final int HVAC_FAN_DIRECTION = 0x0903;
+    public static final int HVAC_AC_ON = 0x0904;
+    public static final int HVAC_RECIRC_ON = 0x0905;
+
+    // Cabin
+    public static final int DOOR_LOCK = 0x0A01;
+    public static final int DOOR_POS = 0x0A02;
+    public static final int WINDOW_POS = 0x0A03;
+    public static final int WINDOW_LOCK = 0x0A04;
+    public static final int MIRROR_Z_POS = 0x0A05;
+    public static final int MIRROR_Y_POS = 0x0A06;
+    public static final int SEAT_BACKREST_ANGLE_1_POS = 0x0A07;
+    public static final int SEAT_HEIGHT_POS = 0x0A08;
+
+    // Sensors
+    public static final int PERF_VEHICLE_SPEED = 0x0701;
+    public static final int PERF_ODOMETER = 0x0702;
+    public static final int ENGINE_RPM = 0x0703;
+    public static final int FUEL_LEVEL = 0x0704;
+    public static final int FUEL_DOOR_OPEN = 0x0705;
+    public static final int PARKING_BRAKE_ON = 0x0706;
+    public static final int GEAR_SELECTION = 0x0707;
+    public static final int CURRENT_GEAR = 0x0708;
+
+    // Power
+    public static final int AP_POWER_STATE_REQ = 0x0B01;
+    public static final int AP_POWER_STATE_REPORT = 0x0B02;
+    public static final int DISPLAY_BRIGHTNESS = 0x0B03;
+
+    // Info
+    public static final int INFO_VIN = 0x0501;
+    public static final int INFO_MAKE = 0x0502;
+    public static final int INFO_MODEL = 0x0503;
+    public static final int INFO_MODEL_YEAR = 0x0504;
+    public static final int INFO_FUEL_DOOR_LOCATION = 0x0505;
+}</code></pre>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">📋</span> Config vs Value: الفرق بين التعريف والبيانات</div>
+                    <p>
+                        هناك مفهومان مهمّان في VHAL:
+                    </p>
+                    <ul>
+                        <li><strong>VehiclePropConfig:</strong> يُعرّف <strong>ما هي الخاصية</strong> (اسمها، نوعها، المناطق المدعومة، القيم المسموحة). يُقرأ مرة واحدة عند بدء التشغيل.</li>
+                        <li><strong>VehiclePropValue:</strong> يحمل <strong>القيمة الفعلية</strong> في لحظة معينة (درجة الحرارة = 22.5، الباب = مفتوح).</li>
+                    </ul>
+                    <pre><code class="language-cpp">// VehiclePropConfig يُعرّف خصائص الخاصية
+parcelable VehiclePropConfig {
+    int32_t prop;              // معرف الخاصية
+    int32_t access;            // READ_ONLY, WRITE_ONLY, READ_WRITE
+    int32_t changeMode;        // STATIC, ON_CHANGE, CONTINUOUS
+    int32_t areaConfigs[];     // إعدادات كل منطقة
+    VehiclePropertyType type;  // BOOLEAN, INT32, INT64, FLOAT, STRING, MIXED
+    float minSampleRate;       // أدنى معدل أخذ عينات (Hz)
+    float maxSampleRate;       // أقصى معدل أخذ عينات (Hz)
+}</code></pre>
+                </div>
+
+                <h3>HIDL vs AIDL في VHAL: التحول الهندسي</h3>
+
+                <p>
+                    في أندرويد 8-10، كان VHAL يستخدم <code>HIDL (HAL Interface Definition Language)</code>. لكن بدءاً من أندرويد 11+، بدأ التحول إلى <code>AIDL</code>. لماذا؟
+                </p>
+
+                <ul>
+                    <li><strong>HIDL</strong> يستخدم <code>hwbinder</code> - نسخة من Binder مخصصة للعتاد. هذا يتطلب <strong>عملية منفصلة</strong> (<code>hwbinder daemon</code>) و<strong>تسلسل إضافي</strong>.</li>
+                    <li><strong>AIDL</strong> يستخدم <code>binder</code> العادي - <strong>أسرع</strong> و<strong>أبسط</strong> و<strong>أقل استهلاكاً للذاكرة</strong>.</li>
+                </ul>
+
+                <pre><code class="language-cpp">// HIDL (القديم) - يتطلب hwbinder
+interface IVehicle @1.0 {
+    getAllPropConfigs() generates (vec<VehiclePropConfig> propConfigs);
+    get(VehiclePropValue requestedProp) generates 
+        (StatusCode status, VehiclePropValue propValue);
+};
+
+// AIDL (الجديد) - يستخدم binder العادي
+interface IVehicle {
+    VehiclePropConfig[] getAllPropConfigs();
+    VehiclePropValue get(in VehiclePropValue requestedProp);
+}</code></pre>
+
+                <div class="info-box">
+                    <div class="warning-icon">ℹ️</div>
+                    <div>
+                        <div class="info-title">المسار المصدري لـ VHAL</div>
+                        <p>في شيفرة AOSP المصدرية، VHAL موجود في:</p>
+                        <ul>
+                            <li><code>hardware/interfaces/automotive/vehicle/</code> - واجهات AIDL/HIDL</li>
+                            <li><code>packages/services/Car/service/</code> - CarService الذي يتحدث إلى VHAL</li>
+                            <li><code>device/generic/car/</code> - تنفيذ VHAL افتراضي (Emulator)</li>
+                            <li><code>vendor/xxx/</code> - تنفيذ VHAL الخاص بكل شركة مصنعة (مغلق المصدر)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Power Management & Security -->
+            <section class="section fade-in" id="power">
+                <div class="section-header">
+                    <div class="section-number">٧</div>
+                    <h2>إدارة الطاقة، الأمان، وبدء التشغيل في السيارات</h2>
+                </div>
+
+                <p>
+                    السيارة ليست هاتفاً ذكياً. عندما تُطفئ السيارة، لا يمكنك "إغلاق النظام" بالكامل كما تفعل مع الهاتف. يجب أن يبقى بعض الأنظمة نشطة (إنذار، تحديثات، تسجيل البيانات)، بينما يدخل البعض الآخر في وضع السكون. هذا يتطلب <strong>نموذج إدارة طاقة معقد</strong> يُعرف بـ <code>CarPowerManagement</code>.
+                </p>
+
+                <h3 id="garage">Garage Mode: العمل الخفي عند إطفاء المحرك</h3>
+
+                <p>
+                    <code>Garage Mode</code> هو <strong>وضع خاص</strong> في AAOS يُفعّل عندما يُطفئ السائق المحرك. في هذا الوضع:
+                </p>
+
+                <ul>
+                    <li>الشاشة الرئيسية <strong>مُطفأة</strong> (لتوفير الطاقة).</li>
+                    <li>التطبيقات <strong>لا تستطيع</strong> تشغيل واجهة المستخدم.</li>
+                    <li>لكن <strong>المهام الخلفية مسموح بها</strong>: تحديثات النظام (OTA)، تسجيل بيانات الصيانة، تحميل الخرائط، تحديث التطبيقات.</li>
+                </ul>
+
+                <pre><code class="language-java">// الاستماع لتغييرات حالة الطاقة
+public class PowerStateListener implements CarPowerManager.CarPowerStateListener {
+
+    @Override
+    public void onStateChanged(int state) {
+        switch (state) {
+            case CarPowerManager.STATE_ON:
+                // السيارة في وضع التشغيل الكامل
+                enableAllFeatures();
+                break;
+
+            case CarPowerManager.STATE_SHUTDOWN_PREPARE:
+                // التحضير للإغلاق
+                saveCriticalData();
+                break;
+
+            case CarPowerManager.STATE_SUSPEND:
+                // الدخول في وضع السكون (Suspend-to-RAM)
+                releaseNonCriticalResources();
+                break;
+
+            case CarPowerManager.STATE_HIBERNATION:
+                // السبات الكامل (Suspend-to-Disk)
+                // يستغرق الإقلاع أطول لكن يوفر أكثر
+                break;
+
+            case CarPowerManager.STATE_POST_SUSPEND:
+                // الاستيقاظ من وضع السكون
+                restoreState();
+                break;
+        }
+    }
+}
+
+// التسجيل في CarPowerManager
+CarPowerManager powerManager = (CarPowerManager) car.getCarManager(Car.POWER_SERVICE);
+powerManager.setListener(AsyncTask.THREAD_POOL_EXECUTOR, new PowerStateListener());</code></pre>
+
+                <div class="analogy">
+                    <div class="analogy-title">التمثيل الحياتي: حارس الليل في المبنى</div>
+                    <p>
+                        <strong>Garage Mode</strong> كحارس ليل في مبنى مكتبي. عندما يغير جميع الموظفون (تُطفئ السيارة)، لا يُغلق المبنى بالكامل. بدلاً من ذلك:
+                    </p>
+                    <ul>
+                        <li><strong>الأضواء الرئيسية تُطفأ</strong> (الشاشة تُطفأ).</li>
+                        <li><strong>نظام الأمان يبقى نشطاً</strong> (إنذار، كاميرات).</li>
+                        <li><strong>فريق الصيانة يعمل</strong> (تحديثات OTA، تنظيف).</li>
+                        <li><strong>المولد الاحتياطي جاهز</strong> (البطارية تحافظ على الطاقة الحرجة).</li>
+                    </ul>
+                    <p>
+                        عندما يأتي أول موظف صباحاً (تُشغل السيارة)، يستيقظ المبنى بالكامل خلال ثوانٍ.
+                    </p>
+                </div>
+
+                <h3>Suspend-to-RAM vs Suspend-to-Disk: درجات السكون</h3>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الوضع</th>
+                                <th>الطاقة المستهلكة</th>
+                                <th>وقت الاستيقاظ</th>
+                                <th>الاستخدام</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>ON (تشغيل كامل)</strong></td>
+                                <td>عالية (5-15 واط)</td>
+                                <td>فوري</td>
+                                <td>القيادة العادية</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Suspend-to-RAM (S3)</strong></td>
+                                <td>منخفضة (0.5-2 واط)</td>
+                                <td>1-3 ثوانٍ</td>
+                                <td>التوقف القصير (إشارة مرور، محطة وقود)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Hibernation (S4)</strong></td>
+                                <td>منخفضة جداً (0.1-0.5 واط)</td>
+                                <td>5-15 ثانية</td>
+                                <td>التوقف الطويل (ليلة كاملة)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>OFF (إغلاق كامل)</strong></td>
+                                <td>صفر (تستخدم البطارية فقط للساعة)</td>
+                                <td>20-60 ثانية</td>
+                                <td>صيانة، تحديثات فاشلة</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>تحسين زمن الإقلاع (Boot Time Optimization)</h3>
+
+                <p>
+                    في عالم السيارات، <span class="highlight">زمن الإقلاع (Boot Time)</span> هو <strong>مسألة حياة أو موت</strong> - ليس مجرد راحة. السائق يتوقع أن تر ven النظام خلال <strong>2 ثوانٍ</strong> من فتح الباب، لا 30 ثانية. لتحقيق هذا، يستخدم AAOS عدة تقنيات:
+                </p>
+
+                <ul>
+                    <li><strong>Zygote Preloading:</strong> تحميل جميع مكتبات Framework في الذاكرة أثناء إقلاع النظام الأولي.</li>
+                    <li><strong>Parallel Service Initialization:</strong> تشغيل خدمات النظام بالتوازي بدلاً من التسلسل.</li>
+                    <li><strong>Lazy HAL Initialization:</strong> تهيئة HALs فقط عند الحاجة (مثلاً لا تُهيئ Bluetooth حتى يُفتح شاشة Bluetooth).</li>
+                    <li><strong>Suspend-to-RAM:</strong> بدلاً من الإغلاق الكامل، يُحفظ حالة النظام في RAM. الاستيقاظ أسرع بـ 10x من الإقلاع البارد.</li>
+                    <li><strong>Read-Ahead Optimization:</strong> تحميل ملفات النظام المتوقعة إلى الذاكرة مسبقاً.</li>
+                </ul>
+
+                <pre><code class="language-java">// init.rc - ترتيب تشغيل الخدمات بالتوازي
+// system/core/rootdir/init.rc
+
+# تشغيل Zygote مبكراً
+service zygote /system/bin/app_process64 -Xzygote /system/bin --zygote --start-system-server
+    class main
+    priority -20
+    user root
+    group root readproc reserved_disk
+
+# تشغيل SurfaceFlinger (إدارة الشاشة) بأولوية عالية
+service surfaceflinger /system/bin/surfaceflinger
+    class core
+    user system
+    group graphics drmrpc
+    onrestart restart zygote
+
+# تشغيل CarService
+service car_service /system/bin/servicemanager
+    class core
+    user system
+    group system</code></pre>
+
+                <h3 id="distraction">منع تشتيت الانتباه: Driver Distraction Optimization</h3>
+
+                <p>
+                    <strong>الأمان</strong> هو الأولوية القصوى في AAOS. لا يمكن أن يُشغل السائق فيديو على الشاشة أثناء القيادة، أو يكتب رسالة نصية طويلة. <code>CarUxRestrictions</code> هو النظام الذي <strong>يُقيّد واجهة المستخدم</strong> بناءً على حالة السيارة.
+                </p>
+
+                <pre><code class="language-java">// CarUxRestrictionsManager - التحقق من القيود
+public class DistractionManager {
+    private CarUxRestrictionsManager mUxRestrictionsManager;
+
+    public void init(Context context) {
+        Car car = Car.createCar(context);
+        mUxRestrictionsManager = (CarUxRestrictionsManager) 
+            car.getCarManager(Car.CAR_UX_RESTRICTION_SERVICE);
+
+        mUxRestrictionsManager.registerListener(
+            new CarUxRestrictionsManager.OnUxRestrictionsChangedListener() {
+                @Override
+                public void onUxRestrictionsChanged(CarUxRestrictions restrictions) {
+                    if (restrictions.isRequiresDistractionOptimization()) {
+                        // السيارة في حركة - تفعيل القيود
+                        applyDrivingRestrictions(restrictions);
+                    } else {
+                        // السيارة متوقفة - إلغاء القيود
+                        removeRestrictions();
+                    }
+                }
+            }
+        );
+    }
+
+    private void applyDrivingRestrictions(CarUxRestrictions restrictions) {
+        // التحقق من أنواع القيود
+        boolean noVideo = restrictions.isVideoRestricted();
+        boolean noKeyboard = restrictions.isKeyboardRestricted();
+        boolean limitedStringLength = restrictions.getMaxStringLength() > 0;
+
+        if (noVideo) {
+            hideVideoPlayer();
+        }
+
+        if (noKeyboard) {
+            disableKeyboardInput();
+        }
+
+        if (limitedStringLength) {
+            int maxLength = restrictions.getMaxStringLength();
+            limitTextInputLength(maxLength);
+        }
+    }
+}</code></pre>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">🛡️</span> مستويات القيود (Restriction Levels)</div>
+                    <p>
+                        <code>CarUxRestrictions</code> يدعم <strong>مستويات متدرجة</strong> من القيود:
+                    </p>
+                    <ul>
+                        <li><strong>BASELINE:</strong> القيود الأساسية (لا يوجد).</li>
+                        <li><strong>NO_VIDEO:</strong> منع تشغيل الفيديو.</li>
+                        <li><strong>NO_KEYBOARD:</strong> منع لوحة المفاتيح (Voice Input فقط).</li>
+                        <li><strong>LIMIT_STRING_LENGTH:</strong> تقييد طول النصوص المعروضة.</li>
+                        <li><strong>NO_SETUP:</strong> منع إعدادات النظام المعقدة.</li>
+                        <li><strong>NO_TEXT_MESSAGE:</strong> منع الرسائل النصية الطويلة.</li>
+                    </ul>
+                    <p>
+                        الشركات المصنعة يمكنها <strong>تخصيص</strong> هذه المستويات عبر <code>car_ux_restrictions_map.xml</code> في overlay.
+                    </p>
+                </div>
+
+                <h3>نموذج الأمان في AAOS: Signature Permissions</h3>
+
+                <p>
+                    في AAOS، ليس كل تطبيق يستطيع التحكم في HVAC أو فتح الأبواب. هذه العمليات تتطلب <strong>أذونات على مستوى النظام (Signature Permissions)</strong>.
+                </p>
+
+                <pre><code class="language-xml"><!-- AndroidManifest.xml لتطبيق نظام السيارة -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.car.systemapp"
+    android:sharedUserId="android.uid.system">
+
+    <!-- أذونات على مستوى النظام -->
+    <uses-permission android:name="android.car.permission.CAR_CONTROL_AUDIO_VOLUME" />
+    <uses-permission android:name="android.car.permission.CAR_CONTROL_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.car.permission.CAR_VENDOR_EXTENSION" />
+    <uses-permission android:name="android.car.permission.CAR_POWER" />
+    <uses-permission android:name="android.car.permission.CAR_CABIN" />
+    <uses-permission android:name="android.car.permission.CAR_HVAC" />
+
+    <!-- التطبيق يجب أن يكون موقعاً بنفس مفتاح النظام -->
+    <application
+        android:allowBackup="false"
+        android:label="@string/app_name"
+        android:persistent="true">
+
+        <service android:name=".CarSystemService"
+            android:exported="true"
+            android:permission="android.car.permission.BIND_CAR_SERVICE" />
+    </application>
+</manifest></code></pre>
+
+                <div class="danger">
+                    <div class="warning-icon">🚫</div>
+                    <div class="danger-content">
+                        <div class="danger-title">SELinux: الجدار الناري للنواة</div>
+                        <p><code>SELinux (Security-Enhanced Linux)</code> هو نظام تحكم في الوصول إلزامي (MAC) يعمل على مستوى kernel. في AAOS، SELinux يُحدد <strong>بالضبط</strong> أي عملية يمكنها الوصول إلى أي ملف أو socket أو Binder service. مثلاً: تطبيق الملاحة لا يستطيع الوصول إلى <code>/dev/can0</code> (CAN Bus device) لأن SELinux policy تمنع ذلك. فقط <code>VehicleHAL</code> و <code>CarService</code> لديهم إذن الوصول. هذا يمنع <strong>تطبيقات خبيثة</strong> من التحكم في عتاد السيارة.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 8: Comparison Table -->
+            <section class="section fade-in" id="comparison">
+                <div class="section-header">
+                    <div class="section-number">٨</div>
+                    <h2>الجدول المقارن الهندسي الشامل: Android Mobile vs Android Automotive</h2>
+                </div>
+
+                <p>
+                    هذا الجدول يُلخّص <strong>جميع الأبعاد الهندسية</strong> التي تميز نظام أندرويد للهواتف عن نظام أندرويد للسيارات. لا يوجد "أفضل" مطلق - بل يوجد <span class="highlight">"الأنسب للبيئة"</span>.
+                </p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="min-width: 180px;">البُعد الهندسي</th>
+                                <th style="min-width: 220px;"><span class="aosp-badge">Android Mobile (AOSP)</span></th>
+                                <th style="min-width: 220px;"><span class="aaos-badge">Android Automotive OS</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>الهدف الأساسي</strong></td>
+                                <td>هاتف ذكي، جهاز لوحي، ساعة ذكية</td>
+                                <td>وحدة المعلومات والترفيه في السيارة (IVI)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>العتاد (SoC)</strong></td>
+                                <td>Qualcomm Snapdragon 8 Gen, MediaTek Dimensity, Samsung Exynos</td>
+                                <td>Qualcomm SA8155/SA8295, Samsung Exynos Auto, NXP i.MX8</td>
+                            </tr>
+                            <tr>
+                                <td><strong>الذاكرة (RAM)</strong></td>
+                                <td>4-16 جيجابايت</td>
+                                <td>8-24 جيجابايت (لدعم شاشات متعددة)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>التخزين</strong></td>
+                                <td>64-512 جيجابايت (UFS)</td>
+                                <td>128-256 جيجابايت (eMMC/UFS + تخزين سريع للخرائط)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>الشاشات</strong></td>
+                                <td>شاشة واحدة (6-7 بوصة)</td>
+                                <td>شاشات متعددة (Cluster 12", IVI 15", Rear 10")</td>
+                            </tr>
+                            <tr>
+                                <td><strong>الاتصال بالسيارة</strong></td>
+                                <td>لا يوجد (Bluetooth/WiFi فقط)</td>
+                                <td>CAN Bus, Ethernet, LIN, MOST</td>
+                            </tr>
+                            <tr>
+                                <td><strong>الوصول إلى العتاد</strong></td>
+                                <td>محدود (Camera, GPS, Sensors)</td>
+                                <td>كامل (HVAC, Doors, Windows, Engine, Airbags)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>خدمات النظام الإضافية</strong></td>
+                                <td>ActivityManager, WindowManager, PackageManager</td>
+                                <td>+ CarService, CarAudio, CarHvac, CarCabin, VHAL</td>
+                            </tr>
+                            <tr>
+                                <td><strong>HALs الإضافية</strong></td>
+                                <td>Camera HAL, Audio HAL, Display HAL</td>
+                                <td>+ Vehicle HAL, EVS HAL (External View System), OBD HAL</td>
+                            </tr>
+                            <tr>
+                                <td><strong>إدارة الطاقة</strong></td>
+                                <td>Doze Mode, App Standby, Battery Saver</td>
+                                <td>+ Garage Mode, Suspend-to-RAM, Wake-on-LAN, Power Policy</td>
+                            </tr>
+                            <tr>
+                                <td><strong>زمن الإقلاع</strong></td>
+                                <td>20-60 ثانية (Cold Boot)</td>
+                                <td>2-5 ثوانٍ (مطلوب)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>أمان السائق</strong></td>
+                                <td>لا يوجد</td>
+                                <td>CarUxRestrictions, Driver Distraction, Eye Tracking</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SELinux Policy</strong></td>
+                                <td>قياسي (Enforcing)</td>
+                                <td>مُحسّن بشكل كبير (Vehicle HAL معزول، CarService محمي)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>التطبيقات المسموحة</strong></td>
+                                <td>جميع تطبيقات Play Store</td>
+                                <td>محدودة (System Apps + تطبيقات مختارة + Driver Distraction)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>التحديثات (OTA)</strong></td>
+                                <td>Google Play System Update + OTA كامل</td>
+                                <td>OTA كامل (A/B Partitioning) + Garage Mode Updates</td>
+                            </tr>
+                            <tr>
+                                <td><strong>الصوت</strong></td>
+                                <td>مكبر صوت واحد أو سماعات أذن</td>
+                                <td>مناطق صوتية متعددة (Driver, Passenger, Rear) + Audio Focus معقد</td>
+                            </tr>
+                            <tr>
+                                <td><strong>الملاحة</strong></td>
+                                <td>Google Maps / Waze</td>
+                                <td>Google Maps Automotive + Offline Maps + Integration مع Cluster</td>
+                            </tr>
+                            <tr>
+                                <td><strong>الشبكات الخلوية</strong></td>
+                                <td>5G/4G مدمج</td>
+                                <td>5G/4G مدمج أو عبر Modem خارجي (TCU)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>البلوتوث</strong></td>
+                                <td>Bluetooth Classic + BLE</td>
+                                <td>+ Bluetooth PBAP (Phone Book), MAP (Messages), A2DP Sink</td>
+                            </tr>
+                            <tr>
+                                <td><strong>الحساسات</strong></td>
+                                <td>Accelerometer, Gyroscope, Magnetometer, Barometer</td>
+                                <td>+ Wheel Speed, Fuel Level, Tire Pressure, Engine RPM, Gear</td>
+                            </tr>
+                            <tr>
+                                <td><strong>التخصيص (OEM)</strong></td>
+                                <td>محدود (Launcher, Icons)</td>
+                                <td>عالٍ جداً (UI كامل، سلوك النظام، CarService مخصص)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>السعر التقريبي (SoC)</strong></td>
+                                <td>30-80 دولار</td>
+                                <td>100-300 دولار (متين، درجات حرارة واسعة، 10+ سنوات عمر)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 9: Interview Questions -->
+            <section class="section fade-in" id="interview">
+                <div class="section-header">
+                    <div class="section-number">٩</div>
+                    <h2>أسئلة المقابلات الشخصية المتقدمة</h2>
+                </div>
+
+                <p>
+                    هذه الأسئلة تغطي <span class="highlight">العمق الهندسي</span> لبنية AOSP و AAOS وهي شائعة في مقابلات Senior AOSP Platform Engineer و Android Automotive Architect.
+                </p>
+
+                <div class="interview-q">
+                    <span class="interview-tag">Senior Level</span>
+                    <h4>السؤال ١: ما الفرق بين Binder IPC و Unix Domain Sockets في أندرويد؟ ولماذا اختارت Google Binder؟</h4>
+                    <div class="interview-a">
+                        <p><strong>الإجابة الهندسية:</strong></p>
+                        <p>
+                            <strong>Unix Domain Sockets</strong> تتطلب <strong>نسخ البيانات مرتين</strong>: من مساحة العميل (User Space) إلى Kernel Buffer، ثم من Kernel Buffer إلى مساحة الخادم (User Space). بالإضافة إلى ذلك، لا تحمل هوية المرسل تلقائياً - يجب إرسالها كجزء من البيانات. هذا يعني <strong>تكلفة عالية</strong> لكل Transaction.
+                        </p>
+                        <p>
+                            <strong>Binder</strong> يستخدم <code>mmap()</code> لإنشاء <strong>ذاكرة مشتركة (Shared Memory)</strong> بين العمليات. البيانات تُنسخ <strong>مرة واحدة فقط</strong> من العميل إلى Kernel. ثم يُعطى الخادم <strong>وصف ملف (File Descriptor)</strong> يشير إلى نفس الذاكرة دون نسخ إضافي. هذا يُقلل من <strong>تكلفة النسخ بمقدار النصف</strong>.
+                        </p>
+                        <p>
+                            بالإضافة إلى ذلك، Binder يحمل <strong>UID و PID</strong> للعميل تلقائياً في كل Transaction. هذا يمكّن النظام من:
+                        </p>
+                        <ul>
+                            <li>فرض Permissions على مستوى النظام (مثلاً <code>android.permission.CAMERA</code>).</li>
+                            <li>منع انتحال الهوية (Identity Spoofing).</li>
+                            <li>تتبع استهلاك الموارد لكل تطبيق.</li>
+                        </ul>
+                        <p>
+                            <strong>الخلاصة:</strong> Binder أسرع (One-Copy vs Two-Copy)، أكثر أماناً (هوية مُدمجة)، ومصمم خصيصاً لنموذج خدمات أندرويد.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="interview-q">
+                    <span class="interview-tag">Senior Level</span>
+                    <h4>السؤال ٢: كيف يعمل Low Memory Killer (LMK) في أندرويد؟ وما الفرق بينه وبين OOM Killer في لينكس القياسي؟</h4>
+                    <div class="interview-a">
+                        <p><strong>الإجابة الهندسية:</strong></p>
+                        <p>
+                            <strong>OOM Killer في لينكس القياسي</strong> يُفعّل عندما تنفد الذاكرة <strong>تماماً</strong>. يختار الضحية بناءً على <code>oom_score</code> الذي يعتمد على استهلاك الذاكرة والـ CPU. المشكلة: يمكن أن يقتل <strong>أي عملية</strong> - حتى System Server أو Phone App - مما يسبب عدم استقرار.
+                        </p>
+                        <p>
+                            <strong>LMK في أندرويد</strong> يعمل <strong>قبل</strong> نفاد الذاكرة تماماً. يُراقب <code>free memory</code> و <code>file-backed pages</code> بشكل مستمر. عندما تصل الذاكرة إلى عتبات (Thresholds) مُحددة مسبقاً، يبدأ في قتل العمليات حسب <strong>أولوية مُحددة</strong>:
+                        </p>
+                        <ul>
+                            <li><strong>Background Apps (OomAdj > 900):</strong> تُقتل أولاً.</li>
+                            <li><strong>Previous App (OomAdj ~ 700):</strong> تُقتل ثانياً.</li>
+                            <li><strong>Home App (OomAdj ~ 600):</strong> تُقتل ثالثاً.</li>
+                            <li><strong>Services (OomAdj ~ 500):</strong> تُقتل رابعاً.</li>
+                            <li><strong>Foreground App (OomAdj ~ 0):</strong> تُحفظ حتى النهاية.</li>
+                            <li><strong>System Server (OomAdj = -1000):</strong> لا تُقتل أبداً (يؤدي إلى reboot).</li>
+                        </ul>
+                        <p>
+                            في AAOS، LMK مُحسّن إضافياً لأن <strong>السيارة لا يمكنها إعادة الإقلاع</strong> أثناء القيادة. لذا يتم تخصيص <code>minfree</code> levels بشكل أكثر تحفظاً.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="interview-q">
+                    <span class="interview-tag">Staff Level</span>
+                    <h4>السؤال ٣: ما هو الفرق بين Android Auto و Android Automotive OS (AAOS) من حيث الهندسة المعمارية؟</h4>
+                    <div class="interview-a">
+                        <p><strong>الإجابة الهندسية:</strong></p>
+                        <p>
+                            <strong>Android Auto:</strong> يعمل على <strong>الهاتف الذكي</strong>. يُعرض واجهة مستخدم مُبسّطة على شاشة السيارة عبر USB/WiFi (بروتوكول <code>Android Auto Protocol</code>). الهاتف هو <strong>المصدر الوحيد</strong> للمعالجة والبيانات. السيارة مجرد "شاشة عرض" و"لوحة لمس". لا يوجد وصول مباشر إلى عتاد السيارة (CAN Bus). Google تتحكم بالتجربة بالكامل.
+                        </p>
+                        <p>
+                            <strong>AAOS:</strong> يعمل <strong>على وحدة IVI في السيارة</strong>. هو نظام تشغيل كامل يشمل Linux Kernel، Android Framework، وخدمات السيارة (CarService, VHAL). يتواصل <strong>مباشرة</strong> مع CAN Bus عبر VHAL. الشركة المصنعة تتحكم في UI/UX والتخصيص. يدعم <strong>شاشات متعددة</strong> (Cluster + IVI + Rear). يتطلب <strong>ترخيص Google Automotive Services (GAS)</strong> لاستخدام Maps و Play Store.
+                        </p>
+                        <p>
+                            <strong>الخلاصة:</strong> Android Auto = "Remote Desktop" من الهاتف. AAOS = "نظام تشغيل مدمج" في السيارة.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="interview-q">
+                    <span class="interview-tag">Staff Level</span>
+                    <h4>السؤال ٤: كيف يعمل VHAL (Vehicle HAL) في قراءة بيانات CAN Bus وتحويلها إلى Vehicle Properties؟</h4>
+                    <div class="interview-a">
+                        <p><strong>الإجابة الهندسية:</strong></p>
+                        <p>
+                            <strong>الرحلة من CAN Bus إلى Java:</strong>
+                        </p>
+                        <ol>
+                            <li><strong>CAN Bus Frame:</strong> ECU (مثلاً وحدة المحرك) تُرسل إطار CAN بـ <code>can_id = 0x123</code> و <code>data = [0x00, 0x3C]</code> (سرعة = 60 كم/س).</li>
+                            <li><strong>SocketCAN Driver:</strong> برنامج تشغيل CAN Bus في Linux Kernel يستلم الإطار ويضعه في <code>/dev/can0</code>.</li>
+                            <li><strong>VehicleHAL (Native):</strong> يقرأ من <code>/dev/can0</code> عبر <code>SocketCAN API</code>. يفك تغليف الإطار (Parse) باستخدام <code>DBC (Database CAN)</code> file الذي يُعرّف: "can_id 0x123 = سرعة السيارة، بايت 0-1 = القيمة × 0.1 كم/س".</li>
+                            <li><strong>VehicleHAL (AIDL):</strong> يُنشئ <code>VehiclePropValue</code> object: <code>{prop: PERF_VEHICLE_SPEED, areaId: GLOBAL, value: 60.0}</code>.</li>
+                            <li><strong>Binder IPC:</strong> يرسل <code>VehiclePropValue</code> عبر Binder إلى <code>CarService</code> (Java).</li>
+                            <li><strong>CarService:</strong> يستلم القيمة، يُحدث حالته الداخلية، ويُبلّغ جميع المستمعين (Listeners) المسجلين.</li>
+                            <li><strong>Application:</strong> <code>CarSensorManager</code> يستدعي <code>onSensorChanged()</code> في التطبيق.</li>
+                        </ol>
+                        <p>
+                            <strong>العكس (كتابة):</strong> عندما يضغط السائق على زر "رفع درجة الحرارة"، تسير الرحلة بالعكس: تطبيق → CarHvacManager → CarService → VHAL → SocketCAN → CAN Bus → ECU HVAC.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="interview-q">
+                    <span class="interview-tag">Senior Level</span>
+                    <h4>السؤال ٥: ما هو Garage Mode في AAOS؟ وكيف يختلف عن Doze Mode في الهاتف؟</h4>
+                    <div class="interview-a">
+                        <p><strong>الإجابة الهندسية:</strong></p>
+                        <p>
+                            <strong>Doze Mode (الهاتف):</strong> يُفعّل عندما يكون الهاتف <strong>ثابتاً وغير مستخدم</strong> لفترة. يُقيّد الوصول إلى الشبكة (JobScheduler, Alarms, Network). الهدف: <strong>توفير البطارية</strong>. المستخدم يمكنه إلغاء Doze ببساطة بتحريك الهاتف.
+                        </p>
+                        <p>
+                            <strong>Garage Mode (السيارة):</strong> يُفعّل عندما يُطفئ السائق <strong>المحرك</strong> (AP_POWER_STATE_REQ = OFF). في هذا الوضع:
+                        </p>
+                        <ul>
+                            <li><strong>الشاشة تُطفأ</strong> (Display OFF).</li>
+                            <li><strong>التطبيقات لا تستطيع</strong> تشغيل Activities.</li>
+                            <li><strong>المهام الخلفية مسموحة</strong>: OTA Updates، تسجيل بيانات الصيانة، تحميل الخرائط.</li>
+                            <li><strong>CarService يبقى نشطاً</strong> لمراقبة حالة السيارة.</li>
+                            <li><strong>النظام قد يدخل Suspend-to-RAM</strong> بعد فترة.</li>
+                        </ul>
+                        <p>
+                            <strong>الفرق الجوهري:</strong> Doze يهدف إلى <strong>توفير البطارية</strong> بتقييد كل شيء. Garage Mode يهدف إلى <strong>التوازن</strong>: إطفاء UI لتوفير الطاقة، لكن السماح بمهام الصيانة الحرجة. السيارة ليست هاتفاً - لا يمكن "إغلاقها" بالكامل.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="interview-q">
+                    <span class="interview-tag">Architect</span>
+                    <h4>السؤال ٦: كيف يتم تأمين VHAL بحيث لا يستطيع تطبيق عشوائي التحكم في أبواب السيارة أو المكابح؟</h4>
+                    <div class="interview-a">
+                        <p><strong>الإجابة الهندسية:</strong></p>
+                        <p>
+                            هناك <strong>أربع طبقات أمان</strong> تحمي VHAL:
+                        </p>
+                        <ol>
+                            <li><strong>Signature Permissions:</strong> أذونات مثل <code>android.car.permission.CAR_CABIN</code> و <code>android.car.permission.CAR_HVAC</code> تتطلب أن يكون التطبيق <strong>موقعاً بنفس مفتاح النظام</strong> (System Signature). تطبيقات Play Store العادية لا تستطيع الحصول عليها.</li>
+                            <li><strong>SELinux Policy:</strong> <code>vehicle_hal.te</code> يُحدد أن <code>vehicle_hal</code> process يمكنه الوصول فقط إلى <code>/dev/can*</code> و <code>car_service</code>. تطبيقات المستخدم (u:r:untrusted_app:s0) لا يمكنها التحدث إلى VHAL مباشرة.</li>
+                            <li><strong>CarService as Gatekeeper:</strong> التطبيقات لا تتحدث إلى VHAL مباشرة. بل تتحدث إلى <code>CarService</code> عبر Binder. CarService يتحقق من <code>UID</code> و <code>Permission</code> قبل تمرير الطلب إلى VHAL.</li>
+                            <li><strong>Property Access Control:</strong> بعض الخصائص (مثلاً <code>DOOR_LOCK</code>) تُعرّف في <code>VehiclePropConfig</code> كـ <code>READ_WRITE</code> فقط لعمليات النظام. VHAL نفسه يرفض الكتابة من عمليات غير موثوقة.</li>
+                        </ol>
+                        <pre><code class="language-xml"><!-- SELinux Policy: vehicle_hal.te -->
+# VHAL يمكنه الوصول فقط إلى CAN devices
+allow vehicle_hal can_device:chr_file rw_file_perms;
+
+# VHAL يمكنه التحدث إلى CarService فقط
+allow vehicle_hal car_service:binder call;
+
+# تطبيقات المستخدم لا يمكنها الوصول إلى VHAL
+neverallow untrusted_app vehicle_hal:binder call;</code></pre>
+                    </div>
+                </div>
+
+                <div class="interview-q">
+                    <span class="interview-tag">Architect</span>
+                    <h4>السؤال ٧: كيف تُصمم نظام Audio في AAOS يدعم شاشات متعددة ومناطق صوتية مختلفة؟</h4>
+                    <div class="interview-a">
+                        <p><strong>الإجابة الهندسية:</strong></p>
+                        <p>
+                            <strong>CarAudio Architecture:</strong>
+                        </p>
+                        <ol>
+                            <li><strong>Audio Zones:</strong> كل منطقة في السيارة (Driver, Passenger, Rear) هي <code>AudioZone</code> مستقلة. كل Zone لديها <code>AudioPolicy</code> خاص بها.</li>
+                            <li><strong>Audio Contexts:</strong> كل مصدر صوتي (Music, Navigation, Voice, Call) له <code>AudioContext</code> يُحدد أولويته.</li>
+                            <li><strong>Audio Mix:</strong> <code>AudioPolicy</code> يُنشئ <code>AudioMix</code> لكل Context+Zone combination. هذا يسمح بتوجيه الموسيقى إلى Zone 0 (Driver) والفيلم إلى Zone 2 (Rear).</li>
+                            <li><strong>Audio Focus:</strong> عندما يحتاج Navigation إلى إعطاء تعليمات، يطلب <code>AudioFocus</code> من <code>CarAudioFocus</code>. النظام يُطبّق <strong>Ducking</strong> على Music في نفس Zone فقط، دون التأثير على Rear Entertainment.</li>
+                            <li><strong>HAL Integration:</strong> <code>CarAudioService</code> يتحدث إلى <code>Audio HAL</code> عبر <code>AudioPolicy</code> API. الـ HAL يُرسل الصوت إلى DSP (Digital Signal Processor) الذي يوجهه إلى المكبرات الصحيحة.</li>
+                        </ol>
+                        <pre><code class="language-java">// car_audio_configuration.xml
+<audioZoneConfiguration version="2.0">
+    <zone name="primary zone" audioZoneId="0">
+        <volumeGroups>
+            <group name="media">
+                <device address="bus0_media"/>
+            </group>
+            <group name="navigation">
+                <device address="bus1_nav"/>
+            </group>
+        </volumeGroups>
+    </zone>
+    <zone name="rear seat" audioZoneId="1">
+        <volumeGroups>
+            <group name="rear media">
+                <device address="bus2_rear"/>
+            </group>
+        </volumeGroups>
+    </zone>
+</audioZoneConfiguration></code></pre>
+                    </div>
+                </div>
+
+                <div class="interview-q">
+                    <span class="interview-tag">Senior Level</span>
+                    <h4>السؤال ٨: ما هي مشكلة Boot Time في AAOS وكيف تُحل؟</h4>
+                    <div class="interview-a">
+                        <p><strong>الإجابة الهندسية:</strong></p>
+                        <p>
+                            <strong>المشكلة:</strong> السائق يتوقع أن تر ven النظام خلال <strong>2 ثوانٍ</strong> من فتح الباب. لكن إقلاع Linux Kernel + Android Framework + CarService + VHAL قد يستغرق 20-40 ثانية.
+                        </p>
+                        <p>
+                            <strong>الحلول:</strong>
+                        </p>
+                        <ul>
+                            <li><strong>Suspend-to-RAM (S3):</strong> بدلاً من الإغلاق الكامل، يُحفظ حالة النظام في RAM. عند فتح الباب، يستيقظ النظام خلال <strong>1-3 ثوانٍ</strong>. هذا هو الحل الأساسي.</li>
+                            <li><strong>Zygote Preloading:</strong> تحميل جميع مكتبات Framework في الذاكرة أثناء إقلاع النظام الأولي. التطبيقات تبدأ عبر <code>fork()</code> من Zygote (Copy-On-Write).</li>
+                            <li><strong>Parallel Service Initialization:</strong> في <code>SystemServer</code>، خدمات النظام تُطلق بالتوازي بدلاً من التسلسل. AAOS يضيف <code>CarService</code> إلى <code>startOtherServices()</code> مع أولوية عالية.</li>
+                            <li><strong>Lazy HAL Initialization:</strong> HALs مثل Bluetooth أو WiFi لا تُهيأ حتى يُفتح الإعدادات. فقط HALs الحرجة (Display, Audio, VHAL) تُهيأ فوراً.</li>
+                            <li><strong>Read-Ahead:</strong> <code>init.rc</code> يستخدم <code>readahead</code> لتحميل ملفات النظام المتوقعة إلى Page Cache.</li>
+                            <li><strong>A/B Partitioning:</strong> يُقلل من وقت التحقق من OTA Updates أثناء الإقلاع.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="interview-q">
+                    <span class="interview-tag">Architect</span>
+                    <h4>السؤال ٩: كيف يعمل HIDL vs AIDL في HALs؟ ولماذا تحولت Google من HIDL إلى AIDL في أندرويد 11+؟</h4>
+                    <div class="interview-a">
+                        <p><strong>الإجابة الهندسية:</strong></p>
+                        <p>
+                            <strong>HIDL (Android 8-10):</strong> صُمم لفصل HAL عن Framework عبر <strong>Stable Interface</strong>. يستخدم <code>hwbinder</code> - نسخة من Binder مخصصة للعتاد. يتطلب <strong>عملية منفصلة</strong> (<code>hwbinder daemon</code>) و<strong>تسلسل إضافي</strong> (HIDL uses its own serialization format). هذا يعني <strong>تكلفة إضافية</strong> في كل Transaction.
+                        </p>
+                        <p>
+                            <strong>AIDL (Android 11+):</strong> يستخدم <code>binder</code> العادي مباشرة. <strong>لا يتطلب hwbinder daemon</strong>. يستخدم <code>Parcel</code> serialization المُحسّن بالفعل. <strong>أسرع</strong> و<strong>أقل استهلاكاً للذاكرة</strong>. بالإضافة إلى ذلك، AIDL يدعم <strong>Java backends</strong> مباشرة (HIDL يتطلب C++ backend).
+                        </p>
+                        <p>
+                            <strong>لماذا التحول؟</strong>
+                        </p>
+                        <ul>
+                            <li><strong>الأداء:</strong> AIDL أسرع بنسبة 20-30% في معظم السيناريوهات.</li>
+                            <li><strong>البساطة:</strong> مطور واحد يمكنه كتابة AIDL interface و Java implementation. HIDL يتطلب C++ implementation + Java wrapper.</li>
+                            <li><strong>الصيانة:</strong> AIDL أقرب إلى "كود أندرويد العادي" - أسهل في التصحيح والصيانة.</li>
+                            <li><strong>التوحيد:</strong> بدلاً من Binder + hwbinder، يوجد Binder واحد فقط.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="interview-q">
+                    <span class="interview-tag">Architect</span>
+                    <h4>السؤال ١٠: كيف تُصمم نظام OTA (Over-The-Air) Updates في AAOS يعمل بأمان أثناء Garage Mode؟</h4>
+                    <div class="interview-a">
+                        <p><strong>الإجابة الهندسية:</strong></p>
+                        <p>
+                            <strong>A/B Partitioning (Seamless Updates):</strong> AAOS يستخدم <strong>A/B partitioning</strong> حيث يوجد نسختان من كل قسم (System, Vendor, Boot). أثناء Garage Mode:
+                        </p>
+                        <ol>
+                            <li><strong>Download:</strong> يُحمّل التحديث إلى القسم غير النشط (B) أثناء Garage Mode.</li>
+                            <li><strong>Verification:</strong> يُتحقق من توقيع التحديث (Verified Boot / dm-verity).</li>
+                            <li><strong>Switch:</strong> عند الإقلاع التالي، يُحوّل Bootloader إلى القسم B.</li>
+                            <li><strong>Rollback:</strong> إذا فشل الإقلاع 3 مرات، يُرجع Bootloader تلقائياً إلى القسم A.</li>
+                        </ol>
+                        <p>
+                            <strong>الأمان:</strong>
+                        </p>
+                        <ul>
+                            <li><strong>Verified Boot:</strong> كل قسم يُتحقق منه عبر <code>dm-verity</code> (hash tree) قبل التحميل.</li>
+                            <li><code>AVB (Android Verified Boot)</code> يضمن أن Bootloader نفسه لم يُعدّل.</li>
+                            <li><strong>Encryption:</strong> partitions تُشفّر بـ <code>File-Based Encryption (FBE)</code>.</li>
+                            <li><strong>SELinux:</strong> OTA Daemon يعمل في <code>u:r:ota_daemon:s0</code> context محدود.</li>
+                        </ul>
+                        <pre><code class="language-java">// Garage Mode + OTA
+public class OtaUpdateService extends Service {
+    @Override
+    public void onCreate() {
+        CarPowerManager powerManager = ...;
+        powerManager.setListener(executor, state -> {
+            if (state == CarPowerManager.STATE_ON) {
+                // السيارة في وضع التشغيل - لا تقم بـ OTA
+                cancelOtaDownload();
+            } else if (state == CarPowerManager.STATE_SHUTDOWN_PREPARE) {
+                // السيارة تُطفأ - Garage Mode قادم
+                if (isWifiConnected() && batteryAboveThreshold()) {
+                    startOtaDownload();
+                }
+            }
+        });
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>المرجع الهندسي الشامل لـ AOSP و Android Automotive OS</p>
+        <p style="margin-top: 10px; font-size: 0.8rem;">مكتوب بالكامل بالعربية الفصحى | Modern Standard Arabic</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            hljs.highlightAll();
+
+            const sections = document.querySelectorAll('.section');
+            const tocLinks = document.querySelectorAll('.toc a');
+
+            function updateActiveLink() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (scrollY >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                tocLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + current) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+
+            window.addEventListener('scroll', updateActiveLink);
+            updateActiveLink();
+        });
+    </script>
+</body>
+</html>

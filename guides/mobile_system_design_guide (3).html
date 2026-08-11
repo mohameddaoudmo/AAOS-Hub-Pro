@@ -1,0 +1,2658 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دليل تصميم أنظمة الهواتف — الجزء الثالث والرابع</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@300;400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --slate-navy: #0F172A;
+            --electric-cyan: #06B6D4;
+            --purple-indigo: #6366F1;
+            --emerald-green: #10B981;
+            --amber-warning: #F59E0B;
+            --crimson-alert: #EF4444;
+            --soft-bg: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-primary: #1E293B;
+            --text-secondary: #64748B;
+            --border-light: #E2E8F0;
+            --code-bg: #1E293B;
+            --code-text: #E2E8F0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Tajawal', 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--soft-bg);
+            color: var(--text-primary);
+            line-height: 1.8;
+            font-size: 17px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--slate-navy) 0%, #1E293B 50%, #334155 100%);
+            color: white;
+            padding: 80px 20px 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -20%;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%; left: -10%;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-content { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(6,182,212,0.2);
+            color: var(--electric-cyan);
+            padding: 8px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            border: 1px solid rgba(6,182,212,0.3);
+            letter-spacing: 1px;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+        .hero h1 span {
+            background: linear-gradient(90deg, var(--electric-cyan), var(--purple-indigo));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: #94A3B8;
+            max-width: 700px;
+            margin: 0 auto 32px;
+        }
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            color: #64748B;
+        }
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .hero-meta .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            background: rgba(15,23,42,0.95);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            overflow-x: auto;
+            gap: 4px;
+        }
+        .nav-item {
+            color: #94A3B8;
+            text-decoration: none;
+            padding: 16px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .nav-item:hover, .nav-item.active {
+            color: var(--electric-cyan);
+            border-bottom-color: var(--electric-cyan);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Section Headers */
+        .section {
+            margin-bottom: 64px;
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border-light);
+        }
+        .section-number {
+            width: 56px; height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 900;
+            color: white;
+            flex-shrink: 0;
+        }
+        .section-title-wrap h2 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--slate-navy);
+            margin-bottom: 4px;
+        }
+        .section-title-wrap .en-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-family: 'Fira Code', monospace;
+            letter-spacing: 0.5px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-light);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .card-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--slate-navy);
+        }
+        .card-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Callout Cards */
+        .callout {
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 20px 0;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .callout-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .callout-cyan { background: rgba(6,182,212,0.08); border-right: 4px solid var(--electric-cyan); }
+        .callout-purple { background: rgba(99,102,241,0.08); border-right: 4px solid var(--purple-indigo); }
+        .callout-emerald { background: rgba(16,185,129,0.08); border-right: 4px solid var(--emerald-green); }
+        .callout-amber { background: rgba(245,158,11,0.08); border-right: 4px solid var(--amber-warning); }
+        .callout-crimson { background: rgba(239,68,68,0.08); border-right: 4px solid var(--crimson-alert); }
+
+        /* Code Blocks */
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 20px;
+            border-radius: 12px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 13.5px;
+            line-height: 1.7;
+            margin: 16px 0;
+            border: 1px solid #334155;
+            direction: ltr;
+            text-align: left;
+        }
+        code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            background: #F1F5F9;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: var(--purple-indigo);
+        }
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+            font-size: 13.5px;
+        }
+        .code-label {
+            background: #334155;
+            color: #94A3B8;
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 6px 6px 0 0;
+            display: inline-block;
+            font-family: 'Fira Code', monospace;
+            margin-bottom: -1px;
+            direction: ltr;
+        }
+
+        /* Lists */
+        ul, ol {
+            padding-right: 24px;
+            margin: 12px 0;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        li::marker {
+            color: var(--electric-cyan);
+        }
+
+        /* Tables */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 24px 0;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            font-size: 15px;
+        }
+        th {
+            background: var(--slate-navy);
+            color: white;
+            padding: 14px 16px;
+            text-align: right;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: top;
+        }
+        tr:hover td { background: #F8FAFC; }
+        tr:last-child td { border-bottom: none; }
+
+        /* Timeline / Steps */
+        .timeline {
+            position: relative;
+            padding-right: 32px;
+            margin: 24px 0;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            right: 10px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--electric-cyan), var(--purple-indigo));
+            border-radius: 3px;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 28px;
+            padding-right: 24px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            right: -27px;
+            top: 6px;
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 3px solid var(--electric-cyan);
+            z-index: 1;
+        }
+        .timeline-item.completed::before {
+            background: var(--electric-cyan);
+        }
+        .timeline-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--slate-navy);
+            margin-bottom: 6px;
+        }
+        .timeline-meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-family: 'Fira Code', monospace;
+            margin-bottom: 8px;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            margin: 2px 4px;
+        }
+        .badge-cyan { background: rgba(6,182,212,0.12); color: #0891B2; }
+        .badge-purple { background: rgba(99,102,241,0.12); color: #4F46E5; }
+        .badge-emerald { background: rgba(16,185,129,0.12); color: #059669; }
+        .badge-amber { background: rgba(245,158,11,0.12); color: #D97706; }
+        .badge-crimson { background: rgba(239,68,68,0.12); color: #DC2626; }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        /* Trade-off Matrix */
+        .matrix-card {
+            background: linear-gradient(135deg, #F8FAFC, #FFFFFF);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .matrix-header {
+            font-weight: 800;
+            color: var(--slate-navy);
+            margin-bottom: 12px;
+            font-size: 1.05rem;
+        }
+        .matrix-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border-light);
+            font-size: 14px;
+        }
+        .matrix-row:last-child { border-bottom: none; }
+        .matrix-opt-a { color: var(--emerald-green); font-weight: 700; }
+        .matrix-opt-b { color: var(--purple-indigo); font-weight: 700; }
+        .matrix-vs { color: var(--text-secondary); font-size: 12px; }
+
+        /* ASCII Diagrams */
+        .ascii-diagram {
+            background: var(--code-bg);
+            color: #E2E8F0;
+            padding: 24px;
+            border-radius: 12px;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-x: auto;
+            direction: ltr;
+            text-align: left;
+            margin: 16px 0;
+            border: 1px solid #334155;
+        }
+
+        /* Case Study Cards */
+        .case-study {
+            border: 2px solid var(--border-light);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+        .case-header {
+            background: linear-gradient(135deg, var(--slate-navy), #1E293B);
+            color: white;
+            padding: 24px 28px;
+        }
+        .case-header h3 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .case-header .case-en {
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            color: var(--electric-cyan);
+            opacity: 0.9;
+        }
+        .case-body {
+            padding: 28px;
+            background: var(--card-bg);
+        }
+
+        /* Footer Summary */
+        .summary-card {
+            background: linear-gradient(135deg, var(--slate-navy), #1E293B);
+            color: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: -100px; left: -100px;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .summary-card h3 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .summary-card p {
+            color: #CBD5E1;
+            line-height: 1.9;
+            position: relative;
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 10px 0;
+            padding-right: 32px;
+            position: relative;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .checklist li::before {
+            content: '☐';
+            position: absolute;
+            right: 0;
+            color: var(--electric-cyan);
+            font-size: 18px;
+        }
+        .checklist li.checked::before {
+            content: '☑';
+            color: var(--emerald-green);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .section-header { flex-direction: column; align-items: flex-start; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .nav-inner { padding: 0 10px; }
+            .nav-item { padding: 12px 14px; font-size: 13px; }
+        }
+
+        /* Smooth scroll */
+        html { scroll-behavior: smooth; }
+
+        /* Highlight text */
+        .highlight {
+            background: linear-gradient(180deg, transparent 60%, rgba(6,182,212,0.25) 60%);
+            padding: 0 4px;
+        }
+
+        /* Section anchors */
+        .section-anchor {
+            display: block;
+            position: relative;
+            top: -80px;
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">📱 MOBILE SYSTEM DESIGN MASTERCLASS</div>
+        <h1>دليل شامل لتصميم <span>أنظمة الهواتف المتنقلة</span></h1>
+        <p class="hero-subtitle">
+            الجزء الثالث والرابع: إطار عمل مقابلات التصميم ودراسات الحالات الواقعية
+            <br>
+            <span style="font-family: 'Fira Code', monospace; font-size: 0.9rem;">Part III & IV — Interview Framework & Real-World Case Studies</span>
+        </p>
+        <div class="hero-meta">
+            <span><span class="dot" style="background: var(--electric-cyan);"></span> 6 فصول تفصيلية</span>
+            <span><span class="dot" style="background: var(--emerald-green);"></span> 9 دراسات حالة</span>
+            <span><span class="dot" style="background: var(--purple-indigo);"></span> 4 مصفوفات قرار</span>
+            <span><span class="dot" style="background: var(--amber-warning);"></span> CRDDS Framework</span>
+        </div>
+    </div>
+</section>
+
+<!-- Navigation -->
+<nav class="nav-bar">
+    <div class="nav-inner">
+        <a href="#ch11" class="nav-item active">الفصل 11</a>
+        <a href="#ch12" class="nav-item">الفصل 12</a>
+        <a href="#ch13" class="nav-item">الفصل 13</a>
+        <a href="#ch14" class="nav-item">الفصل 14</a>
+        <a href="#ch15" class="nav-item">الفصل 15</a>
+        <a href="#ch16" class="nav-item">الفصل 16</a>
+        <a href="#cheatsheets" class="nav-item">الحقائب النهائية</a>
+    </div>
+</nav>
+
+<div class="container">
+
+<!-- ============================================================ -->
+<!-- CHAPTER 11 -->
+<!-- ============================================================ -->
+<span class="section-anchor" id="ch11"></span>
+<section class="section">
+    <div class="section-header">
+        <div class="section-number" style="background: linear-gradient(135deg, var(--electric-cyan), #0891B2);">11</div>
+        <div class="section-title-wrap">
+            <h2>منهجية إدارة مقابلة تصميم أنظمة الهواتف</h2>
+            <div class="en-subtitle">How to Approach a Mobile System Design Interview</div>
+        </div>
+    </div>
+
+    <div class="callout callout-cyan">
+        <div class="callout-icon">🎯</div>
+        <div>
+            <strong>الهدف الاستراتيجي:</strong> مقابلة تصميم النظام ليست اختباراً للحفظ، بل هي محاكاة لتصميم منتج حقيقي ضمن قيود <strong>Battery</strong> و <strong>Memory</strong> و <strong>Network</strong> و <strong>Storage</strong>. نجاحك يعتمد على قدرتك على التنقل بين المستويات المختلفة للتصميم بسلاسة.
+        </div>
+    </div>
+
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--slate-navy); margin: 32px 0 20px;">🔷 إطار عمل CRDDS الخماسي</h3>
+    <p style="margin-bottom: 20px; color: var(--text-secondary);">إطار عمل منظم يضمن تغطية جميع جوانب المقابلة خلال 45 دقيقة.</p>
+
+    <div class="timeline">
+        <div class="timeline-item completed">
+            <div class="timeline-title">C — Clarify Requirements <span class="badge badge-cyan">الدقائق 0-5</span></div>
+            <div class="timeline-meta">Clarification & Scope Definition</div>
+            <p>لا تبدأ بالحل أبداً. ابدأ بطرح الأسئلة التوضيحية لتحديد نطاق المشكلة. حدد:</p>
+            <ul>
+                <li><strong>Target OS:</strong> Android فقط؟ iOS؟ أم Multi-platform (KMP / Flutter)؟</li>
+                <li><strong>Functional Scope:</strong> ما هي رحلات المستخدم الأساسية (Core User Journeys)؟</li>
+                <li><strong>Non-Functional Requirements:</strong> Latency tolerance، Offline availability، Battery impact، Target FPS (60Hz vs 120Hz)</li>
+                <li><strong>Constraints:</strong> App size budget، API rate limits، Local DB storage limit</li>
+            </ul>
+        </div>
+        <div class="timeline-item completed">
+            <div class="timeline-title">R — Rough High-Level Design <span class="badge badge-purple">الدقائق 5-15</span></div>
+            <div class="timeline-meta">HLD — System Boundaries & Data Flow</div>
+            <p>ارسم المخطط العالي المستوى بأربع طبقات رئيسية. ركز على تدفق البيانات بين المكونات، لا على تفاصيل الـ Class:</p>
+            <div class="ascii-diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐         │
+│  │  UI Layer   │───▶│   Domain    │───▶│   Data      │         │
+│  │ (Views/VMs) │    │  (UseCases) │    │ (Repo/Cache)│         │
+│  └─────────────┘    └─────────────┘    └──────┬──────┘         │
+│         ▲                    ▲                  │                │
+│         │                    │                  ▼                │
+│  ┌──────┴──────┐    ┌────────┴────────┐   ┌─────────────┐      │
+│  │  StateHolder│    │  Domain Models  │   │  Network    │      │
+│  │ (ViewModel) │    │  (Pure Kotlin)  │   │  (API/WS)   │      │
+│  └─────────────┘    └─────────────────┘   └──────┬──────┘      │
+│                                                  │              │
+│                           ┌──────────────────────┘              │
+│                           ▼                                     │
+│                    ┌─────────────┐                              │
+│                    │   Server    │                              │
+│                    │  (Backend)  │                              │
+│                    └─────────────┘                              │
+└─────────────────────────────────────────────────────────────────┘
+            </div>
+        </div>
+        <div class="timeline-item completed">
+            <div class="timeline-title">D — Deep Dive into Components <span class="badge badge-emerald">الدقائق 15-30</span></div>
+            <div class="timeline-meta">LLD — Critical Bottlenecks & Component Design</div>
+            <p>اختر المكون الأكثر تعقيداً وتعمق فيه. أمثلة على نقاط التعمق الحرجة:</p>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: rgba(6,182,212,0.12);">⚡</div>
+                        <div>
+                            <div class="card-title">Offline Queue</div>
+                            <div class="card-subtitle">Pending Actions Sync</div>
+                        </div>
+                    </div>
+                    <p style="font-size: 14px; color: var(--text-secondary);">إدارة قائمة الانتظار للعمليات في وضع عدم الاتصال مع ضمان الترتيب والـ Idempotency.</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: rgba(99,102,241,0.12);">🖼️</div>
+                        <div>
+                            <div class="card-title">Image Caching</div>
+                            <div class="card-subtitle">LruCache + Disk Cache</div>
+                        </div>
+                    </div>
+                    <p style="font-size: 14px; color: var(--text-secondary);">استراتيجية التخزين المؤقت للصور مع إدارة ضغط الذاكرة (Memory Pressure).</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: rgba(16,185,129,0.12);">🔌</div>
+                        <div>
+                            <div class="card-title">WebSocket Manager</div>
+                            <div class="card-subtitle">Connection Lifecycle</div>
+                        </div>
+                    </div>
+                    <p style="font-size: 14px; color: var(--text-secondary);">إدارة دورة حياة الاتصال المستمر مع إعادة الاتصال التلقائي وHeartbeat mechanism.</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: rgba(245,158,11,0.12);">🔄</div>
+                        <div>
+                            <div class="card-title">Sync Engine</div>
+                            <div class="card-subtitle">Conflict Resolution</div>
+                        </div>
+                    </div>
+                    <p style="font-size: 14px; color: var(--text-secondary);">محرك المزامنة ثنائي الاتجاه مع حل التعارضات (Last-Write-Wins vs Operational Transform).</p>
+                </div>
+            </div>
+        </div>
+        <div class="timeline-item completed">
+            <div class="timeline-title">D — Discuss Trade-offs <span class="badge badge-amber">الدقائق 30-40</span></div>
+            <div class="timeline-meta">Architectural Decision Records (ADRs)</div>
+            <p>ناقش الخيارات البديلة بوضوح. لا يوجد تصميم "مثالي" — كل قرار له ثمن:</p>
+            <ul>
+                <li><strong>REST vs gRPC:</strong> Readability & Caching vs Performance & Payload Size</li>
+                <li><strong>Room vs MMKV:</strong> Structured Queries vs Ultra-Low Latency Key-Value</li>
+                <li><strong>Polling vs SSE vs WebSocket:</strong> Battery efficiency vs Real-time guarantees</li>
+                <li><strong>SQLite vs Realm:</strong> Maturity & Ecosystem vs Ease of Use</li>
+            </ul>
+        </div>
+        <div class="timeline-item completed">
+            <div class="timeline-title">S — Summarize & Handle Follow-ups <span class="badge badge-crimson">الدقائق 40-45</span></div>
+            <div class="timeline-meta">Recap & Edge Cases</div>
+            <p>لخص التصميم في 60 ثانية. غطِ الحالات الحافة (Edge Cases):</p>
+            <ul>
+                <li>ماذا يحدث عند <strong>Process Death</strong> أثناء رفع صورة؟</li>
+                <li>كيف تتعامل مع <strong>Network Switch</strong> (Wi-Fi → Cellular)؟</li>
+                <li>ما هي استراتيجية <strong>Security</strong> (Encryption at Rest & in Transit)؟</li>
+                <li>كيف يتوسع النظام عند 10x Scale؟</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--slate-navy); margin: 32px 0 20px;">🔷 معرفة نوع الجولة</h3>
+    <div class="grid-2">
+        <div class="card" style="border-top: 4px solid var(--electric-cyan);">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(6,182,212,0.12); color: var(--electric-cyan);">🏗️</div>
+                <div>
+                    <div class="card-title">HLD-Focused Round</div>
+                    <div class="card-subtitle">High-Level Design</div>
+                </div>
+            </div>
+            <ul style="font-size: 15px;">
+                <li>System Boundaries & Component Interaction</li>
+                <li>Data Flow Diagrams (User → App → Server → DB)</li>
+                <li>API Contracts & Payload Formats</li>
+                <li>Scalability & Caching Strategy</li>
+                <li>Offline-first Architecture Decisions</li>
+            </ul>
+            <div class="callout callout-cyan" style="margin: 16px 0 0;">
+                <strong>المفتاح:</strong> ارسم المربعات والأسهم. اشرح "لماذا" كل مكون موجود.
+            </div>
+        </div>
+        <div class="card" style="border-top: 4px solid var(--purple-indigo);">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(99,102,241,0.12); color: var(--purple-indigo);">🔬</div>
+                <div>
+                    <div class="card-title">LLD-Focused Round</div>
+                    <div class="card-subtitle">Low-Level Design</div>
+                </div>
+            </div>
+            <ul style="font-size: 15px;">
+                <li>Class Diagrams & Interface Contracts</li>
+                <li>SOLID Principles Application</li>
+                <li>State Machines & Lifecycle Management</li>
+                <li>Threading Model & Concurrency</li>
+                <li>Memory Management & Object Pools</li>
+            </ul>
+            <div class="callout callout-purple" style="margin: 16px 0 0;">
+                <strong>المفتاح:</strong> اكتب كود نظيف على السبورة. اشرح الـ Dependency Injection والـ Abstractions.
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- CHAPTER 12 -->
+<!-- ============================================================ -->
+<span class="section-anchor" id="ch12"></span>
+<section class="section">
+    <div class="section-header">
+        <div class="section-number" style="background: linear-gradient(135deg, var(--purple-indigo), #4F46E5);">12</div>
+        <div class="section-title-wrap">
+            <h2>طرح الأسئلة التوضيحية الصحيحة</h2>
+            <div class="en-subtitle">Asking the Right Clarifying Questions</div>
+        </div>
+    </div>
+
+    <div class="callout callout-purple">
+        <div class="callout-icon">💡</div>
+        <div>
+            <strong>القاعدة الذهبية:</strong> أول 5 دقائق من المقابلة تحدد 50% من نتيجتها. المهندس الذي يطرح أسئلة توضيحية دقيقة يُظهر <strong>System Thinking</strong> و <strong>Product Sense</strong> — وهما صفتان لا تُقدران بثمن في المستويات Senior+.
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(6,182,212,0.12);">📋</div>
+                <div>
+                    <div class="card-title">Functional Requirements</div>
+                    <div class="card-subtitle">المتطلبات الوظيفية</div>
+                </div>
+            </div>
+            <ul class="checklist">
+                <li>ما هي رحلات المستخدم الأساسية (Core User Journeys)؟</li>
+                <li>هل هناك Views ديناميكية تتغير حسب السياق؟</li>
+                <li>ما هي صيغ الـ Payload (JSON, Protobuf, XML)؟</li>
+                <li>ما هي آلية الـ Authentication (OAuth2, JWT, API Key)؟</li>
+                <li>هل يوجد Push Notifications أم In-App فقط؟</li>
+                <li>هل يدعم التطبيق Multiple Languages / RTL؟</li>
+            </ul>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(99,102,241,0.12);">⚡</div>
+                <div>
+                    <div class="card-title">Non-Functional Requirements</div>
+                    <div class="card-subtitle">المتطلبات غير الوظيفية</div>
+                </div>
+            </div>
+            <ul class="checklist">
+                <li>ما هو Latency Tolerance المقبول (P50, P95, P99)؟</li>
+                <li>هل التطبيق يجب أن يعمل Offline-first أم Network-dependent؟</li>
+                <li>ما هو App Size Budget المستهدف (MB)؟</li>
+                <li>ما هو تأثير البطارية المقبول (Battery Impact)؟</li>
+                <li>ما هي معدلات تحديث الشاشة المستهدفة (60Hz vs 120Hz FPS)؟</li>
+                <li>هل هناك Accessibility requirements (TalkBack / VoiceOver)؟</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--slate-navy); margin: 32px 0 20px;">🔷 تحليل السكيل (Scale Analysis)</h3>
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(16,185,129,0.12);">📊</div>
+                <div>
+                    <div class="card-title">DAU / MAU Impact</div>
+                    <div class="card-subtitle">User Scale Metrics</div>
+                </div>
+            </div>
+            <ul>
+                <li><strong>Peak Concurrent Users:</strong> الحد الأقصى للمستخدمين المتزامنين</li>
+                <li><strong>Requests Per Second (RPS):</strong> المعدل المتوقع من الـ Mobile Client</li>
+                <li><strong>Growth Projection:</strong> التوقعات خلال 6-12 شهراً</li>
+                <li><strong>Geographic Distribution:</strong> هل المستخدمون في منطقة واحدة أم موزعون عالمياً؟</li>
+            </ul>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(245,158,11,0.12);">💾</div>
+                <div>
+                    <div class="card-title">Storage & Bandwidth Budget</div>
+                    <div class="card-subtitle">Resource Constraints</div>
+                </div>
+            </div>
+            <ul>
+                <li><strong>Local DB Storage:</strong> كم MB/GB مسموح للـ Local Database؟</li>
+                <li><strong>Bandwidth Budget:</strong> ما هو حد البيانات الشهري للمستخدم؟</li>
+                <li><strong>API Rate Limits:</strong> هل يوجد حد (مثلاً 100 req/min)؟</li>
+                <li><strong>CDN Strategy:</strong> هل نستخدم CDN للـ Static Assets؟</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--slate-navy); margin: 32px 0 20px;">🔷 نطاق المنصة وتوقعات الاتصال</h3>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>المحور</th>
+                <th>الخيار A</th>
+                <th>الخيار B</th>
+                <th>الخيار C</th>
+            </tr>
+            <tr>
+                <td><strong>Platform</strong></td>
+                <td><span class="badge badge-cyan">Single Platform</span><br>Android (Kotlin) أو iOS (Swift)<br><br>✓ Native APIs كاملة<br>✓ أداء مثالي<br>✗ تكلفة تطوير مضاعفة</td>
+                <td><span class="badge badge-purple">Cross-Platform</span><br>Flutter / React Native<br><br>✓ Codebase واحد<br>✓ سرعة في التطوير<br>✗ Bridge Overhead<br>✗ Native limitations</td>
+                <td><span class="badge badge-emerald">Multi-Platform</span><br>Kotlin Multiplatform (KMP)<br><br>✓ Shared Logic<br>✓ Native UI لكل منصة<br>✗ Ecosystem ناشئ نسبياً</td>
+            </tr>
+            <tr>
+                <td><strong>Connectivity</strong></td>
+                <td><span class="badge badge-emerald">Offline-First</span><br>Local DB = Source of Truth<br><br>✓ تجربة مستخدم سلسة<br>✓ يتطلب Sync Engine<br>✗ تعقيد في Conflict Resolution</td>
+                <td><span class="badge badge-amber">Network-Dependent</span><br>Server = Source of Truth<br><br>✓ بساطة في التصميم<br>✓ Cache اختياري<br>✗ تجربة سيئة بدون إنترنت</td>
+                <td><span class="badge badge-crimson">Hybrid</span><br>بيانات Offline + Online<br><br>✓ مرونة عالية<br>✗ يتطلب Policy واضحة<br>✗ تعقيد في الإدارة</td>
+            </tr>
+        </table>
+    </div>
+
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--slate-navy); margin: 32px 0 20px;">🔷 قائمة أسئلة قابلة لإعادة الاستخدام (Blueprint Checklist)</h3>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th style="width: 15%;">الفئة</th>
+                <th style="width: 40%;">السؤال</th>
+                <th style="width: 45%;">لماذا هذا السؤال حاسم؟</th>
+            </tr>
+            <tr>
+                <td><span class="badge badge-cyan">Scope</span></td>
+                <td>"ما هي الميزات الـ MVP التي يجب تغطيتها في هذه المقابلة؟"</td>
+                <td>يمنع <strong>Over-engineering</strong> ويحدد الحدود الزمنية والوظيفية للتصميم</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-purple">Scale</span></td>
+                <td>"كم عدد المستخدمين المتوقع في السنة الأولى وما هو معدل النمو؟"</td>
+                <td>يؤثر على اختيار الـ Database (SQLite vs Server-side) و Cache Strategy</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-emerald">Platform</span></td>
+                <td>"هل نبني Native أم Cross-platform (Flutter/React Native)؟"</td>
+                <td>يغير Architecture Patterns بالكامل — Native يتيح WorkManager/Background Tasks</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-amber">Offline</span></td>
+                <td>"هل يجب أن يعمل التطبيق بدون إنترنت (Offline-first)؟"</td>
+                <td>يُحدد إذا كنت تحتاج <strong>Sync Engine</strong> و <strong>Conflict Resolution</strong></td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-crimson">Security</span></td>
+                <td>"هل البيانات Sensitive (مدفوعات، موقع GPS، رسائل خاصة)؟"</td>
+                <td>يُفعل <strong>Encryption at Rest</strong> (SQLCipher) و <strong>Certificate Pinning</strong></td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-cyan">Latency</span></td>
+                <td>"ما هو الـ Latency المقبول للميزات التفاعلية (P95)؟"</td>
+                <td>يُحدد إذا كنت بحاجة <strong>Local Caching</strong> أم <strong>Server Round-trip</strong> كافٍ</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-purple">Battery</span></td>
+                <td>"هل هناك قيود على استهلاك البطارية (Background tasks)؟"</td>
+                <td>يؤثر على GPS polling frequency و Background sync intervals</td>
+            </tr>
+        </table>
+    </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- CHAPTER 13 -->
+<!-- ============================================================ -->
+<span class="section-anchor" id="ch13"></span>
+<section class="section">
+    <div class="section-header">
+        <div class="section-number" style="background: linear-gradient(135deg, var(--emerald-green), #059669);">13</div>
+        <div class="section-title-wrap">
+            <h2>رسم المعمارية عالية المستوى (HLD)</h2>
+            <div class="en-subtitle">Drawing the High-Level Design</div>
+        </div>
+    </div>
+
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--slate-navy); margin: 32px 0 20px;">🔷 المعمارية المعيارية للهاتف المحمول</h3>
+    <p style="margin-bottom: 16px;">المعمارية القياسية تتكون من أربع طبقات رئيسية. كل طبقة لها مسؤولية واحدة واضحة (Single Responsibility):</p>
+
+    <div class="ascii-diagram">
+╔══════════════════════════════════════════════════════════════════════════════════════════════╗
+║                           <span style="color: var(--electric-cyan); font-weight: bold;">MOBILE CLIENT ARCHITECTURE — 4-LAYER MODEL</span>                              ║
+╠══════════════════════════════════════════════════════════════════════════════════════════════╣
+║                                                                                              ║
+║   ┌──────────────────────────────────────────────────────────────────────────────────────┐   ║
+║   │ <span style="color: #FBBF24;">▣ LAYER 1: UI LAYER</span>                                                                │   ║
+║   │   • Views / Composables (Jetpack Compose / SwiftUI)                                  │   ║
+║   │   • ViewModels / StateHolders (MVVM / MVI / Redux)                                   │   ║
+║   │   • UI State: Loading → Success → Error → Empty                                      │   ║
+║   └──────────────────────────────────────────────────────────────────────────────────────┘   ║
+║                                         ▲                                                    ║
+║                                         │ <span style="color: var(--emerald-green);">observes StateFlow / LiveData</span>                    ║
+║                                         ▼                                                    ║
+║   ┌──────────────────────────────────────────────────────────────────────────────────────┐   ║
+║   │ <span style="color: #FBBF24;">▣ LAYER 2: BUSINESS LAYER (Domain)</span>                                                 │   ║
+║   │   • Use Cases (Interactors) — Pure Business Rules, Framework-Agnostic                │   ║
+║   │   • Domain Models (Entities) — independent of Android/iOS frameworks                 │   ║
+║   │   • Repository Interfaces (Contracts / Ports in Clean Architecture)                  │   ║
+║   └──────────────────────────────────────────────────────────────────────────────────────┘   ║
+║                                         ▲                                                    ║
+║                                         │ <span style="color: var(--emerald-green);">implements interface</span>                             ║
+║                                         ▼                                                    ║
+║   ┌──────────────────────────────────────────────────────────────────────────────────────┐   ║
+║   │ <span style="color: #FBBF24;">▣ LAYER 3: DATA LAYER</span>                                                              │   ║
+║   │   • Repositories (Concrete Implementations)                                          │   ║
+║   │   • Local Storage Engine (Room / CoreData / MMKV / Realm / DataStore)                │   ║
+║   │   • Cache Manager (LruCache / NSCache / Disk LRU / Coil Memory Cache)                │   ║
+║   │   • Remote API Service (Retrofit / Alamofire / Ktor Client / Apollo)                 │   ║
+║   └──────────────────────────────────────────────────────────────────────────────────────┘   ║
+║                                         ▲                                                    ║
+║                                         │ <span style="color: var(--emerald-green);">HTTP / WebSocket / gRPC</span>                          ║
+║                                         ▼                                                    ║
+║   ┌──────────────────────────────────────────────────────────────────────────────────────┐   ║
+║   │ <span style="color: #FBBF24;">▣ LAYER 4: NETWORK LAYER</span>                                                           │   ║
+║   │   • HTTP Engine (OkHttp / URLSession / Ktor Client / Cronet)                         │   ║
+║   │   • Serializer (Moshi / Kotlinx Serialization / Codable / Gson)                      │   ║
+║   │   • Interceptors (Auth, Logging, Retry, Cache-Control, Certificate Pinning)          │   ║
+║   │   • Socket Client (WebSocket / SSE / MQTT / Socket.IO)                               │   ║
+║   └──────────────────────────────────────────────────────────────────────────────────────┘   ║
+║                                         │                                                    ║
+║                    ═════════════════════╪══════════════════════                                ║
+║                                         │                                                    ║
+║                                         ▼                                                    ║
+║   ┌──────────────────────────────────────────────────────────────────────────────────────┐   ║
+║   │ <span style="color: #FBBF24;">▣ REMOTE SERVER</span>                                                                    │   ║
+║   │   • API Gateway → Load Balancer → Microservices / Monolith                           │   ║
+║   │   • Database (PostgreSQL / MongoDB / DynamoDB / Firestore)                           │   ║
+║   │   • Cache Layer (Redis / Memcached / CDN)                                            │   ║
+║   │   • Message Queue (Kafka / RabbitMQ / SQS)                                           │   ║
+║   └──────────────────────────────────────────────────────────────────────────────────────┘   ║
+║                                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════╝
+    </div>
+
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--slate-navy); margin: 32px 0 20px;">🔷 تفصيل كل طبقة</h3>
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(6,182,212,0.12);">🎨</div>
+                <div>
+                    <div class="card-title">UI Layer</div>
+                    <div class="card-subtitle">Presentation & State Rendering</div>
+                </div>
+            </div>
+            <ul style="font-size: 15px;">
+                <li><strong>Views:</strong> Activities/Fragments (Android) أو ViewControllers (iOS)</li>
+                <li><strong>Composables:</strong> Jetpack Compose (Android) أو SwiftUI (iOS)</li>
+                <li><strong>ViewModels:</strong> يحتفظ بالـ State أثناء تغييرات الـ Configuration</li>
+                <li><strong>StateHolders:</strong> MVI Pattern — State واحد غير قابل للتعديل (Immutable)</li>
+            </ul>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(99,102,241,0.12);">⚙️</div>
+                <div>
+                    <div class="card-title">Business Layer</div>
+                    <div class="card-subtitle">Domain Logic & Use Cases</div>
+                </div>
+            </div>
+            <ul style="font-size: 15px;">
+                <li><strong>Use Cases:</strong> كل Use Case = عملية واحدة (مثال: GetUserProfileUseCase)</li>
+                <li><strong>Domain Models:</strong> POJOs/Kotlin Data Classes خالصة — لا تعتمد على Android SDK</li>
+                <li><strong>Repository Contracts:</strong> Interfaces تُحدد ما يمكن فعله، لا كيفية فعله</li>
+            </ul>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(16,185,129,0.12);">💾</div>
+                <div>
+                    <div class="card-title">Data Layer</div>
+                    <div class="card-subtitle">Repositories, Storage & Caching</div>
+                </div>
+            </div>
+            <ul style="font-size: 15px;">
+                <li><strong>Repositories:</strong> تُقرر: Local أم Remote؟ أم الاثنين (Repository Pattern)</li>
+                <li><strong>Local Storage:</strong> Room (SQL) / DataStore (Key-Value) / MMKV (High-perf KV)</li>
+                <li><strong>Cache Manager:</strong> LruCache (Memory) + DiskLruCache (Disk) للصور</li>
+                <li><strong>Remote Service:</strong> Retrofit + OkHttp (Android) / Alamofire (iOS)</li>
+            </ul>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(245,158,11,0.12);">🌐</div>
+                <div>
+                    <div class="card-title">Network Layer</div>
+                    <div class="card-subtitle">HTTP Engine, Serialization & Sockets</div>
+                </div>
+            </div>
+            <ul style="font-size: 15px;">
+                <li><strong>HTTP Engine:</strong> OkHttp Connection Pooling, HTTP/2, QUIC</li>
+                <li><strong>Interceptors:</strong> Auth Token Refresh, Retry Logic, Logging</li>
+                <li><strong>Serializer:</strong> Moshi (Codegen) / Kotlinx Serialization (MPP)</li>
+                <li><strong>Socket Client:</strong> WebSocket للـ Real-time, SSE للـ Server Push</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--slate-navy); margin: 32px 0 20px;">🔷 استراتيجيات الرسم على السبورة (Whiteboarding)</h3>
+    <div class="card">
+        <div class="grid-2" style="margin: 0;">
+            <div>
+                <h4 style="font-weight: 800; margin-bottom: 12px;">✓ افعل</h4>
+                <ul style="font-size: 15px;">
+                    <li>ابدأ بالمستخدم: ارسم <strong>User Journey</strong> من اليسار لليمين</li>
+                    <li>استخدم الألوان بذكاء: لون واحد للبيانات، لون للتدفق، لون للخارجيات</li>
+                    <li>اترك <strong>White Space</strong> — المساحات الفارغة تُظهر Organization Skills</li>
+                    <li>استخدم الأرقام: 1→2→3 لتوضيح Sequence Flow</li>
+                    <li>اكتب Labels واضحة: لا تفترض أن المقابل يفهم رموزك</li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="font-weight: 800; margin-bottom: 12px;">✗ لا تفعل</h4>
+                <ul style="font-size: 15px;">
+                    <li>لا تكتب <strong>Code</strong> على السبورة في HLD — استخدم Boxes & Arrows</li>
+                    <li>لا تُدخل في تفاصيل الـ Data Model (Fields) في المرحلة الأولى</li>
+                    <li>لا تنسى الـ <strong>External Dependencies</strong> (Firebase, AWS, MapBox)</li>
+                    <li>لا تجعل الرسم مزدحماً — Clutter = Confusion</li>
+                    <li>لا تفترض أن المقابل يعرف Domain Context — اشرح الـ Business Logic</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--slate-navy); margin: 32px 0 20px;">🔷 حدود HLD مقابل LLD</h3>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th style="width: 25%;">المحور</th>
+                <th style="width: 37.5%;">ينتمي إلى HLD</th>
+                <th style="width: 37.5%;">يُؤجل إلى LLD</th>
+            </tr>
+            <tr>
+                <td><strong>System Boundaries</strong></td>
+                <td>أين يبدأ Mobile Client وينتهي؟ ما هي الـ External APIs؟</td>
+                <td>—</td>
+            </tr>
+            <tr>
+                <td><strong>Data Flow</strong></td>
+                <td>كيف تنتقل البيانات بين الطبقات؟</td>
+                <td>—</td>
+            </tr>
+            <tr>
+                <td><strong>Data Models</strong></td>
+                <td>—</td>
+                <td>حقول الـ JSON الـ Exact، Types، Validations</td>
+            </tr>
+            <tr>
+                <td><strong>Interface Contracts</strong></td>
+                <td>—</td>
+                <td>توقيعات الـ Functions، Parameters، Return Types</td>
+            </tr>
+            <tr>
+                <td><strong>Algorithm Details</strong></td>
+                <td>—</td>
+                <td>Pagination Logic، Sorting Strategy، Diffing Algorithm</td>
+            </tr>
+            <tr>
+                <td><strong>External Dependencies</strong></td>
+                <td>هل نستخدم Firebase, AWS, MapBox, Stripe؟</td>
+                <td>كيف نُهيئ الـ SDK (Initialization Config)</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="callout callout-emerald">
+        <div class="callout-icon">🎓</div>
+        <div>
+            <strong>نصيحة Staff Engineer:</strong> عند رسم HLD، ابدأ دائماً بسؤال: <em>"What is the single source of truth for data in this system?"</em> — الإجابة تُحدد إذا كنت بحاجة لـ <strong>Offline-first Architecture</strong> (Local DB = SSOT) أم <strong>Network-dependent</strong> (Server = SSOT).
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- CHAPTER 14 -->
+<!-- ============================================================ -->
+<span class="section-anchor" id="ch14"></span>
+<section class="section">
+    <div class="section-header">
+        <div class="section-number" style="background: linear-gradient(135deg, var(--amber-warning), #D97706);">14</div>
+        <div class="section-title-wrap">
+            <h2>التعمق في تصميم المكونات التفصيلي (LLD)</h2>
+            <div class="en-subtitle">Component-Level Design — Deep Dive</div>
+        </div>
+    </div>
+
+    <div class="callout callout-amber">
+        <div class="callout-icon">🎯</div>
+        <div>
+            <strong>الاستراتيجية:</strong> لا تُعمق في كل شيء. اختر <strong>1-2 مكونات</strong> تمثل التحدي الهندسي الأكبر. في مقابلة 45 دقيقة، التعمق في 3+ مكونات يعني أنك لم تُعمق في أي منها بما فيه الكفاية.
+        </div>
+    </div>
+
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--slate-navy); margin: 32px 0 20px;">🔷 اختيار المكون الأنسب للتعمق</h3>
+    <div class="grid-3">
+        <div class="card" style="border-top: 4px solid var(--electric-cyan);">
+            <div style="font-weight: 800; font-size: 1.1rem; margin-bottom: 8px;">WhatsApp / Telegram</div>
+            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;">Chat App</p>
+            <div style="font-size: 14px;">
+                <span class="badge badge-cyan">Sync Engine</span>
+                <span class="badge badge-purple">Message Queue</span>
+                <span class="badge badge-crimson">E2E Encryption</span>
+            </div>
+        </div>
+        <div class="card" style="border-top: 4px solid var(--purple-indigo);">
+            <div style="font-weight: 800; font-size: 1.1rem; margin-bottom: 8px;">Instagram</div>
+            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;">Photo Sharing</p>
+            <div style="font-size: 14px;">
+                <span class="badge badge-purple">Feed Pager</span>
+                <span class="badge badge-cyan">Image Pipeline</span>
+                <span class="badge badge-amber">Filter Engine</span>
+            </div>
+        </div>
+        <div class="card" style="border-top: 4px solid var(--emerald-green);">
+            <div style="font-weight: 800; font-size: 1.1rem; margin-bottom: 8px;">Uber / Ola</div>
+            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;">Ride Sharing</p>
+            <div style="font-size: 14px;">
+                <span class="badge badge-emerald">Driver Tracker</span>
+                <span class="badge badge-amber">Matching SM</span>
+                <span class="badge badge-cyan">Map Renderer</span>
+            </div>
+        </div>
+    </div>
+
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--slate-navy); margin: 32px 0 20px;">🔷 الأنماط التصميمية الأساسية (Core Design Patterns)</h3>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th style="width: 20%;">Pattern</th>
+                <th style="width: 40%;">الاستخدام في Mobile</th>
+                <th style="width: 40%;">مثال عملي</th>
+            </tr>
+            <tr>
+                <td><code>Observer / Flow</code></td>
+                <td>إشعار الـ UI بتغيرات البيانات (Reactive Programming)</td>
+                <td>Kotlin Flow / LiveData / Combine / RxSwift لربط ViewModel بالـ View</td>
+            </tr>
+            <tr>
+                <td><code>Factory</code></td>
+                <td>إنشاء Objects بناءً على Runtime Type</td>
+                <td>إنشاء ViewHolders مختلفة في RecyclerView (TextVH, ImageVH, VideoVH)</td>
+            </tr>
+            <tr>
+                <td><code>Repository</code></td>
+                <td>عزل مصادر البيانات (Local vs Remote) عن Business Logic</td>
+                <td>UserRepository يُقرر: هل نجيب من Room أم من API بناءً على Freshness Policy</td>
+            </tr>
+            <tr>
+                <td><code>Adapter</code></td>
+                <td>توحيد واجهات مكتبات خارجية مختلفة</td>
+                <td>ImageLoaderAdapter يُخفي فرق Glide vs Coil vs SDWebImage عن الـ UI</td>
+            </tr>
+            <tr>
+                <td><code>State Machine</code></td>
+                <td>إدارة حالات معقدة (Order Status, Ride Matching)</td>
+                <td>RideState: IDLE → SEARCHING → MATCHED → ON_TRIP → COMPLETED → RATED</td>
+            </tr>
+            <tr>
+                <td><code>Singleton / DI</code></td>
+                <td>ضمان وجود Instance واحد للـ Database أو Network Client</td>
+                <td>Hilt / Koin / Dagger يُديران lifecycle للـ Dependencies</td>
+            </tr>
+        </table>
+    </div>
+
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--slate-navy); margin: 32px 0 20px;">🔷 تطبيق مبادئ SOLID في تصميم Mobile</h3>
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(16,185,129,0.12); color: var(--emerald-green);">S</div>
+                <div>
+                    <div class="card-title">Single Responsibility Principle</div>
+                    <div class="card-subtitle">One Reason to Change</div>
+                </div>
+            </div>
+            <p style="font-size: 15px; margin-bottom: 12px;">كل Class له سبب واحد للتغيير. لا تجعل <code>UserRepository</code> يتعامل مع Caching AND Networking AND Serialization AND Analytics.</p>
+            <div class="code-label">Before (Anti-pattern)</div>
+            <pre>class UserManager {
+    fun fetchFromNetwork() { ... }
+    fun saveToDatabase() { ... }
+    fun showNotification() { ... }   // ❌ 3+ responsibilities
+    fun logAnalytics() { ... }       // ❌ Analytics mixed in
+}</pre>
+            <div class="code-label">After (SRP)</div>
+            <pre>class UserRemoteDataSource(private val api: UserApi) { 
+    suspend fun fetch(): UserDto 
+}
+class UserLocalDataSource(private val db: UserDao) { 
+    suspend fun save(user: UserEntity) 
+}
+class NotificationManager { 
+    fun show(title: String, body: String) 
+}
+class UserRepository(
+    private val remote: UserRemoteDataSource,
+    private val local: UserLocalDataSource
+) { ... }</pre>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(99,102,241,0.12); color: var(--purple-indigo);">O</div>
+                <div>
+                    <div class="card-title">Open/Closed Principle</div>
+                    <div class="card-subtitle">Open for Extension, Closed for Modification</div>
+                </div>
+            </div>
+            <p style="font-size: 15px; margin-bottom: 12px;">عند إضافة نوع جديد من الـ API Responses، لا تعدل الـ Parser الحالي. استخدم Polymorphism.</p>
+            <div class="code-label">Implementation</div>
+            <pre>interface ResponseParser&lt;T&gt; {
+    fun parse(json: String): T
+}
+
+class UserParser : ResponseParser&lt;User&gt; { 
+    override fun parse(json: String): User = ... 
+}
+class OrderParser : ResponseParser&lt;Order&gt; { 
+    override fun parse(json: String): Order = ... 
+}
+// Adding ProductParser requires ZERO changes to existing code</pre>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(6,182,212,0.12); color: var(--electric-cyan);">D</div>
+                <div>
+                    <div class="card-title">Dependency Inversion</div>
+                    <div class="card-subtitle">Depend on Abstractions</div>
+                </div>
+            </div>
+            <p style="font-size: 15px; margin-bottom: 12px;">الطبقات العليا لا تعتمد على التفاصيل. تعتمد على Abstractions. هذا يُسهّل الـ Unit Testing بشكل كبير.</p>
+            <div class="code-label">Constructor Injection (Hilt / Koin)</div>
+            <pre>class FeedViewModel(
+    private val getFeedUseCase: GetFeedUseCase,  // Interface
+    private val imageLoader: ImageLoader,         // Interface
+    private val analytics: AnalyticsTracker       // Interface
+) : ViewModel() { ... }
+
+// In tests:
+class FakeImageLoader : ImageLoader { 
+    override fun load(url: String) = mockBitmap 
+}</pre>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(245,158,11,0.12); color: var(--amber-warning);">L/I</div>
+                <div>
+                    <div class="card-title">Liskov Substitution & Interface Segregation</div>
+                    <div class="card-subtitle">Fat Interface Anti-pattern</div>
+                </div>
+            </div>
+            <p style="font-size: 15px; margin-bottom: 12px;">لا تجبر الـ Client على تنفيذ Methods لا يحتاجها. اجزئ الـ Interfaces إلى وحدات صغيرة متخصصة.</p>
+            <div class="code-label">Interface Segregation</div>
+            <pre>// ❌ Bad: One fat interface
+interface Storage {
+    fun read(): ByteArray
+    fun write(data: ByteArray)
+    fun encrypt()
+    fun compress()
+    fun syncToCloud()
+}
+
+// ✓ Good: Segregated interfaces
+interface Readable { fun read(): ByteArray }
+interface Writable { fun write(data: ByteArray) }
+interface Encryptable { fun encrypt() }
+
+class SecureCache : Readable, Writable, Encryptable { ... }
+class PublicCache : Readable, Writable { ... }</pre>
+        </div>
+    </div>
+
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--slate-navy); margin: 32px 0 20px;">🔷 مناقشة المقايضات والحالات الحافة (Trade-offs & Edge Cases)</h3>
+    <div class="grid-2">
+        <div class="matrix-card">
+            <div class="matrix-header">Battery Drain vs Real-time Precision</div>
+            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">في تطبيقات التتبع (Uber)، كلما زادت دقة تحديث الموقع، زاد استهلاك البطارية.</p>
+            <div style="background: rgba(16,185,129,0.08); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                <strong style="color: var(--emerald-green); font-size: 14px;">✓ الحل الأمثل:</strong>
+                <ul style="font-size: 13px; margin: 8px 0 0; padding-right: 20px;">
+                    <li>Adaptive GPS: دقة عالية أثناء الرحلة، منخفضة أثناء الانتظار</li>
+                    <li>Fused Location Provider (GPS + Network + Sensors)</li>
+                    <li>Batch Updates: إرسال كل 5-10 ثوانٍ بدلاً من Real-time</li>
+                    <li>Geofencing: إيقاف التتبع عند مغادرة منطقة العمل</li>
+                </ul>
+            </div>
+        </div>
+        <div class="matrix-card">
+            <div class="matrix-header">Memory Pressure vs Cache Size</div>
+            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">في تطبيقات الصور (Instagram)، حجم الـ Cache يؤثر على الأداء والاستقرار.</p>
+            <div style="background: rgba(16,185,129,0.08); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                <strong style="color: var(--emerald-green); font-size: 14px;">✓ الحل الأمثل:</strong>
+                <ul style="font-size: 13px; margin: 8px 0 0; padding-right: 20px;">
+                    <li>LruCache بحجم ديناميكي يعتمد على <code>Runtime.getRuntime().maxMemory()</code></li>
+                    <li>Disk LRU Cache للصور المضغوطة (JPEG 80% quality)</li>
+                    <li>Downsampling: تحميل الصور بحجم الـ View فقط</li>
+                    <li>Bitmap Pool لإعادة استخدام الذاكرة (Glide / Coil)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="callout callout-crimson">
+        <div class="callout-icon">🚨</div>
+        <div>
+            <strong>Edge Cases لا تُنسى في LLD:</strong>
+            <ul style="margin: 8px 0 0; padding-right: 20px;">
+                <li><strong>Process Death:</strong> ما يحدث عندما يقتل النظام التطبيق بسبب Low Memory؟ هل تُحفظ الـ State في SavedStateHandle؟</li>
+                <li><strong>Network Switch:</strong> الانتقال من Wi-Fi إلى Cellular — هل يُعاد الاتصال تلقائياً؟ هل نُعيد المحاولة فوراً؟</li>
+                <li><strong>Doze Mode / App Standby:</strong> كيف يتصرف Background Sync على Android 6+؟</li>
+                <li><strong>Low Battery Mode:</strong> هل نُقلل من Background Operations وGPS Polling؟</li>
+                <li><strong>Configuration Change:</strong> دوران الشاشة — هل يُعاد إنشاء الـ ViewModel؟ (لا، إذا استخدمت Architecture Components)</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- CHAPTER 15 -->
+<!-- ============================================================ -->
+<span class="section-anchor" id="ch15"></span>
+<section class="section">
+    <div class="section-header">
+        <div class="section-number" style="background: linear-gradient(135deg, var(--crimson-alert), #DC2626);">15</div>
+        <div class="section-title-wrap">
+            <h diligent>الأخطاء الشائعة الواجب تجنبها</h2>
+            <div class="en-subtitle">Common Mistakes to Avoid</div>
+        </div>
+    </div>
+
+    <p style="margin-bottom: 24px; color: var(--text-secondary);">الأنماط المضادة (Anti-patterns) التالية هي الأسباب الأكثر شيوعاً لرسوب المرشحين — حتى لو كانوا مهندسين تقنيين ممتازين. تجنبها يعني أنك تفهم <strong>Mobile System Design</strong> كمنظور هندسي وليس كمجرد كتابة كود.</p>
+
+    <div class="grid-2">
+        <div class="card" style="border-right: 4px solid var(--crimson-alert);">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(239,68,68,0.12); color: var(--crimson-alert);">🚫</div>
+                <div>
+                    <div class="card-title">فخ المهندس المتسرع</div>
+                    <div class="card-subtitle">The "Rushing Engineer" Trap</div>
+                </div>
+            </div>
+            <p style="font-size: 15px; margin-bottom: 12px;"><strong>الخطأ:</strong> البدء برسم Architecture diagram في الدقيقة الأولى دون طرح أي سؤال توضيحي.</p>
+            <div style="background: rgba(239,68,68,0.06); padding: 12px; border-radius: 8px;">
+                <strong style="color: var(--crimson-alert); font-size: 14px;">✗ لماذا هذا خطأ فادح؟</strong>
+                <ul style="font-size: 14px; margin: 8px 0 0; padding-right: 20px;">
+                    <li>يُظهر أنك لا تفهم <strong>Product Context</strong></li>
+                    <li>قد تبني حلاً لمسألة غير موجودة (Over-engineering)</li>
+                    <li>تفوتك Constraints حاسمة (Battery, Offline, Scale)</li>
+                </ul>
+            </div>
+            <div style="background: rgba(16,185,129,0.08); padding: 12px; border-radius: 8px; margin-top: 12px;">
+                <strong style="color: var(--emerald-green); font-size: 14px;">✓ الحل:</strong> ابدأ دائماً بـ "دعني أتأكد من فهمي للمتطلبات..." ثم اطرح 3-5 أسئلة توضيحية.
+            </div>
+        </div>
+
+        <div class="card" style="border-right: 4px solid var(--crimson-alert);">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(239,68,68,0.12); color: var(--crimson-alert);">💻</div>
+                <div>
+                    <div class="card-title">تجاهل قيود الهاتف المحمول</div>
+                    <div class="card-subtitle">Treating Mobile like a Server</div>
+                </div>
+            </div>
+            <p style="font-size: 15px; margin-bottom: 12px;"><strong>الخطأ:</strong> التصرف وكأن الهاتف لديه <strong>Infinite RAM/CPU</strong> و <strong>Unlimited Battery</strong> و <strong>Always-On Network</strong>.</p>
+            <div style="background: rgba(239,68,68,0.06); padding: 12px; border-radius: 8px;">
+                <strong style="color: var(--crimson-alert); font-size: 14px;">✗ أمثلة على هذا الخطأ:</strong>
+                <ul style="font-size: 14px; margin: 8px 0 0; padding-right: 20px;">
+                    <li>"سأُبقي WebSocket مفتوحاً دائماً" — بدون Battery Impact analysis</li>
+                    <li>"سأخزن كل البيانات في الذاكرة" — بدون Memory Pressure handling</li>
+                    <li>"سأجلب كل Feed دفعة واحدة" — بدون Pagination أو Lazy Loading</li>
+                </ul>
+            </div>
+            <div style="background: rgba(16,185,129,0.08); padding: 12px; border-radius: 8px; margin-top: 12px;">
+                <strong style="color: var(--emerald-green); font-size: 14px;">✓ الحل:</strong> اذكر دائماً <strong>Mobile Constraints</strong> كأولوية: Battery, Memory, Network, Storage, Thermal Throttling.
+            </div>
+        </div>
+
+        <div class="card" style="border-right: 4px solid var(--amber-warning);">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(245,158,11,0.12); color: var(--amber-warning);">🏗️</div>
+                <div>
+                    <div class="card-title">الإفراط في التعقيد</div>
+                    <div class="card-subtitle">Over-Engineering</div>
+                </div>
+            </div>
+            <p style="font-size: 15px; margin-bottom: 12px;"><strong>الخطأ:</strong> إضافة Micro-frameworks أو Abstractions غير ضرورية لتطبيق بسيط (مثال: Event Bus + RxJava + Dagger + 5 Libraries لـ To-Do App).</p>
+            <div style="background: rgba(245,158,11,0.06); padding: 12px; border-radius: 8px;">
+                <strong style="color: #D97706; font-size: 14px;">✗ لماذا هذا خطأ؟</strong>
+                <ul style="font-size: 14px; margin: 8px 0 0; padding-right: 20px;">
+                    <li>يزيد App Size (APK/IPA) بلا داعٍ</li>
+                    <li>يُعقد الـ Build Time و Debugging</li>
+                    <li>يُظهر أنك لا تفهم <strong>YAGNI</strong> (You Aren't Gonna Need It)</li>
+                </ul>
+            </div>
+            <div style="background: rgba(16,185,129,0.08); padding: 12px; border-radius: 8px; margin-top: 12px;">
+                <strong style="color: var(--emerald-green); font-size: 14px;">✓ الحل:</strong> ابدأ بأبسط حل يُلبي المتطلبات. أضف Complexity فقط عندما تُبرهن الحاجة إليها.
+            </div>
+        </div>
+
+        <div class="card" style="border-right: 4px solid var(--amber-warning);">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(245,158,11,0.12); color: var(--amber-warning);">⚖️</div>
+                <div>
+                    <div class="card-title">عدم مناقشة المقايضات</div>
+                    <div class="card-subtitle">Presenting "Perfect" Design</div>
+                </div>
+            </div>
+            <p style="font-size: 15px; margin-bottom: 12px;"><strong>الخطأ:</strong> تقديم تصميم كأنه "مثالي" بدون عيوب. كل قرار معماري له ثمن (Trade-off).</p>
+            <div style="background: rgba(245,158,11,0.06); padding: 12px; border-radius: 8px;">
+                <strong style="color: #D97706; font-size: 14px;">✗ أمثلة:</strong>
+                <ul style="font-size: 14px; margin: 8px 0 0; padding-right: 20px;">
+                    <li>"WebSocket أفضل دائماً" — بدون مناقشة Battery Drain</li>
+                    <li>"Room أفضل دائماً" — بدون مناقشة Write Latency</li>
+                    <li>"Offline-first أفضل دائماً" — بدون مناقشة Conflict Complexity</li>
+                </ul>
+            </div>
+            <div style="background: rgba(16,185,129,0.08); padding: 12px; border-radius: 8px; margin-top: 12px;">
+                <strong style="color: var(--emerald-green); font-size: 14px;">✓ الحل:</strong> لكل قرار تقوله، اذكر: <em>"اخترت X لأنه يُعطيني A، لكن الثمن هو B. في سياق هذا التطبيق، A أهم من B لأن..."</em>
+            </div>
+        </div>
+
+        <div class="card" style="border-right: 4px solid var(--purple-indigo);">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(99,102,241,0.12); color: var(--purple-indigo);">🔄</div>
+                <div>
+                    <div class="card-title">خلط مستويات HLD و LLD</div>
+                    <div class="card-subtitle">Mixing Abstraction Levels</div>
+                </div>
+            </div>
+            <p style="font-size: 15px; margin-bottom: 12px;"><strong>الخطأ:</strong> الدخول في تفاصيل الـ Function Parameters أثناء رسم الـ High-Level Architecture، أو البقاء في مستوى المربعات والأسهم عندما يطلب المقابل الـ Code.</p>
+            <div style="background: rgba(99,102,241,0.06); padding: 12px; border-radius: 8px;">
+                <strong style="color: var(--purple-indigo); font-size: 14px;">✗ المشكلة:</strong>
+                <ul style="font-size: 14px; margin: 8px 0 0; padding-right: 20px;">
+                    <li>يُظهر عدم وضوح في التفكير المُنظم (Structured Thinking)</li>
+                    <li>يُضيع الوقت في تفاصيل لا تهم في المرحلة الحالية</li>
+                    <li>يُربك المقابل — لا يعرف في أي مستوى أنت</li>
+                </ul>
+            </div>
+            <div style="background: rgba(16,185,129,0.08); padding: 12px; border-radius: 8px; margin-top: 12px;">
+                <strong style="color: var(--emerald-green); font-size: 14px;">✓ الحل:</strong> استخدم عبارة: <em>"في مستوى HLD، نرى أن... والآن دعني أتعمق في LLD للمكون X..."</em>
+            </div>
+        </div>
+
+        <div class="card" style="border-right: 4px solid var(--electric-cyan);">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(6,182,212,0.12); color: var(--electric-cyan);">🔒</div>
+                <div>
+                    <div class="card-title">تجاهل الأمان والخصوصية</div>
+                    <div class="card-subtitle">Ignoring Security</div>
+                </div>
+            </div>
+            <p style="font-size: 15px; margin-bottom: 12px;"><strong>الخطأ:</strong> عدم ذكر Security حتى يُسأل عنها. في تطبيقات الهاتف، الأمان ليس "إضافة" — هو متطلب أساسي.</p>
+            <div style="background: rgba(6,182,212,0.06); padding: 12px; border-radius: 8px;">
+                <strong style="color: #0891B2; font-size: 14px;">✗ ما يُفترض ذكره تلقائياً:</strong>
+                <ul style="font-size: 14px; margin: 8px 0 0; padding-right: 20px;">
+                    <li>Data Encryption at Rest (SQLCipher / Keychain / Keystore)</li>
+                    <li>HTTPS / TLS 1.3 for Data in Transit</li>
+                    <li>Certificate Pinning لمنع MITM attacks</li>
+                    <li>OAuth2 / JWT Token Management (Refresh logic)</li>
+                    <li>Input Validation و Protection against SQL Injection</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- CHAPTER 16 -->
+<!-- ============================================================ -->
+<span class="section-anchor" id="ch16"></span>
+<section class="section">
+    <div class="section-header">
+        <div class="section-number" style="background: linear-gradient(135deg, #8B5CF6, #7C3AED);">16</div>
+        <div class="section-title-wrap">
+            <h2>حالات الدراسة وتصميم التطبيقات الواقعية</h2>
+            <div class="en-subtitle">Real Interview Case Studies</div>
+        </div>
+    </div>
+
+    <p style="margin-bottom: 32px; color: var(--text-secondary);">في هذا الفصل، نقدم <strong>9 دراسات حالة</strong> كاملة تشمل: المتطلبات → المعمارية عالية المستوى → نموذج البيانات/API → التعمق في المكون الحرج → الحالات الحافة. كل دراسة تمثل سؤالاً شائعاً في مقابلات <strong>FAANG</strong> و <strong>Big Tech</strong>.</p>
+
+    <!-- 16.1 Chat App -->
+    <div class="case-study">
+        <div class="case-header">
+            <h3>16.1 تطبيق الدردشة الفورية <span style="font-weight: 400; opacity: 0.8;">(WhatsApp / Telegram)</span></h3>
+            <div class="case-en">Chat App — Instant Messaging System Design</div>
+        </div>
+        <div class="case-body">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
+                <span class="badge badge-cyan">Offline Sync Queue</span>
+                <span class="badge badge-purple">WebSocket / XMPP</span>
+                <span class="badge badge-emerald">Message Status Lifecycle</span>
+                <span class="badge badge-crimson">E2E Encryption (SQLCipher)</span>
+            </div>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">📋 المتطلبات</h4>
+            <ul>
+                <li><strong>Functional:</strong> إرسال/استقبال رسائل نصية وصوتية وصور. Group Chats حتى 256 عضو. Read Receipts.</li>
+                <li><strong>Non-Functional:</strong> Latency &lt; 200ms للرسائل. Offline-first (يجب إرسال الرسائل عند عودة الاتصال). End-to-End Encryption.</li>
+                <li><strong>Scale:</strong> 1B+ users, 100B+ messages/day.</li>
+            </ul>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🏗️ المعمارية عالية المستوى</h4>
+            <div class="ascii-diagram">
+┌─────────────┐     WebSocket      ┌─────────────┐     ┌─────────────┐
+│   Client    │◄──────────────────►│  Chat Server │────►│  Message DB │
+│  (Mobile)   │    (Persistent)    │  (XMPP/WS)   │     │  (Cassandra)│
+└──────┬──────┘                    └─────────────┘     └─────────────┘
+       │
+       ▼
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Offline    │────►│   Local     │────►│  SQLCipher  │
+│   Queue     │     │    DB       │     │ (Encrypted) │
+│ (Pending    │     │  (SQLite)   │     │             │
+│  Actions)   │     │             │     │             │
+└─────────────┘     └─────────────┘     └─────────────┘
+            </div>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🔬 التعمق: Offline Sync Queue</h4>
+            <pre>class OfflineMessageQueue(
+    private val db: PendingMessageDao,
+    private val networkMonitor: NetworkMonitor,
+    private val syncEngine: SyncEngine
+) {
+    // Queue message when offline
+    suspend fun enqueue(message: Message) {
+        db.insert(PendingMessage(
+            id = generateUUID(),
+            payload = message.encrypt(),
+            priority = Priority.HIGH,
+            retryCount = 0,
+            createdAt = System.currentTimeMillis()
+        ))
+    }
+
+    // Auto-sync when network returns
+    init {
+        networkMonitor.isOnline
+            .filter { it }
+            .flatMapConcat { db.getPending() }
+            .collect { pending ->
+                pending.forEach { msg ->
+                    try {
+                        syncEngine.send(msg.decrypt())
+                        db.delete(msg.id)
+                    } catch (e: NetworkException) {
+                        if (msg.retryCount < MAX_RETRIES) {
+                            db.incrementRetry(msg.id)
+                        } else {
+                            db.markFailed(msg.id)
+                        }
+                    }
+                }
+            }
+    }
+}</pre>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🚨 الحالات الحافة</h4>
+            <ul>
+                <li><strong>Message Duplication:</strong> استخدام <strong>Idempotency Keys</strong> (UUID لكل رسالة) لمنع الإرسال المزدوج عند إعادة المحاولة</li>
+                <li><strong>Device Switch:</strong> مزامنة الرسائل عبر أجهزة متعددة باستخدام <strong>Multi-Device Protocol</strong></li>
+                <li><strong>Key Rotation:</strong> تدوير مفاتيح التشفير كل N رسالة</li>
+                <li><strong>Large Group:</strong> في مجموعات 1000+ عضو، استخدم <strong>Fan-out on Write</strong> مع Message Deduplication</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 16.2 News Feed -->
+    <div class="case-study">
+        <div class="case-header">
+            <h3>16.2 تدفق الأخبار <span style="font-weight: 400; opacity: 0.8;">(Twitter / Facebook Feed)</span></h3>
+            <div class="case-en">News Feed — Infinite Scroll & Content Delivery</div>
+        </div>
+        <div class="case-body">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
+                <span class="badge badge-cyan">Cursor Pagination</span>
+                <span class="badge badge-purple">Image Prefetching</span>
+                <span class="badge badge-emerald">Local Feed Cache</span>
+                <span class="badge badge-amber">Optimistic UI</span>
+            </div>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">📋 المتطلبات</h4>
+            <ul>
+                <li><strong>Functional:</strong> Infinite Scroll Feed. Like/Comment/Share. Media (Images/Videos). Pull-to-Refresh.</li>
+                <li><strong>Non-Functional:</strong> 60 FPS أثناء التمرير. Feed load &lt; 1s. Offline reading للـ Feed الأخير.</li>
+                <li><strong>Scale:</strong> 500M+ DAU, 10K+ tweets/sec.</li>
+            </ul>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🏗️ المعمارية عالية المستوى</h4>
+            <div class="ascii-diagram">
+User ──► FeedViewModel ──► GetFeedUseCase ──► FeedRepository
+                                            │
+                    ┌───────────────────────┴───────────────────────┐
+                    ▼                                               ▼
+            ┌───────────────┐                             ┌───────────────┐
+            │  Local Cache  │                             │  Remote API   │
+            │ (Room + Paging3)│                           │ (Cursor-based)│
+            │               │                             │               │
+            └───────────────┘                             └───────────────┘
+                    │                                               │
+                    ▼                                               ▼
+            ┌───────────────┐                             ┌───────────────┐
+            │  Image Cache  │                             │  Feed Service │
+            │ (Coil/Glide)  │                             │  (Backend)    │
+            └───────────────┘                             └───────────────┘
+            </div>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🔬 التعمق: Cursor Pagination + Image Prefetching</h4>
+            <pre>// API Contract — Cursor-based Pagination
+GET /api/feed?cursor={lastTweetId}&limit=20
+
+Response:
+{
+  "tweets": [...],
+  "nextCursor": "abc123",  // null when no more data
+  "hasMore": true
+}
+
+// Repository with Paging3 (Android)
+class FeedRepository(
+    private val remote: FeedRemoteDataSource,
+    private val local: FeedLocalDataSource
+) {
+    fun getFeedStream(): Flow&lt;PagingData&lt;Tweet&gt;&gt; {
+        return Pager(
+            config = PagingConfig(pageSize = 20, prefetchDistance = 5),
+            remoteMediator = FeedRemoteMediator(remote, local),
+            pagingSourceFactory = { local.getFeedPagingSource() }
+        ).flow
+    }
+}
+
+// Image Prefetching — preload next 3 images
+class ImagePrefetcher(private val imageLoader: ImageLoader) {
+    fun prefetch(tweets: List&lt;Tweet&gt;) {
+        tweets.take(3)
+            .mapNotNull { it.media?.firstOrNull()?.url }
+            .forEach { url ->
+                imageLoader.enqueue(ImageRequest.Builder(context)
+                    .data(url)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .build())
+            }
+    }
+}</pre>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🚨 الحالات الحافة</h4>
+            <ul>
+                <li><strong>Optimistic Like:</strong> تحديث الـ UI فوراً، وإذا فشل الـ API، نتراجع (Rollback) مع Animation</li>
+                <li><strong>Feed Gap:</strong> عند Pull-to-Refresh، كيف ندمج التغريدات الجديدة مع القديمة دون فقدان مكان التمرير؟</li>
+                <li><strong>Memory Pressure:</strong> RecyclerView ViewHolder Pool + Image Downsampling لمنع OOM</li>
+                <li><strong>Stale Cache:</strong> TTL-based invalidation (مثلاً 5 دقائق) مع Background refresh</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 16.3 Photo Sharing -->
+    <div class="case-study">
+        <div class="case-header">
+            <h3>16.3 مشاركة الصور <span style="font-weight: 400; opacity: 0.8;">(Instagram)</span></h3>
+            <div class="case-en">Photo Sharing — Image Upload Pipeline & Filter Engine</div>
+        </div>
+        <div class="case-body">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
+                <span class="badge badge-cyan">Chunked Upload</span>
+                <span class="badge badge-purple">Compression Pipeline</span>
+                <span class="badge badge-emerald">LruCache Strategy</span>
+                <span class="badge badge-amber">Dual Storage</span>
+            </div>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">📋 المتطلبات</h4>
+            <ul>
+                <li><strong>Functional:</strong> التقاط/اختيار صورة، تطبيق Filters، كتابة Caption، نشر. Grid Profile. Stories (24h).</li>
+                <li><strong>Non-Functional:</strong> Upload يعمل في Background. Resume on failure. Max image size 1080x1080. 60 FPS في الـ Feed.</li>
+                <li><strong>Scale:</strong> 100M+ images/day, 2B+ users.</li>
+            </ul>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🏗️ المعمارية عالية المستوى</h4>
+            <div class="ascii-diagram">
+Camera ──► ImagePicker ──► FilterEngine (GPU) ──► Compression ──► UploadManager
+                                                              │
+                    ┌─────────────────────────────────────────┴─────────────────────────┐
+                    ▼                                                                   ▼
+            ┌───────────────┐                                               ┌───────────────┐
+            │  Local Temp   │                                               │  Chunked      │
+            │  Storage      │                                               │  Upload       │
+            │  (Cache Dir)  │                                               │  (Resumable)  │
+            └───────────────┘                                               └───────┬───────┘
+                                                                                    │
+                                                                                    ▼
+                                                                            ┌───────────────┐
+                                                                            │  CDN / S3     │
+                                                                            │  (Permanent)  │
+                                                                            └───────────────┘
+            </div>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🔬 التعمق: Image Upload Pipeline</h4>
+            <pre>class ImageUploadManager(
+    private val api: MediaApi,
+    private val compressor: ImageCompressor,
+    private val workManager: WorkManager
+) {
+    fun uploadImage(uri: Uri, metadata: PostMetadata): UUID {
+        // 1. Compress locally first
+        val compressed = compressor.compress(
+            input = uri,
+            maxWidth = 1080,
+            maxHeight = 1080,
+            quality = 85
+        )
+
+        // 2. Schedule background upload with WorkManager
+        val uploadWork = OneTimeWorkRequestBuilder&lt;ImageUploadWorker&gt;()
+            .setInputData(workDataOf(
+                "file_path" to compressed.path,
+                "caption" to metadata.caption,
+                "filter_id" to metadata.filterId
+            ))
+            .setConstraints(Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build())
+            .setBackoffCriteria(
+                BackoffPolicy.EXPONENTIAL,
+                WorkRequest.MIN_BACKOFF_MILLIS,
+                TimeUnit.MILLISECONDS
+            )
+            .build()
+
+        workManager.enqueue(uploadWork)
+        return uploadWork.id
+    }
+}
+
+// Chunked upload for large files / poor network
+class ChunkedUploader(private val api: MediaApi) {
+    suspend fun upload(file: File, chunkSize: Int = 256 * 1024) {
+        val totalChunks = ceil(file.length() / chunkSize.toDouble()).toInt()
+        val uploadId = api.initiateUpload(file.name, file.length())
+
+        file.inputStream().use { stream ->
+            val buffer = ByteArray(chunkSize)
+            var chunkIndex = 0
+
+            while (stream.read(buffer) > 0) {
+                api.uploadChunk(uploadId, chunkIndex, totalChunks, buffer)
+                chunkIndex++
+            }
+        }
+
+        api.finalizeUpload(uploadId)
+    }
+}</pre>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🚨 الحالات الحافة</h4>
+            <ul>
+                <li><strong>Upload Interruption:</strong> WorkManager يضمن إعادة المحاولة حتى 3 مرات مع Exponential Backoff</li>
+                <li><strong>Memory Pressure during Filter:</strong> استخدام <strong>GPU Rendering</strong> (OpenGL / Metal) بدلاً من CPU Bitmap manipulation</li>
+                <li><strong>Duplicate Upload:</strong> Content-Addressable Storage (Hash-based deduplication)</li>
+                <li><strong>Storage Quota:</strong> LruDiskCache يحذف الصور القديمة تلقائياً عند امتلاء الذاكرة</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 16.4 Ride Sharing -->
+    <div class="case-study">
+        <div class="case-header">
+            <h3>16.4 مشاركة الرحلات <span style="font-weight: 400; opacity: 0.8;">(Uber / Ola)</span></h3>
+            <div class="case-en">Ride Sharing — Driver Location & Matching Engine</div>
+        </div>
+        <div class="case-body">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
+                <span class="badge badge-cyan">GPS Polling vs WebSocket</span>
+                <span class="badge badge-purple">Battery Optimization</span>
+                <span class="badge badge-emerald">Real-time Map</span>
+                <span class="badge badge-amber">Matching State Machine</span>
+            </div>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">📋 المتطلبات</h4>
+            <ul>
+                <li><strong>Functional:</strong> طلب رحلة، مطابقة السائق، تتبع الموقع في الوقت الفعلي، الدفع، التقييم.</li>
+                <li><strong>Non-Functional:</strong> موقع دقيق ±5m. Latency &lt; 2s للمطابقة. Battery optimization (لا يُستنزف في 30 دقيقة).</li>
+                <li><strong>Scale:</strong> 100M+ rides/day, 5M+ drivers online.</li>
+            </ul>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🏗️ المعمارية عالية المستوى</h4>
+            <div class="ascii-diagram">
+┌─────────────┐         ┌─────────────┐         ┌─────────────┐
+│   Rider App │◄───────►│   Matching  │◄───────►│ Driver App  │
+│  (Request)  │  WS/SSE  │   Engine    │  WS/SSE  │ (Location)  │
+└──────┬──────┘         └──────┬──────┘         └──────┬──────┘
+       │                       │                       │
+       ▼                       ▼                       ▼
+┌─────────────┐         ┌─────────────┐         ┌─────────────┐
+│  Ride State │         │  Geo-Spatial│         │  Location   │
+│   Machine   │         │    Index    │         │   Buffer    │
+│  (Finite)   │         │  (Redis/    │         │  (Batch)    │
+│             │         │  PostGIS)   │         │             │
+└─────────────┘         └─────────────┘         └─────────────┘
+            </div>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🔬 التعمق: Driver Location Tracking Engine</h4>
+            <pre>class DriverLocationTracker(
+    private val fusedLocationClient: FusedLocationProviderClient,
+    private val locationBuffer: LocationBuffer,
+    private val webSocketManager: WebSocketManager
+) {
+    // Adaptive location accuracy based on ride state
+    fun startTracking(rideState: RideState) {
+        val request = LocationRequest.Builder(
+            when (rideState) {
+                RideState.IDLE -> 10000L      // 10s interval when idle
+                RideState.SEARCHING -> 5000L  // 5s when searching
+                RideState.ON_TRIP -> 3000L    // 3s during trip
+                else -> 10000L
+            }
+        ).setMinUpdateDistanceMeters(
+            when (rideState) {
+                RideState.ON_TRIP -> 10f      // 10m min distance
+                else -> 50f
+            }
+        ).build()
+
+        fusedLocationClient.requestLocationUpdates(
+            request,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    }
+
+    // Batch location updates to reduce battery/network
+    private val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(result: LocationResult) {
+            locationBuffer.add(result.lastLocation)
+            if (locationBuffer.size >= BATCH_SIZE || 
+                locationBuffer.elapsedTime() >= BATCH_INTERVAL) {
+                webSocketManager.sendLocationBatch(locationBuffer.flush())
+            }
+        }
+    }
+}</pre>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🔬 Matching State Machine</h4>
+            <pre>sealed class RideState {
+    object IDLE : RideState()
+    object SEARCHING : RideState()      // Looking for drivers
+    data class MATCHED(val driverId: String) : RideState()
+    data class DRIVER_ARRIVING(val eta: Int) : RideState()
+    object ON_TRIP : RideState()
+    data class PAYMENT_PENDING(val amount: Double) : RideState()
+    object COMPLETED : RideState()
+    data class CANCELLED(val reason: String) : RideState()
+}
+
+class RideStateMachine {
+    private val _state = MutableStateFlow&lt;RideState&gt;(RideState.IDLE)
+    val state: StateFlow&lt;RideState&gt; = _state.asStateFlow()
+
+    fun transition(event: RideEvent): Result&lt;Unit&gt; {
+        val newState = when (_state.value to event) {
+            is (IDLE to RequestRide) -> SEARCHING
+            is (SEARCHING to DriverAccepted) -> MATCHED(event.driverId)
+            is (MATCHED to DriverArrived) -> DRIVER_ARRIVING(event.eta)
+            is (DRIVER_ARRIVING to TripStarted) -> ON_TRIP
+            is (ON_TRIP to TripEnded) -> PAYMENT_PENDING(event.fare)
+            is (PAYMENT_PENDING to PaymentSuccess) -> COMPLETED
+            else -> return Result.failure(IllegalStateException(
+                "Invalid transition: ${_state.value} -> $event"
+            ))
+        }
+        _state.value = newState
+        return Result.success(Unit)
+    }
+}</pre>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🚨 الحالات الحافة</h4>
+            <ul>
+                <li><strong>No Driver Available:</strong> Exponential radius expansion (1km → 2km → 5km) مع Surge Pricing</li>
+                <li><strong>Driver Cancellation:</strong> Re-match فوري مع Driver آخر دون إعادة طلب</li>
+                <li><strong>GPS Drift:</strong> Kalman Filtering لتنعيم إشارات GPS الضعيفة</li>
+                <li><strong>App Kill during Trip:</strong> Foreground Service + Notification لضمان استمرار التتبع</li>
+            </ul>
+        </div>
+    </div>
+
+
+    <!-- 16.5 Video Streaming -->
+    <div class="case-study">
+        <div class="case-header">
+            <h3>16.5 بث الفيديو <span style="font-weight: 400; opacity: 0.8;">(Netflix / YouTube)</span></h3>
+            <div class="case-en">Video Streaming — Adaptive Bitrate & Player Architecture</div>
+        </div>
+        <div class="case-body">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
+                <span class="badge badge-cyan">HLS / DASH</span>
+                <span class="badge badge-purple">Chunk Caching</span>
+                <span class="badge badge-emerald">ABR Algorithm</span>
+                <span class="badge badge-amber">Background Download</span>
+            </div>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">📋 المتطلبات</h4>
+            <ul>
+                <li><strong>Functional:</strong> تشغيل فيديوهات بجودات متعددة (144p إلى 4K). Subtitles. PiP (Picture-in-Picture). Background Audio.</li>
+                <li><strong>Non-Functional:</strong> Adaptive Bitrate حسب Network Conditions. Seek &lt; 500ms. Buffering &lt; 2s. Offline Download.</li>
+                <li><strong>Scale:</strong> 1B+ hours watched/day, 4K HDR content.</li>
+            </ul>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🏗️ المعمارية عالية المستوى</h4>
+            <div class="ascii-diagram">
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│  Video URL  │─────►│   Player    │─────►│   ABR       │─────►│  CDN Edge   │
+│  (Manifest) │      │  (ExoPlayer/│      │  Selector   │      │  (HLS/DASH) │
+│             │      │   AVPlayer) │      │             │      │             │
+└─────────────┘      └──────┬──────┘      └─────────────┘      └─────────────┘
+                            │
+              ┌─────────────┼─────────────┐
+              ▼             ▼             ▼
+        ┌─────────┐  ┌─────────┐  ┌─────────┐
+        │  Audio  │  │  Video  │  │Subtitle │
+        │ Decoder │  │ Decoder │  │ Parser  │
+        │         │  │ (HW Acc)│  │         │
+        └────┬────┘  └────┬────┘  └────┬────┘
+             └─────────────┴─────────────┘
+                           │
+                           ▼
+                     ┌─────────────┐
+                     │   Surface   │
+                     │  (Render)   │
+                     └─────────────┘
+            </div>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🔬 التعمق: Adaptive Bitrate Streaming (HLS)</h4>
+            <pre>// HLS Manifest (m3u8) — Server provides multiple quality variants
+#EXTM3U
+#EXT-X-STREAM-INF:BANDWIDTH=1280000,RESOLUTION=720x480
+video_480p.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=2560000,RESOLUTION=1280x720
+video_720p.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=7680000,RESOLUTION=1920x1080
+video_1080p.m3u8
+
+// ABR Algorithm — ExoPlayer TrackSelector
+class AdaptiveBitrateSelector {
+    fun selectTrack(availableTracks: List&lt;Track>, 
+                    bandwidth: Long, 
+                    bufferHealth: Long): Track {
+        return when {
+            // If buffer is healthy and bandwidth allows, upgrade quality
+            bufferHealth > BUFFER_THRESHOLD_HIGH && 
+            bandwidth > availableTracks[currentIndex + 1].bitrate -> 
+                availableTracks[currentIndex + 1]
+
+            // If bandwidth drops or buffer is low, downgrade immediately
+            bandwidth < availableTracks[currentIndex].bitrate * 0.8 ||
+            bufferHealth < BUFFER_THRESHOLD_LOW -> 
+                availableTracks.find { it.bitrate <= bandwidth * 0.7 } 
+                    ?: availableTracks.first()
+
+            else -> availableTracks[currentIndex]
+        }
+    }
+}</pre>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🚨 الحالات الحافة</h4>
+            <ul>
+                <li><strong>Network Switch:</strong> Wi-Fi → Cellular يجب أن يُقلل الجودة فوراً لتجنب Stalling</li>
+                <li><strong>Background Playback:</strong> Audio-only track عندما يكون التطبيق في Background</li>
+                <li><strong>Seek Thumbnails:</strong> Pre-generated Sprite Sheets (WebVTT) للـ Preview عند التقديم السريع</li>
+                <li><strong>DRM:</strong> Widevine (Android) / FairPlay (iOS) للمحتوى المحمي</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 16.6 Food Delivery -->
+    <div class="case-study">
+        <div class="case-header">
+            <h3>16.6 توصيل الطعام <span style="font-weight: 400; opacity: 0.8;">(Swiggy / Zomato)</span></h3>
+            <div class="case-en">Food Delivery — Multi-Actor State Sync & Order Tracking</div>
+        </div>
+        <div class="case-body">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
+                <span class="badge badge-cyan">Real-time Tracking</span>
+                <span class="badge badge-purple">Multi-Actor Sync</span>
+                <span class="badge badge-emerald">Dynamic Cart</span>
+                <span class="badge badge-amber">Checkout Flow</span>
+            </div>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">📋 المتطلبات</h4>
+            <ul>
+                <li><strong>Functional:</strong> تصفح المطاعم، إضافة للسلة، Checkout، تتبع الطلب في الوقت الفعلي، تقييم.</li>
+                <li><strong>Non-Functional:</strong> Order Status Sync &lt; 3s. Cart persistence. Offline menu browsing (cached). Payment retry.</li>
+                <li><strong>Scale:</strong> 10M+ orders/day, 500K+ restaurants.</li>
+            </ul>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🏗️ المعمارية عالية المستوى</h4>
+            <div class="ascii-diagram">
+User App ──► OrderService ──► Restaurant App
+                │                    │
+                ▼                    ▼
+          ┌───────────┐        ┌───────────┐
+          │   Order   │        │  Order    │
+          │   State   │◄──────►│  Manager  │
+          │  (Shared) │  WS    │           │
+          └─────┬─────┘        └─────┬─────┘
+                │                      │
+                ▼                      ▼
+          ┌───────────┐        ┌───────────┐
+          │  Driver   │        │  Kitchen  │
+          │   App     │        │  Display  │
+          └───────────┘        └───────────┘
+            </div>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🔬 التعمق: Multi-Actor State Sync</h4>
+            <pre>// Order State is shared across 3 actors: User, Restaurant, Driver
+sealed class OrderStatus {
+    object PLACED : OrderStatus()           // User sees: Confirmed
+    object ACCEPTED : OrderStatus()         // Restaurant accepted
+    object PREPARING : OrderStatus()        // Kitchen started
+    object READY_FOR_PICKUP : OrderStatus() // Waiting for driver
+    object DRIVER_ASSIGNED : OrderStatus()  // Driver found
+    object DRIVER_ARRIVED : OrderStatus()   // At restaurant
+    object PICKED_UP : OrderStatus()        // Food collected
+    object EN_ROUTE : OrderStatus()         // Going to user
+    object DELIVERED : OrderStatus()        // Completed
+    data class CANCELLED(val by: Actor, val reason: String) : OrderStatus()
+}
+
+enum class Actor { USER, RESTAURANT, DRIVER, SYSTEM }
+
+// Each actor sees a filtered view of the state
+class OrderStateManager {
+    fun getViewForActor(status: OrderStatus, actor: Actor): UserView {
+        return when (actor) {
+            Actor.USER -> UserView(
+                displayStatus = status.toUserString(),
+                showMap = status in listOf(EN_ROUTE, DRIVER_ARRIVED),
+                showContactDriver = status in listOf(DRIVER_ASSIGNED, EN_ROUTE),
+                canCancel = status in listOf(PLACED, ACCEPTED, PREPARING)
+            )
+            Actor.RESTAURANT -> RestaurantView(...)
+            Actor.DRIVER -> DriverView(...)
+        }
+    }
+}</pre>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🚨 الحالات الحافة</h4>
+            <ul>
+                <li><strong>Item Unavailable:</strong> بعد الطلب، يُبلغ المطعم أن صنفاً غير متوفر — يجب عرض Replacement Options</li>
+                <li><strong>Driver Reassignment:</strong> إذا رفض السائق أو ألغى، إعادة المطابقة تلقائياً</li>
+                <li><strong>Payment Failure:</strong> Hold على المبلغ + Retry mechanism + Fallback payment methods</li>
+                <li><strong>Cart Expiry:</strong> Items في السلة تنتهي صلاحيتها بعد 30 دقيقة (Price/Availability change)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 16.7 E-Commerce -->
+    <div class="case-study">
+        <div class="case-header">
+            <h3>16.7 التجارة الإلكترونية <span style="font-weight: 400; opacity: 0.8;">(Amazon / Flipkart)</span></h3>
+            <div class="case-en">E-Commerce — Catalog Caching & Flash Sale Handling</div>
+        </div>
+        <div class="case-body">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
+                <span class="badge badge-cyan">Catalog Cache</span>
+                <span class="badge badge-purple">Search & Autocomplete</span>
+                <span class="badge badge-emerald">Offline Cart</span>
+                <span class="badge badge-amber">Flash Sale</span>
+            </div>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">📋 المتطلبات</h4>
+            <ul>
+                <li><strong>Functional:</strong> تصفح المنتجات، Search & Filter، عربة تسوق، Checkout، Orders، Wishlist.</li>
+                <li><strong>Non-Functional:</strong> Search &lt; 100ms. Catalog load &lt; 500ms. Cart sync across devices. Flash Sale: 100K+ concurrent checkouts.</li>
+                <li><strong>Scale:</strong> 500M+ SKUs, 100M+ users.</li>
+            </ul>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🔬 التعمق: Flash Sale / High Traffic Handling</h4>
+            <pre>// Problem: 100K users trying to buy 1000 iPhones in 1 second
+// Solution: Request Queue + Token Bucket + Inventory Reservation
+
+class FlashSaleManager(
+    private val queue: RequestQueue,
+    private val inventoryService: InventoryService
+) {
+    // Step 1: Users enter a "Waiting Room" (Token Queue)
+    suspend fun joinFlashSale(userId: String, productId: String): Result&lt;Token&gt; {
+        val token = queue.enqueue(userId, productId, priority = System.currentTimeMillis())
+
+        // Poll for queue position
+        return pollForTurn(token)
+    }
+
+    // Step 2: When token is active, reserve inventory
+    suspend fun attemptCheckout(token: Token, payment: PaymentInfo): Result&lt;Order&gt; {
+        // Optimistic inventory reservation (holds item for 5 minutes)
+        val reservation = inventoryService.reserve(token.productId, quantity = 1)
+
+        if (!reservation.success) {
+            return Result.failure(SoldOutException())
+        }
+
+        // Step 3: Process payment within reservation window
+        return try {
+            val order = paymentService.charge(payment)
+            inventoryService.confirmReservation(reservation.id)
+            Result.success(order)
+        } catch (e: PaymentException) {
+            inventoryService.releaseReservation(reservation.id)
+            Result.failure(e)
+        }
+    }
+}
+
+// Client-side: Show queue position with WebSocket updates
+class FlashSaleViewModel : ViewModel() {
+    private val _queuePosition = MutableStateFlow&lt;Int&gt;(0)
+    val queuePosition: StateFlow&lt;Int&gt; = _queuePosition
+
+    fun observeQueue(token: Token) {
+        webSocketManager.observe("queue:${token.id}")
+            .map { it.position }
+            .onEach { _queuePosition.value = it }
+            .launchIn(viewModelScope)
+    }
+}</pre>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🚨 الحالات الحافة</h4>
+            <ul>
+                <li><strong>Inventory Oversell:</strong> التأكد من أن Reservation + Confirmation atomic على الخادم</li>
+                <li><strong>Bot Attacks:</strong> CAPTCHA + Rate Limiting + Device Fingerprinting</li>
+                <li><strong>Cart Abandonment:</strong> إشعار تلقائي بعد 1 ساعة مع عرض خصم 10%</li>
+                <li><strong>Price Change:</strong> إذا تغير السعر بعد إضافة المنتج للسلة، يجب تحديث Cart Item</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 16.8 Stock Trading -->
+    <div class="case-study">
+        <div class="case-header">
+            <h3>16.8 تداول الأسهم <span style="font-weight: 400; opacity: 0.8;">(Groww / Zerodha)</span></h3>
+            <div class="case-en">Stock Trading — Ultra-Low Latency & Security</div>
+        </div>
+        <div class="case-body">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
+                <span class="badge badge-cyan">WebSocket Ticker</span>
+                <span class="badge badge-purple">Real-time Graph</span>
+                <span class="badge badge-emerald">High Security Auth</span>
+                <span class="badge badge-crimson">Order Execution</span>
+            </div>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">📋 المتطلبات</h4>
+            <ul>
+                <li><strong>Functional:</strong> عرض أسعار الأسهم في الوقت الفعلي، رسم بياني تفاعلي، تنفيذ أوامر الشراء/البيع، Portfolio tracking.</li>
+                <li><strong>Non-Functional:</strong> Latency &lt; 50ms للأسعار. Order execution &lt; 100ms. Security: 2FA + Biometric + Encryption. 99.99% Uptime.</li>
+                <li><strong>Scale:</strong> 10M+ trades/day, 50K+ ticks/sec.</li>
+            </ul>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🔬 التعمق: Ultra-Low Latency Ticker</h4>
+            <pre>// WebSocket connection with binary protocol (Protobuf) for minimal overhead
+class StockTickerManager(
+    private val webSocket: WebSocketClient,
+    private val protobufParser: ProtobufParser
+) {
+    private val _prices = MutableStateFlow&lt;Map&lt;String, StockPrice&gt;&gt;(emptyMap())
+    val prices: StateFlow&lt;Map&lt;String, StockPrice&gt;&gt; = _prices
+
+    fun connect(symbols: List&lt;String&gt;) {
+        webSocket.connect("wss://ticker.broker.com/stream")
+
+        // Subscribe to symbols
+        val subscribeMsg = SubscribeMessage(
+            symbols = symbols,
+            fields = listOf(PRICE, VOLUME, CHANGE, BID, ASK)
+        )
+        webSocket.send(subscribeMsg.toProtobuf())
+
+        webSocket.onMessage { bytes ->
+            val tick = protobufParser.parse&lt;TickUpdate&gt;(bytes)
+            _prices.update { current ->
+                current + (tick.symbol to tick.toStockPrice())
+            }
+        }
+    }
+
+    // Throttle UI updates to 16ms (60 FPS) to prevent jank
+    val throttledPrices = prices
+        .sample(16)  // Kotlin Flow sample operator
+        .distinctUntilChanged()
+}
+
+// Order Execution with Idempotency
+class OrderExecutionService {
+    suspend fun placeOrder(order: OrderRequest): Result&lt;OrderConfirmation&gt; {
+        // Client-generated idempotency key
+        val idempotencyKey = "${order.userId}:${order.symbol}:${order.timestamp}"
+
+        return api.placeOrder(
+            order = order,
+            headers = mapOf("Idempotency-Key" to idempotencyKey)
+        )
+    }
+}</pre>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🚨 الحالات الحافة</h4>
+            <ul>
+                <li><strong>Order Duplication:</strong> Idempotency Keys تمنع تنفيذ الأمر مرتين بسبب Retry</li>
+                <li><strong>Price Slippage:</strong> السعر تغير بين عرضه وتنفيذ الأمر — يجب عرض Confirmation مع السعر الفعلي</li>
+                <li><strong>Session Timeout:</strong> Auto-lock بعد 5 دقائق من عدم النشاط + Biometric Re-auth</li>
+                <li><strong>Market Closed:</strong> Queue orders for market open + Pre-market data display</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 16.9 Hotel Reservation -->
+    <div class="case-study">
+        <div class="case-header">
+            <h3>16.9 حجز الفنادق <span style="font-weight: 400; opacity: 0.8;">(Airbnb / OYO)</span></h3>
+            <div class="case-en">Hotel Reservation — Search Filters & Booking Validation</div>
+        </div>
+        <div class="case-body">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
+                <span class="badge badge-cyan">Complex Search</span>
+                <span class="badge badge-purple">Dynamic Pricing</span>
+                <span class="badge badge-emerald">Date Validation</span>
+                <span class="badge badge-amber">Image Carousel</span>
+            </div>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">📋 المتطلبات</h4>
+            <ul>
+                <li><strong>Functional:</strong> Search بالموقع والتاريخ والسعر. Filters (Wi-Fi, Pool, Pet-friendly). Calendar view. Booking + Payment.</li>
+                <li><strong>Non-Functional:</strong> Search &lt; 200ms. Calendar sync. Price updates in real-time. Image gallery 60 FPS.</li>
+                <li><strong>Scale:</strong> 7M+ listings, 100M+ searches/day.</li>
+            </ul>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🔬 التعمق: Complex Search Filter Architecture</h4>
+            <pre>// Search Query Builder — dynamic filters
+class HotelSearchQueryBuilder {
+    private var location: LatLng? = null
+    private var radiusKm: Int = 5
+    private var checkIn: Date? = null
+    private var checkOut: Date? = null
+    private var guests: Int = 2
+    private val amenities = mutableSetOf&lt;Amenity&gt;()
+    private var priceRange: ClosedRange&lt;Money&gt;? = null
+    private var rating: Float? = null
+
+    fun build(): SearchQuery {
+        return SearchQuery(
+            geo = GeoFilter(location!!, radiusKm),
+            dates = DateRangeFilter(checkIn!!, checkOut!!),
+            occupancy = OccupancyFilter(guests),
+            amenities = amenities.toList(),
+            price = priceRange?.let { PriceFilter(it.start, it.end) },
+            rating = rating?.let { RatingFilter(min = it) }
+        )
+    }
+}
+
+// Date Range Validation
+class BookingValidator {
+    fun validate(checkIn: Date, checkOut: Date, availability: AvailabilityCalendar): ValidationResult {
+        val nights = ChronoUnit.DAYS.between(checkIn, checkOut)
+
+        return when {
+            nights < 1 -> ValidationResult.Error("Minimum stay is 1 night")
+            nights > 30 -> ValidationResult.Error("Maximum stay is 30 nights")
+            checkIn.isBefore(LocalDate.now()) -> ValidationResult.Error("Check-in cannot be in the past")
+            !availability.isAvailable(checkIn, checkOut) -> 
+                ValidationResult.Error("Selected dates are not available")
+            else -> ValidationResult.Success(nights = nights, totalPrice = availability.calculatePrice(checkIn, checkOut))
+        }
+    }
+}</pre>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🔬 Image Carousel Memory Management</h4>
+            <pre>class HotelImageCarouselAdapter : RecyclerView.Adapter&lt;ImageViewHolder&gt;() {
+
+    // Use RecyclerView's built-in ViewPool + preload next 2 images
+    override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
+        val imageUrl = images[position]
+
+        // Load with downsampling to match View size
+        imageLoader.load(holder.imageView, imageUrl) {
+            placeholder(R.drawable.placeholder)
+            error(R.drawable.error_image)
+            memoryCachePolicy(CachePolicy.ENABLED)
+            // Downsample to exact View dimensions
+            size(ViewSizeResolver(holder.imageView))
+        }
+
+        // Preload next 2 images
+        if (position < images.size - 2) {
+            imageLoader.preload(images[position + 1])
+            imageLoader.preload(images[position + 2])
+        }
+    }
+
+    // Clear memory when ViewHolder is recycled
+    override fun onViewRecycled(holder: ImageViewHolder) {
+        imageLoader.clear(holder.imageView)
+        super.onViewRecycled(holder)
+    }
+}</pre>
+
+            <h4 style="font-weight: 800; color: var(--slate-navy); margin-bottom: 12px;">🚨 الحالات الحافة</h4>
+            <ul>
+                <li><strong>Double Booking:</strong> Optimistic Locking على الخادم (Version number في الـ Booking record)</li>
+                <li><strong>Price Change:</strong> السعر يتغير حسب الطلب — يجب تأمين السعر المعروض لـ 10 دقائق</li>
+                <li><strong>Cancellation Policy:</strong> Free cancellation حتى 24h قبل Check-in، ثم جزئي، ثم غير مسترد</li>
+                <li><strong>Overstay:</strong> إذا لم يُغادر النزيل في موعده، إشعار تلقائي + Charge إضافي</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- CHEAT SHEETS & MASTER TABLES -->
+<!-- ============================================================ -->
+<span class="section-anchor" id="cheatsheets"></span>
+<section class="section">
+    <div class="section-header">
+        <div class="section-number" style="background: linear-gradient(135deg, var(--electric-cyan), var(--purple-indigo));">★</div>
+        <div class="section-title-wrap">
+            <h2>مصفوفات وحقيبة الأدوات النهائية</h2>
+            <div class="en-subtitle">Master Interview Cheat Sheet & Decision Tables</div>
+        </div>
+    </div>
+
+    <!-- Table 1: CRDDS Timeline -->
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--slate-navy); margin: 32px 0 20px;">🔷 الجدول 1: إطار زمني لتنفيذ CRDDS (الدقائق 0-45)</h3>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th style="width: 12%;">المرحلة</th>
+                <th style="width: 12%;">الوقت</th>
+                <th style="width: 38%;">ما يجب فعله</th>
+                <th style="width: 38%;">ما يجب تجنبه</th>
+            </tr>
+            <tr>
+                <td><span class="badge badge-cyan">C</span><br>Clarify</td>
+                <td>0-5 min</td>
+                <td>• اطرح 3-5 أسئلة توضيحية<br>• حدد Scope و Scale و Platform<br>• اكتب المتطلبات على السبورة</td>
+                <td>• لا تبدأ بالحل<br>• لا تفترض Offline-first دون سؤال<br>• لا تتجاهل Battery/Security</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-purple">R</span><br>Rough HLD</td>
+                <td>5-15 min</td>
+                <td>• ارسم Block Diagram (4 Layers)<br>• حدد Data Flow<br>• اذكر External Dependencies</td>
+                <td>• لا تكتب كود<br>• لا تُدخل في Data Models<br>• لا تنسى Server-side</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-emerald">D</span><br>Deep Dive</td>
+                <td>15-30 min</td>
+                <td>• اختر 1-2 Bottlenecks<br>• اكتب Class Diagram / Code<br>• اشرح Threading & Memory</td>
+                <td>• لا تُعمق في كل شيء<br>• لا تنسى Edge Cases<br>• لا تتجاهل Error Handling</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-amber">D</span><br>Trade-offs</td>
+                <td>30-40 min</td>
+                <td>• قارن 2-3 حلول بديلة<br>• اذكر Pros/Cons لكل حل<br>• برر اختيارك بالسياق</td>
+                <td>• لا تقول "هذا الأفضل دائماً"<br>• لا تتجاهل Mobile Constraints<br>• لا تكن غامضاً</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-crimson">S</span><br>Summarize</td>
+                <td>40-45 min</td>
+                <td>• لخص في 60 ثانية<br>• اذكر Edge Cases<br>• تحدث عن Scale & Security</td>
+                <td>• لا تُضيف ميزات جديدة<br>• لا تتجاهل الأسئلة التعقيبية<br>• لا تبدو متوتراً</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Table 2: Case Studies Quick Summary -->
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--slate-navy); margin: 32px 0 20px;">🔷 الجدول 2: ملخص معماري سريع لدراسات الحالة</h3>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th style="width: 15%;">التطبيق</th>
+                <th style="width: 25%;">التحدي الرئيسي</th>
+                <th style="width: 25%;">أفضل نمط معماري</th>
+                <th style="width: 35%;">المكون الأساسي (Building Block)</th>
+            </tr>
+            <tr>
+                <td><strong>WhatsApp</strong><br><span style="font-size:12px;color:var(--text-secondary)">Chat</span></td>
+                <td>Offline Sync + E2E Encryption + Message Ordering</td>
+                <td><span class="badge badge-cyan">Offline-First</span><br>+ Eventual Consistency</td>
+                <td>Sync Engine with Pending Action Queue + SQLCipher for Encryption</td>
+            </tr>
+            <tr>
+                <td><strong>Twitter</strong><br><span style="font-size:12px;color:var(--text-secondary)">News Feed</span></td>
+                <td>Infinite Scroll + 60 FPS + Optimistic UI</td>
+                <td><span class="badge badge-purple">Pagination</span><br>+ Local Cache</td>
+                <td>Cursor-based Paging3 + Room + Coil Image Pipeline</td>
+            </tr>
+            <tr>
+                <td><strong>Instagram</strong><br><span style="font-size:12px;color:var(--text-secondary)">Photo Sharing</span></td>
+                <td>Image Pipeline + GPU Filters + Background Upload</td>
+                <td><span class="badge badge-emerald">Pipeline</span><br>+ Dual Storage</td>
+                <td>Chunked Upload Manager + LruCache + GPU Filter Engine</td>
+            </tr>
+            <tr>
+                <td><strong>Uber</strong><br><span style="font-size:12px;color:var(--text-secondary)">Ride Sharing</span></td>
+                <td>Real-time Location + Battery + Matching</td>
+                <td><span class="badge badge-amber">State Machine</span><br>+ Adaptive Polling</td>
+                <td>Fused Location Provider + RideStateMachine + WebSocket</td>
+            </tr>
+            <tr>
+                <td><strong>Netflix</strong><br><span style="font-size:12px;color:var(--text-secondary)">Video Streaming</span></td>
+                <td>ABR + Chunk Caching + DRM</td>
+                <td><span class="badge badge-cyan">Adaptive Streaming</span><br>+ CDN</td>
+                <td>HLS/DASH Player + ABR Selector + Widevine/FairPlay DRM</td>
+            </tr>
+            <tr>
+                <td><strong>Swiggy</strong><br><span style="font-size:12px;color:var(--text-secondary)">Food Delivery</span></td>
+                <td>Multi-Actor Sync + Real-time Tracking</td>
+                <td><span class="badge badge-purple">Shared State</span><br>+ Actor Views</td>
+                <td>Order State Manager + WebSocket Broadcast + Geofencing</td>
+            </tr>
+            <tr>
+                <td><strong>Amazon</strong><br><span style="font-size:12px;color:var(--text-secondary)">E-Commerce</span></td>
+                <td>Catalog Search + Flash Sale + Cart Sync</td>
+                <td><span class="badge badge-emerald">CQRS</span><br>+ Request Queue</td>
+                <td>Search Index + Flash Sale Token Queue + Offline Cart</td>
+            </tr>
+            <tr>
+                <td><strong>Zerodha</strong><br><span style="font-size:12px;color:var(--text-secondary)">Stock Trading</span></td>
+                <td>Ultra-Low Latency + Security + Order Integrity</td>
+                <td><span class="badge badge-crimson">Binary Protocol</span><br>+ Idempotency</td>
+                <td>WebSocket Ticker (Protobuf) + Order Execution + Biometric Auth</td>
+            </tr>
+            <tr>
+                <td><strong>Airbnb</strong><br><span style="font-size:12px;color:var(--text-secondary)">Hotel Booking</span></td>
+                <td>Complex Filters + Date Validation + Image Gallery</td>
+                <td><span class="badge badge-cyan">Query Builder</span><br>+ Memory Pool</td>
+                <td>Dynamic Search Query + Booking Validator + RecyclerView Pool</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Table 3: Edge Cases & Solutions -->
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--slate-navy); margin: 32px 0 20px;">🔷 الجدول 3: الحالات الحافة الشائعة والحلول المعمارية</h3>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th style="width: 22%;">الحالة الحافة</th>
+                <th style="width: 30%;">الوصف</th>
+                <th style="width: 48%;">الحل المعماري</th>
+            </tr>
+            <tr>
+                <td><strong>Process Death</strong></td>
+                <td>النظام يقتل التطبيق بسبب Low Memory أثناء عملية (مثل رفع صورة)</td>
+                <td>• استخدم <strong>WorkManager</strong> (Android) أو <strong>BGTaskScheduler</strong> (iOS)<br>• احفظ الـ State في <strong>SavedStateHandle</strong><br>• استخدم <strong>Foreground Service</strong> للعمليات الحرجة</td>
+            </tr>
+            <tr>
+                <td><strong>Network Switch</strong></td>
+                <td>الانتقال من Wi-Fi إلى Cellular أو العكس</td>
+                <td>• <strong>NetworkMonitor</strong> يلاحظ التغيير ويُعيد المحاولة<br>• <strong>Exponential Backoff</strong> مع Jitter<br>• خفض جودة الفيديو/الصور فوراً على Cellular</td>
+            </tr>
+            <tr>
+                <td><strong>Doze Mode</strong></td>
+                <td>Android يُقيّد Background tasks عند عدم استخدام الجهاز</td>
+                <td>• استخدم <strong>FCM High Priority</strong> للإشعارات الحرجة<br>• <strong>WorkManager</strong> with <code>set expedite</code> (Android 12+)<br>• <strong>AlarmManager</strong> + <strong>Exact Alarms</strong> للمهام المجدولة</td>
+            </tr>
+            <tr>
+                <td><strong>Low Battery</strong></td>
+                <td>المستخدم فعّل وضع توفير البطارية</td>
+                <td>• اقرأ <code>PowerManager.isPowerSaveMode()</code><br>• قلل GPS polling frequency<br>• أوقف Background prefetching<br>• استخدم <strong>JobScheduler</strong> بدلاً من Polling</td>
+            </tr>
+            <tr>
+                <td><strong>Memory Pressure</strong></td>
+                <td>النظام يطلب تحرير الذاكرة (onTrimMemory)</td>
+                <td>• صّغير <strong>LruCache</strong> فوراً<br>• ألغِ تحميل الصور غير المرئية<br>• استخدم <strong>Bitmap Pool</strong> (Glide/Coil)<br>• احفظ State وحرر الـ ViewModels غير الضرورية</td>
+            </tr>
+            <tr>
+                <td><strong>Duplicate Requests</strong></td>
+                <td>المستخدم ينقر مرتين أو يُعيد المحاولة</td>
+                <td>• <strong>Idempotency Keys</strong> (UUID لكل عملية)<br>• <strong>Debounce</strong> على أزرار الإرسال (300ms)<br>• <strong>Loading State</strong> يمنع النقر المتكرر</td>
+            </tr>
+            <tr>
+                <td><strong>Stale Cache</strong></td>
+                <td>البيانات المخزنة محلياً أصبحت قديمة</td>
+                <td>• <strong>TTL (Time-To-Live)</strong> لكل Cache entry<br>• <strong>ETag / Last-Modified</strong> headers للتحقق<br>• <strong>Background Refresh</strong> عند فتح التطبيق</td>
+            </tr>
+            <tr>
+                <td><strong>Configuration Change</strong></td>
+                <td>دوران الشاشة أو تغيير اللغة أو темная тема</td>
+                <td>• استخدم <strong>ViewModel</strong> (Android) — تبقى حية<br>• استخدم <strong>SwiftUI @StateObject</strong> (iOS)<br>• احفظ الـ State في <strong>SavedStateHandle</strong></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Table 4: Assessment Rubric -->
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--slate-navy); margin: 32px 0 20px;">🔷 الجدول 4: معيار تقييم مقابلة تصميم النظام (Rubric)</h3>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th style="width: 20%;">المحور</th>
+                <th style="width: 26%;" class="rubric-junior">Junior Engineer (L3)</th>
+                <th style="width: 27%;" class="rubric-senior">Senior Engineer (L5-L6)</th>
+                <th style="width: 27%;" class="rubric-staff">Staff / Principal (L7+)</th>
+            </tr>
+            <tr>
+                <td><strong>Requirements</strong></td>
+                <td>يسأل أسئلة أساسية (2-3). يفهم Functional Requirements فقط.</td>
+                <td>يسأل 5+ أسئلة. يغطي Functional + Non-Functional. يحدد Constraints.</td>
+                <td>يقود المقابل في تحديد المتطلبات. يطرح أسئلة لم يفكر فيها المقابل. يُحدد Trade-offs مبكراً.</td>
+            </tr>
+            <tr>
+                <td><strong>HLD</strong></td>
+                <td>يرسم Diagram بسيط. يفهم الطبقات الأساسية.</td>
+                <td>Diagram نظيف مع Data Flow واضح. يذكر External Dependencies. يفصل Concerns.</td>
+                <td>Diagram يُظهر System Boundaries بدقة. يتحدث عن Scalability من البداية. يُبرهن اختياراته بالأرقام.</td>
+            </tr>
+            <tr>
+                <td><strong>LLD</strong></td>
+                <td>يكتب Classes بسيطة. يفهم الـ Repository Pattern.</td>
+                <td>يُطبق SOLID. يستخدم Design Patterns بشكل صحيح. يكتب Interfaces.</td>
+                <td>يُصمم Abstractions عميقة. يفكر في Testability. يُظهر Trade-offs في كل Class. يتحدث عن Concurrency.</td>
+            </tr>
+            <tr>
+                <td><strong>Trade-offs</strong></td>
+                <td>يذكر 1-2 Trade-offs بشكل سطحي.</td>
+                <td>يناقش 3+ Trade-offs مع Pros/Cons. يبرر اختياراته بالسياق.</td>
+                <td>يُقدم Decision Matrix. يتحدث عن Second-order effects. يذكر متى يتغير القرار (Scale, Platform, etc.).</td>
+            </tr>
+            <tr>
+                <td><strong>Mobile Constraints</strong></td>
+                <td>يذكر Battery أو Memory مرة واحدة.</td>
+                <td>يغطي Battery, Memory, Network, Storage بشكل منظم. يُقدم حلولاً.</td>
+                <td>يُظهر Deep Understanding لـ OS limitations. يتحدث عن Thermal Throttling, Doze Mode, App Standby, Background restrictions.</td>
+            </tr>
+            <tr>
+                <td><strong>Edge Cases</strong></td>
+                <td>يذكر 1-2 Edge Cases (Process Death, Network Error).</td>
+                <td>يغطي 5+ Edge Cases. يُقدم حلولاً لكل منها.</td>
+                <td>يُفكر في Edge Cases نادرة (Device Switch, Time Zone, Locale, Accessibility, RTL). يُقدم Mitigation Strategies.</td>
+            </tr>
+            <tr>
+                <td><strong>Communication</strong></td>
+                <td>يتواصل بشكل مقبول. يحتاج توجيهاً.</td>
+                <td>يتواصل بوضوح. يتحقق من فهم المقابل. يُدير الوقت.</td>
+                <td>يُقود المحادثة بثقة. يُسأل المقابل أسئلة. يُقدم Summary منظم. يتحكم في Narrative.</td>
+            </tr>
+        </table>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SUMMARY CALLOUT -->
+<!-- ============================================================ -->
+<div class="summary-card">
+    <h3>🎓 نصيحة Staff / Principal Engineer: التحكم في سرد المقابلة</h3>
+    <p>
+        المقابلة الناجحة ليست تلك التي فيها "أكثر الأفكار"، بل تلك التي فيها "أوضح سرد". ابدأ بسؤال استكشافي، 
+        انتقل بسلاسة من HLD إلى LLD، وفي كل مرحلة اربط قرارك بـ <strong>Business Context</strong>. 
+        لا تقل "سأستخدم WebSocket" — قل "سأستخدم WebSocket لأن هذا التطبيق يتطلب Real-time updates، 
+        والثمن هو Battery Drain، لذا سأستخدم Adaptive Heartbeat (30s عند الخمول، 5s أثناء النشاط)".
+        <br><br>
+        تذكر: المقابل لا يبحث عن الإجابة الصحيحة الوحيدة. يبحث عن مهندس يستطيع <strong>التفكير في ظل عدم اليقين</strong>، 
+        و<strong>اتخاذ قرارات مدروسة</strong>، و<strong>التواصل بها بوضوح</strong>. 
+        هذه هي الصفات التي تُميز Junior عن Senior عن Principal.
+    </p>
+</div>
+
+</div>
+
+<!-- Footer -->
+<footer style="background: var(--slate-navy); color: #64748B; text-align: center; padding: 40px 20px; margin-top: 60px; font-size: 14px;">
+    <p style="margin-bottom: 8px;">Mobile System Design Master Guide — Part III & IV</p>
+    <p style="font-family: 'Fira Code', monospace; font-size: 12px;">Chapters 11-16 | CRDDS Framework | 9 Case Studies | 4 Decision Tables</p>
+    <p style="margin-top: 16px; color: #94A3B8;">Generated for educational purposes. Inspired by FAANG interview practices.</p>
+</footer>
+
+<script>
+// Active nav link on scroll
+const sections = document.querySelectorAll('.section, .section-anchor');
+const navLinks = document.querySelectorAll('.nav-item');
+
+window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (scrollY >= sectionTop - 100) {
+            current = section.getAttribute('id');
+        }
+    });
+
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+            link.classList.add('active');
+        }
+    });
+});
+</script>
+
+</body>
+</html>

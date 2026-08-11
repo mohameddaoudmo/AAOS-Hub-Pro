@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polymorphism Deep & Abstraction Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0f1a;--bg2:#16162a;--bg3:#1e1e3a;--border:#2a2a4a;--text:#e8e8f0;--text2:#a0a0c0;--text3:#606080;--accent:#e94560;--accent2:#3498db;--ok:#2ecc71;--warn:#f39c12;--code:#0d1117}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans Arabic',sans-serif;background:var(--bg);color:var(--text);direction:rtl;min-height:100vh}
+.hdr{background:linear-gradient(135deg,var(--bg2),var(--bg3));padding:32px 20px;text-align:center;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-50%;right:-10%;width:300px;height:300px;background:radial-gradient(circle,var(--accent) 0%,transparent 70%);opacity:.12}
+.hdr h1{font-size:28px;font-weight:700;margin-bottom:8px;position:relative}
+.hdr p{color:var(--text2);font-size:15px;position:relative}
+.hdr .bd{display:inline-block;background:var(--accent);color:#fff;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600;margin-top:12px;position:relative}
+.ctrl{padding:16px 20px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;position:sticky;top:0;z-index:100}
+.ctrl input{flex:1;min-width:220px;max-width:350px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-family:inherit;font-size:13px;outline:none}
+.ctrl input:focus{border-color:var(--accent)}
+.ctrl button{padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text2);font-family:inherit;font-size:12px;cursor:pointer;transition:.2s;white-space:nowrap}
+.ctrl button:hover,.ctrl button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.main{padding:20px;max-width:900px;margin:0 auto}
+.sec{display:flex;align-items:center;gap:10px;margin:28px 0 16px;padding-bottom:10px;border-bottom:2px solid var(--accent)}
+.sec i{width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-style:normal;flex-shrink:0}
+.sec h2{font-size:22px;font-weight:700}
+.sec span{color:var(--text3);font-size:13px;margin-right:auto}
+.card{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden;transition:.2s}
+.card:hover{border-color:rgba(233,69,96,0.25);background:rgba(255,255,255,0.04)}
+.card.x{display:none}
+.ch{padding:16px 20px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
+.num{background:var(--bg3);color:var(--text);width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.ttl{flex:1;font-size:15px;font-weight:600;line-height:1.5}
+.arr{color:var(--text3);transition:transform .3s;flex-shrink:0}
+.card.o .arr{transform:rotate(180deg)}
+.cb{max-height:0;overflow:hidden;transition:max-height .4s ease-out}
+.card.o .cb{max-height:4000px;transition:max-height .6s ease-in}
+.cc{padding:0 20px 20px;color:var(--text2);line-height:1.9;font-size:15px}
+.cc p{margin-bottom:12px}
+.cc ul,.cc ol{margin:12px 0;padding-right:24px}
+.cc li{margin-bottom:6px}
+.cc code{font-family:'JetBrains Mono',monospace;background:rgba(233,69,96,0.1);color:var(--accent);padding:2px 6px;border-radius:4px;font-size:13px}
+.tbl{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+.tbl th{background:var(--bg3);color:var(--text);padding:12px 16px;text-align:right;font-weight:600}
+.tbl td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--text2)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:nth-child(even){background:rgba(255,255,255,0.015)}
+.code{background:var(--code);border:1px solid var(--border);border-radius:10px;margin:16px 0;overflow:hidden;direction:ltr;text-align:left}
+.codeh{background:rgba(255,255,255,0.03);padding:8px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.dot{width:10px;height:10px;border-radius:50%}.dot.r{background:#ff5f56}.dot.y{background:#ffbd2e}.dot.g{background:#27c93f}
+.cl{color:var(--text3);font-size:11px;font-family:'JetBrains Mono',monospace;margin-left:auto}
+.code pre{padding:16px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;color:#c9d1d9}
+.code code{font-family:'JetBrains Mono',monospace;background:none;color:inherit;padding:0}
+.k{color:#ff7b72}.s{color:#a5d6ff}.c{color:#8b949e}.f{color:#d2a8ff}.t{color:#ffa657}.n{color:#79c0ff}
+.note{background:rgba(52,152,219,0.06);border-right:3px solid var(--accent2);padding:14px 18px;border-radius:0 8px 8px 0;margin:16px 0;font-size:14px}
+.note.d{background:rgba(231,76,60,0.06);border-right-color:var(--accent)}
+.note.s{background:rgba(46,204,113,0.06);border-right-color:var(--ok)}
+.note.w{background:rgba(243,156,18,0.06);border-right-color:var(--warn)}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600}
+.tag1{background:rgba(167,119,227,0.12);color:#c084fc}
+.tag2{background:rgba(121,192,255,0.12);color:#79c0ff}
+.tag3{background:rgba(255,166,87,0.12);color:#ffa657}
+.tag4{background:rgba(46,204,113,0.12);color:#2ecc71}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+@media(max-width:600px){.hdr h1{font-size:22px}.main{padding:16px}.ctrl{padding:12px 16px}.ch{padding:14px 16px}.cc{padding:0 16px 16px}.ttl{font-size:14px}}
+</style>
+</head>
+<body>
+<div class="hdr"><h1>Polymorphism Deep & Abstraction Design</h1><p>دليل شامل وعميق لتعدد الأشكال وتصميم التجريد في Kotlin/Java</p><span class="bd">35 سؤال تقني</span></div>
+<div class="ctrl">
+<input type="text" id="s" placeholder="ابحث في الأسئلة..." oninput="fl()">
+<button class="on" onclick="fs('all')">الكل</button>
+<button onclick="fs('p')">Polymorphism</button>
+<button onclick="fs('a')">Abstraction</button>
+<button onclick="ea(1)">فتح الكل</button>
+<button onclick="ea(0)">إغلاق الكل</button>
+</div>
+<div class="main">
+<div class="sec" data-s="p"><i>🔷</i><h2>القسم الأول: Polymorphism Deep</h2><span>#046 - #064</span></div>
+
+<div class="card" data-s="p" data-k="vtable jvm dynamic dispatch invokevirtual bytecode">
+<div class="ch" onclick="tg(this)"><div class="num">046</div><div class="ttl">Dynamic Dispatch على مستوى JVM Vtable</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p><strong>الفكرة:</strong> عند استدعاء method على object، الـ JVM لازم يعرف أنهي نسخة من الميثود ينفذ، خصوصًا لو فيه inheritance و overriding.</p>
+<p><strong>الـ Vtable:</strong> كل class عنده جدول (array) بيحتوي على <strong>pointers</strong> لكل virtual method. كل subclass بيرث الـ vtable ويستبدل pointers اللي عملها override. كل object بيحمل hidden pointer لـ vtable بتاع class.</p>
+<p><strong>الخطوات:</strong> الكومبايلر بيحدد index → Runtime: object → class reference → vtable → index → method pointer → تنفيذ.</p>
+<div class="code"><div class="codeh"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="cl">Kotlin</span></div><pre><code><span class="k">open class</span> <span class="t">Shape</span> { <span class="k">open fun</span> <span class="f">draw</span>() = <span class="f">println</span>(<span class="s">"Shape"</span>) }
+<span class="k">class</span> <span class="t">Circle</span> : <span class="t">Shape</span>() { <span class="k">override fun</span> <span class="f">draw</span>() = <span class="f">println</span>(<span class="s">"Circle"</span>) }
+<span class="k">val</span> s: <span class="t">Shape</span> = <span class="t">Circle</span>()
+s.<span class="f">draw</span>() <span class="c">// JVM يلاقي vtable بتاع Circle وينفذ نسختها</span></code></pre></div>
+<div class="note">JVM بيستخدم <code>invokevirtual</code> bytecode instruction للـ lookup الديناميكي. أما <code>final</code> أو <code>static</code> أو <code>private</code> فبتستخدم <code>invokestatic</code>/<code>invokespecial</code> — ده اسمه <strong>static binding</strong>.</div>
+<div class="tags"><span class="tag tag2">JVM Internals</span><span class="tag tag1">Kotlin</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="p" data-k="double dispatch visitor pattern expression problem">
+<div class="ch" onclick="tg(this)"><div class="num">047</div><div class="ttl">Double Dispatch و Visitor Pattern</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p><strong>المشكلة:</strong> Dynamic Dispatch العادي هو <strong>single dispatch</strong> — بيتحدد بناءً على نوع object واحد فقط. لكن أحيانًا محتاجين نحدد السلوك بناءً على <strong>نوعين من objects</strong> في نفس الوقت.</p>
+<p><strong>الحل:</strong> استدعاءين polymorphic: الأول بيحدد نوع Element، والتاني بيحدد نوع Visitor.</p>
+<div class="code"><div class="codeh"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="cl">Kotlin</span></div><pre><code><span class="k">interface</span> <span class="t">Visitor</span> {
+    <span class="k">fun</span> <span class="f">visit</span>(c: <span class="t">Circle</span>)
+    <span class="k">fun</span> <span class="f">visit</span>(s: <span class="t">Square</span>)
+}
+<span class="k">interface</span> <span class="t">Shape</span> { <span class="k">fun</span> <span class="f">accept</span>(v: <span class="t">Visitor</span>) }
+<span class="k">class</span> <span class="t">Circle</span> : <span class="t">Shape</span> {
+    <span class="k">override fun</span> <span class="f">accept</span>(v: <span class="t">Visitor</span>) = v.<span class="f">visit</span>(<span class="k">this</span>) <span class="c">// dispatch 1</span>
+}
+<span class="k">class</span> <span class="t">AreaVisitor</span> : <span class="t">Visitor</span> {
+    <span class="k">override fun</span> <span class="f">visit</span>(c: <span class="t">Circle</span>) = <span class="f">println</span>(<span class="s">"مساحة دائرة"</span>) <span class="c">// dispatch 2</span>
+}</code></pre></div>
+<div class="tags"><span class="tag tag3">Design Pattern</span><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="p" data-k="subtype parametric ad-hoc polymorphism generics overloading">
+<div class="ch" onclick="tg(this)"><div class="num">048</div><div class="ttl">Subtype vs Parametric vs Ad-hoc Polymorphism</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<table class="tbl"><thead><tr><th>النوع</th><th>التعريف</th><th>مثال Kotlin</th></tr></thead>
+<tbody>
+<tr><td><strong>Subtype</strong></td><td>كائن من subtype يتصرف مكان supertype</td><td><code>val a: Animal = Dog()</code></td></tr>
+<tr><td><strong>Parametric</strong></td><td>نفس الكود يشتغل مع أنواع مختلفة عن طريق generics</td><td><code>fun &lt;T&gt; first(list: List&lt;T&gt;): T</code></td></tr>
+<tr><td><strong>Ad-hoc</strong></td><td>نفس الاسم، تنفيذات مختلفة حسب النوع</td><td><code>operator fun plus(other: Point): Point</code></td></tr>
+</tbody></table>
+<div class="tags"><span class="tag tag4">Concept</span><span class="tag tag1">Kotlin</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="p" data-k="casting as polymorphism abstraction open closed principle">
+<div class="ch" onclick="tg(this)"><div class="num">049</div><div class="ttl">ليه الـ Casting (as) بيكسر الـ Polymorphism؟</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p>Polymorphism الهدف منها التعامل مع objects من خلال abstraction عامة من غير ما تعرف النوع الحقيقي. لما تعمل casting، بترجع تكسر الـ abstraction وتقول "أنا لازم أعرف النوع الحقيقي" — الكود بقى <strong>coupled</strong> بكل subtype (بيخالف Open/Closed Principle).</p>
+<p><strong>البديل:</strong> polymorphic method → Visitor Pattern → sealed class + when</p>
+<div class="note d">وجود casting كتير في الكود هو <strong>code smell</strong> بيقول لك "محتاج تعيد تصميم الـ hierarchy أو تستخدم Visitor/Strategy pattern".</div>
+<div class="tags"><span class="tag tag4">Concept</span><span class="tag tag1">Kotlin</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="p" data-k="covariant return type bridge method bytecode">
+<div class="ch" onclick="tg(this)"><div class="num">050</div><div class="ttl">Covariant Return Type</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p>method في subclass تعمل override وترجع نوع <strong>أضيق (subtype)</strong> من النوع الأصلي. الكومبايلر بيولّد <strong>bridge method</strong> تلقائيًا عشان يحافظ على binary compatibility مع الـ vtable.</p>
+<div class="code"><div class="codeh"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="cl">Kotlin</span></div><pre><code><span class="k">open class</span> <span class="t">Animal</span> {
+    <span class="k">open fun</span> <span class="f">reproduce</span>(): <span class="t">Animal</span> = <span class="t">Animal</span>()
+}
+<span class="k">class</span> <span class="t">Dog</span> : <span class="t">Animal</span>() {
+    <span class="k">override fun</span> <span class="f">reproduce</span>(): <span class="t">Dog</span> = <span class="t">Dog</span>() <span class="c">// أضيق من Animal ✅</span>
+}</code></pre></div>
+<div class="tags"><span class="tag tag2">JVM Internals</span><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="p" data-k="sealed class when exhaustive polymorphism compile time">
+<div class="ch" onclick="tg(this)"><div class="num">051</div><div class="ttl">when على Sealed Class و Exhaustive Polymorphism</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p><code>sealed class</code> بتقول للكومبايلر: "كل subtypes معروفة وقت الكومبايل". الكومبايلر بيعمل <strong>exhaustiveness check</strong> — لو نسيت case في <code>when</code> expression، الكومبايل بيفشل.</p>
+<p>لو ضفت subclass جديد، أي <code>when</code> في المشروع هيدي <strong>compile error</strong> فورًا لو مغطاش الحالة الجديدة — بيمنع bugs runtime.</p>
+<div class="tags"><span class="tag tag1">Kotlin</span><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="p" data-k="overriding hiding static method field binding runtime compile time">
+<div class="ch" onclick="tg(this)"><div class="num">052</div><div class="ttl">Overriding vs Hiding</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<table class="tbl"><thead><tr><th></th><th>Overriding</th><th>Hiding</th></tr></thead>
+<tbody>
+<tr><td>بيحصل مع</td><td>instance methods</td><td>static methods, fields</td></tr>
+<tr><td>نوع الـ binding</td><td>Dynamic (runtime)</td><td>Static (compile-time)</td></tr>
+<tr><td>الـ JVM بيبص على</td><td><strong>النوع الحقيقي</strong> (runtime type)</td><td><strong>نوع المتغير المُعلن</strong> (reference type)</td></tr>
+</tbody></table>
+<div class="tags"><span class="tag tag2">JVM Internals</span><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="p" data-k="recyclerview adapter polymorphism sealed class viewholder">
+<div class="ch" onclick="tg(this)"><div class="num">053</div><div class="ttl">RecyclerView Adapter بولي مورفيك بدون instanceof</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<div class="code"><div class="codeh"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="cl">Kotlin</span></div><pre><code><span class="k">sealed class</span> <span class="t">FeedItem</span> {
+    <span class="k">data class</span> <span class="t">Text</span>(<span class="k">val</span> content: <span class="t">String</span>) : <span class="t">FeedItem</span>()
+    <span class="k">data class</span> <span class="t">Photo</span>(<span class="k">val</span> url: <span class="t">String</span>) : <span class="t">FeedItem</span>()
+    <span class="k">data class</span> <span class="t">Video</span>(<span class="k">val</span> url: <span class="t">String</span>, <span class="k">val</span> duration: <span class="t">Int</span>) : <span class="t">FeedItem</span>()
+}
+<span class="k">class</span> <span class="t">FeedAdapter</span>(<span class="k">private val</span> items: <span class="t">List</span>&lt;<span class="t">FeedItem</span>&gt;) : <span class="t">RecyclerView</span>.<span class="t">Adapter</span>&lt;...&gt;() {
+    <span class="k">override fun</span> <span class="f">getItemViewType</span>(position: <span class="t">Int</span>) = <span class="k">when</span> (items[position]) {
+        <span class="k">is</span> <span class="t">FeedItem</span>.<span class="t">Text</span> -> <span class="n">0</span>
+        <span class="k">is</span> <span class="t">FeedItem</span>.<span class="t">Photo</span> -> <span class="n">1</span>
+        <span class="k">is</span> <span class="t">FeedItem</span>.<span class="t">Video</span> -> <span class="n">2</span>
+    }
+}</code></pre></div>
+<div class="note"><code>when</code> على <code>sealed class</code> مش نفس <code>instanceof</code> العشوائي — لأنه <strong>exhaustive</strong> ومتفحوص وقت الكومبايل.</div>
+<div class="tags"><span class="tag tag1">Kotlin</span><span class="tag tag3">Android</span></div>
+</div></div>
+</div>
+<div class="card" data-s="p" data-k="expression problem oop fp types operations visitor">
+<div class="ch" onclick="tg(this)"><div class="num">054</div><div class="ttl">Expression Problem</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p>مشكلة كلاسيكية: تحب تضيف <strong>أنواع جديدة</strong> و<strong>عمليات جديدة</strong> لنظام موجود.</p>
+<ul>
+<li><strong>OOP:</strong> إضافة نوع سهلة (subclass جديد)، لكن إضافة operation صعبة (لازم تعدل كل classes).</li>
+<li><strong>FP:</strong> إضافة operation سهلة (function جديدة)، لكن إضافة نوع صعبة (لازم تعدل كل functions).</li>
+</ul>
+<p>الحل الأشهر: <strong>Visitor Pattern</strong> أو <strong>type classes</strong> (Haskell/Scala).</p>
+<div class="tags"><span class="tag tag4">Concept</span><span class="tag tag3">Design Pattern</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="p" data-k="visitor pattern expression problem ast evaluator printer">
+<div class="ch" onclick="tg(this)"><div class="num">055</div><div class="ttl">Visitor Pattern لحل Expression Problem (AST)</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<div class="code"><div class="codeh"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="cl">Kotlin</span></div><pre><code><span class="k">sealed class</span> <span class="t">Expr</span> {
+    <span class="k">abstract fun</span> &lt;<span class="t">R</span>&gt; <span class="f">accept</span>(visitor: <span class="t">ExprVisitor</span>&lt;<span class="t">R</span>&gt;): <span class="t">R</span>
+}
+<span class="k">class</span> <span class="t">NumberExpr</span>(<span class="k">val</span> value: <span class="t">Double</span>) : <span class="t">Expr</span>() {
+    <span class="k">override fun</span> &lt;<span class="t">R</span>&gt; <span class="f">accept</span>(v: <span class="t">ExprVisitor</span>&lt;<span class="t">R</span>&gt;) = v.<span class="f">visitNumber</span>(<span class="k">this</span>)
+}
+<span class="k">interface</span> <span class="t">ExprVisitor</span>&lt;<span class="t">R</span>&gt; {
+    <span class="k">fun</span> <span class="f">visitNumber</span>(e: <span class="t">NumberExpr</span>): <span class="t">R</span>
+    <span class="k">fun</span> <span class="f">visitAdd</span>(e: <span class="t">AddExpr</span>): <span class="t">R</span>
+}
+<span class="k">class</span> <span class="t">EvalVisitor</span> : <span class="t">ExprVisitor</span>&lt;<span class="t">Double</span>&gt; { ... }
+<span class="k">class</span> <span class="t">PrintVisitor</span> : <span class="t">ExprVisitor</span>&lt;<span class="t">String</span>&gt; { ... }</code></pre></div>
+<p>لإضافة operation جديدة: class جديد يـ implement <code>ExprVisitor</code> — من غير ما تلمس <code>Expr</code> classes. لكن لو ضفت نوع جديد لـ <code>Expr</code>، لازم تعدل كل Visitors.</p>
+<div class="tags"><span class="tag tag3">Design Pattern</span><span class="tag tag1">Kotlin</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="p" data-k="duck typing structural typing dynamic python javascript">
+<div class="ch" onclick="tg(this)"><div class="num">056</div><div class="ttl">Duck Typing وعلاقته بالـ Polymorphism</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p>"If it walks like a duck and quacks like a duck, then it's a duck." — النوع الحقيقي مش مهم، المهم الـ <strong>behavior</strong>. شائع في اللغات الديناميكية (Python, JS, Ruby).</p>
+<p>Duck typing هو شكل من <strong>ad-hoc/structural polymorphism</strong> بيتحقق runtime. في Kotlin (statically typed)، أقرب حاجة هي <strong>interfaces</strong> أو <strong>extension functions</strong>.</p>
+<div class="tags"><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="p" data-k="compile time runtime polymorphism overloading overriding static dynamic binding">
+<div class="ch" onclick="tg(this)"><div class="num">057</div><div class="ttl">Compile-time vs Runtime Polymorphism</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<table class="tbl"><thead><tr><th></th><th>Compile-time (Static)</th><th>Runtime (Dynamic)</th></tr></thead>
+<tbody>
+<tr><td>الاسم</td><td>Overloading</td><td>Overriding</td></tr>
+<tr><td>بيتحدد</td><td>بناءً على عدد/نوع parameters</td><td>بناءً على النوع الحقيقي للـ object</td></tr>
+<tr><td>الآلية</td><td>Static Binding</td><td>Dynamic Binding (vtable)</td></tr>
+</tbody></table>
+<div class="tags"><span class="tag tag4">Concept</span><span class="tag tag2">JVM Internals</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="p" data-k="overriding access modifiers protected public private liskov substitution">
+<div class="ch" onclick="tg(this)"><div class="num">058</div><div class="ttl">Overriding و Access Modifiers</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p><strong>القاعدة:</strong> الميثود الـ override <strong>لازم تكون بنفس مستوى الوصول أو أوسع</strong> (أقل تقييدًا)، مينفعش تضيّقها. لو سمحنا بتضييق الوصول، هيبوظ <strong>Liskov Substitution Principle</strong> — أي كود بيتعامل مع الأب لازم يقدر يستخدم الابن بنفس الطريقة.</p>
+<div class="code"><div class="codeh"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="cl">Kotlin</span></div><pre><code><span class="k">open class</span> <span class="t">Parent</span> {
+    <span class="k">protected open fun</span> <span class="f">show</span>() {}
+}
+<span class="k">class</span> <span class="t">Child</span> : <span class="t">Parent</span>() {
+    <span class="k">override fun</span> <span class="f">show</span>() {}          <span class="c">// ✅ protected أو public</span>
+    <span class="c">// private override fun show()  // ❌ خطأ - ماينفعش تضيق</span>
+}</code></pre></div>
+<div class="tags"><span class="tag tag4">Concept</span><span class="tag tag1">Kotlin</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="p" data-k="covariance contravariance parameters return types generics in out pecs">
+<div class="ch" onclick="tg(this)"><div class="num">059</div><div class="ttl">Covariance و Contravariance في Parameters و Return Types</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p><strong>Covariance:</strong> يرجع نوع أضيق (subtype) في return type. <strong>Contravariance:</strong> يقبل نوع أوسع (supertype) في parameters — مدعوم في generics و function types.</p>
+<div class="code"><div class="codeh"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="cl">Kotlin</span></div><pre><code><span class="c">// Covariance في Generics</span>
+<span class="k">class</span> <span class="t">Container</span>&lt;<span class="k">out</span> <span class="t">T</span>&gt;(<span class="k">val</span> item: <span class="t">T</span>)
+<span class="k">val</span> anyContainer: <span class="t">Container</span>&lt;<span class="t">Any</span>&gt; = <span class="t">Container</span>(<span class="s">"hello"</span>) <span class="c">// ✅</span>
+
+<span class="c">// Contravariance في Generics</span>
+<span class="k">interface</span> <span class="t">Consumer</span>&lt;<span class="k">in</span> <span class="t">T</span>&gt; { <span class="k">fun</span> <span class="f">consume</span>(item: <span class="t">T</span>) }
+
+<span class="c">// PECS: Producer Extends (out), Consumer Super (in)</span></code></pre></div>
+<div class="tags"><span class="tag tag4">Concept</span><span class="tag tag1">Kotlin</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="p" data-k="generics templates type erasure bounded type parameters parametric polymorphism">
+<div class="ch" onclick="tg(this)"><div class="num">060</div><div class="ttl">تأثير Generics/Templates على Polymorphism</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p>Generics بتضيف طبقة <strong>parametric polymorphism</strong> مع الحفاظ على <strong>type safety</strong> وقت الكومبايل.</p>
+<ul>
+<li><strong>Type Erasure (JVM):</strong> <code>List&lt;String&gt;</code> و <code>List&lt;Int&gt;</code> بيبقوا <code>List</code> عادي runtime. مينفعش تعمل <code>is List&lt;String&gt;</code> runtime.</li>
+<li><strong>Bounded Type Parameters:</strong> <code>fun &lt;T : Comparable&lt;T&gt;&gt; max(a: T, b: T): T</code> — بيدمج parametric مع subtype polymorphism.</li>
+</ul>
+<div class="tags"><span class="tag tag4">Concept</span><span class="tag tag2">JVM Internals</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="p" data-k="performance virtual method calls vtable inline caching jit monomorphic">
+<div class="ch" onclick="tg(this)"><div class="num">061</div><div class="ttl">Performance Implications للـ Virtual Method Calls</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p><strong>التكلفة:</strong></p>
+<ul>
+<li><strong>Indirect call:</strong> vtable lookup خطوات إضافية (object → class → vtable → method → call).</li>
+<li><strong>CPU Branch Prediction:</strong> virtual calls بتقلل قدرة التنبؤ بمسار التنفيذ → pipeline stalls.</li>
+<li><strong>منع Inlining:</strong> JIT صعب يعمل inline لـ virtual methods لأن الهدف مش معروف وقت الكومبايل.</li>
+</ul>
+<p><strong>التحسين:</strong> JIT بيعمل <strong>Monomorphic Inline Caching</strong> — لو نفس النقطة بتنادي نفس النوع دايمًا، بيحولها لـ direct call مؤقتًا مع fallback لو اتغير.</p>
+<div class="note s">نصيحة: خلّي الميثودز <code>final</code> أو <code>private</code> لو معرفش إنها محتاجة override — ده بيدي الكومبايلر فرصة يحسّن الأداء.</div>
+<div class="tags"><span class="tag tag2">JVM Internals</span><span class="tag tag4">Performance</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="p" data-k="compile time runtime polymorphism overloading overriding">
+<div class="ch" onclick="tg(this)"><div class="num">062</div><div class="ttl">Compile-time vs Runtime Polymorphism (إجابة نموذجية)</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p><strong>Compile-time:</strong> Method Overloading (نفس الاسم، parameters مختلفة). <strong>Runtime:</strong> Method Overriding (Dynamic Dispatch).</p>
+<div class="tags"><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="p" data-k="method resolution dynamic dispatch runtime type reference type">
+<div class="ch" onclick="tg(this)"><div class="num">063</div><div class="ttl">Method Resolution في الـ Polymorphism</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p>الـ JVM بتستخدم <strong>Dynamic Method Dispatch</strong>. الكومبايلر بيتأكد من <strong>نوع الـ reference</strong> (النوع المُعلن)، لكن الـ JVM runtime بتنادي <strong>أنسب نسخة (الأكثر تحديدًا)</strong> بناءً على <strong>النوع الحقيقي للـ object</strong>.</p>
+<div class="tags"><span class="tag tag2">JVM Internals</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="p" data-k="covariant return types override subtype">
+<div class="ch" onclick="tg(this)"><div class="num">064</div><div class="ttl">Covariant Return Types (إجابة نموذجية)</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p>بتسمح إن الميثود الـ override تُرجع نوع أضيق (subtype) من النوع الأصلي.</p>
+<div class="code"><div class="codeh"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="cl">Kotlin</span></div><pre><code><span class="k">open class</span> <span class="t">Animal</span> { <span class="k">open fun</span> <span class="f">reproduce</span>(): <span class="t">Animal</span> = <span class="t">Animal</span>() }
+<span class="k">class</span> <span class="t">Dog</span> : <span class="t">Animal</span>() { <span class="k">override fun</span> <span class="f">reproduce</span>(): <span class="t">Dog</span> = <span class="t">Dog</span>() }</code></pre></div>
+<div class="tags"><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+<div class="sec" data-s="a"><i>🔶</i><h2>القسم الثاني: Abstraction Design</h2><span>#065 - #080</span></div>
+
+<div class="card" data-s="a" data-k="leaky abstraction android recyclerview bitmap livedata">
+<div class="ch" onclick="tg(this)"><div class="num">065</div><div class="ttl">Leaky Abstraction: 3 أمثلة من Android</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p><strong>التعريف:</strong> لما التفاصيل الداخلية (implementation details) للطبقة المفروض تكون "مخفية" بتظهر وتأثر على المستخدم — رغم إن الهدف من الـ abstraction إنها تخفيها.</p>
+<p><strong>1. RecyclerView.ViewHolder و View Recycling:</strong> المفروض يخفي تفاصيل إعادة استخدام Views، لكن لو مانضفتش الـ state القديم في <code>onBindViewHolder</code>، هتلاقي views "بتفتكر" حالة عنصر تاني.</p>
+<p><strong>2. Bitmap و Memory Management:</strong> الـ <code>Bitmap</code> API بيوهمك إنه object عادي (garbage collected)، لكن الـ pixel data بتتخزن في <strong>native memory</strong> في Android أقدم — لو مانديتش <code>bitmap.recycle()</code> يدويًا، ممكن <code>OutOfMemoryError</code>.</p>
+<p><strong>3. LiveData/Flow و Lifecycle:</strong> المفروض تخفي تعقيد ربط observers بالـ lifecycle، لكن لو استخدمت <code>observeForever</code> من غير <code>removeObserver</code>، هتسرب memory.</p>
+<div class="note w">Joel Spolsky's Law: "All non-trivial abstractions, to some degree, are leaky."</div>
+<div class="tags"><span class="tag tag3">Android</span><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="a" data-k="accidental complexity essential complexity abstraction design">
+<div class="ch" onclick="tg(this)"><div class="num">066</div><div class="ttl">Accidental Complexity vs Essential Complexity</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<table class="tbl"><thead><tr><th></th><th>Essential Complexity</th><th>Accidental Complexity</th></tr></thead>
+<tbody>
+<tr><td>التعريف</td><td>جزء أساسي من طبيعة المشكلة نفسها</td><td>ناتج من الطريقة اللي حلينا بيها المشكلة</td></tr>
+<tr><td>مثال</td><td>لازم تتأكد من صحة بيانات الدفع في تطبيق بنكي</td><td>boilerplate كتير عشان تربط network layer بالـ UI</td></tr>
+</tbody></table>
+<p>Abstraction كويسة بتاخد التفاصيل المعقدة اللي مالهاش علاقة بجوهر المشكلة وتخفيها ورا واجهة بسيطة.</p>
+<div class="tags"><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="a" data-k="list arraylist return type interface implementation program to interface">
+<div class="ch" onclick="tg(this)"><div class="num">067</div><div class="ttl">ليه List أفضل من ArrayList كـ Return Type؟</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p>مبدأ "Program to an interface, not an implementation"</p>
+<ul>
+<li><strong>المرونة:</strong> تقدر تغيّر التنفيذ الداخلي من ArrayList لـ LinkedList من غير ما تكسر كود الـ caller.</li>
+<li><strong>Immutability:</strong> <code>List</code> في Kotlin بتدي read-only view — الـ caller مايقدرش يعدل الـ list.</li>
+<li><strong>تقليل Coupling:</strong> الكود بقى coupled بس بالـ contract العام (List operations).</li>
+</ul>
+<div class="tags"><span class="tag tag4">Concept</span><span class="tag tag1">Kotlin</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="a" data-k="law of demeter lod train wreck viewmodel repository">
+<div class="ch" onclick="tg(this)"><div class="num">068</div><div class="ttl">Law of Demeter (LoD)</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p>"Talk only to your immediate friends, don't talk to strangers." — object يتفاعل بس مع: نفسه، parameters، objects عمله، fields المباشرة.</p>
+<p><strong>مايجوزش:</strong> chain calls عميقة (Train Wreck) زي <code>userManager.getUser().getAddress().getCity().getName()</code></p>
+<p><strong>الـ Refactor:</strong> delegate من خلال methods في كل layer — الـ ViewModel يتفاعل مع Repository بس، مش يعمل chain عميق.</p>
+<div class="tags"><span class="tag tag3">Design Pattern</span><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="a" data-k="cohesion coupling single responsibility loose coupling high cohesion">
+<div class="ch" onclick="tg(this)"><div class="num">069</div><div class="ttl">Cohesion و Coupling</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p><strong>Cohesion (التماسك):</strong> مدى ارتباط المسؤوليات جوه نفس الـ class. High cohesion = كلاس بيعمل حاجة واحدة واضحة.</p>
+<p><strong>Coupling (الترابط):</strong> مدى اعتماد class على classes تانية. Loose coupling = التغيير في class واحد مايأثرش على التانية.</p>
+<p><strong>ليه High Cohesion + Loose Coupling؟</strong> أسهل للفهم والصيانة (SRP) + أسهل للاختبار والتوسيع (mock للـ interfaces).</p>
+<div class="tags"><span class="tag tag4">Concept</span><span class="tag tag3">Clean Architecture</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="a" data-k="abstraction layer viewmodel third party adapter facade dependency injection">
+<div class="ch" onclick="tg(this)"><div class="num">070</div><div class="ttl">Abstraction Layer بين ViewModel ومكتبة Third-party</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p><strong>الاستراتيجية:</strong> Adapter/Facade Pattern عن طريق Interface خاص بيك (مش بتاع المكتبة).</p>
+<ol>
+<li>اعمل <strong>interface</strong> خاص بيك يعبّر عن احتياجات الـ ViewModel فقط.</li>
+<li>اعمل <strong>implementation</strong> بيستخدم المكتبة جوه ويحوّل بياناتها لموديلز خاصة بيك (Domain Models).</li>
+<li>الـ ViewModel يعتمد بس على الـ interface عن طريق DI.</li>
+</ol>
+<div class="code"><div class="codeh"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="cl">Kotlin</span></div><pre><code><span class="k">interface</span> <span class="t">AuthProvider</span> {
+    <span class="k">suspend fun</span> <span class="f">login</span>(email: <span class="t">String</span>, password: <span class="t">String</span>): <span class="t">AppUser</span>
+}
+<span class="k">class</span> <span class="t">FirebaseAuthProvider</span>(<span class="k">private val</span> firebaseAuth: <span class="t">FirebaseAuth</span>) : <span class="t">AuthProvider</span> {
+    <span class="k">override suspend fun</span> <span class="f">login</span>(...) = ... <span class="c">// تحويل من Firebase لموديلك</span>
+}
+<span class="k">class</span> <span class="t">LoginViewModel</span>(<span class="k">private val</span> authProvider: <span class="t">AuthProvider</span>) : <span class="t">ViewModel</span>() { ... }</code></pre></div>
+<p>لو حبيت تستبدل Firebase بـ AWS Cognito: بس <code>class CognitoAuthProvider : AuthProvider</code> جديد + تغيير DI binding — الـ ViewModel صفر تعديل.</p>
+<div class="tags"><span class="tag tag3">Clean Architecture</span><span class="tag tag1">Kotlin</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="a" data-k="use case interactor repository clean architecture domain layer">
+<div class="ch" onclick="tg(this)"><div class="num">071</div><div class="ttl">Use Case (Interactor) vs Repository</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<table class="tbl"><thead><tr><th></th><th>Repository</th><th>Use Case</th></tr></thead>
+<tbody>
+<tr><td>المسؤولية</td><td>إدارة الوصول للبيانات (network, DB, cache)</td><td>تنفيذ <strong>منطق عمل واحد محدد</strong></td></tr>
+<tr><td>بيعرف عن</td><td>مصادر البيانات (API, DB)</td><td>إيه اللي المستخدم عايز يعمله</td></tr>
+<tr><td>مثال</td><td><code>getUser(id)</code>, <code>saveUser(user)</code></td><td><code>LoginUseCase</code>, <code>ValidateAndSaveUserUseCase</code></td></tr>
+</tbody></table>
+<p><strong>ليه منفصلين في Clean Architecture؟</strong> SRP + إعادة الاستخدام + سهولة الاختبار (mock للـ Repository) + فصل Domain layer (مستقر) عن Data layer (بيتغير).</p>
+<div class="tags"><span class="tag tag3">Clean Architecture</span><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="a" data-k="anti corruption layer acl ddd domain driven design adapter">
+<div class="ch" onclick="tg(this)"><div class="num">072</div><div class="ttl">Anti-Corruption Layer (ACL) في DDD</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p>طبقة abstraction بين نظامك (Domain Model) وبين نظام خارجي (SDK/API) عنده تصميم مختلف — بهدف <strong>حماية Domain Model من "التلوث"</strong>.</p>
+<div class="code"><div class="codeh"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="cl">Kotlin</span></div><pre><code><span class="c">// SDK خارجي بتصميم سيء</span>
+<span class="k">class</span> <span class="t">LegacyPaymentSDK</span> {
+    <span class="k">fun</span> <span class="f">doPayment</span>(amt: <span class="t">String</span>, curr: <span class="t">Int</span>, cb: (<span class="t">Int</span>, <span class="t">String</span>?) -> <span class="t">Unit</span>) { ... }
+}
+
+<span class="c">// ACL - بيترجم بين العالمين</span>
+<span class="k">interface</span> <span class="t">PaymentGateway</span> {
+    <span class="k">suspend fun</span> <span class="f">pay</span>(amount: <span class="t">Double</span>, currency: <span class="t">Currency</span>): <span class="t">PaymentResult</span>
+}
+<span class="k">class</span> <span class="t">LegacyPaymentGatewayAdapter</span>(<span class="k">private val</span> sdk: <span class="t">LegacyPaymentSDK</span>) : <span class="t">PaymentGateway</span> {
+    <span class="k">override suspend fun</span> <span class="f">pay</span>(...) = <span class="c">// ترجمة error codes وتحويل الموديلز</span>
+}</code></pre></div>
+<p>كل "الوسخ" اتحصر جوه الـ Adapter. باقي التطبيق بيتعامل مع domain models نضيفة.</p>
+<div class="tags"><span class="tag tag3">DDD</span><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="a" data-k="abstract class interface all methods abstract multiple inheritance">
+<div class="ch" onclick="tg(this)"><div class="num">073</div><div class="ttl">Abstract Class بكل الميثودز Abstract vs Interface</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<table class="tbl"><thead><tr><th></th><th>Abstract Class</th><th>Interface</th></tr></thead>
+<tbody>
+<tr><td>Multiple Inheritance</td><td>لا (class واحد)</td><td>نعم</td></tr>
+<tr><td>State (fields)</td><td>تقدر تحط instance fields</td><td>بدون backing field افتراضي</td></tr>
+<tr><td>Constructor</td><td>نعم</td><td>لا</td></tr>
+<tr><td>Access Modifiers</td><td><code>protected</code>, <code>private</code></td><td>كل حاجة <code>public</code></td></tr>
+<tr><td>العلاقة الدلالية</td><td>"IS-A"</td><td>"CAN-DO"</td></tr>
+</tbody></table>
+<p>اختار Abstract Class لو: محتاج single-inheritance حقيقي، متوقع تضيف state/behavior قريب، عايز تتحكم في constructor، أو محتاج protected members. غير كده، <strong>interface أفضل</strong>.</p>
+<div class="tags"><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+<div class="card" data-s="a" data-k="stable dependencies principle sdp abstraction stable dependency inversion">
+<div class="ch" onclick="tg(this)"><div class="num">074</div><div class="ttl">Stable Dependencies Principle وتصميم Abstractions مستقرة</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p><strong>SDP:</strong> "Depend in the direction of stability." — modules اللي بتتغير كتير تعتمد على modules أكتر استقرارًا. الـ <strong>abstractions</strong> المفروض تكون أكتر حاجة مستقرة.</p>
+<ul>
+<li>اعتمد على <strong>السلوك</strong> مش التفاصيل.</li>
+<li><strong>Interface Segregation:</strong> interfaces صغيرة ومركزة.</li>
+<li><strong>Dependency Inversion:</strong> الطبقات العليا (Domain) تعرّف interfaces، والطبقات الأدنى (Data) تعمل implement.</li>
+<li>قِس الاستقرار: <code>I = Ce / (Ca + Ce)</code> — كل ما الـ module اعتمد عليه modules تانية كتير (Afferent Coupling عالي)، كل ما بقى أكتر استقرارًا.</li>
+</ul>
+<div class="tags"><span class="tag tag4">Concept</span><span class="tag tag3">Clean Architecture</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="a" data-k="abstract class interface comparison">
+<div class="ch" onclick="tg(this)"><div class="num">075</div><div class="ttl">Abstract Class vs Interface (إجابة نموذجية)</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p><strong>Abstract Classes:</strong> مشاركة كود بين classes مرتبطة، non-public members، implementations افتراضية.</p>
+<p><strong>Interfaces:</strong> تعريف عقد (contract) لـ classes مش مرتبطة، multiple inheritance، loose coupling.</p>
+<div class="tags"><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="a" data-k="abstract class constructor">
+<div class="ch" onclick="tg(this)"><div class="num">076</div><div class="ttl">هل Abstract Class يقدر يكون عنده Constructor؟</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p>نعم. بيتستخدم لتهيئة protected fields. مايمكنش تعمل instantiate للـ abstract class، لكن <code>super()</code> بينادي الـ constructor من الـ subclass.</p>
+<div class="code"><div class="codeh"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="cl">Kotlin</span></div><pre><code><span class="k">abstract class</span> <span class="t">Animal</span>(<span class="k">protected val</span> name: <span class="t">String</span>) {
+    <span class="k">abstract fun</span> <span class="f">makeSound</span>()
+}
+<span class="k">class</span> <span class="t">Dog</span>(name: <span class="t">String</span>) : <span class="t">Animal</span>(name) {
+    <span class="k">override fun</span> <span class="f">makeSound</span>() = <span class="f">println</span>(<span class="s">"$name: Woof!"</span>)
+}</code></pre></div>
+<div class="tags"><span class="tag tag1">Kotlin</span><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="a" data-k="default methods interface java 8 diamond problem mixin">
+<div class="ch" onclick="tg(this)"><div class="num">077</div><div class="ttl">Default Methods في الـ Interfaces وتأثيراتها</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p>من Java 8، interfaces تقدر تحط implementation افتراضي. الفايدة: تضيف method جديدة لـ interface موجود <strong>من غير ما تكسر</strong> الـ classes اللي بتعمل implement (backward compatibility).</p>
+<p><strong>التداعيات:</strong></p>
+<ul>
+<li><strong>Diamond Problem:</strong> لو class عمل implement لـ interfaceين وكل واحد عنده default method بنفس الاسم، لازم يعمل override صريح.</li>
+<li>بيبوظ جزء من فكرة interfaces (contract بحت) — سبب جدل بين المصممين.</li>
+<li>مفيدة لعمل <strong>Mixins</strong> (سلوك مشترك بدون inheritance تقليدي).</li>
+</ul>
+<div class="code"><div class="codeh"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="cl">Kotlin</span></div><pre><code><span class="k">interface</span> <span class="t">A</span> { <span class="k">fun</span> <span class="f">greet</span>() = <span class="f">println</span>(<span class="s">"A"</span>) }
+<span class="k">interface</span> <span class="t">B</span> { <span class="k">fun</span> <span class="f">greet</span>() = <span class="f">println</span>(<span class="s">"B"</span>) }
+<span class="k">class</span> <span class="t">C</span> : <span class="t">A</span>, <span class="t">B</span> {
+    <span class="k">override fun</span> <span class="f">greet</span>() {
+        <span class="k">super</span>&lt;<span class="t">A</span>&gt;.<span class="f">greet</span>() <span class="c">// لازم تحدد صراحة</span>
+        <span class="k">super</span>&lt;<span class="t">B</span>&gt;.<span class="f">greet</span>()
+    }
+}</code></pre></div>
+<div class="tags"><span class="tag tag1">Kotlin</span><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="a" data-k="versioning interface methods backward compatibility semantic versioning">
+<div class="ch" onclick="tg(this)"><div class="num">078</div><div class="ttl">Versioning لما تضيف Methods لـ Interfaces</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p>لو عندك interface منشور (public API) وناس عاملة implement ليه، وضفت method جديدة abstract، كل الـ implementations هتكسر (compile error).</p>
+<p><strong>استراتيجيات الحل:</strong></p>
+<ol>
+<li><strong>Default Methods:</strong> أشيع وأفضل حل — backward compatible.</li>
+<li><strong>Extension Interface:</strong> <code>interface PaymentProcessorV2 : PaymentProcessor</code> — interface جديد بدل تعديل القديم.</li>
+<li><strong>Semantic Versioning:</strong> Major Version Bump لو التغيير breaking فعلاً.</li>
+<li><strong>Deprecation:</strong> <code>@Deprecated</code> قبل الحذف بفترة كافية.</li>
+</ol>
+<div class="tags"><span class="tag tag4">Concept</span><span class="tag tag3">API Design</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="a" data-k="abstract class vs interface summary">
+<div class="ch" onclick="tg(this)"><div class="num">079</div><div class="ttl">Abstract Classes vs Interfaces (إجابة نموذجية)</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p><strong>Abstract Classes:</strong> مشاركة كود بين classes مرتبطة، non-public members، implementations افتراضية.</p>
+<p><strong>Interfaces:</strong> تعريف عقد لـ classes مش مرتبطة، multiple inheritance، loose coupling.</p>
+<div class="tags"><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+
+<div class="card" data-s="a" data-k="abstract class constructor summary">
+<div class="ch" onclick="tg(this)"><div class="num">080</div><div class="ttl">هل Abstract Classes يقدروا يكون عندهم Constructors؟ (إجابة نموذجية)</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<p>نعم. بتُستخدم لتهيئة protected fields. مايمكنش instantiate للـ abstract class، لكن <code>super()</code> بينادي constructor السوبركلاس من داخل الـ subclass.</p>
+<div class="tags"><span class="tag tag1">Kotlin</span><span class="tag tag4">Concept</span></div>
+</div></div>
+</div>
+
+<!-- Summary -->
+<div class="sec"><i>📋</i><h2>ملخص سريع</h2></div>
+<div class="card">
+<div class="ch" onclick="tg(this)"><div class="num">📝</div><div class="ttl">نقاط مهمة للمراجعة السريعة</div><svg class="arr" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="cb"><div class="cc">
+<ul>
+<li><strong>Vtable:</strong> array of method pointers لكل class — JVM بيستخدم <code>invokevirtual</code> للـ dynamic dispatch.</li>
+<li><strong>Double Dispatch:</strong> Visitor Pattern بحل مشكلة تحديد السلوك بناءً على نوعين من objects.</li>
+<li><strong>Expression Problem:</strong> OOP سهل في الأنواع صعب في العمليات | FP العكس | Visitor Pattern حل وسط.</li>
+<li><strong>Sealed Class + when:</strong> exhaustive وآمن وقت الكومبايل — أفضل من instanceof العشوائي.</li>
+<li><strong>Leaky Abstraction:</strong> كل abstraction معقدة هتسرّب — Joel Spolsky's Law.</li>
+<li><strong>Program to Interface:</strong> ارجع <code>List</code> مش <code>ArrayList</code> — مرونة وأمان.</li>
+<li><strong>Law of Demeter:</strong> لا train wrecks — delegate بدل chain calls العميقة.</li>
+<li><strong>High Cohesion + Loose Coupling:</strong> هدف التصميم الجيد.</li>
+<li><strong>ACL:</strong> حماية Domain Model من "تلوث" SDKs/APIs الخارجية.</li>
+<li><strong>Stable Dependencies:</strong> اعتمد في اتجاه الاستقرار — abstractions هي الأكثر استقرارًا.</li>
+</ul>
+<div class="note s">بالتوفيق في المقابلة! 🚀</div>
+</div></div>
+</div>
+
+</div>
+
+<script>
+function tg(el) {
+    var card = el.parentElement;
+    card.classList.toggle('o');
+}
+function fs(sec) {
+    var cards = document.querySelectorAll('.card');
+    var secs = document.querySelectorAll('.sec');
+    var btns = document.querySelectorAll('.ctrl button');
+    btns.forEach(function(b) { b.classList.remove('on'); });
+    event.target.classList.add('on');
+    if (sec === 'all') {
+        cards.forEach(function(c) { c.classList.remove('x'); });
+        secs.forEach(function(s) { s.style.display = 'flex'; });
+    } else {
+        cards.forEach(function(c) {
+            if (c.dataset.s === sec) c.classList.remove('x');
+            else c.classList.add('x');
+        });
+        secs.forEach(function(s) {
+            if (s.dataset.s === sec) s.style.display = 'flex';
+            else s.style.display = 'none';
+        });
+    }
+}
+function fl() {
+    var q = document.getElementById('s').value.toLowerCase();
+    var cards = document.querySelectorAll('.card');
+    cards.forEach(function(c) {
+        var k = (c.dataset.k || '').toLowerCase();
+        var t = c.querySelector('.ttl').textContent.toLowerCase();
+        if (k.indexOf(q) !== -1 || t.indexOf(q) !== -1) c.classList.remove('x');
+        else c.classList.add('x');
+    });
+}
+function ea(open) {
+    var cards = document.querySelectorAll('.card');
+    cards.forEach(function(c) {
+        if (open) c.classList.add('o');
+        else c.classList.remove('o');
+    });
+}
+</script>
+</body>
+</html>

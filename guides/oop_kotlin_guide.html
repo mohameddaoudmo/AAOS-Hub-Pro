@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دليل شامل: أسئلة OOP / Kotlin / Android Design Patterns</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for Syntax Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-kotlin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Tajawal', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#ecfeff',
+                            100: '#cffafe',
+                            200: '#a5f3fc',
+                            300: '#67e8f9',
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                            700: '#0e7490',
+                            800: '#155e75',
+                            900: '#164e63',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Tajawal', system-ui, sans-serif;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* Code block styling */
+        pre[class*="language-"] {
+            background: #0f172a !important;
+            border: 1px solid #1e293b;
+            border-radius: 0.75rem;
+            padding: 1.25rem !important;
+            margin: 0 !important;
+            direction: ltr;
+            text-align: left;
+        }
+
+        code[class*="language-"] {
+            font-family: 'Fira Code', 'JetBrains Mono', 'Cascadia Code', monospace !important;
+            font-size: 0.875rem !important;
+            line-height: 1.7 !important;
+            direction: ltr;
+        }
+
+        /* Search highlight */
+        .search-highlight {
+            background: rgba(34, 211, 238, 0.2);
+            border-radius: 2px;
+            padding: 0 2px;
+        }
+
+        /* Section card hover effect */
+        .section-card {
+            transition: all 0.3s ease;
+        }
+        .section-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px -10px rgba(6, 182, 212, 0.15);
+        }
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #22d3ee 0%, #818cf8 50%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Glass effect */
+        .glass {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Progress bar */
+        #progress-bar {
+            transition: width 0.1s ease;
+        }
+
+        /* Sidebar link active state */
+        .nav-link.active {
+            background: rgba(6, 182, 212, 0.1);
+            border-right: 3px solid #22d3ee;
+            color: #22d3ee;
+        }
+
+        /* Smooth fade in */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        /* Tooltip for copy button */
+        .copy-tooltip {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #22d3ee;
+            color: #0f172a;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .copy-tooltip.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200 antialiased" x-data="appData()" x-init="init()">
+
+    <!-- Progress Bar -->
+    <div class="fixed top-0 left-0 right-0 h-1 z-50 bg-slate-800">
+        <div id="progress-bar" class="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500" style="width: 0%"></div>
+    </div>
+
+    <!-- Mobile Header -->
+    <header class="lg:hidden fixed top-1 left-0 right-0 z-40 glass border-b border-slate-800/50">
+        <div class="flex items-center justify-between px-4 py-3">
+            <button @click="sidebarOpen = !sidebarOpen" class="p-2 rounded-lg bg-slate-800/50 text-slate-300 hover:text-cyan-400 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+            <h1 class="text-sm font-bold gradient-text truncate max-w-[200px]">دليل OOP / Kotlin</h1>
+            <button @click="searchOpen = !searchOpen" class="p-2 rounded-lg bg-slate-800/50 text-slate-300 hover:text-cyan-400 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Search Overlay -->
+    <div x-show="searchOpen" 
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-sm flex items-start justify-center pt-20 px-4"
+         @click.away="searchOpen = false"
+         x-cloak>
+        <div class="w-full max-w-2xl">
+            <div class="relative">
+                <input type="text" 
+                       x-model="searchQuery"
+                       @input="performSearch()"
+                       placeholder="ابحث في الدليل..."
+                       class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-6 py-4 pr-12 text-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all"
+                       autofocus>
+                <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <div x-show="searchResults.length > 0" class="mt-4 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden max-h-[60vh] overflow-y-auto" x-cloak>
+                <template x-for="result in searchResults" :key="result.id">
+                    <a :href="result.href" 
+                       @click="searchOpen = false"
+                       class="block px-6 py-3 hover:bg-slate-800/50 border-b border-slate-800/50 last:border-0 transition-colors">
+                        <div class="text-cyan-400 font-semibold text-sm" x-text="result.section"></div>
+                        <div class="text-slate-300 mt-1" x-html="result.highlightedTitle"></div>
+                    </a>
+                </template>
+            </div>
+            <div x-show="searchQuery.length > 0 && searchResults.length === 0" class="mt-4 text-center text-slate-500" x-cloak>
+                لا توجد نتائج مطابقة
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside :class="sidebarOpen ? 'translate-x-0' : 'translate-x-full'"
+           class="fixed right-0 top-0 h-full w-80 bg-slate-900/95 backdrop-blur-xl border-l border-slate-800/50 z-30 transform transition-transform duration-300 lg:translate-x-0 overflow-y-auto"
+           style="padding-top: 80px;">
+
+        <div class="px-6 pb-6">
+            <!-- Logo / Title -->
+            <div class="mb-8">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-cyan-500/20">
+                        OOP
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-slate-100 text-lg leading-tight">دليل شامل</h1>
+                        <p class="text-xs text-slate-500">Kotlin & Android Patterns</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desktop Search -->
+            <div class="hidden lg:block mb-6">
+                <button @click="searchOpen = true" 
+                        class="w-full bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 rounded-xl px-4 py-2.5 text-right text-slate-400 hover:text-slate-200 transition-all flex items-center justify-between group">
+                    <span class="text-sm">ابحث في الدليل...</span>
+                    <svg class="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="space-y-1">
+                <template x-for="(section, index) in sections" :key="index">
+                    <div>
+                        <a :href="section.href"
+                           @click="sidebarOpen = false"
+                           class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 transition-all group"
+                           :class="{'active': activeSection === section.id}">
+                            <span class="text-lg" x-text="section.emoji"></span>
+                            <span class="text-sm font-medium truncate" x-text="section.title"></span>
+                            <span class="mr-auto text-xs bg-slate-800 text-slate-500 px-2 py-0.5 rounded-full" x-text="section.count"></span>
+                        </a>
+                    </div>
+                </template>
+            </nav>
+
+            <!-- Stats -->
+            <div class="mt-8 pt-6 border-t border-slate-800/50">
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-slate-800/30 rounded-xl p-3 text-center">
+                        <div class="text-2xl font-bold text-cyan-400">66</div>
+                        <div class="text-xs text-slate-500 mt-1">سؤال</div>
+                    </div>
+                    <div class="bg-slate-800/30 rounded-xl p-3 text-center">
+                        <div class="text-2xl font-bold text-purple-400">9</div>
+                        <div class="text-xs text-slate-500 mt-1">قسم</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="lg:mr-80 min-h-screen">
+        <div class="max-w-4xl mx-auto px-4 lg:px-8 pt-20 lg:pt-12 pb-20">
+
+            <!-- Hero -->
+            <div class="text-center mb-16 animate-fade-in">
+                <div class="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full px-4 py-1.5 mb-6">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                    <span class="text-cyan-400 text-sm font-medium">دليل تفاعلي شامل</span>
+                </div>
+                <h1 class="text-4xl lg:text-5xl font-black mb-6 leading-tight">
+                    <span class="gradient-text">أسئلة OOP / Kotlin</span><br>
+                    <span class="text-slate-100">Android Design Patterns</span>
+                </h1>
+                <p class="text-slate-400 text-lg max-w-2xl mx-auto leading-relaxed">
+                    دليلك الشامل لأهم أسئلة البرمجة كائنية التوجه، لغة Kotlin، وأنماط تصميم Android مع الشرح العميق والأمثلة العملية
+                </p>
+                <div class="flex flex-wrap items-center justify-center gap-3 mt-8">
+                    <span class="px-3 py-1 rounded-full bg-slate-800/50 border border-slate-700/50 text-xs text-slate-400">Object-Oriented</span>
+                    <span class="px-3 py-1 rounded-full bg-slate-800/50 border border-slate-700/50 text-xs text-slate-400">Kotlin</span>
+                    <span class="px-3 py-1 rounded-full bg-slate-800/50 border border-slate-700/50 text-xs text-slate-400">Android</span>
+                    <span class="px-3 py-1 rounded-full bg-slate-800/50 border border-slate-700/50 text-xs text-slate-400">Design Patterns</span>
+                    <span class="px-3 py-1 rounded-full bg-slate-800/50 border border-slate-700/50 text-xs text-slate-400">Concurrency</span>
+                </div>
+            </div>
+
+            <!-- Content Sections -->
+            
+            <section id="section-0" class="mb-16 scroll-mt-24">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center text-2xl shadow-lg">
+                        🧬
+                    </div>
+                    <div>
+                        <h2 class="text-2xl lg:text-3xl font-bold text-slate-100">Inheritance Pitfalls (#025 - #045)</h2>
+                        <div class="h-1 w-20 bg-gradient-to-l from-cyan-500 to-transparent rounded-full mt-2"></div>
+                    </div>
+                </div>
+                <div class="space-y-8">
+    
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="025-استدعاء-open-method-من-الـ-constructor" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #025 – استدعاء open method من الـ constructor
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">لو نادينا method مفتوحة (open) جوه constructor الأب، وكانت الابن (subclass) عامل override ليها، فـ Kotlin/JVM هيستدعوا نسخة الابن <strong class="text-cyan-200 font-semibold">قبل ما الابن يخلص تهيئة الـ properties بتاعته</strong>. النتيجة: الـ method بتتنفذ على object لسه &quot;نص متكوّن&quot; (partially constructed)، فأي property في الابن لسه مالهاش قيمة بتظهر null أو default value غلط.</p>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">open class Parent {
+    init { printInfo() } // بينادي نسخة الـ Child!
+    open fun printInfo() = println(&quot;Parent&quot;)
+}
+
+class Child : Parent() {
+    val name = &quot;Kotlin&quot;
+    override fun printInfo() = println(&quot;Child name length = ${name.length}&quot;)
+}
+
+fun main() { Child() }
+// النتيجة: Child name length = 0  (مش الطول الحقيقي، لأن name لسه null وقت النداء)</code></pre>
+            </div>
+<p class="text-slate-300 leading-relaxed mb-4">الحل: متعملش override لدوال بتتنادى من الـ init/constructor، أو خلي الدالة final، أو استخدم factory method بدل ما تعتمد على virtual dispatch جوه الـ constructor.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="026-ليه-Kotlin-بيمنع-نداء-non-final-methods-على-object-نص-متكون" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #026 – ليه Kotlin بيمنع نداء non-final methods على object نص متكون
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">الـ JVM بيبني الـ object على مراحل: تخصيص الذاكرة (allocate) → تنفيذ constructor الأب بالكامل → تنفيذ constructor الابن. لو نادينا method قابلة للـ override في مرحلة constructor الأب، الـ vtable بيوجّه النداء لنسخة الابن (لأن الـ dynamic dispatch بيعتمد على النوع الحقيقي runtime)، لكن حقول الابن لسه معملتلهاش initialize. Kotlin مبيمنعش ده صراحة بالـ compiler (لسه ممكن يحصل)، لكنه بيقلل الخطر لأن الكلاسات والدوال <strong class="text-cyan-200 font-semibold">final by default</strong>، فمعظم الحالات دي مش بتحصل غصب عنك زي Java.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="027-Constructor-chaining-this-و-super" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #027 – Constructor chaining: this() و super()
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">this(...)</code>: بينادي constructor تاني في <strong class="text-cyan-200 font-semibold">نفس الكلاس</strong>.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">super(...)</code>: بينادي constructor في <strong class="text-cyan-200 font-semibold">الكلاس الأب</strong>.</span></li>
+</ul>
+<p class="text-slate-300 leading-relaxed mb-4">ترتيب التنفيذ دايمًا: الأب الأقدم أولًا، نزولًا للابن.</p>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">open class A(x: Int) { init { println(&quot;A($x)&quot;) } }
+open class B(x: Int) : A(x) { init { println(&quot;B($x)&quot;) } }
+class C(x: Int) : B(x) { init { println(&quot;C($x)&quot;) } }
+
+fun main() { C(5) }
+// A(5)
+// B(5)
+// C(5)</code></pre>
+            </div>
+<p class="text-slate-300 leading-relaxed mb-4">لو استخدمنا <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">this()</code> جوه C علشان ينده constructor تاني في C، هو برضو في الآخر لازم يوصل لـ super() قبل ما ينفذ أي كود تاني.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="028-abstract-override-vs-open-override" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #028 – abstract override vs open override
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">open override</code>: بتفتح الدالة تاني عشان أي subclass جاي يقدر يعمل override زيادة.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>الدالة اللي already implemented متقدرش &quot;تتحول&quot; لـ abstract تاني في نفس الكلاس، لكن ممكن كلاس abstract intermediate يعيد تعريفها كـ abstract (re-abstraction) لو احتاج يجبر الفروع الجاية إنها تدي implementation جديدة، وده بيتعمل بصيغة <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">abstract override fun foo()</code> في كلاس abstract وسيط.</span></li>
+</ul>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">abstract class Base { open fun foo() = println(&quot;Base&quot;) }
+abstract class Middle : Base() { abstract override fun foo() }
+class Leaf : Middle() { override fun foo() = println(&quot;Leaf&quot;) }</code></pre>
+            </div>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="029-Deep-inheritance-5-levels-وكابوس-الصيانة" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #029 – Deep inheritance (5+ levels) وكابوس الصيانة
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">كل تعديل في أي مستوى ممكن يكسر سلوك المستويات الأعمق (fragile base class)، وصعب تتوقع مين بيعمل override لإيه، وصعب تتبع تدفق التنفيذ (yo-yo problem). الحل المعتمد في OOP الحديث: <strong class="text-cyan-200 font-semibold">Composition over Inheritance</strong> — بدل ما تعمل هرم طويل، اعمل interfaces صغيرة + كلاسات تتجمع مع بعض (has-a بدل is-a)، أو استخدم Strategy/Decorator Pattern لإضافة سلوك بدل وراثة جديدة.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="030-sealed-class-subclass-ممكن-تكون-open" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #030 – sealed class subclass ممكن تكون open؟
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">أيوه، subclass لكلاس sealed ممكن تتعرف كـ <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">open</code> عادي، وده بيسمح إن حد يعمل وراثة تانية منها (لكن لازم تبقى في نفس الـ module/package زي قيود sealed classes). الفايدة: بتقدر تعمل hierarchy مرنة جوه مجموعة محدودة معروفة (exhaustive <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">when</code>). الخطر: لو فتحت subclass كتير للتوريث الإضافي، ممكن تفقد الفايدة الأساسية من sealed (إنك عارف كل الأنواع الممكنة وقت الـ compile) لو الأنواع الجديدة دي بتتعرف بعيد عن الملف الأصلي.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="031-Yo-yo-Problem" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #031 – Yo-yo Problem
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">لما تقرا كود مبني على هرم وراثة عميق، بتضطر &quot;تلف&quot; بين الكلاسات (فوق تحت زي اليويو) عشان تفهم مين بينفذ إيه فعليًا، لأن الـ method ممكن تتعرف في كلاس وتتنفذ فعليًا في تاني. في Android ده بيظهر بوضوح في هرم Activity/Fragment القديم: BaseActivity → BaseAuthActivity → BaseToolbarActivity → MainActivity، وأي lifecycle method زي onCreate ممكن تتلف بين 4 كلاسات عشان تفهم مين عمل super.onCreate() وفين. الحل الحديث: Composition عبر delegates/Fragments صغيرة، أو Jetpack Compose بدل هرم الـ Activity.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="032-final-و-fragile-base-class-problem" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #032 – final و fragile base class problem
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">لما الكلاس final، مفيش حد يقدر يعمل subclass ليها ويعتمد على تفاصيل internal ممكن تتغير مستقبلًا. فالكلاس الأب حر يغيّر implementation جواه من غير ما يخاف يكسر كود ورثه منها؛ العلاقة الوحيدة المسموحة هي عبر الـ public API المعلن، مش عبر افتراضات داخلية. في Kotlin، كل كلاس final by default، فالمشكلة دي بتتحل من الأساس إلا لو انت قررت تفتح الكلاس بـ <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">open</code> عن قصد.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="033-Behavioral-subtyping-vs-Syntactic-subtyping" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #033 – Behavioral subtyping vs Syntactic subtyping
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Syntactic</strong>: الابن بس لازم يديه نفس الـ method signatures (بيتأكد منه الـ compiler).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Behavioral (Liskov Substitution Principle)</strong>: الابن لازم كمان يحافظ على نفس &quot;العقد السلوكي&quot; (preconditions ماتتشددش، postconditions ماتضعفش) بحيث تقدر تستبدل الأب بالابن من غير ما تكسر الكود.</span></li>
+</ul>
+<p class="text-slate-300 leading-relaxed mb-4">Kotlin الـ compiler بيتأكد بس من الـ syntactic subtyping. الـ behavioral جزء من مسؤولية المبرمج، ومفيش أداة تلقائية تضمنهولك بالكامل.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="034-تعارض-default-methods-بين-اتنين-interfaces" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #034 – تعارض default methods بين اتنين interfaces
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">لو Interface A و Interface B عندهم نفس اسم الدالة بـ default implementation مختلف، وكلاس C بيعمل implement للاتنين، الـ <strong class="text-cyan-200 font-semibold">Kotlin compiler بيرفض الترجمة</strong> ويجبرك إنك تعمل override صريح في C وتحدد أنهي implementation تستخدم (أو تدمجهم):</p>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">interface A { fun greet() = println(&quot;A&quot;) }
+interface B { fun greet() = println(&quot;B&quot;) }
+class C : A, B {
+    override fun greet() { super&lt;A&gt;.greet(); super&lt;B&gt;.greet() }
+}</code></pre>
+            </div>
+<p class="text-slate-300 leading-relaxed mb-4">على مستوى الـ bytecode، الـ JVM (Java 8+) بيعامل default methods كـ static-ish invokespecial calls على الـ interface، والـ compiler بيولّد method جديدة في C بتنادي <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">A.super.greet()</code> و <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">B.super.greet()</code> بشكل صريح.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="035-تضييق-visibility-للـ-override" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #035 – تضييق visibility للـ override
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">لأ، متقدرش. في OOP وفي Kotlin تحديدًا، الـ override لازم يحافظ على نفس مستوى الـ visibility أو أوسع، مش أضيق، لأن ده بيكسر الـ Liskov Substitution Principle: لو حد شغال على الأب واستخدم method عمومية، وبعدين استبدلها بالابن، لازم يقدر ينده نفس الـ method. تضييقها هيكسر التوافق (substitutability).</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="036-Mixin-Inheritance" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #036 – Mixin Inheritance
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">الـ Mixin هو وسيلة &quot;تحقن&quot; سلوك جاهز (implementation) لأكتر من كلاس من غير علاقة وراثة is-a حقيقية. Kotlin interfaces مع default methods بتقرب من الفكرة دي: كلاس يقدر يعمل implement لعدة interfaces، كل واحدة معاها سلوك جاهز.</p>
+<p class="text-slate-300 leading-relaxed mb-4"><strong class="text-cyan-200 font-semibold">القيود</strong>: الـ interface متقدرش تحمل state حقيقي (بس ممكن abstract/computed properties)، لسه لازم تحل تعارضات الـ default methods يدويًا (زي #034)، ومفيش تحكم كامل زي Ruby mixins أو Traits في لغات تانية.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="037-Diamond-Problem" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #037 – Diamond Problem
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">لو كلاس D بيرث من B و C، واللي هما الاتنين وارثين من A، وعند D استدعاء method موروثة من A بس اتعدلت في B و C كل واحدة بشكل مختلف، مين الـ implementation اللي هتشتغل؟ الغموض ده اسمه Diamond Problem.</p>
+<ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">C++</strong>: بيسمح بالـ multiple inheritance لكن بيحتاج <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">virtual inheritance</code> تتحكم فيه يدوي.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Java/Kotlin</strong>: بيمنعوا multiple inheritance للكلاسات خالص؛ بيسمحوا بس بتعدد الـ interfaces، وأي تعارض في default methods لازم يتحل صراحة (زي #034/#045).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Python</strong>: بيستخدم C3 Linearization (MRO) عشان يحدد ترتيب واضح ومحدد لحل التعارض.</span></li>
+</ul>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="038-Composition-vs-Inheritance" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #038 – Composition vs Inheritance
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Inheritance (is-a)</strong>: مناسب لما فيه علاقة نوعية حقيقية وثابتة (Dog is-a Animal) وسلوك مشترك مستقر.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Composition (has-a)</strong>: الكلاس بيحتوي object تاني ويفوض له السلوك. مرن أكتر، بيقلل fragile base class، وبيسمح بتغيير السلوك runtime (عبر تغيير الـ object المحتوى).</span></li>
+</ul>
+<p class="text-slate-300 leading-relaxed mb-4">القاعدة الشائعة: <strong class="text-cyan-200 font-semibold">&quot;Favor composition over inheritance&quot;</strong> — استخدم وراثة بس لما تحتاج فعلًا polymorphism حقيقي (تعامل مع الأنواع الفرعية كأب بشكل موحد)، واستخدم composition لإعادة استخدام الكود في باقي الحالات.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="039-Method-Resolution-Order-MRO" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #039 – Method Resolution Order (MRO)
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">هو الترتيب اللي بيه اللغة بتقرر أنهي implementation تستخدم لما فيه أكتر من مصدر محتمل لنفس الـ method (زي لما كلاس بيرث من أكتر من أب في Python، أو بيعمل implement لأكتر من interface). أهميته إنه بيدي سلوك <strong class="text-cyan-200 font-semibold">متوقع وقابل للتكرار</strong> بدل غموض؛ من غيره كل تشغيل ممكن يختار implementation مختلفة أو يديك تعارض compile-time.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="040-مشاكل-الـ-Deep-Inheritance-Hierarchies" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #040 – مشاكل الـ Deep Inheritance Hierarchies
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>Fragile base class: أي تعديل بسيط فوق بيكسر حاجات تحت.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>Yo-yo problem: صعوبة تتبع التنفيذ.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>Tight coupling: الفروع مرتبطة بتفاصيل داخلية للأب.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>صعوبة الاختبار (testing) لأن كل مستوى بيحمل حالة من اللي فوقه.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>صعوبة إعادة استخدام جزء من السلوك من غير ما تجر الهرم كله معاك.</span></li>
+</ul>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="041-Fragile-Base-Class-Problem" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #041 – Fragile Base Class Problem
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">لما تغيّر تفصيلة داخلية (implementation detail) في كلاس أب، وده يكسر سلوك subclasses حتى لو الـ public API متغيرش. بيحصل لأن الابن بيعتمد (يعمل implicit assumption) على تفاصيل داخل الأب مش موثقة كعقد رسمي.</p>
+<p class="text-slate-300 leading-relaxed mb-4"><strong class="text-cyan-200 font-semibold">الحل</strong>: خلي الكلاسات final بشكل افتراضي (زي Kotlin)، افتح للـ extension بس النقط اللي فعلًا متعمولها design كـ extension points (template methods واضحة)، وفضّل composition/interfaces عن الوراثة العميقة.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="042-Overriding-exceptions" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #042 – Overriding exceptions
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">class Child : Parent() {
+    // ✅ نفس الاستثناء أو subclass منه أو من غير استثناء أو أي Unchecked
+    override fun method() { }
+}</code></pre>
+            </div>
+<p class="text-slate-300 leading-relaxed mb-4">القاعدة: الـ override يقدر يرمي نفس الاستثناء، subclass منه، أو مفيش استثناء خالص، أو أي RuntimeException (unchecked) في أي وقت — لكن مايقدرش يوسّع (throws a broader checked exception) عن الأب. ملحوظة: Kotlin أصلًا معندوش checked exceptions زي Java، فالقيد ده بيفرق لو انت بتنادي كود Java من Kotlin.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="043-Overriding-vs-Hiding" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #043 – Overriding vs Hiding
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Overriding</strong>: بيحصل مع instance methods، ويتحدد runtime (dynamic/late binding) بناءً على النوع الحقيقي للـ object.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Hiding</strong>: بيحصل مع static methods، ويتحدد compile-time (static/early binding) بناءً على نوع المتغير المعلن.</span></li>
+</ul>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">Parent p = new Child();
+p.staticMethod(); // بينادي نسخة Parent لأن static methods بتتحدد بنوع الـ reference مش الـ object
+p.instanceMethod(); // بينادي نسخة Child (لو فيه override) لأن ده runtime polymorphism</code></pre>
+            </div>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="044-هل-الـ-Constructors-ممكن-تتعمللها-override" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #044 – هل الـ Constructors ممكن تتعمللها override؟
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">لأ. الـ constructors مش موروثة أصلًا (each class defines its own) ومالهاش اسم بيتشارك بين الأب والابن بالمعنى البوليمورفي، فمش بتشارك في آلية الـ dynamic dispatch. كل كلاس بيعرف الـ constructors بتاعته، والابن بيستدعي constructor الأب صراحة عبر <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">super()</code>، مش بيعمل override له.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="045-حل-Diamond-Problem-في-Java" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #045 – حل Diamond Problem في Java
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">Java مبتسمحش بالوراثة المتعددة للكلاسات من الأساس، فمفيش diamond problem حقيقي على مستوى الكلاسات. المشكلة بتظهر بس مع الـ interfaces اللي عندها default methods متعارضة، وفي الحالة دي Java بتجبر الكلاس الوارث إنه يعمل override صريح ويحدد أنهي implementation يستخدم، زي:</p>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-java rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-java">class C implements A, B {
+    public void method() { A.super.method(); }
+}</code></pre>
+            </div>
+<p class="text-slate-300 leading-relaxed mb-4">---</p>
+                        </div>
+                    </div>
+        
+                </div>
+            </section>
+    
+
+            <section id="section-1" class="mb-16 scroll-mt-24">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center text-2xl shadow-lg">
+                        ⚙
+                    </div>
+                    <div>
+                        <h2 class="text-2xl lg:text-3xl font-bold text-slate-100">️ Concurrency & OOP State (#161 - #169)</h2>
+                        <div class="h-1 w-20 bg-gradient-to-l from-cyan-500 to-transparent rounded-full mt-2"></div>
+                    </div>
+                </div>
+                <div class="space-y-8">
+    
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="161-Race-Condition-على-مستوى-الـ-Object" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #161 – Race Condition على مستوى الـ Object
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">بتحصل لما اكتر من thread بيقروا/يكتبوا في نفس الـ mutable state جوه object في نفس الوقت من غير تزامن (synchronization)، فالنتيجة النهائية بتعتمد على ترتيب تنفيذ عشوائي (timing) بدل منطق محدد.</p>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">class Counter {
+    var count = 0
+    fun increment() { count++ } // مش atomic: read → add → write
+}
+
+fun main() = runBlocking {
+    val counter = Counter()
+    val jobs = List(1000) {
+        launch(Dispatchers.Default) { counter.increment() }
+    }
+    jobs.forEach { it.join() }
+    println(counter.count) // غالبًا أقل من 1000 بسبب lost updates
+}</code></pre>
+            </div>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="162-Monitor-Pattern-و-Synchronized" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #162 – Monitor Pattern و @Synchronized
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">الـ Monitor Pattern هو تصميم بيضمن إن <strong class="text-cyan-200 font-semibold">thread واحد بس</strong> يقدر ينفذ جوه block معين من الكود في نفس الوقت، عن طريق ربط الكود بـ &quot;قفل&quot; (lock) مرتبط بالـ object نفسه.</p>
+<p class="text-slate-300 leading-relaxed mb-4"><code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">@Synchronized</code> في Kotlin بتعمل بالظبط كده: بتاخد الـ intrinsic lock بتاع الـ object (أو الكلاس لو static) قبل ما تنفذ الدالة، وتسيبه بعد ما تخلص.</p>
+<p class="text-slate-300 leading-relaxed mb-4"><strong class="text-cyan-200 font-semibold">العيوب</strong>: أداء أبطأ (thread contention)، ممكن يعمل deadlock لو استخدمته مع locks تانية بترتيب مختلف، وبيمنع أي تحكم دقيق زي timeout أو try-lock، وبيقفل الـ object كله مش جزء بس منه.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="163-volatile-vs-AtomicInteger-vs-Mutex" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #163 – volatile vs AtomicInteger vs Mutex
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">volatile</strong>: بيضمن الـ visibility بس (كل thread هيشوف آخر قيمة اتكتبت فورًا)، لكنه <strong class="text-cyan-200 font-semibold">مش بيضمن atomicity</strong> للعمليات المركبة زي <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">count++</code> (اللي هي read-modify-write). يفشل لو عندك أكتر من عملية مترابطة.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">AtomicInteger</strong>: بيضمن atomicity لعمليات بسيطة (increment, compareAndSet) عبر CAS (Compare-And-Swap) من غير حاجة لـ lock كامل. يفشل لو محتاج تعمل أكتر من عملية atomic مترابطة مع بعض كوحدة واحدة (compound actions).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Mutex (coroutines) / synchronized</strong>: بيضمن atomicity لأي block كامل من الكود، حتى لو معقد. أبطأ نسبيًا، وممكن يعمل deadlock لو استخدامه غلط.</span></li>
+</ul>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="164-Actor-Model-في-Kotlin-Coroutines" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #164 – Actor Model في Kotlin Coroutines
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">الـ Actor بيحل مشكلة الـ race condition من غير locks عن طريق إن الـ state بتاعته <strong class="text-cyan-200 font-semibold">معزولة تمامًا</strong> وبتتعدل بس من جوه الـ actor نفسه، والتواصل بيتم عبر رسائل (channel) بتتعالج <strong class="text-cyan-200 font-semibold">واحدة ورا التانية بالتسلسل</strong>. مفيش اتنين thread بيلمسوا نفس الـ state في نفس اللحظة لأن كل حاجة بتمر عبر channel واحد متسلسل.</p>
+<p class="text-slate-300 leading-relaxed mb-4"><strong class="text-cyan-200 font-semibold">التشبيه في OOP</strong>: الـ Actor زي object بيطبق <strong class="text-cyan-200 font-semibold">encapsulation صارم جدًا</strong> — مفيش حد بره الـ object يقدر يلمس الـ state مباشرة، وأي تفاعل لازم يكون عبر &quot;رسالة&quot; (method call تتعامل معاملة queue)، بالظبط زي فكرة الـ message passing الأصلية في OOP كما تخيلها Alan Kay.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="165-StateFlow-vs-MutableStateFlow-Encapsulation" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #165 – StateFlow vs MutableStateFlow (Encapsulation)
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">MutableStateFlow</code>: بيسمح بالقراءة والكتابة (<code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">value = x</code>)، وده زي الـ private/internal field.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">StateFlow</code>: read-only view، وده زي public getter من غير setter.</span></li>
+</ul>
+<p class="text-slate-300 leading-relaxed mb-4">النمط ده هو <strong class="text-cyan-200 font-semibold">information hiding</strong>: الكلاس بيحتفظ بـ <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">MutableStateFlow</code> كـ <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">private</code>، وبيكشف بس <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">StateFlow</code> كـ public property، بحيث المستهلكين (UI) يقدروا يقروا ويعملوا observe بس، ومايقدروش يعدلوا الحالة من بره. ده نفس فكرة <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">LiveData</code> مقابل <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">MutableLiveData</code> بالظبط — نفس pattern الـ encapsulation، بس StateFlow بيدعم coroutines وعنده initial value إجباري.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="166-ليه-viewModelScope-آمن-من-الـ-memory-leaks" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #166 – ليه viewModelScope آمن من الـ memory leaks
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4"><code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">viewModelScope</code> هو <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">CoroutineScope</code> مربوط بـ <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">Job</code> مخزن جوه الـ <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">ViewModel</code> نفسها عبر <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">CloseableCoroutineContext</code>. لما الـ <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">ViewModel</code> توصل لـ <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">onCleared()</code> (بتتنادى تلقائيًا من الـ <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">ViewModelStore</code> لما الـ Activity/Fragment تتدمر نهائيًا)، فريموورك Android بينده <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">clear()</code> على كل الـ <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">Closeable</code> objects المسجلة، وده بيعمل <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">job.cancel()</code> تلقائيًا على كل الـ coroutines الشغالة جوه الـ scope ده. فالسلسلة: Activity destroyed → ViewModelStore.clear() → ViewModel.clear() → CloseableCoroutineContext.close() → Job.cancel() → كل الـ coroutines بتتوقف، فمفيش thread أو callback فاضل شغال يمسك reference لـ View اتمسحت.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="167-Deadlock-بين-Objects" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #167 – Deadlock بين Objects
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">بيحصل لما Object A بياخد lock بتاعه وبعدين بينتظر lock بتاع Object B، في نفس الوقت اللي Object B ماسك lock بتاعه وبينتظر lock بتاع A — كل واحد واقف ينتظر التاني للأبد.</p>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">class Account(val name: String) {
+    @Synchronized
+    fun transferTo(other: Account) {
+        Thread.sleep(50)
+        other.receive()
+    }
+    @Synchronized
+    fun receive() { println(&quot;received by $name&quot;) }
+}
+
+fun main() {
+    val a = Account(&quot;A&quot;)
+    val b = Account(&quot;B&quot;)
+    Thread { a.transferTo(b) }.start() // A locked, waiting for B
+    Thread { b.transferTo(a) }.start() // B locked, waiting for A -&gt; Deadlock
+}</code></pre>
+            </div>
+<p class="text-slate-300 leading-relaxed mb-4">الحل التقليدي: ترتيب ثابت للـ locks (مثلًا حسب hashCode أو ID) بحيث كل الـ threads بتاخد الأقفال بنفس الترتيب دايمًا.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="168-Producer-Consumer-بمبادئ-OOP" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #168 – Producer-Consumer بمبادئ OOP
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">class SafeQueue&lt;T&gt;(private val capacity: Int) {
+    private val items = ArrayDeque&lt;T&gt;()
+    private val lock = Object()
+
+    fun produce(item: T) = synchronized(lock) {
+        while (items.size == capacity) (lock as java.lang.Object).wait()
+        items.addLast(item)
+        (lock as java.lang.Object).notifyAll()
+    }
+
+    fun consume(): T = synchronized(lock) {
+        while (items.isEmpty()) (lock as java.lang.Object).wait()
+        val item = items.removeFirst()
+        (lock as java.lang.Object).notifyAll()
+        item
+    }
+}</code></pre>
+            </div>
+<p class="text-slate-300 leading-relaxed mb-4">تصميميًا: الـ Queue نفسها object مسؤول عن حماية حالتها الداخلية (encapsulation + thread-safety مع بعض)، والـ Producers والـ Consumers مجرد كلاسات بتستخدم الـ API العام من غير ما تعرف تفاصيل التزامن جوه. في الكود الحقيقي، الأفضل تستخدم <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">Channel</code> في coroutines بدل wait/notify اليدوي.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="169-Task-Scheduling-System" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #169 – Task Scheduling System
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">تصميم مقترح باستخدام Design Patterns:</p>
+<ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Strategy Pattern</strong>: لأنواع الجدولة المختلفة (FIFO, Priority, Cron-based).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Composite/Dependency Graph</strong>: لتمثيل الـ dependencies بين المهام (task لازم تخلص قبل التانية تبدأ) — DAG structure.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Observer Pattern</strong>: لإعلام أي جزء في النظام لما مهمة تخلص أو تفشل.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Command Pattern</strong>: كل Task تتمثل كـ Command قابلة للتنفيذ/الإلغاء/الإعادة.</span></li>
+</ul>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">data class Task(val id: String, val priority: Int, val dependsOn: List&lt;String&gt; = emptyList(), val action: suspend () -&gt; Unit)
+
+class Scheduler {
+    private val queue = java.util.PriorityQueue&lt;Task&gt;(compareByDescending { it.priority })
+    private val completed = mutableSetOf&lt;String&gt;()
+
+    fun submit(task: Task) = queue.add(task)
+
+    suspend fun runReady() {
+        val ready = queue.filter { it.dependsOn.all { d -&gt; d in completed } }
+        ready.forEach { task -&gt;
+            queue.remove(task)
+            task.action()
+            completed += task.id
+        }
+    }
+}</code></pre>
+            </div>
+<p class="text-slate-300 leading-relaxed mb-4">النقطة الأهم في الـ system design هنا: فصل &quot;جدولة إيه يشتغل امتى&quot; (scheduler) عن &quot;المهمة نفسها بتعمل إيه&quot; (task action) — ده Single Responsibility واضح.</p>
+<p class="text-slate-300 leading-relaxed mb-4">---</p>
+                        </div>
+                    </div>
+        
+                </div>
+            </section>
+    
+
+            <section id="section-2" class="mb-16 scroll-mt-24">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center text-2xl shadow-lg">
+                        🛒
+                    </div>
+                    <div>
+                        <h2 class="text-2xl lg:text-3xl font-bold text-slate-100">Shopping Cart & E-commerce (#198 - #201)</h2>
+                        <div class="h-1 w-20 bg-gradient-to-l from-cyan-500 to-transparent rounded-full mt-2"></div>
+                    </div>
+                </div>
+                <div class="space-y-8">
+    
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="198-أنهي-Design-Pattern-لـ-Shopping-Cart-App" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #198 – أنهي Design Pattern لـ Shopping Cart App؟
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">الأفضل مزيج من <strong class="text-cyan-200 font-semibold">MVVM + Repository + Observer</strong>:</p>
+<ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">MVVM</strong> يفصل الـ UI logic (View) عن الـ business logic (ViewModel) عن الـ Model.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Repository</strong> بيتعامل مع مصدر البيانات (local DB / network) ويوحد نقطة الوصول للداتا.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Observer</strong> (عبر StateFlow/LiveData) بيبلّغ الشاشات المختلفة أي تغيير في السلة لحظيًا.</span></li>
+</ul>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">class CartViewModel(private val repo: CartRepository) : ViewModel() {
+    val cartItems: StateFlow&lt;List&lt;CartItem&gt;&gt; = repo.observeCart()
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    fun addItem(item: CartItem) = viewModelScope.launch { repo.add(item) }
+}</code></pre>
+            </div>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="199-تحديثات-السلة-لحظيا-عبر-شاشات-مختلفة" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #199 – تحديثات السلة لحظيًا عبر شاشات مختلفة
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">استخدم <strong class="text-cyan-200 font-semibold">Observer Pattern</strong> عبر <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">StateFlow</code>/<code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">LiveData</code> من مصدر بيانات مشترك (Repository واحد بيتشارك بين كل الشاشات عبر DI). أي شاشة (تفاصيل المنتج، السلة، الـ toolbar badge) بتعمل subscribe لنفس الـ stream، فأي <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">add</code>/<code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">remove</code> بيوصل لكل المستمعين تلقائيًا من غير ما الشاشات تكلم بعض مباشرة.</p>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">// كل شاشة بتعمل collect لنفس الـ flow
+viewModel.cartItems.collectAsState() // في شاشة تانية:
+cartBadgeViewModel.itemCount.collectAsState()</code></pre>
+            </div>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="200-إدارة-حالة-السلة-globally" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #200 – إدارة حالة السلة globally
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">اتنين خيار حسب حجم المشروع:</p>
+<ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Singleton</strong> (<code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">object CartManager</code>) — بسيط، لكن صعب تختبره (hard to mock) وبيبقى global mutable state.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Repository + Dependency Injection</strong> (الأفضل في المشاريع الكبيرة) — الـ Repository بيتسجل كـ Singleton في الـ DI container (Hilt/Koin) فبيبقى instance واحد فعليًا، لكن بيفضل قابل للاستبدال بـ fake/mock في الاختبارات، وده بيديك نفس فايدة الـ single-source-of-truth من غير عيوب الـ Singleton التقليدي.</span></li>
+</ul>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="201-طرق-دفع-مختلفة-في-الـ-Checkout" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #201 – طرق دفع مختلفة في الـ Checkout
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">استخدم <strong class="text-cyan-200 font-semibold">Strategy Pattern</strong>: كل طريقة دفع بتعمل implement لنفس الـ interface، فإضافة طريقة جديدة (زي Apple Pay) بتبقى مجرد كلاس جديد من غير ما تلمس كود الـ checkout الأساسي (Open/Closed Principle).</p>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">interface PaymentStrategy { suspend fun pay(amount: Double): PaymentResult }
+
+class CreditCardPayment(private val card: CardInfo) : PaymentStrategy {
+    override suspend fun pay(amount: Double): PaymentResult { /* ... */ return PaymentResult.Success }
+}
+class PayPalPayment(private val token: String) : PaymentStrategy {
+    override suspend fun pay(amount: Double): PaymentResult { /* ... */ return PaymentResult.Success }
+}
+
+class CheckoutViewModel(private val strategy: PaymentStrategy) {
+    suspend fun checkout(amount: Double) = strategy.pay(amount)
+}</code></pre>
+            </div>
+<p class="text-slate-300 leading-relaxed mb-4">---</p>
+                        </div>
+                    </div>
+        
+                </div>
+            </section>
+    
+
+            <section id="section-3" class="mb-16 scroll-mt-24">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center text-2xl shadow-lg">
+                        💾
+                    </div>
+                    <div>
+                        <h2 class="text-2xl lg:text-3xl font-bold text-slate-100">Data Management Patterns (#202 - #204)</h2>
+                        <div class="h-1 w-20 bg-gradient-to-l from-cyan-500 to-transparent rounded-full mt-2"></div>
+                    </div>
+                </div>
+                <div class="space-y-8">
+    
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="202-Offline-First-Apps" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #202 – Offline-First Apps
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">استخدم <strong class="text-cyan-200 font-semibold">Repository Pattern + Cache-Aside (Single Source of Truth)</strong>: الـ Repository دايمًا بيرجع بياناته من الـ local database (زي Room)، وده هو الـ SSOT اللي الـ UI بيعمل عليه observe. أي بيانات جاية من الـ network بتتخزن في الـ DB الأول، وبعدين الـ UI بيتحدث تلقائيًا لأنه observing على الـ DB مش على الـ network call مباشرة.</p>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">class ProductRepository(private val dao: ProductDao, private val api: ProductApi) {
+    fun observeProducts(): Flow&lt;List&lt;Product&gt;&gt; = dao.getAll() // SSOT
+
+    suspend fun refresh() {
+        val remote = api.fetchProducts()
+        dao.insertAll(remote) // الداتا بتتحدث محليًا، والـ Flow بيبعت التحديث تلقائي
+    }
+}</code></pre>
+            </div>
+<p class="text-slate-300 leading-relaxed mb-4">لو مفيش نت، الـ <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">observeProducts()</code> بيفضل شغال عادي من الـ cache المحلي.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="203-إدارة-إعدادات-التطبيق" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #203 – إدارة إعدادات التطبيق
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>لإعدادات بسيطة (theme, language, notifications toggle): <strong class="text-cyan-200 font-semibold">Singleton</strong> بسيط زي <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">PreferencesManager</code> فوق <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">DataStore</code>/<code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">SharedPreferences</code>.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>لإعدادات معقدة (متعددة المصادر، محتاجة sync، أو منطق تحقق معقد): <strong class="text-cyan-200 font-semibold">Repository Pattern</strong> كامل بحيث تقدر تستبدلها/تختبرها بسهولة.</span></li>
+</ul>
+<p class="text-slate-300 leading-relaxed mb-4">النقطة المهمة: استخدم DI عشان تحقن الـ instance بدل ما تنادي <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">PreferencesManager.getInstance()</code> في كل مكان، عشان تحافظ على قابلية الاختبار.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="204-مزامنة-البيانات-بين-local-و-remote" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #204 – مزامنة البيانات بين local و remote
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">استخدم <strong class="text-cyan-200 font-semibold">Sync Manager</strong> بيعتمد على <strong class="text-cyan-200 font-semibold">Observer Pattern + WorkManager</strong>:</p>
+<ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>أي تعديل محلي (add/edit/delete) بيتسجل كـ &quot;pending change&quot; في جدول منفصل أو flag.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">WorkManager</code> بيشغل periodic/triggered work بيقرا الـ pending changes ويبعتها للسيرفر (push)، وبعدين يجيب أحدث نسخة من السيرفر (pull) ويحدث الـ local DB.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>أي conflict (تعديل حصل في الاتنين) بيتحل بسياسة واضحة (زي Last-Write-Wins أو timestamp-based merge).</span></li>
+</ul>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+    override suspend fun doWork(): Result {
+        syncManager.pushPendingChanges()
+        syncManager.pullRemoteUpdates()
+        return Result.success()
+    }
+}</code></pre>
+            </div>
+<p class="text-slate-300 leading-relaxed mb-4">الميزة الأساسية: الـ UI مش عارف ولا مهتم إن فيه مزامنة شغالة أصلًا — هو بس بيعمل observe على الـ local DB زي الحالة العادية (offline-first)، والمزامنة بتحصل في الخلفية.</p>
+<p class="text-slate-300 leading-relaxed mb-4">---</p>
+                        </div>
+                    </div>
+        
+                </div>
+            </section>
+    
+
+            <section id="section-4" class="mb-16 scroll-mt-24">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center text-2xl shadow-lg">
+                        🗺
+                    </div>
+                    <div>
+                        <h2 class="text-2xl lg:text-3xl font-bold text-slate-100">️ Navigation Patterns (#205 - #206)</h2>
+                        <div class="h-1 w-20 bg-gradient-to-l from-cyan-500 to-transparent rounded-full mt-2"></div>
+                    </div>
+                </div>
+                <div class="space-y-8">
+    
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="205-Navigation-معقدة-Multi-step-flows" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #205 – Navigation معقدة (Multi-step flows)
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">استخدم <strong class="text-cyan-200 font-semibold">State Pattern</strong> فوق <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">Navigation Component</code>: كل خطوة في الـ flow (مثلًا Checkout: Cart → Address → Payment → Confirm) بتتمثل كـ state، وكل state عارف بس &quot;أنا أروح فين بعدين&quot; حسب قرار المستخدم، من غير ما تكتب منطق <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">if/else</code> ضخم في مكان واحد.</p>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">sealed interface CheckoutState {
+    object Cart : CheckoutState
+    object Address : CheckoutState
+    object Payment : CheckoutState
+    object Confirm : CheckoutState
+}
+
+fun CheckoutState.next(): CheckoutState = when (this) {
+    CheckoutState.Cart -&gt; CheckoutState.Address
+    CheckoutState.Address -&gt; CheckoutState.Payment
+    CheckoutState.Payment -&gt; CheckoutState.Confirm
+    CheckoutState.Confirm -&gt; CheckoutState.Confirm
+}</code></pre>
+            </div>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="206-Deep-Linking" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #206 – Deep Linking
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">استخدم <strong class="text-cyan-200 font-semibold">Chain of Responsibility Pattern</strong>: كل handler متخصص في نوع لينك معين، وبيتفحص هل هو ده اللي يقدر يتعامل مع الرابط ده، لو أيوه بيتعامل معاه، لو لأ بيمرره لل handler التالي في السلسلة.</p>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">interface DeepLinkHandler {
+    var next: DeepLinkHandler?
+    fun handle(uri: Uri): Boolean
+}
+
+class ProductLinkHandler : DeepLinkHandler {
+    override var next: DeepLinkHandler? = null
+    override fun handle(uri: Uri): Boolean {
+        if (uri.pathSegments.firstOrNull() == &quot;product&quot;) {
+            openProduct(uri.pathSegments[1]); return true
+        }
+        return next?.handle(uri) ?: false
+    }
+}</code></pre>
+            </div>
+<p class="text-slate-300 leading-relaxed mb-4">الميزة: إضافة نوع لينك جديد = handler جديد جوه السلسلة، من غير ما تلمس الـ handlers القديمة (Open/Closed Principle).</p>
+<p class="text-slate-300 leading-relaxed mb-4">---</p>
+                        </div>
+                    </div>
+        
+                </div>
+            </section>
+    
+
+            <section id="section-5" class="mb-16 scroll-mt-24">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center text-2xl shadow-lg">
+                        🌍
+                    </div>
+                    <div>
+                        <h2 class="text-2xl lg:text-3xl font-bold text-slate-100">Real-World App Examples (#207 - #211)</h2>
+                        <div class="h-1 w-20 bg-gradient-to-l from-cyan-500 to-transparent rounded-full mt-2"></div>
+                    </div>
+                </div>
+                <div class="space-y-8">
+    
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="207-هيكلة-Food-Delivery-App" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #207 – هيكلة Food Delivery App
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">MVVM + Clean Architecture</strong> كأساس عام.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Repository Pattern</strong> لبيانات المطاعم والمنيو.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Observer Pattern</strong> لتحديثات حالة الأوردر لحظيًا (Preparing → On the way → Delivered).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Strategy Pattern</strong> لخيارات التوصيل المختلفة (Standard / Express / Scheduled).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">State Pattern</strong> لإدارة تدفق الأوردر نفسه كحالة واضحة المراحل.</span></li>
+</ul>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="208-Music-Streaming-App" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #208 – Music Streaming App
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">MVVM</strong> كبنية عامة.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Singleton</strong> لخدمة الـ <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">MediaPlayer</code> (مورد واحد للجهاز كله، مفيش معنى لأكتر من نسخة تشتغل مع بعض).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Observer</strong> لتحديثات حالة التشغيل (playing/paused/buffering) عبر كل الشاشات (mini-player, full player, notification).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Command Pattern</strong> لأزرار التحكم (Play/Pause/Skip)، بحيث تقدر تسجل أو تلغي أوامر بسهولة.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Strategy Pattern</strong> لجودة الصوت المختلفة (حسب الشبكة أو اختيار المستخدم).</span></li>
+</ul>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="209-Chat-Application" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #209 – Chat Application
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">MVVM + Repository</strong> كبنية أساسية.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Observer Pattern</strong> لاستقبال الرسايل لحظيًا (عبر WebSocket/Firebase).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Factory Pattern</strong> لإنشاء أنواع رسايل مختلفة (نص، صورة، فيديو، صوت) بشكل موحد.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">State Pattern</strong> لحالة الاتصال (Connecting / Connected / Reconnecting / Offline).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Command Pattern</strong> لأكشنز الرسالة (إرسال، إعادة محاولة، حذف) بحيث كل أكشن قابل للتراجع/الإعادة.</span></li>
+</ul>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="210-Photo-Editing-App" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #210 – Photo Editing App
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Command Pattern</strong>: كل عملية تعديل (crop, rotate, filter) بتتمثل كـ command منفصلة.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Memento Pattern</strong>: لحفظ حالة الصورة قبل كل عملية، عشان Undo/Redo تشتغل بسهولة.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Strategy Pattern</strong>: لأنواع الفلاتر المختلفة، كل فلتر implementation مستقلة.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Factory Pattern</strong>: لإنشاء الأدوات المختلفة (Brush, Eraser, Crop tool) بشكل موحد.</span></li>
+</ul>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">interface EditCommand { fun execute(bitmap: Bitmap): Bitmap }
+class RotateCommand(val degrees: Float) : EditCommand {
+    override fun execute(bitmap: Bitmap) = rotate(bitmap, degrees)
+}
+class EditHistory {
+    private val undoStack = ArrayDeque&lt;Bitmap&gt;()
+    private val redoStack = ArrayDeque&lt;Bitmap&gt;()
+    fun apply(cmd: EditCommand, current: Bitmap): Bitmap {
+        undoStack.addLast(current)
+        redoStack.clear()
+        return cmd.execute(current)
+    }
+    fun undo(current: Bitmap): Bitmap? = undoStack.removeLastOrNull()?.also { redoStack.addLast(current) }
+}</code></pre>
+            </div>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="211-Multi-Module-App-Architecture" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #211 – Multi-Module App Architecture
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Clean Architecture + Dependency Inversion</strong>: كل module (feature) مستقل، وبيعتمد على abstractions (interfaces) مش implementations مباشرة.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>كل module بيتبع <strong class="text-cyan-200 font-semibold">MVVM</strong> داخليًا.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Repository Pattern</strong> في data layer، منفصل عن باقي الـ modules.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Use Cases (Interactors)</strong> لمنطق العمل، بحيث الـ ViewModel رفيع وخفيف.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Dependency Injection</strong> (Hilt/Koin) للتواصل بين الـ modules من غير ما تعمل direct dependency بين feature وfeature تانية — التواصل بيتم عبر interfaces معرفة في module مشترك (core/common).</span></li>
+</ul>
+<p class="text-slate-300 leading-relaxed mb-4">---</p>
+                        </div>
+                    </div>
+        
+                </div>
+            </section>
+    
+
+            <section id="section-6" class="mb-16 scroll-mt-24">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center text-2xl shadow-lg">
+                        ⚠
+                    </div>
+                    <div>
+                        <h2 class="text-2xl lg:text-3xl font-bold text-slate-100">️ Best Practices & Mistakes (#212 - #214)</h2>
+                        <div class="h-1 w-20 bg-gradient-to-l from-cyan-500 to-transparent rounded-full mt-2"></div>
+                    </div>
+                </div>
+                <div class="space-y-8">
+    
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="212-مشكلة-الـ-God-Objects-في-Android" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #212 – مشكلة الـ God Objects في Android
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">الـ God Object (زي Activity ضخمة بتعمل كل حاجة: UI + networking + business logic + navigation) بيكسر <strong class="text-cyan-200 font-semibold">Single Responsibility Principle</strong>، وبيبقى صعب الاختبار والصيانة والتوسعة لأن أي تعديل بسيط ممكن يأثر على حاجات تانية كتير جوه نفس الكلاس.</p>
+<p class="text-slate-300 leading-relaxed mb-4"><strong class="text-cyan-200 font-semibold">الحل</strong>: فكك الكلاس لمسؤوليات أصغر — استخدم <strong class="text-cyan-200 font-semibold">Fragments</strong> لتقسيم الـ UI، <strong class="text-cyan-200 font-semibold">ViewModels</strong> لمنطق العرض، <strong class="text-cyan-200 font-semibold">Repositories</strong> للداتا، و<strong class="text-cyan-200 font-semibold">Facade Pattern</strong> لو لسه محتاج واجهة موحدة بسيطة فوق أنظمة فرعية معقدة.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="213-تجنب-Memory-Leaks-في-الـ-Listeners" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #213 – تجنب Memory Leaks في الـ Listeners
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>استخدم <strong class="text-cyan-200 font-semibold">WeakReference</strong> لما تحتاج تحتفظ بمرجع لـ Context/View من كلاس عمره أطول (زي Singleton أو background service).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>الأفضل: استخدم <strong class="text-cyan-200 font-semibold">Lifecycle-Aware Components</strong> (<code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">LifecycleObserver</code>, <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">viewLifecycleOwner.lifecycleScope</code>) بحيث الـ listener بيتنضف تلقائيًا.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>لو استخدمت listener يدوي، لازم تعمل <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">unregister</code>/<code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">removeListener</code> صراحة في <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">onDestroy()</code>/<code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">onPause()</code> المناسبة، خصوصًا في Fragments لازم تستخدم <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">viewLifecycleOwner</code> مش <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">this</code> عشان تتفادى leak لما الـ view تتدمر بس الـ Fragment instance لسه موجود.</span></li>
+</ul>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="214-امتى-متستخدمش-Singleton" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #214 – امتى متستخدمش Singleton
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">تجنب الـ Singleton لما:</p>
+<ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>الـ object بيحمل reference لـ <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">Context</code>/<code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">Activity</code> (بيمنع الـ garbage collection ويسبب leak).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>محتاج نسخ مختلفة بإعدادات مختلفة (مثلًا اتصال بأكتر من بيئة/سيرفر في نفس الوقت).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>بتحتاج تعمل اختبار (unit testing) — الـ Singleton صعب تستبدله بـ mock/fake لأنه global state ثابت.</span></li>
+</ul>
+<p class="text-slate-300 leading-relaxed mb-4">البديل: <strong class="text-cyan-200 font-semibold">Dependency Injection</strong> — بتاخد نفس فايدة &quot;instance واحدة مشتركة&quot; (عبر تسجيله كـ singleton scope في الـ DI container)، بس بتفضل قادر تستبدله في الاختبارات وتتحكم في lifecycle بتاعه بوضوح.</p>
+<p class="text-slate-300 leading-relaxed mb-4">---</p>
+                        </div>
+                    </div>
+        
+                </div>
+            </section>
+    
+
+            <section id="section-7" class="mb-16 scroll-mt-24">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center text-2xl shadow-lg">
+                        🛠
+                    </div>
+                    <div>
+                        <h2 class="text-2xl lg:text-3xl font-bold text-slate-100">️ System Design Scenarios (#215 - #225)</h2>
+                        <div class="h-1 w-20 bg-gradient-to-l from-cyan-500 to-transparent rounded-full mt-2"></div>
+                    </div>
+                </div>
+                <div class="space-y-8">
+    
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="215-نظام-E-commerce-بمنتجات-مختلفة" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #215 – نظام E-commerce بمنتجات مختلفة
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">abstract class Product(val id: String, val basePrice: Double) {
+    abstract fun calculatePrice(): Double
+}
+class Electronics(id: String, basePrice: Double, val warrantyMonths: Int) : Product(id, basePrice) {
+    override fun calculatePrice() = basePrice + warrantyMonths * 2.0
+}
+class Clothing(id: String, basePrice: Double, val size: String) : Product(id, basePrice) {
+    override fun calculatePrice() = basePrice
+}
+interface PricingStrategy { fun apply(product: Product): Double }
+class DiscountPricing(val percent: Double) : PricingStrategy {
+    override fun apply(product: Product) = product.calculatePrice() * (1 - percent)
+}
+interface InventoryManager { fun reserve(productId: String, qty: Int): Boolean }</code></pre>
+            </div>
+<ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Template Method / abstract class</strong> لتوحيد شكل المنتج مع سلوك خاص لكل نوع.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Strategy</strong> لسياسات التسعير (خصومات، عروض).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Repository</strong> منفصل لإدارة المخزون.</span></li>
+</ul>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="216-نظام-بنكي-بحسابات-مختلفة" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #216 – نظام بنكي بحسابات مختلفة
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">abstract class Account(val balance: Double) {
+    abstract fun applyInterest(): Double
+    abstract fun withdraw(amount: Double): Boolean
+}
+class SavingsAccount(balance: Double, val rate: Double) : Account(balance) {
+    override fun applyInterest() = balance * rate
+    override fun withdraw(amount: Double) = amount &lt;= balance // بدون سحب على المكشوف
+}
+class CreditAccount(balance: Double, val creditLimit: Double) : Account(balance) {
+    override fun applyInterest() = 0.0
+    override fun withdraw(amount: Double) = amount &lt;= balance + creditLimit
+}</code></pre>
+            </div>
+<p class="text-slate-300 leading-relaxed mb-4"><strong class="text-cyan-200 font-semibold">Strategy Pattern</strong> لحساب الفوائد لو الصيغة معقدة وممكن تتغير بمعزل عن نوع الحساب.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="217-RPG-بشخصيات-وتجهيزات-ومهارات" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #217 – RPG بشخصيات وتجهيزات ومهارات
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">interface SkillTreeNode { val unlocked: Boolean; fun activate() }
+abstract class Character(var health: Int, var mana: Int) {
+    val equipment = mutableListOf&lt;Equipment&gt;()
+    abstract fun attack(target: Character)
+}
+class Warrior : Character(150, 20) { override fun attack(target: Character) { /* ... */ } }
+interface Equipment { fun applyEffect(character: Character) }</code></pre>
+            </div>
+<ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Strategy</strong> لأنواع الهجوم/القدرات المختلفة.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Decorator Pattern</strong> للـ Equipment (كل قطعة سلاح/درع بتضيف تأثير فوق الشخصية من غير ما تغير كلاسها).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Composite Pattern</strong> لشجرة المهارات (Skill Tree) لأنها هرمية بطبيعتها.</span></li>
+</ul>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="218-نظام-إدارة-مستندات-PDFWordExcel" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #218 – نظام إدارة مستندات (PDF/Word/Excel)
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Strategy Pattern</strong>: كل نوع ملف عنده معالج مختلف (<code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">PdfProcessor</code>, <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">WordProcessor</code>) يطبق interface موحد <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">DocumentProcessor</code>.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Decorator Pattern</strong>: لإضافة صلاحيات/version control فوق أي مستند من غير ما تغير كلاس المستند نفسه.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Memento Pattern</strong>: لحفظ نسخ سابقة (version history) والرجوع ليها.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Proxy Pattern</strong>: للتحكم في الوصول (access permissions) قبل ما تسمح بفتح/تعديل الملف فعليًا.</span></li>
+</ul>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="219-تطبيق-رسم-Drawing-App" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #219 – تطبيق رسم (Drawing App)
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Composite Pattern</strong>: الأشكال ممكن تتجمع في مجموعات (group of shapes) وتتعامل زي شكل واحد.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Command Pattern</strong>: كل عملية (رسم، تحريك، تغيير حجم) = command، وده اللي بيسهّل الـ Undo/Redo.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Memento Pattern</strong>: بديل/مكمل لحفظ لقطة من حالة الشكل قبل التعديل.</span></li>
+</ul>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">interface Shape { fun draw(canvas: Canvas); fun resize(factor: Float); fun move(dx: Float, dy: Float) }
+class Circle(var radius: Float, var x: Float, var y: Float) : Shape { /* ... */ }
+class DrawCommand(val shape: Shape) : EditCommand { /* ... */ }</code></pre>
+            </div>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="220-نظام-تأجير-مركبات" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #220 – نظام تأجير مركبات
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Strategy Pattern</strong>: لنماذج التسعير المختلفة (يومي، أسبوعي، حسب المسافة).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">State Pattern</strong>: لحالة المركبة (Available, Rented, InMaintenance).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Observer Pattern</strong>: لجدولة الصيانة — بيتبلغ النظام تلقائي لما مركبة توصل لعدد كيلومترات معين.</span></li>
+</ul>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="221-Media-Player-صوتفيديوصورplaylists" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #221 – Media Player (صوت/فيديو/صور/playlists)
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Strategy Pattern</strong>: لأنواع الميديا وكودكس مختلفة، كل واحد عنده decoder خاص.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Composite Pattern</strong>: الـ Playlist نفسها مجموعة من عناصر ميديا، بتتعامل زي عنصر واحد قابل للتشغيل.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">State Pattern</strong>: لحالة التشغيل (Playing/Paused/Buffering/Stopped).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Factory Pattern</strong>: لإنشاء الـ Player المناسب حسب نوع الملف.</span></li>
+</ul>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="222-نظام-Caching-LRULFUFIFO" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #222 – نظام Caching (LRU/LFU/FIFO)
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Strategy Pattern</strong>: كل سياسة إخلاء (eviction policy) implementation منفصلة تطبق interface موحد.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Thread Safety</strong>: عبر <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">Mutex</code>/<code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">synchronized</code> أو استخدام <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">ConcurrentHashMap</code> + <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">LinkedHashMap</code> للـ LRU.</span></li>
+</ul>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">interface EvictionPolicy&lt;K&gt; { fun onAccess(key: K); fun evictKey(): K? }
+class LRUCache&lt;K, V&gt;(private val capacity: Int) {
+    private val map = LinkedHashMap&lt;K, V&gt;(capacity, 0.75f, true)
+    @Synchronized
+    fun get(key: K): V? = map[key]
+    @Synchronized
+    fun put(key: K, value: V) {
+        if (map.size &gt;= capacity &amp;&amp; !map.containsKey(key)) {
+            val eldest = map.keys.first()
+            map.remove(eldest)
+        }
+        map[key] = value
+    }
+}</code></pre>
+            </div>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="223-نظام-ORM" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #223 – نظام ORM
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Data Mapper Pattern</strong>: يفصل شكل الـ Object في الكود عن شكل الصف (row) في الجدول.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Proxy Pattern</strong>: لتطبيق <strong class="text-cyan-200 font-semibold">Lazy Loading</strong> — بدل ما تجيب كل الـ relations فورًا، بترجع proxy object بيجيب الداتا الحقيقية بس أول مرة يتحاول حد يستخدمها فعليًا.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Repository Pattern</strong>: كطبقة فوق الـ ORM نفسه، عشان تخفي تفاصيل الـ query عن باقي التطبيق.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Unit of Work Pattern</strong>: لتجميع كل التعديلات وتنفيذها كـ transaction واحدة.</span></li>
+</ul>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="224-Patterns-لتطبيق-توصيل-طعام" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #224 – Patterns لتطبيق توصيل طعام
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">State Pattern</strong>: لتتبع حالة الأوردر (Preparing/Delivering/Delivered).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Observer Pattern</strong>: لتحديثات التتبع اللحظية.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Strategy Pattern</strong>: لطرق الدفع المختلفة.</span></li>
+</ul>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="225-Patterns-أمنية-في-تطبيقات-البنوك" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #225 – Patterns أمنية في تطبيقات البنوك
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Proxy Pattern</strong>: لتأمين نداءات الـ API (بيتحقق من الصلاحيات/التوكن قبل ما يمرر النداء للخدمة الحقيقية).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Facade Pattern</strong>: بيخفي تعقيد منطق الأمان (تشفير، توقيع، مصادقة) وراه واجهة بسيطة.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Strategy Pattern</strong>: لطرق تشفير مختلفة قابلة للتبديل حسب نوع البيانات أو مستوى الحساسية.</span></li>
+</ul>
+<p class="text-slate-300 leading-relaxed mb-4">---</p>
+                        </div>
+                    </div>
+        
+                </div>
+            </section>
+    
+
+            <section id="section-8" class="mb-16 scroll-mt-24">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center text-2xl shadow-lg">
+                        🔬
+                    </div>
+                    <div>
+                        <h2 class="text-2xl lg:text-3xl font-bold text-slate-100">Tricky Concepts & Deep Dives (#226 - #234)</h2>
+                        <div class="h-1 w-20 bg-gradient-to-l from-cyan-500 to-transparent rounded-full mt-2"></div>
+                    </div>
+                </div>
+                <div class="space-y-8">
+    
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="226-نداء-virtual-method-من-الـ-constructor" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #226 – نداء virtual method من الـ constructor
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">(نفس فكرة #025 بالتفصيل) — الخطر إنك بتنادي implementation ممكن تعتمد على state لسه متعملوش initialize في الابن، فبتاخد قيم غلط أو default (زي null أو صفر) بدل القيم الحقيقية.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="227-Fragile-Base-Class-Problem-وكيفية-تجنبه" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #227 – Fragile Base Class Problem وكيفية تجنبه
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">(نفس تفصيل #041) — الحل الأساسي: تفضيل composition، تصميم extension points واضحة (template methods موثقة)، وخلي الكلاسات final ما لم يكن فيه سبب واضح للفتح.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="228-تبعات-overriding-equals-من-غير-hashCode" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #228 – تبعات overriding equals() من غير hashCode()
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">لو عدّلت <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">equals()</code> من غير ما تعدّل <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">hashCode()</code> بنفس المنطق، بتكسر الـ <strong class="text-cyan-200 font-semibold">contract</strong> الأساسي: أي كائنين متساويين بـ <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">equals()</code> <strong class="text-cyan-200 font-semibold">لازم</strong> يكون عندهم نفس <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">hashCode()</code>. النتيجة: الكائنات دي هتتصرف بشكل غلط جوه <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">HashMap</code>/<code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">HashSet</code> — ممكن كائن &quot;متساوي&quot; منطقيًا يتحط في bucket مختلف، فـ <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">contains()</code> أو <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">get()</code> يرجع نتيجة غلط (بيدور في bucket غلط بناءً على hash قديم).</p>
+<div class="relative group mb-6">
+                <div class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyCode(this)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        نسخ
+                    </button>
+                </div>
+                <pre class="language-kotlin rounded-xl overflow-x-auto text-sm leading-relaxed"><code class="language-kotlin">class Point(val x: Int, val y: Int) {
+    override fun equals(other: Any?) = other is Point &amp;&amp; x == other.x &amp;&amp; y == other.y
+    // نسيان override hashCode() هنا = باج خطير مع HashSet/HashMap
+}</code></pre>
+            </div>
+<p class="text-slate-300 leading-relaxed mb-4">Kotlin بيحل المشكلة دي تلقائيًا لو استخدمت <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">data class</code> لأنها بتولّد الاتنين مع بعض بشكل متسق.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="229-التعامل-مع-Circular-Dependencies-بين-كلاسات" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #229 – التعامل مع Circular Dependencies بين كلاسات
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">الحلول الشائعة:</p>
+<ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Dependency Inversion</strong>: خلي الاتنين يعتمدوا على interface مشترك بدل ما يعتمدوا على بعض مباشرة.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Mediator Pattern</strong>: كلاس ثالث بيتوسط بينهم بدل ما يكلموا بعض مباشرة.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">Lazy initialization</strong>: استخدام <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">lazy { }</code> أو Dependency Injection عشان تأجل حل الـ dependency لحد ما تحتاجه فعليًا.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>إعادة تصميم المسؤوليات (refactor) بحيث المنطق المشترك ينتقل لكلاس تالت مستقل، وكل كلاس يعتمد عليه هو بس.</span></li>
+</ul>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="230-تأثير-Garbage-Collection-على-قرارات-تصميم-الـ-Objects" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #230 – تأثير Garbage Collection على قرارات تصميم الـ Objects
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>تجنب إنشاء objects كتير قصيرة العمر (churn) جوه loops حساسة للأداء — كل object بيزود ضغط على الـ GC.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>الحذر من الـ <strong class="text-cyan-200 font-semibold">memory leaks المنطقية</strong>: الاحتفاظ بمراجع (references) لعمر أطول من اللازم (listeners مسجلين، static references لـ Context) بيمنع الـ GC من تحرير الذاكرة حتى لو الـ object منطقيًا &quot;خلص شغله&quot;.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span><strong class="text-cyan-200 font-semibold">immutable objects</strong> بتسهل حياة الـ GC وبتقلل الأخطاء المرتبطة بمشاركة الحالة، لكن ممكن تزود عدد الـ allocations لو كل تعديل بيعمل نسخة جديدة.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>استخدام <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">WeakReference</code>/<code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">SoftReference</code> بقصد لما تحتاج cache ممكن يتفضّى تلقائيًا لو الذاكرة قلّت.</span></li>
+</ul>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="231-تبعات-استخدام-الـ-Reflection-في-تصميم-OOP" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #231 – تبعات استخدام الـ Reflection في تصميم OOP
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <ul class="space-y-2 mb-4">
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>بيكسر <strong class="text-cyan-200 font-semibold">encapsulation</strong> لأنه بيسمح بالوصول لـ private members من بره.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>بيبطئ الأداء بشكل ملحوظ مقارنة بالنداء المباشر (لأنه بيتجاوز الـ compile-time type checking).</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>بيصعّب الـ refactoring: أدوات الـ IDE مش دايمًا بتلاقي كل الاستخدامات لأن الاسم بيتحدد كـ string أحيانًا.</span></li>
+<li class="flex items-start gap-2"><span class="text-cyan-400 mt-1.5">•</span><span>بيكسر ضمانات الـ type-safety اللي الـ compiler المفروض يديهالك.</span></li>
+</ul>
+<p class="text-slate-300 leading-relaxed mb-4">بيستخدم بحذر في حالات محددة زي: frameworks (dependency injection, serialization)، أو annotation processing، لكن مش كحل عام في الكود التطبيقي العادي.</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="232-تأثير-الـ-GenericsTemplates-على-الـ-Polymorphism" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #232 – تأثير الـ Generics/Templates على الـ Polymorphism
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            <p class="text-slate-300 leading-relaxed mb-4">الـ Generics بتديك <strong class="text-cyan-200 font-semibold">polymorphism إضافي على مستوى الـ compile-time</strong> (parametric polymorphism) منفصل عن الـ runtime polymorphism التقليدي (inheritance-based). أهم نقطة في Kotlin/Java: بسبب <strong class="text-cyan-200 font-semibold">Type Erasure</strong>، معلومات الـ generic type بتتشال وقت الـ runtime، فمينفعش تعمل <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">is List&lt;String&gt;</code> مباشرة، ومينفعش تعمل overload لدالتين باختلاف الـ generic type بس.</p>
+<p class="text-slate-300 leading-relaxed mb-4"><strong class="text-cyan-200 font-semibold">Variance</strong> (<code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">out</code>/<code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">in</code> في Kotlin) بتتحكم في العلاقة بين <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">List&lt;Dog&gt;</code> و <code class="bg-slate-800/80 text-amber-300 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-700/50">List&lt;Animal&gt;</code> — بدونها، الـ generics ممكن تكسر type-safety الـ polymorphism العادي لو استخدمتها غلط (زي مشكلة array covariance الشهيرة في Java).</p>
+                        </div>
+                    </div>
+        
+                    <div class="section-card bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 lg:p-8 backdrop-blur-sm">
+                        <h3 id="233" class="text-xl font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            #233
+                        </h3>
+                        <div class="prose prose-invert max-w-none">
+                            
+                        </div>
+                    </div>
+        
+                </div>
+            </section>
+    
+
+            <!-- Footer -->
+            <footer class="mt-20 pt-10 border-t border-slate-800/50 text-center">
+                <p class="text-slate-500 text-sm">دليل شامل لأسئلة OOP / Kotlin / Android Design Patterns</p>
+                <p class="text-slate-600 text-xs mt-2">تم إنشاء هذا الدليل بعناية للمطورين العرب</p>
+            </footer>
+        </div>
+    </main>
+
+    <!-- Back to Top -->
+    <button id="back-to-top"
+            onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+            class="fixed bottom-6 left-6 w-12 h-12 rounded-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 shadow-lg shadow-cyan-500/25 flex items-center justify-center transition-all transform translate-y-20 opacity-0 z-40">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    </button>
+
+    <script>
+        function appData() {
+            return {
+                sidebarOpen: false,
+                searchOpen: false,
+                searchQuery: '',
+                searchResults: [],
+                activeSection: '',
+                sections: [{"id": "section-0", "href": "#section-0", "title": "Inheritance Pitfalls (#025 - #045)", "emoji": "🧬", "count": 21}, {"id": "section-1", "href": "#section-1", "title": "️ Concurrency & OOP State (#161 - #169)", "emoji": "⚙", "count": 9}, {"id": "section-2", "href": "#section-2", "title": "Shopping Cart & E-commerce (#198 - #201)", "emoji": "🛒", "count": 4}, {"id": "section-3", "href": "#section-3", "title": "Data Management Patterns (#202 - #204)", "emoji": "💾", "count": 3}, {"id": "section-4", "href": "#section-4", "title": "️ Navigation Patterns (#205 - #206)", "emoji": "🗺", "count": 2}, {"id": "section-5", "href": "#section-5", "title": "Real-World App Examples (#207 - #211)", "emoji": "🌍", "count": 5}, {"id": "section-6", "href": "#section-6", "title": "️ Best Practices & Mistakes (#212 - #214)", "emoji": "⚠", "count": 3}, {"id": "section-7", "href": "#section-7", "title": "️ System Design Scenarios (#215 - #225)", "emoji": "🛠", "count": 11}, {"id": "section-8", "href": "#section-8", "title": "Tricky Concepts & Deep Dives (#226 - #234)", "emoji": "🔬", "count": 8}],
+
+                init() {
+                    this.observeSections();
+                    this.updateProgress();
+                    window.addEventListener('scroll', () => {
+                        this.updateProgress();
+                        this.toggleBackToTop();
+                    });
+                },
+
+                observeSections() {
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                this.activeSection = entry.target.id;
+                            }
+                        });
+                    }, { rootMargin: '-20% 0px -80% 0px' });
+
+                    document.querySelectorAll('section[id]').forEach(section => {
+                        observer.observe(section);
+                    });
+                },
+
+                updateProgress() {
+                    const scrollTop = window.scrollY;
+                    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                    const progress = (scrollTop / docHeight) * 100;
+                    document.getElementById('progress-bar').style.width = progress + '%';
+                },
+
+                toggleBackToTop() {
+                    const btn = document.getElementById('back-to-top');
+                    if (window.scrollY > 500) {
+                        btn.classList.remove('translate-y-20', 'opacity-0');
+                    } else {
+                        btn.classList.add('translate-y-20', 'opacity-0');
+                    }
+                },
+
+                performSearch() {
+                    if (this.searchQuery.length < 2) {
+                        this.searchResults = [];
+                        return;
+                    }
+
+                    const query = this.searchQuery.toLowerCase();
+                    const results = [];
+
+                    document.querySelectorAll('section[id]').forEach(section => {
+                        const sectionTitle = section.querySelector('h2')?.textContent || '';
+                        section.querySelectorAll('h3').forEach(h3 => {
+                            const text = h3.textContent;
+                            if (text.toLowerCase().includes(query)) {
+                                const highlighted = text.replace(new RegExp(`(${query})`, 'gi'), '<span class="search-highlight">$1</span>');
+                                results.push({
+                                    id: h3.id,
+                                    section: sectionTitle,
+                                    title: text,
+                                    highlightedTitle: highlighted,
+                                    href: '#' + h3.id
+                                });
+                            }
+                        });
+                    });
+
+                    this.searchResults = results.slice(0, 10);
+                }
+            }
+        }
+
+        function copyCode(btn) {
+            const pre = btn.closest('.relative').querySelector('pre');
+            const code = pre.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const original = btn.innerHTML;
+                btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> تم النسخ`;
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                }, 2000);
+            });
+        }
+
+        // Keyboard shortcut for search
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                document.querySelector('[x-data]').__x.$data.searchOpen = true;
+            }
+            if (e.key === 'Escape') {
+                document.querySelector('[x-data]').__x.$data.searchOpen = false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدليل الشامل لصلاحيات النظام وتكوين سياسات SELinux في أندرويد</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 16mm 14mm;
+            background-color: #f8fafc;
+            @top-center {
+                content: "الدليل الشامل لصلاحيات النظام وتكوين سياسات SELinux في أندرويد";
+                font-size: 9pt;
+                color: #64748b;
+                border-bottom: 1px solid #e2e8f0;
+                padding-bottom: 4mm;
+            }
+            @bottom-center {
+                content: "صفحة " counter(page) " من " counter(pages);
+                font-size: 9pt;
+                color: #64748b;
+                border-top: 1px solid #e2e8f0;
+                padding-top: 4mm;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Segoe UI", "Tahoma", "Arial", sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.8;
+            font-size: 11pt;
+            text-align: right;
+        }
+
+        /* Header Banner */
+        .header-banner {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+            padding: 40px 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(15, 23, 42, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-banner::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(225, 29, 72, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header-banner h1 {
+            font-size: 24pt;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-banner .subtitle {
+            font-size: 13pt;
+            color: #94a3b8;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-banner .badge {
+            display: inline-block;
+            background: #e11d48;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 9pt;
+            font-weight: 600;
+            margin-top: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 100%;
+            padding: 0 10px;
+        }
+
+        /* Section Cards */
+        .section {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            border-right: 4px solid #0f172a;
+            page-break-inside: avoid;
+        }
+
+        .section h2 {
+            color: #0f172a;
+            font-size: 16pt;
+            font-weight: 700;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h2 .icon {
+            background: #0f172a;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14pt;
+            flex-shrink: 0;
+        }
+
+        .section h3 {
+            color: #334155;
+            font-size: 13pt;
+            font-weight: 600;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            padding-right: 12px;
+            border-right: 3px solid #e11d48;
+        }
+
+        .section p {
+            margin-bottom: 14px;
+            text-align: justify;
+            color: #334155;
+        }
+
+        .section ul, .section ol {
+            margin-right: 20px;
+            margin-bottom: 14px;
+            color: #334155;
+        }
+
+        .section li {
+            margin-bottom: 8px;
+        }
+
+        /* Code Blocks - STRICTLY LTR */
+        pre {
+            direction: ltr;
+            text-align: left;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 18px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: "Consolas", "Monaco", "Courier New", monospace;
+            font-size: 9.5pt;
+            line-height: 1.6;
+            margin: 16px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid #334155;
+        }
+
+        code {
+            direction: ltr;
+            text-align: left;
+            font-family: "Consolas", "Monaco", "Courier New", monospace;
+            font-size: 9.5pt;
+        }
+
+        .inline-code {
+            background: #f1f5f9;
+            color: #0f172a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10pt;
+            border: 1px solid #cbd5e1;
+        }
+
+        /* Syntax Highlighting */
+        .comment { color: #64748b; font-style: italic; }
+        .keyword { color: #c084fc; font-weight: bold; }
+        .string { color: #4ade80; }
+        .type { color: #fbbf24; }
+        .function { color: #38bdf8; }
+        .number { color: #f472b6; }
+        .operator { color: #f87171; }
+        .path { color: #a5f3fc; }
+        .deny { color: #f87171; font-weight: bold; }
+        .allow { color: #4ade80; font-weight: bold; }
+
+        /* Warning & Info Boxes */
+        .warning-box {
+            background: linear-gradient(to right, #fffbeb, #fef3c7);
+            border-right: 4px solid #d97706;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 16px 0;
+            color: #92400e;
+        }
+
+        .warning-box strong {
+            color: #b45309;
+        }
+
+        .danger-box {
+            background: linear-gradient(to right, #fef2f2, #fee2e2);
+            border-right: 4px solid #e11d48;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 16px 0;
+            color: #991b1b;
+        }
+
+        .danger-box strong {
+            color: #be123c;
+        }
+
+        .info-box {
+            background: linear-gradient(to right, #eff6ff, #dbeafe);
+            border-right: 4px solid #2563eb;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 16px 0;
+            color: #1e40af;
+        }
+
+        .success-box {
+            background: linear-gradient(to right, #ecfdf5, #d1fae5);
+            border-right: 4px solid #059669;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 16px 0;
+            color: #065f46;
+        }
+
+        /* ASCII Diagrams */
+        .ascii-diagram {
+            direction: ltr;
+            text-align: left;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: "Consolas", "Monaco", monospace;
+            font-size: 9pt;
+            line-height: 1.5;
+            color: #0f172a;
+            margin: 16px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 10pt;
+            direction: rtl;
+        }
+
+        th {
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 12px;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: right;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        tr:hover {
+            background: #f1f5f9;
+        }
+
+        /* Step Cards */
+        .step-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 18px;
+            margin: 14px 0;
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: #0f172a;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 11pt;
+        }
+
+        .step-card h4 {
+            color: #0f172a;
+            font-size: 12pt;
+            margin-bottom: 10px;
+            margin-top: 5px;
+        }
+
+        /* Log Analysis */
+        .log-entry {
+            direction: ltr;
+            text-align: left;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 14px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 9pt;
+            line-height: 1.7;
+            margin: 12px 0;
+            border-right: 3px solid #e11d48;
+        }
+
+        .log-label {
+            display: inline-block;
+            background: #e11d48;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 8pt;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        /* Footer */
+        .document-footer {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+            font-size: 10pt;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 40px;
+        }
+
+        /* Highlight spans */
+        .hl-deny { color: #e11d48; font-weight: bold; }
+        .hl-allow { color: #059669; font-weight: bold; }
+        .hl-warn { color: #d97706; font-weight: bold; }
+        .hl-tech { color: #2563eb; font-weight: 600; }
+
+        /* Print optimizations */
+        @media print {
+            body {
+                background: white;
+            }
+            .section {
+                box-shadow: none;
+                border: 1px solid #e2e8f0;
+            }
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Banner -->
+        <div class="header-banner">
+            <h1>الدليل الشامل لصلاحيات النظام وتكوين سياسات SELinux في أندرويد</h1>
+            <div class="subtitle">البلوك 11: اليوم 21-22 — هندسة الأمان المتقدمة وهيكلية SELinux في AOSP</div>
+            <div class="badge">Principal Android OS Architect & SELinux Security Specialist</div>
+        </div>
+
+        <!-- Section 1: Android Security Architecture -->
+        <div class="section">
+            <h2><span class="icon">🔐</span>1. هيكلية أمان أندرويد: DAC مقابل MAC</h2>
+
+            <p>تعتمد أنظمة أندرويد الحديثة على <span class="hl-tech">نموذج أمان مزدوج</span> يجمع بين آليتين أساسيتين: <strong>Discretionary Access Control (DAC)</strong> و <strong>Mandatory Access Control (MAC)</strong>. يُعدّ فهم الفرق بينهما حجر الزاوية لأي مهندس نظام يعمل على مستوى AOSP.</p>
+
+            <h3>1.1 التحكم التقديري بالوصول (DAC — Discretionary Access Control)</h3>
+            <p>في أنظمة Linux التقليدية، يتحكم <span class="hl-tech">UID (User ID)</span> و <span class="hl-tech">GID (Group ID)</span> في صلاحيات الوصول إلى الملفات والموارد. يُطلق على هذا النموذج "تقديري" لأن مالك المورد (Owner) يملك صلاحية تعديل صلاحيات الوصول إليه باستخدام أوامر مثل <code class="inline-code">chmod</code> و <code class="inline-code">chown</code>.</p>
+
+            <div class="ascii-diagram">
+┌─────────────────────────────────────────────────────────────┐
+│                    نموذج DAC التقليدي                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   ┌─────────────┐         ┌─────────────┐                  │
+│   │  Process    │         │   File      │                  │
+│   │  UID=1000   │────────▶│  UID=1000   │                  │
+│   │  (system)   │  read   │  mode=644   │                  │
+│   └─────────────┘         └─────────────┘                  │
+│                                                             │
+│   ┌─────────────┐         ┌─────────────┐                  │
+│   │  Process    │         │   File      │                  │
+│   │  UID=0      │────────▶│  UID=0      │                  │
+│   │  (root)     │  ALL    │  mode=600   │                  │
+│   └─────────────┘         └─────────────┘                  │
+│                                                             │
+│  ⚠️  المشكلة: إذا امتلكت صلاحية root، فأنت تملك كل شيء!   │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ نقطة ضعف DAC:</strong> في نموذج DAC، إذا تمكن تطبيق أو خدمة ما من الحصول على صلاحيات root (مثلاً عبر ثغرة أمان)، فإنه يكتسب صلاحية غير محدودة على كامل موارد النظام. هذا يجعل النموذج غير كافٍ لأنظمة التشغيل الحديثة التي تتطلب عزلًا دقيقًا للموارد.
+            </div>
+
+            <h3>1.2 التحكم الإلزامي بالوصول (MAC — Mandatory Access Control)</h3>
+            <p>لمعالجة قصور DAC، أُدخل <span class="hl-tech">SELinux (Security-Enhanced Linux)</span> كطبقة MAC إضافية. في MAC، لا يقرر مالك المورد من يمكنه الوصول إليه، بل <strong>السياسة المركزية (Policy)</strong> هي التي تحدد ذلك بشكل إلزامي. حتى المستخدم root يخضع لقيود SELinux.</p>
+
+            <div class="ascii-diagram">
+┌─────────────────────────────────────────────────────────────┐
+│              نموذج MAC مع SELinux                           │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   ┌─────────────┐      ┌──────────────┐    ┌─────────────┐│
+│   │  Process    │      │   SELinux    │    │   File      ││
+│   │  UID=0      │─────▶│   Policy     │───▶│  u:object_r:││
+│   │  (root)     │      │  (MAC Layer) │    │ system_file:s0│
+│   └─────────────┘      └──────────────┘    └─────────────┘│
+│          │                      ▲                           │
+│          │                      │                           │
+│          └──────────────────────┘                           │
+│          يتم رفض الوصول إذا لم تُصرّح السياسة             │
+│                                                             │
+│  ✅ حتى root يخضع للقيود! لا يوجد "تجاوز" للسياسة       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+            </div>
+
+            <h3>1.3 أوضاع SELinux: Enforcing مقابل Permissive</h3>
+            <p>يعمل SELinux في أحد الوضعين، ويمكن التبديل بينهما عبر أوامر <code class="inline-code">setenforce</code> و <code class="inline-code">getenforce</code>:</p>
+
+            <table>
+                <tr>
+                    <th>الوضع</th>
+                    <th>الوصف</th>
+                    <th>الأمر</th>
+                    <th>اللون</th>
+                </tr>
+                <tr>
+                    <td><span class="hl-allow">Enforcing</span></td>
+                    <td>يتم تطبيق السياسة بشكل فعلي ورفض أي وصول غير مصرّح به</td>
+                    <td><code class="inline-code">setenforce 1</code></td>
+                    <td style="color: #059669;">●</td>
+                </tr>
+                <tr>
+                    <td><span class="hl-warn">Permissive</span></td>
+                    <td>يتم تسجيل المخالفات فقط دون رفضها (مفيد للتصحيح)</td>
+                    <td><code class="inline-code">setenforce 0</code></td>
+                    <td style="color: #d97706;">●</td>
+                </tr>
+            </table>
+
+            <div class="danger-box">
+                <strong>🚨 تحذير أمني:</strong> يجب ألا يُترك وضع Permissive في الأجهزة الإنتاجية (Production Devices). يُستخدم هذا الوضع حصريًا أثناء مرحلة التطوير والتصحيح (Debugging) لالتقاط سجلات <code class="inline-code">avc: denied</code> وتحليلها قبل توليد القواعد المناسبة.
+            </div>
+
+            <pre dir="ltr"><code class="language-bash"><span class="comment"># التحقق من الوضع الحالي لـ SELinux</span>
+$ getenforce
+Enforcing
+
+<span class="comment"># التبديل إلى وضع Permissive للتصحيح (مؤقتًا فقط)</span>
+$ setenforce 0
+
+<span class="comment"># العودة إلى وضع Enforcing</span>
+$ setenforce 1
+
+<span class="comment"># التحقق من سياق العملية الحالية</span>
+$ id -Z
+u:r:shell:s0</code></pre>
+        </div>
+
+        <!-- Section 2: System & Privileged Apps -->
+        <div class="section">
+            <h2><span class="icon">⭐</span>2. التطبيقات المُميزة (Privileged Apps) وتثبيتها في النظام</h2>
+
+            <p>في هيكلية أندرويد، لا يتمتع جميع التطبيقات المثبتة في قسم <code class="inline-code">/system</code> بنفس المستوى من الصلاحيات. هناك تمييز حاسم بين <strong>التطبيقات العادية</strong> و <strong>التطبيقات المُميزة (Privileged Apps)</strong>.</p>
+
+            <h3>2.1 الفرق بين /system/app و /system/priv-app</h3>
+
+            <table>
+                <tr>
+                    <th>المسار</th>
+                    <th>النوع</th>
+                    <th>الصلاحيات</th>
+                    <th>الاستخدام</th>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">/system/app</code></td>
+                    <td>Normal System App</td>
+                    <td>صلاحيات النظام العادية فقط</td>
+                    <td>تطبيقات النظام الأساسية (Calculator, Calendar)</td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">/system/priv-app</code></td>
+                    <td>Privileged App</td>
+                    <td>صلاحيات <code class="inline-code">signatureOrSystem</code> المحمية</td>
+                    <td>تطبيقات النظام المتقدمة (Settings, SystemUI, TeleService)</td>
+                </tr>
+            </table>
+
+            <div class="info-box">
+                <strong>💡 ملاحظة هندسية:</strong> التطبيقات المُميزة (Privileged Apps) هي التطبيقات الوحيدة التي يمكنها الحصول على أذونات <code class="inline-code">signatureOrSystem</code> دون توقيعها بمفتاح المنصة (Platform Key). هذا يمنحها وصولًا أعمق إلى واجهات برمجة النظام المحمية.
+            </div>
+
+            <h3>2.2 بناء Privileged App باستخدام Android.bp</h3>
+            <p>لتحويل تطبيق إلى Privileged App في AOSP، يجب تعديل ملف <code class="inline-code">Android.bp</code> ليشمل الخصائص <code class="inline-code">privileged: true</code> و <code class="inline-code">certificate: "platform"</code>:</p>
+
+            <pre dir="ltr"><code class="language-xml"><span class="comment">// system/priv-app/MyPrivilegedApp/Android.bp</span>
+<span class="comment">// ==========================================</span>
+<span class="comment">// ملف بناء تطبيق مُميز (Privileged Application)</span>
+<span class="comment">// يجب وضع هذا التطبيق في المسار: system/priv-app/MyPrivilegedApp/</span>
+
+android_app {
+    name: <span class="string">"MyPrivilegedApp"</span>,
+
+    <span class="comment">// تمكين وضع التطبيق المُميز — إلزامي للوصول إلى signatureOrSystem</span>
+    privileged: <span class="keyword">true</span>,
+
+    <span class="comment">// توقيع التطبيق بشهادة المنصة (Platform Certificate)</span>
+    <span class="comment">// هذا يُمنحه معرف UID=1000 (system) ويُمكّنه من الوصول إلى APIs المحمية</span>
+    certificate: <span class="string">"platform"</span>,
+
+    <span class="comment">// مسار ملف AndroidManifest.xml</span>
+    manifest: <span class="string">"AndroidManifest.xml"</span>,
+
+    <span class="comment">// مصادر التطبيق</span>
+    srcs: [<span class="string">"src/**/*.java"</span>],
+
+    <span class="comment">// الموارد</span>
+    resource_dirs: [<span class="string">"res"</span>],
+
+    <span class="comment">// المكتبات المطلوبة</span>
+    libs: [
+        <span class="string">"framework"</span>,
+    ],
+
+    <span class="comment">// تحسين التطبيق</span>
+    optimize: {
+        enabled: <span class="keyword">true</span>,
+        shrink: <span class="keyword">true</span>,
+    },
+}</code></pre>
+
+            <h3>2.3 إلزامية ملف privapp-permissions.xml</h3>
+            <p>بدءًا من Android 8.0 (Oreo)، فرضت Google شرطًا صارمًا: <strong>كل تطبيق مُميز يجب أن تكون أذوناته مدرجة في قائمة بيضاء (Whitelist)</strong> داخل ملف <code class="inline-code">privapp-permissions.xml</code>. إذا حاول تطبيق مُميز استخدام إذن <code class="inline-code">signatureOrSystem</code> دون وجوده في القائمة البيضاء، فإن النظام يرفض منحه الإذن، وقد يتسبب ذلك في حلقة إعادة تشغيل (Boot Loop) إذا كان التطبيق حيويًا.</p>
+
+            <pre dir="ltr"><code class="language-xml"><span class="comment">&lt;!-- system/etc/permissions/privapp-permissions.xml --&gt;</span>
+<span class="comment">&lt;!-- ============================================== --&gt;</span>
+<span class="comment">&lt;!-- قائمة الأذونات البيضاء للتطبيقات المُميزة       --&gt;</span>
+<span class="comment">&lt;!-- يجب تضمين هذا الملف في build عبر Android.bp    --&gt;</span>
+
+<span class="operator">&lt;?</span>xml version=<span class="string">"1.0"</span> encoding=<span class="string">"utf-8"</span><span class="operator">?&gt;</span>
+<span class="operator">&lt;</span>permissions<span class="operator">&gt;</span>
+
+    <span class="comment">&lt;!-- تطبيقنا المُميز: MyPrivilegedApp --&gt;</span>
+    <span class="operator">&lt;</span>privapp-permissions package=<span class="string">"com.example.myprivilegedapp"</span><span class="operator">&gt;</span>
+
+        <span class="comment">&lt;!-- إذن الوصول إلى إعدادات النظام المحمية --&gt;</span>
+        <span class="operator">&lt;</span>permission name=<span class="string">"android.permission.WRITE_SECURE_SETTINGS"</span> <span class="operator">/&gt;</span>
+
+        <span class="comment">&lt;!-- إذن إدارة الحزم --&gt;</span>
+        <span class="operator">&lt;</span>permission name=<span class="string">"android.permission.INSTALL_PACKAGES"</span> <span class="operator">/&gt;</span>
+
+        <span class="comment">&lt;!-- إذن الوصول إلى شبكة الاتصال --&gt;</span>
+        <span class="operator">&lt;</span>permission name=<span class="string">"android.permission.CONNECTIVITY_INTERNAL"</span> <span class="operator">/&gt;</span>
+
+        <span class="comment">&lt;!-- إذن إدارة الطاقة --&gt;</span>
+        <span class="operator">&lt;</span>permission name=<span class="string">"android.permission.DEVICE_POWER"</span> <span class="operator">/&gt;</span>
+
+        <span class="comment">&lt;!-- إذن الوصول إلى إشعارات النظام --&gt;</span>
+        <span class="operator">&lt;</span>permission name=<span class="string">"android.permission.MANAGE_NOTIFICATIONS"</span> <span class="operator">/&gt;</span>
+
+    <span class="operator">&lt;/</span>privapp-permissions<span class="operator">&gt;</span>
+
+<span class="operator">&lt;/</span>permissions<span class="operator">&gt;</span></code></pre>
+
+            <div class="danger-box">
+                <strong>🚨 تحذير حلقة الإقلاع (Boot Loop):</strong> إذا نسيت إضافة إذن <code class="inline-code">signatureOrSystem</code> إلى <code class="inline-code">privapp-permissions.xml</code>، وكان التطبيق المُميز يُنفّذ عملية حيوية أثناء الإقلاع (مثل SystemUI أو Telephony)، فسيحاول النظام تشغيله، ويفشل، ويعيد الإقلاع — مما يؤدي إلى حلقة إعادة تشغيل لا نهائية. <strong>تحقق دائمًا من اكتمال القائمة البيضاء قبل تثبيت النظام.</strong>
+            </div>
+
+            <pre dir="ltr"><code class="language-xml"><span class="comment">// system/etc/permissions/Android.bp — تضمين ملف الأذونات</span>
+prebuilt_etc {
+    name: <span class="string">"privapp-permissions-com.example.myprivilegedapp"</span>,
+    src: <span class="string">"privapp-permissions.xml"</span>,
+    sub_dir: <span class="string">"permissions"</span>,
+    filename_from_src: <span class="keyword">true</span>,
+}</code></pre>
+        </div>
+
+        <!-- Section 3: SELinux Fundamentals -->
+        <div class="section">
+            <h2><span class="icon">🛡️</span>3. أساسيات SELinux وقواعد Type Enforcement (.te)</h2>
+
+            <p>تُعدّ قواعد <span class="hl-tech">Type Enforcement (TE)</span> جوهر سياسة SELinux. تستند هذه القواعد إلى مفهوم <strong>تسمية (Labeling)</strong> كل كيان في النظام (عملية، ملف، جهاز، مأخذ شبكة) بـ <strong>سياق أمان (Security Context)</strong> محدد.</p>
+
+            <h3>3.1 فهم سياقات الأمان (Security Contexts)</h3>
+            <p>كل كيان في النظام يحمل تسمية (Label) تتبع الصيغة التالية:</p>
+
+            <div class="ascii-diagram">
+┌─────────────────────────────────────────────────────────────┐
+│              بنية سياق الأمان (Security Context)            │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   u:object_r:system_file:s0                                 │
+│   │    │       │           │                                │
+│   │    │       │           └─ Range (مستوى MLS/MCS)        │
+│   │    │       └─ Type (النوع — الأهم في TE)               │
+│   │    └─ Role (الدور — غالبًا object_r للملفات)          │
+│   └─ User (المستخدم — غالبًا u)                            │
+│                                                             │
+│   مثال على عملية (Process):                                 │
+│   u:r:system_server:s0                                      │
+│     │ │    │          │                                     │
+│     │ │    │          └─ Range                              │
+│     │ │    └─ Domain (النطاق — للعمليات)                  │
+│     │ └─ Role (الدور — غالبًا r للعمليات)                 │
+│     └─ User                                                 │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+            </div>
+
+            <pre dir="ltr"><code class="language-bash"><span class="comment"># عرض سياقات الملفات في المسار الحالي</span>
+$ ls -Z
+u:object_r:system_file:s0  init.rc
+u:object_r:rootfs:s0       system
+
+<span class="comment"># عرض سياق العمليات الجارية</span>
+$ ps -Z
+u:r:init:s0                    root     1     0  ... init
+u:r:system_server:s0           system   1234  1   ... system_server
+u:r:platform_app:s0:c512,c768  u0_a10   2345  1234 ... com.android.settings</code></pre>
+
+            <h3>3.2 تشريح قاعدة Type Enforcement (.te)</h3>
+            <p>تتكون قاعدة TE الأساسية من أربعة عناصر رئيسية:</p>
+
+            <div class="ascii-diagram">
+┌─────────────────────────────────────────────────────────────┐
+│              تشريح قاعدة allow في SELinux                   │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   allow  source_domain  target_type  :  object_class  { perms };│
+│   │      │              │              │  │            │      │
+│   │      │              │              │  │            │      │
+│   │      │              │              │  │            │      └─ الفاصلة المنقوطة (إنهاء القاعدة)│
+│   │      │              │              │  │            └─ قائمة الصلاحيات (read, write, open...)│
+│   │      │              │              │  └─ فئة الكائن (file, dir, chr_file, socket...)│
+│   │      │              │              └─ الفاصل الزمني (:)  │
+│   │      │              └─ النوع المستهدف (الملف/الجهاز)   │
+│   │      └─ نطاق المصدر (العملية/الخدمة)                   │
+│   └─ الكلمة المحجوزة (allow أو dontaudit أو neverallow)    │
+│                                                             │
+│   مثال:                                                     │
+│   allow system_server system_file:file { read write open }; │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+            </div>
+
+            <pre dir="ltr"><code class="language-bash"><span class="comment"># system/sepolicy/public/system_server.te (مقتطف)</span>
+<span class="comment"># ============================================</span>
+<span class="comment"># هذا الملف يحدد نطاق (Domain) خدمة النظام الرئيسية</span>
+
+<span class="comment"># تعريف النطاق (Domain) لـ system_server</span>
+<span class="keyword">type</span> system_server, domain;
+
+<span class="comment"># منح system_server صلاحية الوصول إلى ملفات النظام للقراءة</span>
+<span class="allow">allow</span> system_server system_file:file { <span class="function">read</span> <span class="function">open</span> <span class="function">getattr</span> };
+
+<span class="comment"># منح system_server صلاحية الوصول إلى أجهزة العشوائية (random/urandom)</span>
+<span class="allow">allow</span> system_server random_device:chr_file { <span class="function">read</span> <span class="function">write</span> <span class="function">open</span> };
+
+<span class="comment"># السماح لـ system_server بالانتقال (transition) إلى نطاقات أخرى</span>
+<span class="allow">allow</span> system_server app_domain:process { <span class="function">signal</span> <span class="function">sigkill</span> };</code></pre>
+
+            <h3>3.3 الفرق بين Domains و Types</h3>
+            <table>
+                <tr>
+                    <th>المفهوم</th>
+                    <th>الاستخدام</th>
+                    <th>المثال</th>
+                    <th>الملف</th>
+                </tr>
+                <tr>
+                    <td><span class="hl-tech">Domain</span></td>
+                    <td>يُستخدم لتسمية <strong>العمليات (Processes)</strong></td>
+                    <td><code class="inline-code">system_server</code>, <code class="inline-code">platform_app</code></td>
+                    <td><code class="inline-code">*.te</code></td>
+                </tr>
+                <tr>
+                    <td><span class="hl-tech">Type</span></td>
+                    <td>يُستخدم لتسمية <strong>الملفات والموارد الثابتة</strong></td>
+                    <td><code class="inline-code">system_file</code>, <code class="inline-code">sysfs</code></td>
+                    <td><code class="inline-code">file.te</code>, <code class="inline-code">device.te</code></td>
+                </tr>
+            </table>
+
+            <div class="info-box">
+                <strong>💡 ملاحظة تصميم:</strong> في AOSP، يتم تعريف Domains و Types في ملفات منفصلة ضمن <code class="inline-code">system/sepolicy/</code>. يُفضل فصل تعريفات الأنواع (Type Definitions) عن قواعد الوصول (Access Rules) لتحسين قابلية الصيانة وإعادة الاستخدام.
+            </div>
+        </div>
+
+        <!-- Section 4: Practical Implementation -->
+        <div class="section">
+            <h2><span class="icon">⚙️</span>4. تطبيق عملي: كتابة سياسة SELinux لخدمة جديدة</h2>
+
+            <p>في هذا القسم، سنطبق مفاهيم SELinux على سيناريو واقعي: لدينا خدمة أصلية (Native Service) تُسمى <code class="inline-code">custom_hw_service</code> تحتاج إلى الوصول لقراءة وكتابة جهاز محرف (Character Device) موجود في <code class="inline-code">/dev/custom_hw_node</code>.</p>
+
+            <div class="ascii-diagram">
+┌─────────────────────────────────────────────────────────────┐
+│         سيناريو: خدمة مخصصة تصل إلى جهاز عتادي            │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   ┌──────────────────┐      ┌─────────────────────┐        │
+│   │ custom_hw_service│─────▶│ /dev/custom_hw_node │        │
+│   │ (Native Daemon)  │      │ (Character Device)  │        │
+│   │ Domain: custom_  │      │ Type: custom_hw_    │        │
+│   │   hw_service     │      │   device            │        │
+│   └──────────────────┘      └─────────────────────┘        │
+│                                                             │
+│   المطلوب:                                                  │
+│   1. تعريف النوع (Type) للجهاز                             │
+│   2. تعريف النطاق (Domain) للخدمة                          │
+│   3. ربط الجهاز بالنوع عبر file_contexts                   │
+│   4. كتابة قاعدة allow للوصول                             │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h4>تعريف سياق الملف في file_contexts</h4>
+                <p>أول خطوة هي إخبار SELinux بأن الملف <code class="inline-code">/dev/custom_hw_node</code> يجب أن يحمل النوع <code class="inline-code">custom_hw_device</code> عند إنشاء الملفات (Labeling). يتم ذلك في ملف <code class="inline-code">file_contexts</code>:</p>
+
+                <pre dir="ltr"><code class="language-bash"><span class="comment"># device/company/sepolicy/vendor/file_contexts</span>
+<span class="comment"># ===========================================</span>
+<span class="comment"># ربط المسار الفعلي بالنوع (Type) في SELinux</span>
+
+<span class="comment"># الجهاز العتادي المخصص — يتم تسميته تلقائيًا بنوع custom_hw_device</span>
+<span class="path">/dev/custom_hw_node</span>    u:object_r:<span class="type">custom_hw_device</span>:s0
+
+<span class="comment"># ملاحظة: يمكن استخدام تعبيرات regex للمسارات المتغيرة</span>
+<span class="comment"># /dev/custom_hw_node[0-9]*    u:object_r:custom_hw_device:s0</span></code></pre>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h4>تعريف الأنواع في device.te و file.te</h4>
+                <p>يجب تعريف النوع <code class="inline-code">custom_hw_device</code> كـ <code class="inline-code">dev_type</code> (نوع جهاز) في ملف <code class="inline-code">device.te</code>. كما نحتاج لتعريف نطاق الخدمة:</p>
+
+                <pre dir="ltr"><code class="language-bash"><span class="comment"># device/company/sepolicy/vendor/device.te</span>
+<span class="comment"># ========================================</span>
+<span class="comment"># تعريف أنواع الأجهزة (Device Types)</span>
+
+<span class="comment"># تعريف نوع الجهاز العتادي المخصص</span>
+<span class="comment"># dev_type: سمة (Attribute) تُستخدم لتجميع جميع أنواع الأجهزة</span>
+<span class="keyword">type</span> <span class="type">custom_hw_device</span>, dev_type;
+
+<span class="comment"># ============================================</span>
+<span class="comment"># device/company/sepolicy/vendor/file.te</span>
+<span class="comment"># ============================================</span>
+<span class="comment"># تعريف أنواع الملفات العامة (File Types)</span>
+
+<span class="comment"># تعريف نوع ملفات بيانات الخدمة (إذا احتجنا تخزين بيانات)</span>
+<span class="keyword">type</span> <span class="type">custom_hw_data_file</span>, file_type, data_file_type;</code></pre>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h4>كتابة قواعد النطاق في custom_hw_service.te</h4>
+                <p>نقوم بتعريف نطاق الخدمة وربطها بعملية init باستخدام وحدات ماكرو مُحسّنة (Optimized Macros) مثل <code class="inline-code">init_daemon_domain()</code>:</p>
+
+                <pre dir="ltr"><code class="language-bash"><span class="comment"># device/company/sepolicy/vendor/custom_hw_service.te</span>
+<span class="comment"># ===================================================</span>
+<span class="comment"># قواعد SELinux للخدمة المخصصة (Custom Hardware Service)</span>
+
+<span class="comment"># ─────────────────────────────────────────────────────</span>
+<span class="comment"># 1. تعريف النطاق (Domain) للخدمة</span>
+<span class="comment"># ─────────────────────────────────────────────────────</span>
+<span class="keyword">type</span> <span class="type">custom_hw_service</span>, domain;
+
+<span class="comment"># ربط النطاق بعملية init — يُفعّل الانتقال التلقائي (Auto-Transition)</span>
+<span class="comment"># عندما يبدأ init تشغيل الخدمة، تنتقل العملية إلى نطاق custom_hw_service</span>
+<span class="function">init_daemon_domain</span>(custom_hw_service)
+
+<span class="comment"># ─────────────────────────────────────────────────────</span>
+<span class="comment"># 2. منح صلاحيات الوصول إلى الجهاز العتادي</span>
+<span class="comment"># ─────────────────────────────────────────────────────</span>
+<span class="comment"># السماح للخدمة بالقراءة والكتابة والفتح والتحكم (ioctl) في الجهاز</span>
+<span class="allow">allow</span> custom_hw_service custom_hw_device:chr_file { 
+    <span class="function">read</span> 
+    <span class="function">write</span> 
+    <span class="function">open</span> 
+    <span class="function">ioctl</span> 
+    <span class="function">getattr</span> 
+};
+
+<span class="comment"># ─────────────────────────────────────────────────────</span>
+<span class="comment"># 3. صلاحيات إضافية مطلوبة للخدمة</span>
+<span class="comment"># ─────────────────────────────────────────────────────</span>
+
+<span class="comment"># السماح بالوصول إلى مأخذ binder للتواصل مع framework</span>
+<span class="allow">allow</span> custom_hw_service binder_device:chr_file { <span class="function">read</span> <span class="function">write</span> <span class="function">ioctl</span> <span class="function">open</span> };
+
+<span class="comment"># السماح بالاتصال بـ servicemanager لتسجيل الخدمة</span>
+<span class="allow">allow</span> custom_hw_service servicemanager:service_manager { <span class="function">add</span> <span class="function">find</span> };
+
+<span class="comment"># السماح بكتابة السجلات (Logs) إلى logd</span>
+<span class="allow">allow</span> custom_hw_service logd:unix_stream_socket { <span class="function">connectto</span> <span class="function">read</span> <span class="function">write</span> };
+
+<span class="comment"># السماح بالوصول إلى ملفات البيانات الخاصة بالخدمة</span>
+<span class="allow">allow</span> custom_hw_service custom_hw_data_file:dir { <span class="function">create</span> <span class="function">read</span> <span class="function">write</span> <span class="function">open</span> <span class="function">add_name</span> <span class="function">remove_name</span> };
+<span class="allow">allow</span> custom_hw_service custom_hw_data_file:file { <span class="function">create</span> <span class="function">read</span> <span class="function">write</span> <span class="function">open</span> <span class="function">append</span> <span class="function">getattr</span> };</code></pre>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <h4>تسجيل الخدمة في init.rc</h4>
+                <p>يجب تسجيل الخدمة في ملف <code class="inline-code">init.rc</code> (أو <code class="inline-code">init.target.rc</code>) ليتم تشغيلها بواسطة init وانتقالها تلقائيًا إلى النطاق المحدد:</p>
+
+                <pre dir="ltr"><code class="language-bash"><span class="comment"># device/company/init.rc</span>
+<span class="comment"># ======================</span>
+<span class="comment"># تسجيل خدمة العتاد المخصصة</span>
+
+<span class="keyword">service</span> custom_hw_service /system/bin/custom_hw_service
+    <span class="keyword">class</span> core
+    <span class="keyword">user</span> system
+    <span class="keyword">group</span> system
+    <span class="keyword">seclabel</span> u:r:custom_hw_service:s0    <span class="comment"># ← سياق SELinux للخدمة</span>
+    <span class="keyword">oneshot</span> <span class="keyword">disabled</span>
+
+<span class="comment"># تشغيل الخدمة عند اكتمال الإقلاع</span>
+<span class="keyword">on</span> property:sys.boot_completed=1
+    <span class="keyword">start</span> custom_hw_service</code></pre>
+            </div>
+
+            <div class="success-box">
+                <strong>✅ ملخص التنفيذ:</strong> بهذه الخطوات الأربع، نكون قد أنشأنا نطاقًا (Domain) مخصصًا للخدمة، عرّفنا نوعًا (Type) للجهاز العتادي، ربطنا المسار الفعلي بالنوع عبر <code class="inline-code">file_contexts</code>، ومنحنا الصلاحيات الدقيقة عبر قواعد <code class="inline-code">.te</code>. الخدمة الآن تعمل ضمن حدود SELinux دون الحاجة إلى وضع Permissive.
+            </div>
+        </div>
+
+        <!-- Section 5: Diagnostics & audit2allow -->
+        <div class="section">
+            <h2><span class="icon">🔍</span>5. استكشاف الأخطاء وتوليد القواعد تلقائيًا (audit2allow)</h2>
+
+            <p>عندما ترفض SELinux وصولًا غير مصرّح به، فإنها تُنشئ سجلًا يُعرف بـ <span class="hl-deny">"AVC Denial"</span>. يُعدّ فك شفرة هذه السجلات وتحويلها إلى قواعد <code class="inline-code">.te</code> صالحة مهارة أساسية لكل مهندس أمان أندرويد.</p>
+
+            <h3>5.1 قراءة سجل avc: denied</h3>
+            <p>تظهر سجلات الرفض في <code class="inline-code">dmesg</code> أو <code class="inline-code">logcat</code> بالصيغة التالية:</p>
+
+            <div class="log-entry">
+                <div class="log-label">AVC DENIAL LOG</div>
+<span class="deny">avc: denied</span> { <span class="allow">read write open</span> } for  pid=<span class="number">1234</span> comm=<span class="string">"custom_hw_service"</span>     name=<span class="string">"custom_hw_node"</span> dev=<span class="string">"tmpfs"</span> ino=<span class="number">12345</span>     scontext=<span class="type">u:r:custom_hw_service:s0</span>     tcontext=<span class="type">u:object_r:device:s0</span>     tclass=<span class="hl-tech">chr_file</span>     permissive=<span class="number">0</span>
+            </div>
+
+            <h3>5.2 تفكيك السجل (Deconstructing the Log)</h3>
+
+            <table>
+                <tr>
+                    <th>الحقل</th>
+                    <th>القيمة في المثال</th>
+                    <th>الوصف</th>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">avc: denied</code></td>
+                    <td><span class="hl-deny">denied</span></td>
+                    <td>نوع الحدث: رفض الوصول</td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">{ ... }</code></td>
+                    <td><code class="inline-code">read write open</code></td>
+                    <td>الصلاحيات المطلوبة (Permissions)</td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">pid</code></td>
+                    <td>1234</td>
+                    <td>معرّف العملية (Process ID)</td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">comm</code></td>
+                    <td><code class="inline-code">"custom_hw_service"</code></td>
+                    <td>اسم العملية (Command Name)</td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">scontext</code></td>
+                    <td><code class="inline-code">u:r:custom_hw_service:s0</code></td>
+                    <td><strong>سياق المصدر (Source Context)</strong> — النطاق (Domain)</td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">tcontext</code></td>
+                    <td><code class="inline-code">u:object_r:device:s0</code></td>
+                    <td><strong>سياق الهدف (Target Context)</strong> — النوع (Type)</td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">tclass</code></td>
+                    <td><code class="inline-code">chr_file</code></td>
+                    <td><strong>فئة الهدف (Target Class)</strong> — نوع الكائن</td>
+                </tr>
+            </table>
+
+            <div class="info-box">
+                <strong>💡 تحليل المثال:</strong> في السجل أعلاه، العملية <code class="inline-code">custom_hw_service</code> (نطاقها <code class="inline-code">u:r:custom_hw_service:s0</code>) حاولت الوصول إلى جهاز محرف (chr_file) يحمل النوع <code class="inline-code">device</code> (النوع الافتراضي العام) بصلاحيات <code class="inline-code">read write open</code>. تم الرفض لأن <code class="inline-code">file_contexts</code> لم يُعدّل لربط <code class="inline-code">/dev/custom_hw_node</code> بالنوع <code class="inline-code">custom_hw_device</code>.
+            </div>
+
+            <h3>5.3 استخدام audit2allow لتوليد القواعد تلقائيًا</h3>
+            <p>أداة <code class="inline-code">audit2allow</code> تقرأ سجلات AVC Denial وتحوّلها إلى قواعد <code class="inline-code">.te</code> جاهزة للاستخدام. تُستخدم بالشكل التالي:</p>
+
+            <pre dir="ltr"><code class="language-bash"><span class="comment"># الخطوة 1: التقاط سجلات AVC من dmesg</span>
+$ dmesg | grep <span class="string">"avc: denied"</span> > avc_denials.log
+
+<span class="comment"># الخطوة 2: استخدام audit2allow لتوليد القواعد</span>
+$ audit2allow -i avc_denials.log
+
+<span class="comment"># النتيجة:</span>
+<span class="comment"># ============= custom_hw_service ==============</span>
+<span class="allow">allow</span> custom_hw_service device:chr_file { <span class="function">read</span> <span class="function">write</span> <span class="function">open</span> };
+
+<span class="comment"># ─────────────────────────────────────────────</span>
+<span class="comment"># الخطوة 3: توليد قاعدة لنوع مخصص (مع تحديد النوع الصحيح)</span>
+<span class="comment"># إذا كانت file_contexts مُعدّلة بشكل صحيح، سيولد audit2allow:</span>
+<span class="allow">allow</span> custom_hw_service custom_hw_device:chr_file { <span class="function">read</span> <span class="function">write</span> <span class="function">open</span> };
+
+<span class="comment"># الخطوة 4: توليد ملف .te كامل (مفيد للسياسات المعقدة)</span>
+$ audit2allow -i avc_denials.log -p /sepolicy > custom_hw_service_auto.te</code></pre>
+
+            <div class="warning-box">
+                <strong>⚠️ تحذير هام:</strong> لا تستخدم <code class="inline-code">audit2allow</code> بشكل أعمى (Blindly). راجع كل قاعدة مُولدة يدويًا للتأكد من أنها لا تمنح صلاحيات زائدة (Over-Privileging). الهدف هو <strong>أقل صلاحية ممكنة (Principle of Least Privilege)</strong>، وليس حل المشكلة بأسرع طريقة.
+            </div>
+
+            <h3>5.4 قواعد neverallow وامتثال CTS</h3>
+            <p>تُعرّف Google في AOSP قواعد <code class="inline-code">neverallow</code> التي تُمنع صراحةً وجود قواعد <code class="inline-code">allow</code> معينة. هذه القواعد غير قابلة للتجاوز ويجب الامتثال لها لاجتياز اختبارات <span class="hl-tech">CTS (Compatibility Test Suite)</span>.</p>
+
+            <pre dir="ltr"><code class="language-bash"><span class="comment"># system/sepolicy/public/domain.te (مقتطف)</span>
+<span class="comment"># ===========================================</span>
+<span class="comment"># قواعد neverallow — لا يمكن تجاوزها أبدًا</span>
+
+<span class="comment"># مثال 1: منع أي تطبيق غير موثوق من الوصول إلى kernel</span>
+<span class="deny">neverallow</span> { appdomain -init } kernel:security *;
+
+<span class="comment"># مثال 2: منع التطبيقات من الوصول المباشر إلى أجهزة العتاد</span>
+<span class="deny">neverallow</span> appdomain dev_type:chr_file { <span class="function">read</span> <span class="function">write</span> };
+
+<span class="comment"># مثال 3: منع الوصول إلى ملفات shadow (كلمات المرور)</span>
+<span class="deny">neverallow</span> { domain -init -installd } shadow_file:file *;</code></pre>
+
+            <div class="danger-box">
+                <strong>🚨 قيود neverallow:</strong> إذا حاولت إضافة قاعدة <code class="inline-code">allow</code> تتعارض مع <code class="inline-code">neverallow</code>، فإن عملية بناء السياسة (Policy Build) ستفشل برسالة خطأ واضحة. لا يمكنك "تجاوز" neverallow حتى بامتلاك root — هذه قيود مُدمجة في السياسة المترجمة (Compiled Policy). <strong>الحل الوحيد هو إعادة هيكلة التصميم ليتوافق مع قواعد Google.</strong>
+            </div>
+
+            <h3>5.5 سير عمل التصحيح الموصى به (Recommended Debugging Workflow)</h3>
+            <ol>
+                <li>ضع الجهاز في وضع <code class="inline-code">Permissive</code> باستخدام <code class="inline-code">setenforce 0</code></li>
+                <li>شغّل السيناريو الذي يُسبب الرفض (Denial)</li>
+                <li>التقط السجلات باستخدام <code class="inline-code">dmesg | grep avc</code></li>
+                <li>حلّل السجلات يدويًا لفهم <code class="inline-code">scontext</code> و <code class="inline-code">tcontext</code> و <code class="inline-code">tclass</code></li>
+                <li>استخدم <code class="inline-code">audit2allow</code> كمساعد، وليس كحل نهائي</li>
+                <li>اكتب القواعد يدويًا مع مراعاة مبدأ أقل الصلاحية (Least Privilege)</li>
+                <li>أعد بناء السياسة (<code class="inline-code">m sepolicy</code>)</li>
+                <li>اختبر في وضع <code class="inline-code">Enforcing</code> (<code class="inline-code">setenforce 1</code>)</li>
+                <li>شغّل <code class="inline-code">cts-tradefed</code> للتحقق من عدم كسر neverallow</li>
+            </ol>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="section">
+            <h2><span class="icon">📋</span>ملخص المفاهيم الأساسية</h2>
+
+            <table>
+                <tr>
+                    <th>المفهوم</th>
+                    <th>الوصف</th>
+                    <th>الملف/الأمر</th>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">DAC</code></td>
+                    <td>التحكم التقديري بالوصول (UID/GID)</td>
+                    <td>Linux Kernel</td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">MAC</code></td>
+                    <td>التحكم الإلزامي بالوصول (SELinux)</td>
+                    <td>SELinux Policy</td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">Domain</code></td>
+                    <td>نطاق العملية (Process Label)</td>
+                    <td><code class="inline-code">*.te</code></td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">Type</code></td>
+                    <td>نوع الملف/الجهاز (Resource Label)</td>
+                    <td><code class="inline-code">file.te</code>, <code class="inline-code">device.te</code></td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">file_contexts</code></td>
+                    <td>ربط المسارات بالأنواع</td>
+                    <td><code class="inline-code">file_contexts</code></td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">allow</code></td>
+                    <td>قاعدة السماح بالوصول</td>
+                    <td><code class="inline-code">*.te</code></td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">neverallow</code></td>
+                    <td>قاعدة المنع المطلق (CTS)</td>
+                    <td><code class="inline-code">domain.te</code></td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">audit2allow</code></td>
+                    <td>توليد القواعد من سجلات الرفض</td>
+                    <td>أداة سطر أوامر</td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">privapp-permissions.xml</code></td>
+                    <td>القائمة البيضاء للتطبيقات المُميزة</td>
+                    <td><code class="inline-code">system/etc/permissions/</code></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="document-footer">
+            <p>تم إعداد هذا الدليل كمرجع تقني شامل لمطوري AOSP ومهندسي الأمان في أنظمة أندرويد المدمجة</p>
+            <p style="margin-top: 8px; font-size: 9pt; color: #94a3b8;">البلوك 11: اليوم 21-22 | Principal Android OS Architect & SELinux Security Specialist</p>
+        </div>
+    </div>
+</body>
+</html>

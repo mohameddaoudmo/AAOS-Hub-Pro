@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الدليل الشامل لخدمات النظام في إطار عمل أندرويد — البلوك 8: اليوم 15-16</title>
+<style>
+@page {
+  size: A4;
+  margin: 16mm 14mm;
+  background-color: #f8fafc;
+  @top-center {
+    content: "الدليل الشامل لخدمات النظام في Android Framework — البلوك 8";
+    font-size: 9pt;
+    color: #64748b;
+    font-family: "Segoe UI", "Tahoma", sans-serif;
+  }
+  @bottom-center {
+    content: "صفحة " counter(page) " من " counter(pages);
+    font-size: 9pt;
+    color: #64748b;
+    font-family: "Segoe UI", "Tahoma", sans-serif;
+  }
+}
+:root {
+  --header-bg: #0f172a;
+  --header-accent: #0ea5e9;
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --code-bg: #0f172a;
+  --code-text: #e2e8f0;
+  --accent-teal: #0ea5e9;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --success-bg: #f0fdf4;
+  --success-border: #86efac;
+  --warning-bg: #fffbeb;
+  --warning-border: #fcd34d;
+  --info-bg: #f0f9ff;
+  --info-border: #7dd3fc;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Segoe UI", "Tahoma", "Arial", sans-serif;
+  background-color: #f8fafc;
+  color: var(--text-primary);
+  line-height: 1.9;
+  font-size: 11pt;
+  direction: rtl;
+  text-align: right;
+}
+.header-banner {
+  background: linear-gradient(135deg, var(--header-bg) 0%, #1e293b 100%);
+  color: white;
+  padding: 40px 30px;
+  text-align: center;
+  border-bottom: 4px solid var(--header-accent);
+  position: relative;
+  overflow: hidden;
+}
+.header-banner::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(14,165,233,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.header-banner h1 {
+  font-size: 22pt;
+  font-weight: 700;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
+  letter-spacing: -0.5px;
+}
+.header-banner .subtitle {
+  font-size: 12pt;
+  color: #94a3b8;
+  position: relative;
+  z-index: 1;
+}
+.header-banner .badge {
+  display: inline-block;
+  background: var(--header-accent);
+  color: white;
+  padding: 4px 16px;
+  border-radius: 20px;
+  font-size: 10pt;
+  margin-top: 12px;
+  font-weight: 600;
+}
+.container {
+  max-width: 210mm;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.section {
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  margin: 24px 0;
+  padding: 28px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  page-break-inside: avoid;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f1f5f9;
+}
+.section-number {
+  background: var(--header-accent);
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14pt;
+  flex-shrink: 0;
+}
+.section h2 {
+  font-size: 16pt;
+  color: var(--header-bg);
+  font-weight: 700;
+}
+.section h3 {
+  font-size: 13pt;
+  color: var(--text-primary);
+  margin: 20px 0 12px 0;
+  font-weight: 600;
+  border-right: 4px solid var(--accent-teal);
+  padding-right: 12px;
+}
+.section h4 {
+  font-size: 11.5pt;
+  color: var(--text-secondary);
+  margin: 16px 0 8px 0;
+  font-weight: 600;
+}
+.section p {
+  margin-bottom: 14px;
+  text-align: justify;
+  color: var(--text-secondary);
+}
+pre {
+  direction: ltr !important;
+  text-align: left !important;
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 18px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
+  font-size: 9.5pt;
+  line-height: 1.6;
+  margin: 16px 0;
+  border: 1px solid #334155;
+  position: relative;
+}
+pre::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 6px;
+  left: 12px;
+  font-size: 8pt;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+code {
+  direction: ltr !important;
+  text-align: left !important;
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
+  font-size: 9.5pt;
+}
+p code, li code, td code {
+  background: #f1f5f9;
+  color: #0f172a;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 9.5pt;
+  direction: ltr !important;
+  display: inline-block;
+}
+.code-keyword { color: #c678dd; }
+.code-type { color: #e5c07b; }
+.code-string { color: #98c379; }
+.code-comment { color: #5c6370; font-style: italic; }
+.code-function { color: #61afef; }
+.code-number { color: #d19a66; }
+.code-annotation { color: #e06c75; }
+.ascii-diagram {
+  direction: ltr !important;
+  text-align: left !important;
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 20px;
+  font-family: "Consolas", "Monaco", monospace;
+  font-size: 9pt;
+  line-height: 1.5;
+  color: var(--text-primary);
+  margin: 16px 0;
+  overflow-x: auto;
+  white-space: pre;
+}
+.info-card {
+  background: var(--info-bg);
+  border-right: 4px solid var(--accent-teal);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 16px 0;
+}
+.info-card-title {
+  font-weight: 700;
+  color: #0369a1;
+  margin-bottom: 8px;
+  font-size: 11pt;
+}
+.best-practice {
+  background: var(--success-bg);
+  border: 1px solid var(--success-border);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 16px 0;
+}
+.best-practice-title {
+  font-weight: 700;
+  color: #166534;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5pt;
+}
+.best-practice-title::before {
+  content: "✓";
+  background: var(--accent-emerald);
+  color: white;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.warning-card {
+  background: var(--warning-bg);
+  border-right: 4px solid var(--accent-amber);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 16px 0;
+}
+.warning-card-title {
+  font-weight: 700;
+  color: #92400e;
+  margin-bottom: 8px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 10pt;
+  direction: rtl;
+}
+th {
+  background: var(--header-bg);
+  color: white;
+  padding: 12px 16px;
+  text-align: right;
+  font-weight: 600;
+}
+td {
+  padding: 10px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: right;
+}
+tr:nth-child(even) { background: #f8fafc; }
+ul, ol {
+  margin: 12px 24px 12px 0;
+  padding-right: 20px;
+}
+li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.flow-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin: 14px 0;
+  padding: 14px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+.flow-step-number {
+  background: var(--header-accent);
+  color: white;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 11pt;
+  flex-shrink: 0;
+}
+.flow-step-content { flex: 1; }
+.flow-step-title {
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.highlight-box {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 16px 0;
+  border-right: 4px solid var(--accent-teal);
+}
+.highlight-box code {
+  background: rgba(255,255,255,0.1);
+  color: #7dd3fc;
+}
+.page-footer {
+  text-align: center;
+  padding: 24px;
+  color: #94a3b8;
+  font-size: 9pt;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 32px;
+}
+.service-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 9pt;
+  font-weight: 600;
+  margin-left: 6px;
+}
+.tag-bootstrap { background: #fef3c7; color: #92400e; }
+.tag-core { background: #dbeafe; color: #1e40af; }
+.tag-other { background: #f3e8ff; color: #6b21a8; }
+.phase-timeline {
+  position: relative;
+  padding-right: 30px;
+  margin: 20px 0;
+}
+.phase-timeline::before {
+  content: "";
+  position: absolute;
+  right: 8px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--accent-teal), var(--accent-emerald));
+  border-radius: 3px;
+}
+.phase-item {
+  position: relative;
+  margin-bottom: 20px;
+  padding: 14px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+.phase-item::before {
+  content: "";
+  position: absolute;
+  right: -26px;
+  top: 18px;
+  width: 12px;
+  height: 12px;
+  background: var(--accent-teal);
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 0 0 2px var(--accent-teal);
+}
+.phase-name {
+  font-weight: 700;
+  color: var(--header-bg);
+  font-size: 11pt;
+}
+.phase-desc {
+  color: var(--text-secondary);
+  font-size: 10pt;
+  margin-top: 4px;
+}
+.method-sig {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-family: "Consolas", monospace;
+  font-size: 10pt;
+  direction: ltr !important;
+  text-align: left !important;
+  margin: 12px 0;
+  border-right: 3px solid var(--accent-teal);
+}
+.aosp-path {
+  background: #0f172a;
+  color: #7dd3fc;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-family: "Consolas", monospace;
+  font-size: 9pt;
+  direction: ltr !important;
+  text-align: left !important;
+  display: inline-block;
+  margin: 8px 0;
+}
+.comparison-table th { background: #1e293b; }
+</style>
+</head>
+<body>
+
+<div class="header-banner">
+  <h1>الدليل الشامل لخدمات النظام في إطار عمل أندرويد</h1>
+  <div class="subtitle">System Services Deep Dive — Android Framework Architecture</div>
+  <div class="badge">البلوك 8: اليوم 15-16</div>
+</div>
+
+<div class="container">
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">٠</div>
+    <h2>نظرة عامة على المرجع</h2>
+  </div>
+  <p>
+    يُعدّ فهم <strong>خدمات النظام (System Services)</strong> في Android Framework من أهم الركائز التي يجب على أي مطوّر نظام (System Developer) أو مهندس إطار عمل (Framework Engineer) إتقانها. هذه الخدمات هي العمود الفقري الذي ترتكز عليه جميع وظائف النظام — من إدارة الطاقة والبطارية، إلى إدارة النافذة والعرض، مرورًا بالشبكات والاتصال.
+  </p>
+  <p>
+    في هذا المرجع الشامل، سنقوم بتتبع الرحلة الكاملة لخدمة النظام بدءًا من لحظة إقلاع الجهاز (Boot Sequence)، مرورًا بتسجيلها في <code>ServiceManager</code>، وانتهاءً بكيفية وصول التطبيقات إليها عبر <code>Context.getSystemService()</code>.
+  </p>
+  <div class="info-card">
+    <div class="info-card-title">🎯 الأهداف التعليمية لهذا المرجع</div>
+    <ul>
+      <li>فهم تسلسل الإقلاع الكامل: <code>Init → Zygote → SystemServer</code></li>
+      <li>إتقان ميكانيكية <code>ServiceManager</code> كسجلّ عالمي (Global Registry) لخدمات Binder</li>
+      <li>تحليل دورة حياة <code>SystemService</code> ومراحل الإقلاع (Boot Phases)</li>
+      <li>تتبع end-to-end لـ <code>BatteryService</code> كنموذج واقعي</li>
+      <li>فهم نمط <code>Manager Pattern</code> من جانب التطبيق</li>
+      <li>تعلم أفضل الممارسات لإضافة خدمة نظام مخصصة في AOSP</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">١</div>
+    <h2>تسلسل الإقلاع وبنية SystemServer</h2>
+  </div>
+
+  <h3>١.١ نظرة شاملة على عملية إقلاع Android</h3>
+  <p>
+    عند الضغط على زر التشغيل، تبدأ رحلة معقّدة تمر بعدة طبقات برمجية وعتادية. يُعدّ تسلسل الإقلاع في Android فريدًا من نوعه لأنه يجمع بين نواة Linux التقليدية وآلية Java Runtime المخصصة.
+  </p>
+
+  <div class="ascii-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        Android Boot Sequence (تسلسل الإقلاع)               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌──────────────┐     ┌──────────────┐     ┌──────────────┐               │
+│   │   Boot ROM   │ ──→ │  Bootloader  │ ──→ │    Kernel    │               │
+│   │   (Primary)  │     │  (aboot/UEFI)│     │  (Linux)     │               │
+│   └──────────────┘     └──────────────┘     └──────┬───────┘               │
+│          │                    │                    │                        │
+│          ▼                    ▼                    ▼                        │
+│   ┌─────────────────────────────────────────────────────────────────┐      │
+│   │                         init进程 (PID 1)                         │      │
+│   │  • يقرأ init.rc وinit.&lt;device&gt;.rc                               │      │
+│   │  • يُطلق خدمات native: healthd, lmkd, servicemanager             │      │
+│   └─────────────────────────────┬───────────────────────────────────┘      │
+│                                 │                                           │
+│                                 ▼                                           │
+│   ┌─────────────────────────────────────────────────────────────────┐      │
+│   │                    Zygote进程 (app_process)                      │      │
+│   │  • يُحمّل Android Runtime (ART)                                   │      │
+│   │  • يُنشئ نسخة pre-initialized من Dalvik/ART VM                   │      │
+│   │  • يستمع على socket للطلبات القادمة من system_server             │      │
+│   └─────────────────────────────┬───────────────────────────────────┘      │
+│                                 │                                           │
+│                                 ▼                                           │
+│   ┌─────────────────────────────────────────────────────────────────┐      │
+│   │                    SystemServer (system_server)                  │      │
+│   │  • القلب النابض للـ Android Framework                            │      │
+│   │  • يُطلق جميع System Services (~90+ service)                     │      │
+│   │  • يُدير دورة الحياة الكاملة للخدمات عبر SystemServiceManager    │      │
+│   └─────────────────────────────────────────────────────────────────┘      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+  </div>
+
+  <h3>١.٢ دور SystemServer.java كقلب الإطار</h3>
+  <p>
+    يقع الملف <code>SystemServer.java</code> في المسار <span class="aosp-path">frameworks/base/services/java/com/android/server/SystemServer.java</span> وهو النقطة المحورية التي تبدأ منها معظم خدمات النظام. يعمل <code>SystemServer</code> في عملية منفصلة تُسمى <code>system_server</code> تحمل UID 1000 (SYSTEM_UID).
+  </p>
+
+  <div class="highlight-box">
+    <strong>لماذا SystemServer منفصل عن Zygote؟</strong><br>
+    يتم فصل <code>system_server</code> عن <code>Zygote</code> لأسباب أمنية واستقرارية: إذا تعطّلت إحدى خدمات النظام، فإن عملية <code>system_server</code> قد تُعاد تشغيلها دون الحاجة إلى إعادة إطلاق <code>Zygote</code> بأكمله — مما يحافظ على استقرار التطبيقات العاملة.
+  </div>
+
+  <h3>١.٣ الفئات الثلاث لخدمات النظام</h3>
+  <p>
+    داخل دالة <code>run()</code> في <code>SystemServer.java</code>، يتم بدء الخدمات في ثلاث فئات رئيسية، كل منها يخدم غرضًا محددًا في تسلسل الإقلاع:
+  </p>
+
+  <table>
+    <tr>
+      <th>الفئة</th>
+      <th>الغرض</th>
+      <th>أمثلة</th>
+      <th>الأولوية</th>
+    </tr>
+    <tr>
+      <td><span class="service-tag tag-bootstrap">Bootstrap Services</span></td>
+      <td>خدمات أساسية لا يمكن للنظام العمل بدونها. يجب أن تبدأ قبل أي خدمة أخرى.</td>
+      <td><code>ActivityManagerService</code>, <code>PowerManagerService</code>, <code>PackageManagerService</code>, <code>DisplayManagerService</code></td>
+      <td>عالية جدًا</td>
+    </tr>
+    <tr>
+      <td><span class="service-tag tag-core">Core Services</span></td>
+      <td>خدمات أساسية للوظائف الأساسية للنظام، تعتمد على Bootstrap Services.</td>
+      <td><code>BatteryService</code>, <code>UsageStatsService</code>, <code>WebViewUpdateService</code></td>
+      <td>عالية</td>
+    </tr>
+    <tr>
+      <td><span class="service-tag tag-other">Other Services</span></td>
+      <td>خدمات إضافية توفّر وظائف متخصصة، تعتمد على الخدمات الأساسية.</td>
+      <td><code>CameraService</code>, <code>AlarmManagerService</code>, <code>InputManagerService</code>, <code>VibratorService</code></td>
+      <td>متوسطة</td>
+    </tr>
+  </table>
+
+  <pre data-lang="java"><code class="language-java"><span class="code-comment">// frameworks/base/services/java/com/android/server/SystemServer.java</span>
+<span class="code-keyword">public</span> <span class="code-keyword">final</span> <span class="code-keyword">class</span> <span class="code-type">SystemServer</span> {
+
+    <span class="code-keyword">private</span> <span class="code-type">SystemServiceManager</span> <span class="code-function">mSystemServiceManager</span>;
+
+    <span class="code-keyword">public</span> <span class="code-keyword">static</span> <span class="code-keyword">void</span> <span class="code-function">main</span>(<span class="code-type">String</span>[] args) {
+        <span class="code-keyword">new</span> <span class="code-type">SystemServer</span>().<span class="code-function">run</span>();
+    }
+
+    <span class="code-keyword">private</span> <span class="code-keyword">void</span> <span class="code-function">run</span>() {
+        <span class="code-comment">// 1. إنشاء SystemServiceManager — المدير الرئيسي لدورة حياة الخدمات</span>
+        mSystemServiceManager = <span class="code-keyword">new</span> <span class="code-type">SystemServiceManager</span>(mSystemContext);
+        <span class="code-type">LocalServices</span>.<span class="code-function">addService</span>(<span class="code-type">SystemServiceManager</span>.<span class="code-keyword">class</span>, mSystemServiceManager);
+
+        <span class="code-comment">// ───────────────────────────────────────────────</span>
+        <span class="code-comment">// الفئة الأولى: Bootstrap Services</span>
+        <span class="code-comment">// ───────────────────────────────────────────────</span>
+        <span class="code-type">Installer</span> installer = mSystemServiceManager.<span class="code-function">startService</span>(<span class="code-type">Installer</span>.<span class="code-keyword">class</span>);
+        mSystemServiceManager.<span class="code-function">startService</span>(<span class="code-type">ActivityManagerService.Lifecycle</span>.<span class="code-keyword">class</span>);
+        mSystemServiceManager.<span class="code-function">startService</span>(<span class="code-type">PowerManagerService</span>.<span class="code-keyword">class</span>);
+        mSystemServiceManager.<span class="code-function">startService</span>(<span class="code-type">LightsService</span>.<span class="code-keyword">class</span>);
+        mSystemServiceManager.<span class="code-function">startService</span>(<span class="code-type">DisplayManagerService</span>.<span class="code-keyword">class</span>);
+
+        <span class="code-comment">// ───────────────────────────────────────────────</span>
+        <span class="code-comment">// الفئة الثانية: Core Services</span>
+        <span class="code-comment">// ───────────────────────────────────────────────</span>
+        mSystemServiceManager.<span class="code-function">startService</span>(<span class="code-type">BatteryService</span>.<span class="code-keyword">class</span>);
+        mSystemServiceManager.<span class="code-function">startService</span>(<span class="code-type">UsageStatsService</span>.<span class="code-keyword">class</span>);
+        mSystemServiceManager.<span class="code-function">startService</span>(<span class="code-type">WebViewUpdateService</span>.<span class="code-keyword">class</span>);
+
+        <span class="code-comment">// ───────────────────────────────────────────────</span>
+        <span class="code-comment">// الفئة الثالثة: Other Services</span>
+        <span class="code-comment">// ───────────────────────────────────────────────</span>
+        mSystemServiceManager.<span class="code-function">startService</span>(<span class="code-type">CameraService</span>.<span class="code-keyword">class</span>);
+        mSystemServiceManager.<span class="code-function">startService</span>(<span class="code-type">AlarmManagerService</span>.<span class="code-keyword">class</span>);
+        <span class="code-comment">// ... ~90 خدمة إضافية</span>
+    }
+}</code></pre>
+
+  <div class="info-card">
+    <div class="info-card-title">💡 رؤية معمارية: لماذا ثلاث فئات؟</div>
+    <p style="margin:0; color:#475569;">
+      التقسيم إلى ثلاث فئات ليس عشوائيًا — فهو يعكس <strong>التبعيات (Dependencies)</strong> بين الخدمات. على سبيل المثال، <code>BatteryService</code> (Core) يحتاج إلى <code>ActivityManagerService</code> (Bootstrap) لإرسال broadcast عند تغيّر مستوى الشحن. و<code>CameraService</code> (Other) يحتاج إلى <code>BatteryService</code> لمعرفة ما إذا كان مستوى البطارية منخفضًا جدًا.
+    </p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">٢</div>
+    <h2>ميكانيكية عمل ServiceManager</h2>
+  </div>
+
+  <h3>٢.١ ما هو ServiceManager؟</h3>
+  <p>
+    <code>ServiceManager</code> هو <strong>سجلّ Binder العالمي (Global Binder Registry)</strong> — يُشبه "نظام DNS" للإطار. عندما تُسجّل خدمة نظام نفسها، فإنها تُضيف واجهة Binder الخاصة بها إلى هذا السجلّ تحت اسم فريد (مثل <code>"battery"</code> أو <code>"power"</code>). عندما يحتاج تطبيق أو خدمة أخرى إلى التواصل مع تلك الخدمة، فإنه يبحث عنها في <code>ServiceManager</code> ليحصل على وكيل Binder (Binder Proxy).
+  </p>
+
+  <div class="ascii-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    ServiceManager — Global Binder Registry                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌─────────────────────┐         ┌─────────────────────┐                  │
+│   │   System Server     │         │   Application       │                  │
+│   │   (system_server)   │         │   (com.example.app) │                  │
+│   │                     │         │                     │                  │
+│   │  BatteryService     │         │  BatteryManager     │                  │
+│   │       │             │         │       │             │                  │
+│   │       ▼             │         │       ▼             │                  │
+│   │  ┌─────────────┐    │         │  ┌─────────────┐    │                  │
+│   │  │ IBinder     │────┼────┐    │  │ IBinder     │────┼────┐             │
+│   │  │ (stub impl) │    │    │    │  │ (proxy)     │    │    │             │
+│   │  └─────────────┘    │    │    │  └─────────────┘    │    │             │
+│   │                     │    │    │                     │    │             │
+│   │  addService()       │    │    │  getService()       │    │             │
+│   │       │             │    │    │       │             │    │             │
+│   └───────┼─────────────┘    │    └───────┼─────────────┘    │             │
+│           │                  │            │                  │             │
+│           ▼                  │            ▼                  │             │
+│   ┌─────────────────────────────────────────────────────────────────┐      │
+│   │                      ServiceManager (servicemanager)             │      │
+│   │  ┌─────────────────────────────────────────────────────────┐    │      │
+│   │  │  Name          │  IBinder Reference  │  SELinux Context │    │      │
+│   │  ├─────────────────────────────────────────────────────────┤    │      │
+│   │  │  "battery"     │  BatteryService     │  u:object_r:...  │    │      │
+│   │  │  "power"       │  PowerManagerService│  u:object_r:...  │    │      │
+│   │  │  "activity"    │  ActivityManagerServ│  u:object_r:...  │    │      │
+│   │  │  "window"      │  WindowManagerServic│  u:object_r:...  │    │      │
+│   │  └─────────────────────────────────────────────────────────┘    │      │
+│   │                                                                 │      │
+│   │  • يعمل كعملية native مستقلة (PID مبكر)                         │      │
+│   │  • يُدار عبر binder driver (/dev/binder)                        │      │
+│   │  • يتحقق من SELinux context قبل السماح بالتسجيل/البحث          │      │
+│   └─────────────────────────────────────────────────────────────────┘      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+  </div>
+
+  <h3>٢.٢ تسجيل الخدمة: addService()</h3>
+  <p>
+    عندما تستدعي خدمة النظام <code>publishBinderService()</code> (من الفئة الأساسية <code>SystemService</code>)، فإنها في الواقع تستدعي <code>ServiceManager.addService()</code> لتسجيل واجهة Binder الخاصة بها.
+  </p>
+
+  <pre data-lang="java"><code class="language-java"><span class="code-comment">// frameworks/base/core/java/android/os/ServiceManager.java</span>
+<span class="code-keyword">public</span> <span class="code-keyword">final</span> <span class="code-keyword">class</span> <span class="code-type">ServiceManager</span> {
+
+    <span class="code-keyword">private</span> <span class="code-keyword">static</span> <span class="code-type">IServiceManager</span> <span class="code-function">sServiceManager</span>;
+
+    <span class="code-comment">/**
+     * تسجيل خدمة Binder في السجلّ العالمي.
+     * @param name اسم الخدمة الفريد (مثل "battery", "power")
+     * @param service واجهة Binder التي تُنفّذ الخدمة
+     */</span>
+    <span class="code-keyword">public</span> <span class="code-keyword">static</span> <span class="code-keyword">void</span> <span class="code-function">addService</span>(<span class="code-type">String</span> name, <span class="code-type">IBinder</span> service) {
+        <span class="code-keyword">try</span> {
+            <span class="code-type">IServiceManager</span> sm = <span class="code-function">getIServiceManager</span>();
+            sm.<span class="code-function">addService</span>(name, service, <span class="code-keyword">false</span> <span class="code-comment">/* allowIsolated */</span>);
+        } <span class="code-keyword">catch</span> (<span class="code-type">RemoteException</span> e) {
+            <span class="code-type">Log</span>.<span class="code-function">e</span>(<span class="code-type">TAG</span>, <span class="code-string">"error in addService"</span>, e);
+        }
+    }
+
+    <span class="code-comment">/**
+     * البحث عن خدمة Binder في السجلّ العالمي.
+     * @param name اسم الخدمة المطلوبة
+     * @return وكيل Binder (Binder Proxy) أو null إذا لم تُوجد
+     */</span>
+    <span class="code-keyword">public</span> <span class="code-keyword">static</span> <span class="code-type">IBinder</span> <span class="code-function">getService</span>(<span class="code-type">String</span> name) {
+        <span class="code-keyword">try</span> {
+            <span class="code-type">IServiceManager</span> sm = <span class="code-function">getIServiceManager</span>();
+            <span class="code-keyword">return</span> sm.<span class="code-function">getService</span>(name);
+        } <span class="code-keyword">catch</span> (<span class="code-type">RemoteException</span> e) {
+            <span class="code-type">Log</span>.<span class="code-function">e</span>(<span class="code-type">TAG</span>, <span class="code-string">"error in getService"</span>, e);
+            <span class="code-keyword">return</span> <span class="code-keyword">null</span>;
+        }
+    }
+}</code></pre>
+
+  <h3>٢.٣ استرجاع الخدمة: getService()</h3>
+  <p>
+    من جانب التطبيق، عند استدعاء <code>Context.getSystemService(Context.BATTERY_SERVICE)</code>، فإن السلسلة تمر بعدة طبقات حتى تصل إلى <code>ServiceManager.getService("battery")</code>:
+  </p>
+
+  <div class="flow-step">
+    <div class="flow-step-number">1</div>
+    <div class="flow-step-content">
+      <div class="flow-step-title">Context.getSystemService(String name)</div>
+      <div>تُستدعى من التطبيق — تبحث في <code>SystemServiceRegistry</code> عن المدير (Manager) المقابل.</div>
+    </div>
+  </div>
+
+  <div class="flow-step">
+    <div class="flow-step-number">2</div>
+    <div class="flow-step-content">
+      <div class="flow-step-title">SystemServiceRegistry.getSystemService()</div>
+      <div>يُرجع كائن Manager (مثل <code>BatteryManager</code>) مُغلّفًا لوكيل Binder.</div>
+    </div>
+  </div>
+
+  <div class="flow-step">
+    <div class="flow-step-number">3</div>
+    <div class="flow-step-content">
+      <div class="flow-step-title">ServiceManager.getService("battery")</div>
+      <div>يُرجع <code>IBinder</code> proxy يشير إلى <code>BatteryService</code> العامل في <code>system_server</code>.</div>
+    </div>
+  </div>
+
+  <div class="flow-step">
+    <div class="flow-step-number">4</div>
+    <div class="flow-step-content">
+      <div class="flow-step-title">IBinder.transact()</div>
+      <div>يُرسل استدعاء IPC عبر Binder driver إلى <code>system_server</code> حيث يُنفّذ <code>BatteryService</code> العملية.</div>
+    </div>
+  </div>
+
+  <h3>٢.٤ طبقة الأمان: SELinux Context</h3>
+  <p>
+    لا يمكن لأي عملية تسجيل خدمة في <code>ServiceManager</code> دون امتلاك السياق الأمني (SELinux Context) المناسب. يتم التحقق من ذلك في طبقة native عبر <code>selinux_check_access()</code>.
+  </p>
+
+  <pre data-lang="cpp"><code class="language-cpp"><span class="code-comment">// frameworks/native/cmds/servicemanager/ServiceManager.cpp</span>
+<span class="code-type">status_t</span> <span class="code-type">ServiceManager</span>::<span class="code-function">addService</span>(<span class="code-keyword">const</span> <span class="code-type">String16</span>&amp; name,
+                                    <span class="code-keyword">const</span> <span class="code-type">sp&lt;IBinder&gt;</span>&amp; service,
+                                    <span class="code-type">bool</span> allowIsolated,
+                                    <span class="code-type">int</span> dumpsysPriority) {
+    <span class="code-comment">// التحقق من SELinux context قبل السماح بالتسجيل</span>
+    <span class="code-keyword">const</span> <span class="code-type">char</span>* context = <span class="code-function">selinux_lookup</span>(name.<span class="code-function">string</span>());
+    <span class="code-keyword">if</span> (!<span class="code-function">selinux_check_access</span>(<span class="code-function">getpidcon</span>(), context, <span class="code-string">"add"</span>)) {
+        <span class="code-keyword">return</span> <span class="code-type">PERMISSION_DENIED</span>;
+    }
+
+    <span class="code-type">AutoMutex</span> <span class="code-function">_l</span>(mLock);
+    mNameToService[name] = service;
+    <span class="code-keyword">return</span> <span class="code-type">NO_ERROR</span>;
+}</code></pre>
+
+  <div class="warning-card">
+    <div class="warning-card-title">⚠️ تحذير أمني</div>
+    <p style="margin:0; color:#92400e;">
+      محاولة تسجيل خدمة باسم موجود مسبقًا (مثل <code>"battery"</code>) من قِبل عملية غير موثوقة ستفشل بسبب فحص SELinux. فقط العمليات التي تحمل السياق <code>u:r:system_server:s0</code> يمكنها تسجيل خدمات النظام الرئيسية.
+    </p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">٣</div>
+    <h2>دورة حياة خدمات النظام</h2>
+  </div>
+
+  <h3>٣.١ الفئة الأساسية: SystemService</h3>
+  <p>
+    جميع خدمات النظام في Android ترث من الفئة المجردة <code>com.android.server.SystemService</code>. هذه الفئة تُوفّر هيكلًا موحدًا لدورة الحياة، وتُتيح لـ <code>SystemServiceManager</code> إدارة جميع الخدمات بشكل متسق.
+  </p>
+
+  <pre data-lang="java"><code class="language-java"><span class="code-comment">// frameworks/base/services/core/java/com/android/server/SystemService.java</span>
+<span class="code-keyword">public</span> <span class="code-keyword">abstract</span> <span class="code-keyword">class</span> <span class="code-type">SystemService</span> {
+
+    <span class="code-keyword">private</span> <span class="code-keyword">final</span> <span class="code-type">Context</span> mContext;
+
+    <span class="code-keyword">public</span> <span class="code-function">SystemService</span>(<span class="code-type">Context</span> context) {
+        mContext = context;
+    }
+
+    <span class="code-comment">/**
+     * يُستدعى مرة واحدة عند بدء الخدمة.
+     * هنا يجب تسجيل الـ Binder interface في ServiceManager.
+     */</span>
+    <span class="code-keyword">public</span> <span class="code-keyword">abstract</span> <span class="code-keyword">void</span> <span class="code-function">onStart</span>();
+
+    <span class="code-comment">/**
+     * يُستدعى عند الوصول إلى مرحلة إقلاع معينة.
+     * تُتيح للخدمة الاستجابة لأحداث مراحل الإقلاع المختلفة.
+     */</span>
+    <span class="code-keyword">public</span> <span class="code-keyword">void</span> <span class="code-function">onBootPhase</span>(<span class="code-keyword">int</span> phase) {}
+
+    <span class="code-comment">/**
+     * يُستدعى عندما يصبح مستخدم جديد نشطًا.
+     */</span>
+    <span class="code-keyword">public</span> <span class="code-keyword">void</span> <span class="code-function">onUserStarting</span>(<span class="code-keyword">int</span> userId) {}
+
+    <span class="code-comment">/**
+     * يُستدعى عند اكتمال بدء المستخدم.
+     */</span>
+    <span class="code-keyword">public</span> <span class="code-keyword">void</span> <span class="code-function">onUserStarted</span>(<span class="code-keyword">int</span> userId) {}
+
+    <span class="code-comment">/**
+     * يُستدعى عند توقف المستخدم.
+     */</span>
+    <span class="code-keyword">public</span> <span class="code-keyword">void</span> <span class="code-function">onUserStopped</span>(<span class="code-keyword">int</span> userId) {}
+
+    <span class="code-comment">// ─── أدوات مساعدة محمية ───</span>
+
+    <span class="code-keyword">protected</span> <span class="code-keyword">final</span> <span class="code-keyword">void</span> <span class="code-function">publishBinderService</span>(<span class="code-type">String</span> name, <span class="code-type">IBinder</span> service) {
+        <span class="code-type">ServiceManager</span>.<span class="code-function">addService</span>(name, service);
+    }
+
+    <span class="code-keyword">protected</span> <span class="code-keyword">final</span> <span class="code-type">IBinder</span> <span class="code-function">getBinderService</span>(<span class="code-type">String</span> name) {
+        <span class="code-keyword">return</span> <span class="code-type">ServiceManager</span>.<span class="code-function">getService</span>(name);
+    }
+}</code></pre>
+
+  <h3>٣.٢ مراحل الإقلاع (Boot Phases)</h3>
+  <p>
+    تُعرّف الفئة <code>SystemService</code> ثوابتًا تمثّل مراحل الإقلاع المختلفة. يقوم <code>SystemServiceManager</code> بإشعار جميع الخدمات عند الوصول إلى كل مرحلة، مما يُتيح لها تهيئة المكونات التي تعتمد على خدمات أخرى.
+  </p>
+
+  <div class="phase-timeline">
+    <div class="phase-item">
+      <div class="phase-name">PHASE_WAIT_FOR_DEFAULT_DISPLAY</div>
+      <div class="phase-desc">
+        تُشير إلى أن الشاشة الافتراضية جاهزة. الخدمات التي تعتمد على <code>DisplayManager</code> يمكنها البدء في هذه المرحلة.
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-name">PHASE_LOCK_SETTINGS_READY</div>
+      <div class="phase-desc">
+        إعدادات قفل الشاشة جاهزة. <code>KeyguardManager</code> والخدمات الأمنية تستجيب هنا.
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-name">PHASE_SYSTEM_SERVICES_READY</div>
+      <div class="phase-desc">
+        جميع خدمات النظام الأساسية قد بدأت. يمكن للخدمات الآن البحث عن خدمات أخرى بأمان.
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-name">PHASE_ACTIVITY_MANAGER_READY</div>
+      <div class="phase-desc">
+        <code>ActivityManagerService</code> جاهز. يمكن إرسال broadcasts وبدء الأنشطة.
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-name">PHASE_THIRD_PARTY_APPS_CAN_START</div>
+      <div class="phase-desc">
+        التطبيقات التابعة لجهات خارجية يمكنها البدء. الخدمات التي تتفاعل مع التطبيقات تستعد هنا.
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-name">PHASE_BOOT_COMPLETED</div>
+      <div class="phase-desc">
+        الإقلاع اكتمل بالكامل. جميع الخدمات يجب أن تكون جاهزة لاستقبال الطلبات من التطبيقات.
+      </div>
+    </div>
+  </div>
+
+  <pre data-lang="java"><code class="language-java"><span class="code-comment">// frameworks/base/services/core/java/com/android/server/SystemServiceManager.java</span>
+<span class="code-keyword">public</span> <span class="code-keyword">class</span> <span class="code-type">SystemServiceManager</span> {
+
+    <span class="code-keyword">private</span> <span class="code-keyword">final</span> <span class="code-type">ArrayList&lt;SystemService&gt;</span> mServices = <span class="code-keyword">new</span> <span class="code-type">ArrayList</span>&lt;&gt;();
+
+    <span class="code-keyword">public</span> &lt;T <span class="code-keyword">extends</span> <span class="code-type">SystemService</span>&gt; T <span class="code-function">startService</span>(<span class="code-type">Class</span>&lt;T&gt; serviceClass) {
+        <span class="code-keyword">try</span> {
+            <span class="code-type">Constructor</span>&lt;T&gt; constructor = serviceClass.<span class="code-function">getConstructor</span>(<span class="code-type">Context</span>.<span class="code-keyword">class</span>);
+            T service = constructor.<span class="code-function">newInstance</span>(mContext);
+            mServices.<span class="code-function">add</span>(service);
+            service.<span class="code-function">onStart</span>(); <span class="code-comment">// ← استدعاء onStart()</span>
+            <span class="code-keyword">return</span> service;
+        } <span class="code-keyword">catch</span> (<span class="code-type">Exception</span> e) {
+            <span class="code-keyword">throw</span> <span class="code-keyword">new</span> <span class="code-type">RuntimeException</span>(<span class="code-string">"Failed to create service "</span> + serviceClass, e);
+        }
+    }
+
+    <span class="code-keyword">public</span> <span class="code-keyword">void</span> <span class="code-function">startBootPhase</span>(<span class="code-keyword">int</span> phase) {
+        <span class="code-keyword">for</span> (<span class="code-type">SystemService</span> service : mServices) {
+            <span class="code-type">TimingsTraceAndSlog</span>.<span class="code-function">traceBegin</span>(<span class="code-string">"OnBootPhase_"</span> + phase
+                + <span class="code-string">"_"</span> + service.<span class="code-function">getClass</span>().<span class="code-function">getName</span>());
+            <span class="code-keyword">try</span> {
+                service.<span class="code-function">onBootPhase</span>(phase); <span class="code-comment">// ← إشعار كل خدمة</span>
+            } <span class="code-keyword">catch</span> (<span class="code-type">Exception</span> ex) {
+                <span class="code-type">Slog</span>.<span class="code-function">wtf</span>(<span class="code-type">TAG</span>, <span class="code-string">"Failure passing boot phase "</span> + phase
+                    + <span class="code-string">" to "</span> + service, ex);
+            } <span class="code-keyword">finally</span> {
+                <span class="code-type">TimingsTraceAndSlog</span>.<span class="code-function">traceEnd</span>();
+            }
+        }
+    }
+}</code></pre>
+
+  <div class="info-card">
+    <div class="info-card-title">🔧 لماذا Boot Phases مهمة جدًا؟</div>
+    <p style="margin:0; color:#475569;">
+      بدون مراحل الإقلاع، كانت الخدمات ستضطر إلى "الانتظار العشوائي" (busy-waiting) حتى تصبح الخدمات التي تعتمد عليها جاهزة. مراحل الإقلاع توفر آلية <strong>إشعار مركزية</strong> تضمن أن كل خدمة تبدأ عملها في الوقت الصحيح دون تبعيات دائرية أو سباقات (race conditions).
+    </p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">٤</div>
+    <h2>تتبع دورة حياة خدمة حقيقية: BatteryService</h2>
+  </div>
+
+  <h3>٤.١ لماذا BatteryService كنموذج؟</h3>
+  <p>
+    <code>BatteryService</code> خدمة مثالية للدراسة لأنها: (1) تتفاعل مباشرة مع طبقة HAL (Hardware Abstraction Layer)، (2) تُسجّل Binder interface، (3) تستجيب لمراحل الإقلاع، و(4) تُوفّر واجهة واضحة للتطبيقات عبر <code>BatteryManager</code>.
+  </p>
+
+  <div class="ascii-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│              BatteryService End-to-End Architecture                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐      │
+│   │   Kernel Space  │     │  Native Space   │     │   Java Space    │      │
+│   │                 │     │                 │     │                 │      │
+│   │  power_supply   │────→│   healthd       │────→│ BatteryService  │      │
+│   │  (driver)       │     │   (daemon)      │     │ (system_server) │      │
+│   │                 │     │                 │     │                 │      │
+│   │  /sys/class/    │     │  IBattery       │     │  BinderService  │      │
+│   │  power_supply/  │     │  (HIDL/AIDL)    │     │  (IBatteryStats)│      │
+│   │  battery/uevent │     │                 │     │                 │      │
+│   └─────────────────┘     └─────────────────┘     └────────┬────────┘      │
+│                                                            │               │
+│                                                            ▼               │
+│   ┌─────────────────────────────────────────────────────────────────┐      │
+│   │                    ServiceManager ("battery")                    │      │
+│   └─────────────────────────────┬───────────────────────────────────┘      │
+│                                 │                                           │
+│                                 ▼                                           │
+│   ┌─────────────────────────────────────────────────────────────────┐      │
+│   │                    Application (com.example.app)                 │      │
+│   │                                                                  │      │
+│   │   BatteryManager bm = (BatteryManager)                          │      │
+│   │       getSystemService(Context.BATTERY_SERVICE);                 │      │
+│   │                                                                  │      │
+│   │   int level = bm.getIntProperty(                                │      │
+│   │       BatteryManager.BATTERY_PROPERTY_CAPACITY);                 │      │
+│   │                                                                  │      │
+│   └─────────────────────────────────────────────────────────────────┘      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+  </div>
+
+  <h3>٤.٢ الخطوة 1: الإنشاء في SystemServer</h3>
+  <p>
+    يتم إنشاء <code>BatteryService</code> ضمن فئة <strong>Core Services</strong> في <code>SystemServer.run()</code>:
+  </p>
+
+  <pre data-lang="java"><code class="language-java"><span class="code-comment">// frameworks/base/services/java/com/android/server/SystemServer.java</span>
+<span class="code-keyword">private</span> <span class="code-keyword">void</span> <span class="code-function">startOtherServices</span>() {
+    <span class="code-comment">// ... Bootstrap services قد بدأت بالفعل ...</span>
+
+    <span class="code-type">Slog</span>.<span class="code-function">i</span>(<span class="code-type">TAG</span>, <span class="code-string">"Battery Service"</span>);
+    <span class="code-type">BatteryService</span> batteryService = <span class="code-keyword">null</span>;
+    <span class="code-keyword">try</span> {
+        batteryService = <span class="code-keyword">new</span> <span class="code-type">BatteryService</span>(context);
+        <span class="code-type">ServiceManager</span>.<span class="code-function">addService</span>(<span class="code-string">"battery"</span>, batteryService);
+    } <span class="code-keyword">catch</span> (<span class="code-type">Throwable</span> e) {
+        <span class="code-type">Slog</span>.<span class="code-function">e</span>(<span class="code-type">TAG</span>, <span class="code-string">"Failure starting BatteryService"</span>, e);
+    }
+
+    <span class="code-comment">// ... خدمات أخرى ...</span>
+}</code></pre>
+
+  <div class="info-card">
+    <div class="info-card-title">📌 ملاحظة هامة</div>
+    <p style="margin:0; color:#475569;">
+      في الإصدارات الحديثة من AOSP، يتم استخدام <code>mSystemServiceManager.startService(BatteryService.class)</code> بدلاً من الإنشاء المباشر. هذا يضمن أن <code>SystemServiceManager</code> يتتبع دورة الحياة الكاملة للخدمة.
+    </p>
+  </div>
+
+  <h3>٤.٣ الخطوة 2: onStart() — تسجيل Binder Interface</h3>
+  <p>
+    عند استدعاء <code>onStart()</code>، تقوم <code>BatteryService</code> بإنشاء كائن <code>BinderService</code> داخلي (يُنفّذ واجهة <code>IBatteryStats</code>) وتسجيله في <code>ServiceManager</code>.
+  </p>
+
+  <pre data-lang="java"><code class="language-java"><span class="code-comment">// frameworks/base/services/core/java/com/android/server/BatteryService.java</span>
+<span class="code-keyword">public</span> <span class="code-keyword">final</span> <span class="code-keyword">class</span> <span class="code-type">BatteryService</span> <span class="code-keyword">extends</span> <span class="code-type">SystemService</span> {
+
+    <span class="code-keyword">private</span> <span class="code-keyword">final</span> <span class="code-type">IBatteryStats</span> mBatteryStats;
+    <span class="code-keyword">private</span> <span class="code-keyword">final</span> <span class="code-type">BinderService</span> mBinderService;
+
+    <span class="code-keyword">public</span> <span class="code-function">BatteryService</span>(<span class="code-type">Context</span> context) {
+        <span class="code-keyword">super</span>(context);
+        mBatteryStats = <span class="code-type">BatteryStatsService</span>.<span class="code-function">getService</span>();
+        mBinderService = <span class="code-keyword">new</span> <span class="code-type">BinderService</span>();
+
+        <span class="code-comment">// الاستماع إلى أحداث HAL عبر healthd</span>
+        <span class="code-function">initHealthInfo</span>();
+    }
+
+    <span class="code-annotation">@Override</span>
+    <span class="code-keyword">public</span> <span class="code-keyword">void</span> <span class="code-function">onStart</span>() {
+        <span class="code-type">Slog</span>.<span class="code-function">d</span>(<span class="code-type">TAG</span>, <span class="code-string">"Starting BatteryService..."</span>);
+
+        <span class="code-comment">// تسجيل BinderService في ServiceManager تحت الاسم "battery"</span>
+        <span class="code-function">publishBinderService</span>(<span class="code-type">Context</span>.<span class="code-type">BATTERY_SERVICE</span>, mBinderService);
+
+        <span class="code-comment">// تسجيل مستقبل لأحداث البطارية من HAL</span>
+        <span class="code-function">registerHealthCallback</span>();
+    }
+
+    <span class="code-comment">// ─── الفئة الداخلية التي تُنفّذ واجهة Binder ───</span>
+    <span class="code-keyword">private</span> <span class="code-keyword">final</span> <span class="code-keyword">class</span> <span class="code-type">BinderService</span> <span class="code-keyword">extends</span> <span class="code-type">IBatteryStats.Stub</span> {
+
+        <span class="code-annotation">@Override</span>
+        <span class="code-keyword">public</span> <span class="code-keyword">int</span> <span class="code-function">getBatteryLevel</span>() {
+            <span class="code-keyword">return</span> mHealthInfo.<span class="code-function">batteryLevel</span>;
+        }
+
+        <span class="code-annotation">@Override</span>
+        <span class="code-keyword">public</span> <span class="code-keyword">boolean</span> <span class="code-function">isCharging</span>() {
+            <span class="code-keyword">return</span> mHealthInfo.<span class="code-function">batteryStatus</span> == <span class="code-type">BatteryManager</span>.<span class="code-type">BATTERY_STATUS_CHARGING</span>;
+        }
+
+        <span class="code-annotation">@Override</span>
+        <span class="code-keyword">public</span> <span class="code-keyword">void</span> <span class="code-function">getBatteryState</span>(<span class="code-type">BatteryState</span> state) {
+            <span class="code-keyword">synchronized</span> (mLock) {
+                state.<span class="code-function">set</span>(mHealthInfo);
+            }
+        }
+    }
+}</code></pre>
+
+  <h3>٤.٤ الخطوة 3: الاستماع إلى أحداث العتاد (HAL Events)</h3>
+  <p>
+    <code>BatteryService</code> لا تستقبل أحداث البطارية مباشرة من النواة. بدلاً من ذلك، تستخدم <strong>Health HAL</strong> (Hardware Abstraction Layer) التي تُوفّر واجهة موحدة للتفاعل مع برامج تشغيل البطارية المختلفة.
+  </p>
+
+  <pre data-lang="java"><code class="language-java"><span class="code-comment">// BatteryService.java — تسجيل callback لأحداث HAL</span>
+<span class="code-keyword">private</span> <span class="code-keyword">void</span> <span class="code-function">registerHealthCallback</span>() {
+    <span class="code-keyword">try</span> {
+        <span class="code-type">IHealth</span> healthService = <span class="code-type">IHealth</span>.<span class="code-function">getService</span>(<span class="code-keyword">true</span> <span class="code-comment">/* retry */</span>);
+        <span class="code-keyword">if</span> (healthService != <span class="code-keyword">null</span>) {
+            healthService.<span class="code-function">registerCallback</span>(<span class="code-keyword">new</span> <span class="code-type">HealthCallback</span>());
+        }
+    } <span class="code-keyword">catch</span> (<span class="code-type">RemoteException</span> e) {
+        <span class="code-type">Slog</span>.<span class="code-function">e</span>(<span class="code-type">TAG</span>, <span class="code-string">"Failed to register health callback"</span>, e);
+    }
+}
+
+<span class="code-keyword">private</span> <span class="code-keyword">final</span> <span class="code-keyword">class</span> <span class="code-type">HealthCallback</span> <span class="code-keyword">extends</span> <span class="code-type">IHealthInfoCallback.Stub</span> {
+    <span class="code-annotation">@Override</span>
+    <span class="code-keyword">public</span> <span class="code-keyword">void</span> <span class="code-function">healthInfoChanged</span>(<span class="code-type">HealthInfo</span> info) {
+        <span class="code-keyword">synchronized</span> (mLock) {
+            mHealthInfo = info;
+            <span class="code-function">processValuesLocked</span>();
+        }
+    }
+}</code></pre>
+
+  <h3>٤.٥ الخطوة 4: الاستجابة لمراحل الإقلاع onBootPhase()</h3>
+  <p>
+    عندما يصل <code>SystemServiceManager</code> إلى مرحلة <code>PHASE_BOOT_COMPLETED</code>، يتم إشعار <code>BatteryService</code> لإرسال broadcast أولي يُخبر التطبيقات بحالة البطارية الحالية.
+  </p>
+
+  <pre data-lang="java"><code class="language-java"><span class="code-annotation">@Override</span>
+<span class="code-keyword">public</span> <span class="code-keyword">void</span> <span class="code-function">onBootPhase</span>(<span class="code-keyword">int</span> phase) {
+    <span class="code-keyword">if</span> (phase == <span class="code-type">PHASE_BOOT_COMPLETED</span>) {
+        <span class="code-type">Slog</span>.<span class="code-function">d</span>(<span class="code-type">TAG</span>, <span class="code-string">"Boot completed — sending initial battery broadcast"</span>);
+
+        <span class="code-keyword">synchronized</span> (mLock) {
+            <span class="code-comment">// إرسال Intent.ACTION_BATTERY_CHANGED الأولي</span>
+            <span class="code-type">Intent</span> intent = <span class="code-keyword">new</span> <span class="code-type">Intent</span>(<span class="code-type">Intent</span>.<span class="code-type">ACTION_BATTERY_CHANGED</span>);
+            intent.<span class="code-function">addFlags</span>(<span class="code-type">Intent</span>.<span class="code-type">FLAG_RECEIVER_REGISTERED_ONLY</span>
+                | <span class="code-type">Intent</span>.<span class="code-type">FLAG_RECEIVER_FOREGROUND</span>);
+            <span class="code-function">updateBatteryIntentLocked</span>(intent);
+            mContext.<span class="code-function">sendStickyBroadcastAsUser</span>(intent, <span class="code-type">UserHandle</span>.<span class="code-type">ALL</span>);
+        }
+    }
+}</code></pre>
+
+  <div class="best-practice">
+    <div class="best-practice-title">أفضل الممارسات من BatteryService</div>
+    <ul>
+      <li><strong>استخدام synchronized blocks:</strong> جميع العمليات على <code>mHealthInfo</code> تتم داخل <code>synchronized (mLock)</code> لتجنب race conditions.</li>
+      <li><strong>Sticky Broadcast:</strong> يستخدم <code>ACTION_BATTERY_CHANGED</code> sticky broadcast لضمان أن أي تطبيق يسجّل <code>BroadcastReceiver</code> يستلم آخر قيمة فورًا.</li>
+      <li><strong>فصل Binder Interface:</strong> <code>BinderService</code> فئة داخلية منفصلة تُنفّذ واجهة AIDL — هذا يُبقي منطق الخدمة منفصلًا عن منطق IPC.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">٥</div>
+    <h2>واجهة التطبيقات: نمط التغليف Manager Pattern</h2>
+  </div>
+
+  <h3>٥.١ لماذا لا يتعامل التطبيق مباشرة مع Binder؟</h3>
+  <p>
+    التطبيقات العادية <strong>لا يجب أن تتعامل مباشرة</strong> مع كائنات Binder الخام. بدلاً من ذلك، يوفر Android Framework طبقة تغليف (Wrapper Layer) تُسمى <strong>Managers</strong> — فئات في حزمة <code>android.app</code> تُبسّط الوصول إلى خدمات النظام.
+  </p>
+
+  <div class="ascii-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    Manager Pattern — App → System Service                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌─────────────────┐                                                       │
+│   │   Application   │                                                       │
+│   │                 │                                                       │
+│   │  BatteryManager │  ←──  واجهة عالية المستوى، سهلة الاستخدام          │
+│   │    (android.app)│       getIntProperty(), isCharging()                  │
+│   │                 │                                                       │
+│   └────────┬────────┘                                                       │
+│            │                                                                │
+│            ▼                                                                │
+│   ┌─────────────────┐     ┌─────────────────┐                               │
+│   │  SystemService  │────→│  IBinder Proxy  │  ←──  IPC عبر Binder Driver   │
+│   │    Registry     │     │  (transact())   │                               │
+│   │                 │     │                 │                               │
+│   └─────────────────┘     └────────┬────────┘                               │
+│                                    │                                        │
+│                                    ▼                                        │
+│   ┌─────────────────────────────────────────────────────────────────┐       │
+│   │                    system_server (PID ~500)                      │       │
+│   │                                                                  │       │
+│   │   BatteryService.BinderService  ←──  تنفيذ فعلي للعمليات       │       │
+│   │   (extends IBatteryStats.Stub)                                   │       │
+│   │                                                                  │       │
+│   └─────────────────────────────────────────────────────────────────┘       │
+│                                                                             │
+│   ═══════════════════════════════════════════════════════════════════════   │
+│   الفائدة: التطبيق لا يحتاج لمعرفة تفاصيل Binder أو AIDL أو IPC!          │
+└─────────────────────────────────────────────────────────────────────────────┘
+  </div>
+
+  <h3>٥.٢ تتبع Context.getSystemService()</h3>
+  <p>
+    عندما يستدعي التطبيق <code>getSystemService(Context.BATTERY_SERVICE)</code>، تبدأ رحلة تمر بعدة طبقات:
+  </p>
+
+  <pre data-lang="java"><code class="language-java"><span class="code-comment">// frameworks/base/core/java/android/app/ContextImpl.java</span>
+<span class="code-keyword">class</span> <span class="code-type">ContextImpl</span> <span class="code-keyword">extends</span> <span class="code-type">Context</span> {
+
+    <span class="code-annotation">@Override</span>
+    <span class="code-keyword">public</span> <span class="code-type">Object</span> <span class="code-function">getSystemService</span>(<span class="code-type">String</span> name) {
+        <span class="code-type">ServiceFetcher</span>&lt;?&gt; fetcher = <span class="code-type">SystemServiceRegistry</span>.<span class="code-function">getServiceFetcher</span>(name);
+        <span class="code-keyword">return</span> fetcher != <span class="code-keyword">null</span> ? fetcher.<span class="code-function">getService</span>(<span class="code-keyword">this</span>) : <span class="code-keyword">null</span>;
+    }
+}</code></pre>
+
+  <h3>٥.٣ SystemServiceRegistry — مصنع المدراء</h3>
+  <p>
+    <code>SystemServiceRegistry</code> هو "مصنع" مركزي يُسجّل جميع المدراء (Managers) ويُدير تخزينهم المؤقت (Caching). يتم تسجيل كل خدمة عبر <code>registerService()</code> أثناء تحميل الفئة (static initializer).
+  </p>
+
+  <pre data-lang="java"><code class="language-java"><span class="code-comment">// frameworks/base/core/java/android/app/SystemServiceRegistry.java</span>
+<span class="code-keyword">final</span> <span class="code-keyword">class</span> <span class="code-type">SystemServiceRegistry</span> {
+
+    <span class="code-keyword">private</span> <span class="code-keyword">static</span> <span class="code-keyword">final</span> <span class="code-type">Map&lt;String, ServiceFetcher&lt;?&gt;&gt;</span> SYSTEM_SERVICE_FETCHERS =
+        <span class="code-keyword">new</span> <span class="code-type">ArrayMap</span>&lt;&gt;();
+
+    <span class="code-keyword">static</span> {
+        <span class="code-comment">// ─── تسجيل BatteryManager ───</span>
+        <span class="code-function">registerService</span>(<span class="code-type">Context</span>.<span class="code-type">BATTERY_SERVICE</span>, <span class="code-type">BatteryManager</span>.<span class="code-keyword">class</span>,
+            <span class="code-keyword">new</span> <span class="code-type">CachedServiceFetcher</span>&lt;<span class="code-type">BatteryManager</span>&gt;() {
+                <span class="code-annotation">@Override</span>
+                <span class="code-keyword">public</span> <span class="code-type">BatteryManager</span> <span class="code-function">createService</span>(<span class="code-type">ContextImpl</span> ctx) {
+                    <span class="code-keyword">return</span> <span class="code-keyword">new</span> <span class="code-type">BatteryManager</span>();
+                }
+            });
+
+        <span class="code-comment">// ─── تسجيل PowerManager ───</span>
+        <span class="code-function">registerService</span>(<span class="code-type">Context</span>.<span class="code-type">POWER_SERVICE</span>, <span class="code-type">PowerManager</span>.<span class="code-keyword">class</span>,
+            <span class="code-keyword">new</span> <span class="code-type">CachedServiceFetcher</span>&lt;<span class="code-type">PowerManager</span>&gt;() {
+                <span class="code-annotation">@Override</span>
+                <span class="code-keyword">public</span> <span class="code-type">PowerManager</span> <span class="code-function">createService</span>(<span class="code-type">ContextImpl</span> ctx) {
+                    <span class="code-type">IBinder</span> b = <span class="code-type">ServiceManager</span>.<span class="code-function">getService</span>(<span class="code-type">Context</span>.<span class="code-type">POWER_SERVICE</span>);
+                    <span class="code-type">IPowerManager</span> service = <span class="code-type">IPowerManager.Stub</span>.<span class="code-function">asInterface</span>(b);
+                    <span class="code-keyword">return</span> <span class="code-keyword">new</span> <span class="code-type">PowerManager</span>(ctx.<span class="code-function">getOuterContext</span>(), service,
+                        ctx.<span class="code-function">getDisplayNoVerify</span>(<span class="code-type">Display</span>.<span class="code-type">DEFAULT_DISPLAY</span>));
+                }
+            });
+
+        <span class="code-comment">// ... تسجيل ~50+ خدمة أخرى</span>
+    }
+
+    <span class="code-keyword">private</span> <span class="code-keyword">static</span> &lt;T&gt; <span class="code-keyword">void</span> <span class="code-function">registerService</span>(<span class="code-type">String</span> serviceName,
+                                          <span class="code-type">Class</span>&lt;T&gt; serviceClass,
+                                          <span class="code-type">ServiceFetcher</span>&lt;T&gt; serviceFetcher) {
+        SYSTEM_SERVICE_NAMES.<span class="code-function">put</span>(serviceClass, serviceName);
+        SYSTEM_SERVICE_FETCHERS.<span class="code-function">put</span>(serviceName, serviceFetcher);
+    }
+}</code></pre>
+
+  <h3>٥.٤ BatteryManager — المدير كوكيل (Proxy)</h3>
+  <p>
+    <code>BatteryManager</code> هو الفئة التي يتعامل معها المطوّرون مباشرة. هي تُغلّف الوصول إلى <code>IBatteryStats</code> Binder interface وتُوفّر واجهة Java نظيفة.
+  </p>
+
+  <pre data-lang="java"><code class="language-java"><span class="code-comment">// frameworks/base/core/java/android/os/BatteryManager.java</span>
+<span class="code-keyword">public</span> <span class="code-keyword">class</span> <span class="code-type">BatteryManager</span> {
+
+    <span class="code-keyword">public</span> <span class="code-keyword">static</span> <span class="code-keyword">final</span> <span class="code-type">String</span> <span class="code-function">EXTRA_LEVEL</span> = <span class="code-string">"level"</span>;
+    <span class="code-keyword">public</span> <span class="code-keyword">static</span> <span class="code-keyword">final</span> <span class="code-type">String</span> <span class="code-function">EXTRA_SCALE</span> = <span class="code-string">"scale"</span>;
+    <span class="code-keyword">public</span> <span class="code-keyword">static</span> <span class="code-keyword">final</span> <span class="code-type">String</span> <span class="code-function">EXTRA_STATUS</span> = <span class="code-string">"status"</span>;
+
+    <span class="code-keyword">public</span> <span class="code-keyword">static</span> <span class="code-keyword">final</span> <span class="code-keyword">int</span> <span class="code-function">BATTERY_PROPERTY_CAPACITY</span> = <span class="code-number">4</span>;
+
+    <span class="code-comment">/**
+     * يُرجع قيمة خاصية البطارية المطلوبة.
+     * هذه الدالة تتواصل مع BatteryService عبر Binder IPC.
+     */</span>
+    <span class="code-keyword">public</span> <span class="code-keyword">int</span> <span class="code-function">getIntProperty</span>(<span class="code-keyword">int</span> id) {
+        <span class="code-keyword">try</span> {
+            <span class="code-keyword">return</span> <span class="code-type">IBatteryStats.Stub</span>.<span class="code-function">asInterface</span>(
+                <span class="code-type">ServiceManager</span>.<span class="code-function">getService</span>(<span class="code-type">Context</span>.<span class="code-type">BATTERY_SERVICE</span>)
+            ).<span class="code-function">getIntProperty</span>(id);
+        } <span class="code-keyword">catch</span> (<span class="code-type">RemoteException</span> e) {
+            <span class="code-keyword">return</span> <span class="code-type">Integer</span>.<span class="code-type">MIN_VALUE</span>;
+        }
+    }
+
+    <span class="code-comment">/**
+     * يُرجع نسبة الشحن الحالية (0-100).
+     */</span>
+    <span class="code-keyword">public</span> <span class="code-keyword">int</span> <span class="code-function">getBatteryPercent</span>() {
+        <span class="code-keyword">return</span> <span class="code-function">getIntProperty</span>(<span class="code-type">BATTERY_PROPERTY_CAPACITY</span>);
+    }
+}</code></pre>
+
+  <h3>٥.٥ آلية التخزين المؤقت (Caching)</h3>
+  <p>
+    <code>SystemServiceRegistry</code> يستخدم نمط <code>CachedServiceFetcher</code> لضمان أن كل Manager يُنشأ مرة واحدة فقط لكل <code>Context</code>، مما يُقلل من حمل إنشاء كائنات Binder proxy.
+  </p>
+
+  <pre data-lang="java"><code class="language-java"><span class="code-comment">// SystemServiceRegistry.java — آلية التخزين المؤقت</span>
+<span class="code-keyword">static</span> <span class="code-keyword">abstract</span> <span class="code-keyword">class</span> <span class="code-type">CachedServiceFetcher</span>&lt;T&gt; <span class="code-keyword">implements</span> <span class="code-type">ServiceFetcher</span>&lt;T&gt; {
+    <span class="code-keyword">private</span> <span class="code-keyword">final</span> <span class="code-keyword">int</span> mCacheIndex;
+
+    <span class="code-function">CachedServiceFetcher</span>() {
+        mCacheIndex = sServiceCacheSize++;
+    }
+
+    <span class="code-annotation">@Override</span>
+    <span class="code-keyword">public</span> <span class="code-keyword">final</span> T <span class="code-function">getService</span>(<span class="code-type">ContextImpl</span> ctx) {
+        <span class="code-keyword">final</span> <span class="code-type">Object</span>[] cache = ctx.<span class="code-function">getServiceCache</span>();
+        <span class="code-keyword">synchronized</span> (cache) {
+            <span class="code-type">Object</span> service = cache[mCacheIndex];
+            <span class="code-keyword">if</span> (service == <span class="code-keyword">null</span>) {
+                service = <span class="code-function">createService</span>(ctx); <span class="code-comment">// ← إنشاء مرة واحدة فقط</span>
+                cache[mCacheIndex] = service;
+            }
+            <span class="code-keyword">return</span> (T) service;
+        }
+    }
+
+    <span class="code-keyword">public</span> <span class="code-keyword">abstract</span> T <span class="code-function">createService</span>(<span class="code-type">ContextImpl</span> ctx);
+}</code></pre>
+
+  <div class="info-card">
+    <div class="info-card-title">📊 أداء Manager Pattern</div>
+    <p style="margin:0; color:#475569;">
+      بدون التخزين المؤقت، كل استدعاء لـ <code>getSystemService()</code> سيُنشئ Binder proxy جديد — وهذا مكلف. بفضل <code>CachedServiceFetcher</code>، يتم إنشاء كل Manager مرة واحدة فقط لكل <code>Context</code>، مما يُقلل من:
+    </p>
+    <ul style="margin-top:8px;">
+      <li>حمل GC (Garbage Collection) بسبب إنشاء كائنات مؤقتة</li>
+      <li>استدعاءات IPC المتكررة إلى <code>ServiceManager</code></li>
+      <li>استهلاك الذاكرة بسبب proxies مكررة</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">٦</div>
+    <h2>أفضل الممارسات لتعديل الفريمورك</h2>
+  </div>
+
+  <h3>٦.١ الخطوات الكاملة لإضافة خدمة نظام مخصصة</h3>
+  <p>
+    إضافة خدمة نظام مخصصة في AOSP تتطلب تعديلات في عدة طبقات. فيما يلي الخطوات المنهجية:
+  </p>
+
+  <div class="flow-step">
+    <div class="flow-step-number">1</div>
+    <div class="flow-step-content">
+      <div class="flow-step-title">تعريف واجهة AIDL</div>
+      <div>أنشئ ملف <code>ICustomService.aidl</code> في <span class="aosp-path">frameworks/base/core/java/android/os/ICustomService.aidl</span></div>
+    </div>
+  </div>
+
+  <div class="flow-step">
+    <div class="flow-step-number">2</div>
+    <div class="flow-step-content">
+      <div class="flow-step-title">كتابة خدمة النظام</div>
+      <div>أنشئ <code>CustomService.java</code> في <span class="aosp-path">frameworks/base/services/core/java/com/android/server/CustomService.java</span> واجعلها ترث <code>SystemService</code>.</div>
+    </div>
+  </div>
+
+  <div class="flow-step">
+    <div class="flow-step-number">3</div>
+    <div class="flow-step-content">
+      <div class="flow-step-title">تسجيل الخدمة في SystemServer</div>
+      <div>أضف <code>mSystemServiceManager.startService(CustomService.class)</code> في <code>SystemServer.run()</code>.</div>
+    </div>
+  </div>
+
+  <div class="flow-step">
+    <div class="flow-step-number">4</div>
+    <div class="flow-step-content">
+      <div class="flow-step-title">إنشاء Manager للتطبيقات</div>
+      <div>أنشئ <code>CustomManager.java</code> في <span class="aosp-path">frameworks/base/core/java/android/app/CustomManager.java</span> تُغلّف الوصول إلى AIDL interface.</div>
+    </div>
+  </div>
+
+  <div class="flow-step">
+    <div class="flow-step-number">5</div>
+    <div class="flow-step-content">
+      <div class="flow-step-title">تسجيل Manager في SystemServiceRegistry</div>
+      <div>أضف <code>registerService(Context.CUSTOM_SERVICE, CustomManager.class, ...)</code> في <code>SystemServiceRegistry</code>.</div>
+    </div>
+  </div>
+
+  <h3>٦.٢ مثال عملي: خدمة مخصصة</h3>
+
+  <h4>الخطوة 1: AIDL Interface</h4>
+  <pre data-lang="aidl"><code class="language-java"><span class="code-comment">// frameworks/base/core/java/android/os/ICustomService.aidl</span>
+<span class="code-keyword">package</span> android.os;
+
+<span class="code-keyword">interface</span> <span class="code-type">ICustomService</span> {
+    <span class="code-keyword">int</span> <span class="code-function">getCustomValue</span>();
+    <span class="code-keyword">void</span> <span class="code-function">setCustomValue</span>(<span class="code-keyword">int</span> value);
+}</code></pre>
+
+  <h4>الخطوة 2: خدمة النظام</h4>
+  <pre data-lang="java"><code class="language-java"><span class="code-comment">// frameworks/base/services/core/java/com/android/server/CustomService.java</span>
+<span class="code-keyword">package</span> com.android.server;
+
+<span class="code-keyword">public</span> <span class="code-keyword">class</span> <span class="code-type">CustomService</span> <span class="code-keyword">extends</span> <span class="code-type">SystemService</span> {
+
+    <span class="code-keyword">private</span> <span class="code-keyword">final</span> <span class="code-type">BinderService</span> mBinderService;
+    <span class="code-keyword">private</span> <span class="code-keyword">int</span> mValue = <span class="code-number">0</span>;
+
+    <span class="code-keyword">public</span> <span class="code-function">CustomService</span>(<span class="code-type">Context</span> context) {
+        <span class="code-keyword">super</span>(context);
+        mBinderService = <span class="code-keyword">new</span> <span class="code-type">BinderService</span>();
+    }
+
+    <span class="code-annotation">@Override</span>
+    <span class="code-keyword">public</span> <span class="code-keyword">void</span> <span class="code-function">onStart</span>() {
+        <span class="code-function">publishBinderService</span>(<span class="code-type">Context</span>.<span class="code-type">CUSTOM_SERVICE</span>, mBinderService);
+    }
+
+    <span class="code-keyword">private</span> <span class="code-keyword">final</span> <span class="code-keyword">class</span> <span class="code-type">BinderService</span> <span class="code-keyword">extends</span> <span class="code-type">ICustomService.Stub</span> {
+        <span class="code-annotation">@Override</span>
+        <span class="code-keyword">public</span> <span class="code-keyword">int</span> <span class="code-function">getCustomValue</span>() {
+            <span class="code-keyword">return</span> mValue;
+        }
+
+        <span class="code-annotation">@Override</span>
+        <span class="code-keyword">public</span> <span class="code-keyword">void</span> <span class="code-function">setCustomValue</span>(<span class="code-keyword">int</span> value) {
+            mValue = value;
+        }
+    }
+}</code></pre>
+
+  <h4>الخطوة 3: Manager للتطبيقات</h4>
+  <pre data-lang="java"><code class="language-java"><span class="code-comment">// frameworks/base/core/java/android/app/CustomManager.java</span>
+<span class="code-keyword">package</span> android.app;
+
+<span class="code-keyword">public</span> <span class="code-keyword">class</span> <span class="code-type">CustomManager</span> {
+    <span class="code-keyword">private</span> <span class="code-keyword">final</span> <span class="code-type">ICustomService</span> mService;
+
+    <span class="code-function">CustomManager</span>(<span class="code-type">ICustomService</span> service) {
+        mService = service;
+    }
+
+    <span class="code-keyword">public</span> <span class="code-keyword">int</span> <span class="code-function">getValue</span>() {
+        <span class="code-keyword">try</span> {
+            <span class="code-keyword">return</span> mService.<span class="code-function">getCustomValue</span>();
+        } <span class="code-keyword">catch</span> (<span class="code-type">RemoteException</span> e) {
+            <span class="code-keyword">throw</span> e.<span class="code-function">rethrowFromSystemServer</span>();
+        }
+    }
+}</code></pre>
+
+  <h4>الخطوة 4: تسجيل في SystemServiceRegistry</h4>
+  <pre data-lang="java"><code class="language-java"><span class="code-comment">// frameworks/base/core/java/android/app/SystemServiceRegistry.java</span>
+<span class="code-keyword">static</span> {
+    <span class="code-comment">// ... تسجيلات أخرى ...</span>
+
+    <span class="code-function">registerService</span>(<span class="code-type">Context</span>.<span class="code-type">CUSTOM_SERVICE</span>, <span class="code-type">CustomManager</span>.<span class="code-keyword">class</span>,
+        <span class="code-keyword">new</span> <span class="code-type">CachedServiceFetcher</span>&lt;<span class="code-type">CustomManager</span>&gt;() {
+            <span class="code-annotation">@Override</span>
+            <span class="code-keyword">public</span> <span class="code-type">CustomManager</span> <span class="code-function">createService</span>(<span class="code-type">ContextImpl</span> ctx) {
+                <span class="code-type">IBinder</span> b = <span class="code-type">ServiceManager</span>.<span class="code-function">getService</span>(<span class="code-type">Context</span>.<span class="code-type">CUSTOM_SERVICE</span>);
+                <span class="code-type">ICustomService</span> service = <span class="code-type">ICustomService.Stub</span>.<span class="code-function">asInterface</span>(b);
+                <span class="code-keyword">return</span> <span class="code-keyword">new</span> <span class="code-type">CustomManager</span>(service);
+            }
+        });
+}</code></pre>
+
+  <h3>٦.٣ قائمة مراجعة (Checklist) قبل الدمج</h3>
+
+  <div class="best-practice">
+    <div class="best-practice-title">قائمة التحقق من جودة خدمة النظام</div>
+    <ul>
+      <li><strong>Thread Safety:</strong> هل جميع العمليات على الحالة المشتركة محمية بـ <code>synchronized</code> أو Locks؟</li>
+      <li><strong>Deadlock Prevention:</strong> هل هناك تبعيات دائرية بين خدمات النظام؟</li>
+      <li><strong>SELinux:</strong> هل تم تحديث سياسات SELinux للسماح بالتسجيل في ServiceManager؟</li>
+      <li><strong>Permission Checks:</strong> هل تتحقق الخدمة من الأذونات (Permissions) قبل تنفيذ العمليات الحساسة؟</li>
+      <li><strong>Memory Leaks:</strong> هل تُسجّل الخدمة BroadcastReceivers أو Listeners دون إلغاء تسجيلها؟</li>
+      <li><strong>Boot Time:</strong> هل عملية <code>onStart()</code> خفيفة بما يكفي؟ (تجنب I/O_blocking في onStart)</li>
+      <li><strong>RemoteException:</strong> هل يتم التعامل مع <code>RemoteException</code> في جميع استدعاءات Binder؟</li>
+    </ul>
+  </div>
+
+  <div class="warning-card">
+    <div class="warning-card-title">⚠️ تحذيرات هامة</div>
+    <ul style="margin:0; color:#92400e;">
+      <li><strong>لا تُنفّذ I/O_blocking في onStart():</strong> هذا سيُبطئ إقلاع النظام بأكمله. استخدم Threads أو Handlers للعمليات الثقيلة.</li>
+      <li><strong>لا تفترض ترتيب بدء الخدمات:</strong> استخدم <code>onBootPhase()</code> بدلاً من الافتراض بأن خدمة أخرى قد بدأت.</li>
+      <li><strong>اجتنب التبعيات الدائرية:</strong> إذا كانت الخدمة A تعتمد على B وB تعتمد على A، فسيتسبب ذلك في Deadlock.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<div class="page-footer">
+  <p>تم إعداد هذا المرجع كجزء من مسار تعلم Android Framework Architecture — البلوك 8: اليوم 15-16</p>
+  <p style="margin-top:4px; color:#cbd5e1;">System Services Deep Dive | AOSP Framework | Android OS Internals</p>
+</div>
+
+</div> <!-- end container -->
+</body>
+</html>

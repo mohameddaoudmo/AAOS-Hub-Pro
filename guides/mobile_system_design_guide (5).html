@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PART I: Mobile System Design Basics — دليل شامل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@300;400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-navy: #0F172A;
+            --electric-blue: #38BDF8;
+            --cyber-green: #2DD4BF;
+            --system-amber: #F59E0B;
+            --crimson-alert: #EF4444;
+            --soft-bg: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-primary: #1E293B;
+            --text-secondary: #64748B;
+            --border-light: #E2E8F0;
+            --code-bg: #1E293B;
+            --code-text: #E2E8F0;
+            --gradient-hero: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+            --gradient-card: linear-gradient(145deg, #FFFFFF 0%, #F1F5F9 100%);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Tajawal', 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--soft-bg);
+            color: var(--text-primary);
+            line-height: 1.8;
+            font-size: 17px;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--soft-bg); }
+        ::-webkit-scrollbar-thumb { background: var(--electric-blue); border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--deep-navy); }
+        .hero {
+            background: var(--gradient-hero);
+            color: white;
+            padding: 100px 20px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 50%, rgba(56,189,248,0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 50%, rgba(45,212,191,0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(56,189,248,0.15);
+            border: 1px solid rgba(56,189,248,0.3);
+            color: var(--electric-blue);
+            padding: 8px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+        .hero h1 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.3;
+            background: linear-gradient(135deg, #FFFFFF 0%, var(--electric-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: rgba(255,255,255,0.75);
+            max-width: 700px;
+            margin: 0 auto 40px;
+            font-weight: 400;
+        }
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+        .hero-meta-item { text-align: center; }
+        .hero-meta-item .number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--cyber-green);
+            display: block;
+            line-height: 1;
+        }
+        .hero-meta-item .label {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 4px;
+        }
+        .nav-toc {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-light);
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+        .nav-toc-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        .nav-toc a {
+            white-space: nowrap;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        .nav-toc a:hover, .nav-toc a.active {
+            background: rgba(56,189,248,0.1);
+            color: var(--electric-blue);
+            border-color: rgba(56,189,248,0.2);
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+        .section { margin-bottom: 80px; }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-light);
+        }
+        .section-number {
+            width: 56px;
+            height: 56px;
+            background: var(--gradient-hero);
+            color: white;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            font-family: 'Cairo', sans-serif;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-md);
+        }
+        .section-title {
+            font-family: 'Cairo', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--deep-navy);
+            line-height: 1.3;
+        }
+        .section-title-en {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-family: 'Fira Code', monospace;
+            margin-top: 4px;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        .card-gradient { background: var(--gradient-card); }
+        .card-dark {
+            background: var(--deep-navy);
+            color: white;
+            border: 1px solid rgba(56,189,248,0.2);
+        }
+        .card-dark .card-title { color: white; }
+        .card-dark p { color: rgba(255,255,255,0.8); }
+        .card-title {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--deep-navy);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .icon-blue { background: rgba(56,189,248,0.15); color: var(--electric-blue); }
+        .icon-green { background: rgba(45,212,191,0.15); color: var(--cyber-green); }
+        .icon-amber { background: rgba(245,158,11,0.15); color: var(--system-amber); }
+        .icon-red { background: rgba(239,68,68,0.15); color: var(--crimson-alert); }
+        .icon-purple { background: rgba(139,92,246,0.15); color: #8B5CF6; }
+        .callout {
+            border-radius: var(--radius-md);
+            padding: 24px 28px;
+            margin: 24px 0;
+            border-right: 5px solid;
+            position: relative;
+        }
+        .callout-info { background: rgba(56,189,248,0.08); border-color: var(--electric-blue); }
+        .callout-success { background: rgba(45,212,191,0.08); border-color: var(--cyber-green); }
+        .callout-warning { background: rgba(245,158,11,0.08); border-color: var(--system-amber); }
+        .callout-danger { background: rgba(239,68,68,0.08); border-color: var(--crimson-alert); }
+        .callout-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            font-family: 'Cairo', sans-serif;
+        }
+        .callout-info .callout-title { color: var(--electric-blue); }
+        .callout-success .callout-title { color: var(--cyber-green); }
+        .callout-warning .callout-title { color: var(--system-amber); }
+        .callout-danger .callout-title { color: var(--crimson-alert); }
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 24px;
+            border-radius: var(--radius-md);
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            margin: 20px 0;
+            border: 1px solid rgba(56,189,248,0.15);
+            position: relative;
+        }
+        pre::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--electric-blue), var(--cyber-green));
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+        }
+        code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            background: rgba(56,189,248,0.1);
+            color: var(--electric-blue);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            font-size: inherit;
+        }
+        .code-label {
+            display: inline-block;
+            background: var(--deep-navy);
+            color: var(--electric-blue);
+            padding: 4px 16px;
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: -4px;
+            margin-right: 8px;
+            border: 1px solid rgba(56,189,248,0.2);
+            border-bottom: none;
+        }
+        .syntax-keyword { color: #C678DD; }
+        .syntax-string { color: #98C379; }
+        .syntax-comment { color: #5C6370; font-style: italic; }
+        .syntax-function { color: #61AFEF; }
+        .syntax-number { color: #D19A66; }
+        .syntax-class { color: #E5C07B; }
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 24px 0;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            font-size: 15px;
+        }
+        thead { background: var(--gradient-hero); color: white; }
+        th {
+            padding: 16px 20px;
+            text-align: right;
+            font-weight: 700;
+            font-family: 'Cairo', sans-serif;
+            font-size: 15px;
+            white-space: nowrap;
+        }
+        td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: top;
+        }
+        tbody tr:hover { background: rgba(56,189,248,0.03); }
+        tbody tr:last-child td { border-bottom: none; }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        .badge-blue { background: rgba(56,189,248,0.15); color: #0284C7; }
+        .badge-green { background: rgba(45,212,191,0.15); color: #0D9488; }
+        .badge-amber { background: rgba(245,158,11,0.15); color: #B45309; }
+        .badge-red { background: rgba(239,68,68,0.15); color: #B91C1C; }
+        .badge-purple { background: rgba(139,92,246,0.15); color: #7C3AED; }
+        .badge-dark { background: var(--deep-navy); color: white; }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .pillar {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            border: 2px solid var(--border-light);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .pillar:hover {
+            border-color: var(--electric-blue);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        .pillar-number {
+            position: absolute;
+            top: -14px;
+            right: 24px;
+            width: 36px;
+            height: 36px;
+            background: var(--electric-blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 16px;
+            box-shadow: var(--shadow-md);
+        }
+        .pillar-title {
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            margin-top: 8px;
+            color: var(--deep-navy);
+        }
+        .matrix-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+        }
+        .matrix-header {
+            background: var(--gradient-hero);
+            color: white;
+            padding: 20px 28px;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+        .timeline {
+            position: relative;
+            padding-right: 40px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            right: 12px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--electric-blue), var(--cyber-green));
+            border-radius: 3px;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 32px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            right: -34px;
+            top: 6px;
+            width: 16px;
+            height: 16px;
+            background: var(--card-bg);
+            border: 4px solid var(--electric-blue);
+            border-radius: 50%;
+            z-index: 2;
+        }
+        .timeline-item:last-child::before { border-color: var(--cyber-green); }
+        .timeline-time {
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            color: var(--electric-blue);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .timeline-title {
+            font-family: 'Cairo', sans-serif;
+            font-weight: 800;
+            font-size: 1.15rem;
+            color: var(--deep-navy);
+            margin-bottom: 6px;
+        }
+        ul.feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        ul.feature-list li {
+            padding: 10px 0;
+            padding-right: 32px;
+            position: relative;
+            border-bottom: 1px solid var(--border-light);
+        }
+        ul.feature-list li:last-child { border-bottom: none; }
+        ul.feature-list li::before {
+            content: '▸';
+            position: absolute;
+            right: 0;
+            color: var(--cyber-green);
+            font-weight: 900;
+            font-size: 18px;
+        }
+        .protocol-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            border: 2px solid var(--border-light);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .protocol-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+        .protocol-card.rest::before { background: var(--electric-blue); }
+        .protocol-card.graphql::before { background: #E535AB; }
+        .protocol-card.ws::before { background: var(--cyber-green); }
+        .protocol-card.grpc::before { background: var(--system-amber); }
+        .protocol-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: transparent;
+        }
+        .protocol-name {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .protocol-card.rest .protocol-name { color: var(--electric-blue); }
+        .protocol-card.graphql .protocol-name { color: #E535AB; }
+        .protocol-card.ws .protocol-name { color: var(--cyber-green); }
+        .protocol-card.grpc .protocol-name { color: var(--system-amber); }
+        .metric-box {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            text-align: center;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+        .metric-box:hover {
+            border-color: var(--electric-blue);
+            transform: scale(1.02);
+        }
+        .metric-value {
+            font-family: 'Fira Code', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--deep-navy);
+            display: block;
+        }
+        .metric-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-weight: 600;
+        }
+        .footer {
+            background: var(--deep-navy);
+            color: white;
+            padding: 60px 24px;
+            text-align: center;
+            margin-top: 80px;
+        }
+        .footer h3 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+        .footer p {
+            color: rgba(255,255,255,0.6);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .section-title { font-size: 1.5rem; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .card { padding: 24px; }
+            .container { padding: 40px 16px; }
+            .hero { padding: 60px 16px 50px; }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .section { animation: fadeInUp 0.6s ease-out; }
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(56,189,248,0.05) 0%, rgba(45,212,191,0.05) 100%);
+            border: 1px dashed var(--electric-blue);
+            border-radius: var(--radius-md);
+            padding: 20px 24px;
+            margin: 20px 0;
+        }
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        .tag {
+            background: var(--soft-bg);
+            border: 1px solid var(--border-light);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+        .tag:hover {
+            background: var(--electric-blue);
+            color: white;
+            border-color: var(--electric-blue);
+        }
+        .diagram-box {
+            background: var(--code-bg);
+            color: var(--code-text);
+            border-radius: var(--radius-md);
+            padding: 28px;
+            margin: 24px 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            border: 1px solid rgba(56,189,248,0.2);
+            overflow-x: auto;
+        }
+        .diagram-box .node { color: var(--electric-blue); font-weight: 600; }
+        .diagram-box .arrow { color: var(--cyber-green); }
+        .diagram-box .label { color: var(--system-amber); }
+        .diagram-box .comment { color: #5C6370; }
+    </style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-badge">📱 MOBILE SYSTEM DESIGN MASTER GUIDE</div>
+    <h1>الجزء الأول: أساسيات تصميم أنظمة الهواتف</h1>
+    <p class="hero-subtitle">
+        دليل شامل ومعمّق لكل ما يحتاجه المهندس المتمرس لفهم البنية التحتية لتطبيقات الموبايل، 
+        من النماذج المعمارية إلى قيود الأجهزة واستراتيجيات المقابلات التقنية.
+    </p>
+    <div class="hero-meta">
+        <div class="hero-meta-item">
+            <span class="number">04</span>
+            <span class="label">أقسام رئيسية</span>
+        </div>
+        <div class="hero-meta-item">
+            <span class="number">12+</span>
+            <span class="label">مفهوم أساسي</span>
+        </div>
+        <div class="hero-meta-item">
+            <span class="number">03</span>
+            <span class="label">مصفوفات قرارات</span>
+        </div>
+        <div class="hero-meta-item">
+            <span class="number">45</span>
+            <span class="label">دقيقة مقابلة</span>
+        </div>
+    </div>
+</section>
+
+<!-- NAVIGATION -->
+<nav class="nav-toc">
+    <div class="nav-toc-inner">
+        <a href="#sec1" class="active">ما هو تصميم أنظمة الهواتف؟</a>
+        <a href="#sec2">المفاهيم الأساسية</a>
+        <a href="#sec3">قيود الهواتف</a>
+        <a href="#sec4">مصفوفة القرارات</a>
+        <a href="#interview">خطة المقابلة</a>
+    </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="container">
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 1: WHAT IS MOBILE SYSTEM DESIGN? -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="section" id="sec1">
+    <div class="section-header">
+        <div class="section-number">1</div>
+        <div>
+            <h2 class="section-title">ما هو تصميم أنظمة الهواتف؟</h2>
+            <div class="section-title-en">What is Mobile System Design?</div>
+        </div>
+    </div>
+
+    <!-- System Design Definition -->
+    <div class="card card-gradient">
+        <div class="card-title">
+            <div class="card-icon icon-blue">🎯</div>
+            تعريف System Design ببساطة
+        </div>
+        <p style="font-size: 1.05rem; line-height: 2; color: var(--text-primary);">
+            <strong>System Design</strong> هو فن وعلم بناء الأنظمة البرمجية القادرة على التعامل مع متطلبات العمل 
+            (Functional Requirements) وقيود التشغيل (Non-Functional Requirements) بكفاءة. في سياق 
+            <strong>Mobile System Design</strong>، نركز على تصميم تطبيقات العميل (Client-Side Applications) 
+            التي تعمل على أجهزة المستخدم النهائي، مقابل <strong>Backend System Design</strong> الذي يهتم 
+            ببناء الخوادم والخدمات السحابية (Server-Side Monoliths/Microservices).
+        </p>
+        <div class="highlight-box" style="margin-top: 20px;">
+            <strong>الفرق الجوهري:</strong> Backend يتحكم في البيئة (Environment) بالكامل — يمكنك إضافة خوادم، 
+            تحديث الـ OS، وتحسين الشبكة. أما Mobile فأنت تُرسل كود إلى "جهاز غريب" لا تملكه، 
+            لا تتحكم في موارده، ولا تعرف حالته.
+        </div>
+    </div>
+
+    <!-- Why Companies Ask -->
+    <div class="card">
+        <div class="card-title">
+            <div class="card-icon icon-green">💼</div>
+            لماذا تسأل الشركات الكبرى أسئلة System Design؟
+        </div>
+        <p style="margin-bottom: 20px;">
+            عند تقييم مرشحين لمناصب <strong>Senior/Staff Engineer</strong>، لا يبحث المقابلون عن إجابة "صحيحة" 
+            واحدة، بل عن طريقة تفكير منظمة. إليك ما يتم تقييمه فعلياً:
+        </p>
+        <div class="grid-2">
+            <div class="pillar">
+                <div class="pillar-number">1</div>
+                <div class="pillar-title">Scalability Thinking</div>
+                <p>قدرة المهندس على التفكير في النمو — ماذا يحدث عندما يصبح التطبيق لديه مليون مستخدم؟ عشرة ملايين؟</p>
+            </div>
+            <div class="pillar">
+                <div class="pillar-number">2</div>
+                <div class="pillar-title">Trade-offs Analysis</div>
+                <p>هل يستطيع المرشح توضيح التضحيات (Trade-offs) بين السرعة والموثوقية، أو بين الذاكرة والشبكة؟</p>
+            </div>
+            <div class="pillar">
+                <div class="pillar-number">3</div>
+                <div class="pillar-title">Edge-Case Handling</div>
+                <p>كيف يتعامل النظام مع السيناريوهات النادرة؟ انقطاع الشبكة، نفاد البطارية، أو قتل النظام للتطبيق؟</p>
+            </div>
+            <div class="pillar">
+                <div class="pillar-number">4</div>
+                <div class="pillar-title">Systems Thinking</div>
+                <p>رؤية النظام ككل متكامل — ليس فقط كود، بل بيانات، شبكة، أجهزة، وسياسات أمنية.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backend vs Mobile Comparison -->
+    <div class="card">
+        <div class="card-title">
+            <div class="card-icon icon-amber">⚖️</div>
+            Backend System Design vs. Mobile System Design
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>معيار المقارنة</th>
+                        <th>Backend System Design</th>
+                        <th>Mobile System Design</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>State Management</strong></td>
+                        <td><span class="badge badge-blue">Stateless</span> غالباً — الطلبات لا تحمل حالة بينها</td>
+                        <td><span class="badge badge-amber">Stateful</span> — التطبيق يحتفظ بحالة UI، Cache، وSession</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Scaling Strategy</strong></td>
+                        <td><span class="badge badge-green">Horizontal Scaling</span> — إضافة خوادم بسهولة</td>
+                        <td><span class="badge badge-red">Resource Constraints</span> — لا يمكن "إضافة ذاكرة" للهاتف</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Primary Bottleneck</strong></td>
+                        <td><span class="badge badge-purple">DB Bottlenecks</span> — قاعدة البيانات هي الحد الأقصى</td>
+                        <td><span class="badge badge-amber">Battery/Network</span> — البطارية والشبكة هما القيد الأساسي</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Deployment Control</strong></td>
+                        <td><span class="badge badge-green">Full Control</span> — CI/CD فوري وموحد</td>
+                        <td><span class="badge badge-red">Fragmented</span> — App Store review، OS versions مختلفة</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Failure Recovery</strong></td>
+                        <td><span class="badge badge-blue">Auto-restart</span> — Kubernetes، Health checks</td>
+                        <td><span class="badge badge-amber">User-dependent</span> — يجب على المستخدم إعادة فتح التطبيق</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Environment</strong></td>
+                        <td><span class="badge badge-blue">Controlled</span> — Data center موثوق</td>
+                        <td><span class="badge badge-red">Uncontrolled</span> — 2G في مترو الأنفاق، 5G في المنزل</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- HLD vs LLD -->
+    <div class="grid-2">
+        <div class="card card-dark">
+            <div class="card-title">
+                <div class="card-icon icon-blue" style="background: rgba(56,189,248,0.2);">🏗️</div>
+                High-Level Design (HLD)
+            </div>
+            <ul class="feature-list">
+                <li>Data Flow بين العميل والخادم</li>
+                <li>Client-Server Boundaries</li>
+                <li>Sync Strategies (Pull vs Push)</li>
+                <li>Caching Layers (Memory, Disk, Network)</li>
+                <li>Network Protocols (REST, GraphQL, WebSocket)</li>
+                <li>Architecture Patterns (MVI, MVVM, Clean Architecture)</li>
+            </ul>
+        </div>
+        <div class="card" style="border: 2px solid var(--cyber-green);">
+            <div class="card-title">
+                <div class="card-icon icon-green">🔬</div>
+                Low-Level Design (LLD)
+            </div>
+            <ul class="feature-list">
+                <li>Class Diagrams و UML Relationships</li>
+                <li>Design Patterns (Observer, Factory, Repository, Singleton)</li>
+                <li>Threading & Concurrency Models</li>
+                <li>State Management (Redux, BLoC, MVI)</li>
+                <li>Local Database Schema (Room, Core Data, SQLite)</li>
+                <li>Memory Management & Object Lifecycles</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- What Interviewers Care About -->
+    <div class="callout callout-info">
+        <div class="callout-title">🎤 ما يهتم به مقابل Mobile فعلياً — The 5 Evaluation Pillars</div>
+        <div class="grid-2" style="margin-top: 16px; gap: 16px;">
+            <div style="background: rgba(255,255,255,0.5); padding: 16px; border-radius: 10px;">
+                <strong style="color: var(--deep-navy);">1. Clarifying Requirements</strong><br>
+                هل تسأل عن حجم المستخدمين؟ نوع الجهاز؟ هل التطبيق يحتاج Offline mode؟
+            </div>
+            <div style="background: rgba(255,255,255,0.5); padding: 16px; border-radius: 10px;">
+                <strong style="color: var(--deep-navy);">2. Modularity</strong><br>
+                هل يمكن فصل الميزات إلى Modules مستقلة؟ Feature Flags؟ Micro-frontends؟
+            </div>
+            <div style="background: rgba(255,255,255,0.5); padding: 16px; border-radius: 10px;">
+                <strong style="color: var(--deep-navy);">3. Performance & Resource Constraints</strong><br>
+                كيف تتعامل مع Battery drain؟ Memory pressure؟ Thermal throttling؟
+            </div>
+            <div style="background: rgba(255,255,255,0.5); padding: 16px; border-radius: 10px;">
+                <strong style="color: var(--deep-navy);">4. Offline Readiness</strong><br>
+                هل يعمل التطبيق بدون إنترنت؟ ما استراتيجية Sync؟ Conflict resolution؟
+            </div>
+        </div>
+        <div style="background: rgba(255,255,255,0.5); padding: 16px; border-radius: 10px; margin-top: 16px;">
+            <strong style="color: var(--deep-navy);">5. Trade-off Articulation</strong><br>
+            هل تستطيع توضيح لماذا اخترت GraphQL بدلاً من REST؟ لماذا Room وليس Realm؟ 
+            ما هي التضحيات (Trade-offs) في كل قرار؟
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 2: CORE CONCEPTS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="section" id="sec2">
+    <div class="section-header">
+        <div class="section-number">2</div>
+        <div>
+            <h2 class="section-title">المفاهيم الأساسية التي يجب أن يعرفها كل مطور موبايل</h2>
+            <div class="section-title-en">Core Concepts Every Mobile Developer Must Know</div>
+        </div>
+    </div>
+
+    <!-- Client-Server Model -->
+    <div class="card">
+        <div class="card-title">
+            <div class="card-icon icon-blue">🌐</div>
+            نموذج العميل-الخادم — Client-Server Model
+        </div>
+        <p style="margin-bottom: 24px;">
+            كل طلب (Request) يخرج من تطبيق الموبايل يمر بمراحل متعددة. فهم هذه المراحل ضروري 
+            لتشخيص مشاكل الأداء وتصميم حلول فعالة:
+        </p>
+
+        <div class="diagram-box" dir="ltr">
+<span class="comment">┌─────────────────────────────────────────────────────────────────────────┐</span>
+<span class="comment">│                    MOBILE REQUEST LIFECYCLE                             │</span>
+<span class="comment">└─────────────────────────────────────────────────────────────────────────┘</span>
+
+<span class="node">[Mobile App]</span> 
+       │
+       ▼ <span class="label">1. DNS Resolution</span> <span class="arrow">──────────────────────────────────────►</span> <span class="node">[DNS Server]</span>
+       │         (Translate domain → IP address)
+       ▼
+<span class="node">[TLS Handshake]</span> <span class="arrow">────────────────────────────────────────────────►</span> <span class="node">[Server]</span>
+       │         (Certificate validation, Key exchange)
+       ▼
+<span class="node">[API Gateway]</span> <span class="arrow">──────────────────────────────────────────────────►</span> <span class="node">[Load Balancer]</span>
+       │         (Auth, Rate limiting, Routing)
+       ▼
+<span class="node">[Payload Parsing]</span> <span class="label">JSON / Protobuf / XML deserialization</span>
+       │
+       ▼
+<span class="node">[Local DB Persistence]</span> <span class="label">Room / Core Data / SQLite write</span>
+       │
+       ▼
+<span class="node">[UI Render]</span> <span class="label">Compose / SwiftUI / RecyclerView update</span>
+       │
+       ▼
+<span class="node">[User Sees Result]</span> 🎉
+        </div>
+
+        <div class="grid-4" style="margin-top: 24px;">
+            <div class="metric-box">
+                <span class="metric-value">~50ms</span>
+                <span class="metric-label">DNS Resolution</span>
+            </div>
+            <div class="metric-box">
+                <span class="metric-value">~100ms</span>
+                <span class="metric-label">TLS Handshake</span>
+            </div>
+            <div class="metric-box">
+                <span class="metric-value">~200ms</span>
+                <span class="metric-label">Network RTT (4G)</span>
+            </div>
+            <div class="metric-box">
+                <span class="metric-value">16ms</span>
+                <span class="metric-label">Frame Budget (60fps)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Protocols -->
+    <div class="card">
+        <div class="card-title">
+            <div class="card-icon icon-purple">📡</div>
+            مصفوفة البروتوكولات — APIs & Protocols Matrix
+        </div>
+        <p style="margin-bottom: 24px;">
+            اختيار البروتوكول المناسب هو قرار معماري حاسم. لا يوجد "أفضل" بروتوكول مطلق — 
+            كل بروتوكول له سياق استخدامه الأمثل:
+        </p>
+
+        <div class="grid-2">
+            <div class="protocol-card rest">
+                <div class="protocol-name">REST</div>
+                <p><strong>When to use:</strong></p>
+                <ul class="feature-list">
+                    <li>عمليات CRUD بسيطة</li>
+                    <li>Caching عبر HTTP (Cache-Control, ETag)</li>
+                    <li>APIs عامة وثابتة</li>
+                    <li>Debugging سهل عبر cURL/Postman</li>
+                </ul>
+                <div class="tag-cloud">
+                    <span class="tag">GET / POST / PUT / DELETE</span>
+                    <span class="tag">HTTP Caching</span>
+                    <span class="tag">Stateless</span>
+                </div>
+            </div>
+
+            <div class="protocol-card graphql">
+                <div class="protocol-name">GraphQL</div>
+                <p><strong>When to use:</strong></p>
+                <ul class="feature-list">
+                    <li>منع Over-fetching / Under-fetching</li>
+                    <li>شاشات ديناميكية متعددة البيانات</li>
+                    <li>Mobile Apps مع بيانات معقدة ومتداخلة</li>
+                    <li>Product Catalogs، Social Feeds</li>
+                </ul>
+                <div class="tag-cloud">
+                    <span class="tag">Single Endpoint</span>
+                    <span class="tag">Type Safety</span>
+                    <span class="tag">Apollo Client</span>
+                </div>
+            </div>
+
+            <div class="protocol-card ws">
+                <div class="protocol-name">WebSocket / SSE</div>
+                <p><strong>When to use:</strong></p>
+                <ul class="feature-list">
+                    <li>Real-time feeds (Chat, Notifications)</li>
+                    <li>Live tracking (Maps, Delivery apps)</li>
+                    <li>Collaborative editing</li>
+                    <li>Live sports scores</li>
+                </ul>
+                <div class="tag-cloud">
+                    <span class="tag">Bidirectional</span>
+                    <span class="tag">Persistent Connection</span>
+                    <span class="tag">Low Latency</span>
+                </div>
+            </div>
+
+            <div class="protocol-card grpc">
+                <div class="protocol-name">gRPC</div>
+                <p><strong>When to use:</strong></p>
+                <ul class="feature-list">
+                    <li>Binary serialization (Protobuf)</li>
+                    <li>High throughput microservices</li>
+                    <li>Service-to-service communication</li>
+                    <li>Low latency internal APIs</li>
+                </ul>
+                <div class="tag-cloud">
+                    <span class="tag">HTTP/2</span>
+                    <span class="tag">Streaming</span>
+                    <span class="tag">Strongly Typed</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Network Metrics -->
+    <div class="card">
+        <div class="card-title">
+            <div class="card-icon icon-red">📊</div>
+            مقاييس الشبكة المعمقة — Network Metrics Deep-Dive
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 24px;">
+            <div>
+                <h4 style="font-family: 'Cairo', sans-serif; color: var(--deep-navy); margin-bottom: 12px;">📏 الفرق بين المقاييس الرئيسية</h4>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Metric</th><th>التعريف</th><th>الوحدة</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Latency</strong></td>
+                                <td>الوقت المستغرق لانتقال حزمة بيانات من المصدر للوجهة</td>
+                                <td>ms</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Throughput</strong></td>
+                                <td>عدد العمليات/الطلبات المنجزة في الثانية</td>
+                                <td>req/s</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Bandwidth</strong></td>
+                                <td>الحد الأقصى لسعة نقل البيانات في القناة</td>
+                                <td>Mbps</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Jitter</strong></td>
+                                <td>التباين في Latency بين الحزم المتتالية</td>
+                                <td>ms</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div>
+                <h4 style="font-family: 'Cairo', sans-serif; color: var(--deep-navy); margin-bottom: 12px;">🔋 تأثير حجم البيانات على البطارية</h4>
+                <div class="callout callout-warning">
+                    <div class="callout-title">⚠️ JSON vs Protobuf</div>
+                    <p><strong>JSON:</strong> Text-based، حجم أكبر (+30-50%)، parsing أبطأ، Battery drain أعلى.</p>
+                    <p style="margin-top: 8px;"><strong>Protobuf:</strong> Binary، حجم أصغر، parsing أسرع 5-10x، Battery أكثر كفاءة.</p>
+                </div>
+                <div style="background: var(--soft-bg); padding: 16px; border-radius: 10px; margin-top: 12px;">
+                    <strong>📉 Payload Size Impact:</strong><br>
+                    كل 1KB إضافي في الـ Response يستهلك طاقة راديو إضافية. 
+                    في <strong>3G</strong>، الـ Tail Latency (~10s) يعني أن الراديو يبقى نشطاً بعد انتهاء الطلب!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sync vs Async -->
+    <div class="card">
+        <div class="card-title">
+            <div class="card-icon icon-green">⚡</div>
+            التنفيذ المتزامن vs. غير المتزامن — Synchronous vs. Asynchronous Execution
+        </div>
+
+        <div class="grid-2">
+            <div class="callout callout-danger">
+                <div class="callout-title">🚫 Main Thread Freezing (ANR)</div>
+                <p>
+                    أي عملية ثقيلة على <strong>Main/UI Thread</strong> تتجاوز 5 ثوانٍ تؤدي إلى 
+                    <strong>ANR (Application Not Responding)</strong>. الحلول:
+                </p>
+                <ul style="margin-top: 12px; padding-right: 20px;">
+                    <li>Thread Pools (Coroutine Dispatchers، GCD Queues)</li>
+                    <li>Non-blocking I/O (Kotlin Coroutines، Swift async/await)</li>
+                    <li>WorkManager / Background Tasks</li>
+                </ul>
+            </div>
+            <div>
+                <span class="code-label">Kotlin Coroutines Example</span>
+                <pre dir="ltr"><code><span class="syntax-comment">// ❌ BAD: Blocking the Main Thread</span>
+<span class="syntax-keyword">val</span> data = api.fetchData() <span class="syntax-comment">// ANR Risk!</span>
+
+<span class="syntax-comment">// ✅ GOOD: Offload to IO Dispatcher</span>
+lifecycleScope.<span class="syntax-function">launch</span>(Dispatchers.IO) {
+    <span class="syntax-keyword">val</span> data = api.<span class="syntax-function">fetchData</span>()
+    <span class="syntax-keyword">withContext</span>(Dispatchers.Main) {
+        uiState.<span class="syntax-function">update</span> { data }
+    }
+}
+
+<span class="syntax-comment">// ✅ BETTER: Reactive Streams with Flow</span>
+viewModelScope.<span class="syntax-function">launch</span> {
+    repository.<span class="syntax-function">getDataStream</span>()
+        .<span class="syntax-function">flowOn</span>(Dispatchers.IO)
+        .<span class="syntax-function">collect</span> { data ->
+            _uiState.value = data
+        }
+}</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client-Side Scalability -->
+    <div class="card card-gradient">
+        <div class="card-title">
+            <div class="card-icon icon-blue">📈</div>
+            قابلية التوسع على جانب العميل — Scalability on the Client Side
+        </div>
+        <p style="margin-bottom: 20px;">
+            <strong>Scalability</strong> في Mobile لا تعني "إضافة خوادم" — بل تعني قدرة الكود على النمو 
+            دون أن ينهار تحت ضغط الميزات والبيانات:
+        </p>
+        <div class="grid-2">
+            <div class="pillar">
+                <div class="pillar-number" style="background: var(--system-amber);">1</div>
+                <div class="pillar-title">Codebase Scale</div>
+                <p>Modularization — فصل التطبيق إلى Feature Modules مستقلة. Dynamic Delivery لتقليل حجم الـ APK.</p>
+            </div>
+            <div class="pillar">
+                <div class="pillar-number" style="background: var(--system-amber);">2</div>
+                <div class="pillar-title">Feature Modularization</div>
+                <p>Plugin Architecture، Feature Flags، A/B Testing Frameworks. كل ميزة يمكن تفعيلها/تعطيلها دون إعادة بناء.</p>
+            </div>
+            <div class="pillar">
+                <div class="pillar-number" style="background: var(--system-amber);">3</div>
+                <div class="pillar-title">Heavy Data Volume</div>
+                <p>Pagination (Offset vs Cursor)، Lazy Loading، Image Compression، Delta Sync بدلاً من Full Sync.</p>
+            </div>
+            <div class="pillar">
+                <div class="pillar-number" style="background: var(--system-amber);">4</div>
+                <div class="pillar-title">Form Factor Adaptation</div>
+                <p>Responsive Layouts، Foldable Support، Tablet Optimization، Multi-window Mode.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 3: MOBILE CONSTRAINTS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="section" id="sec3">
+    <div class="section-header">
+        <div class="section-number">3</div>
+        <div>
+            <h2 class="section-title">قيود وبيئة عمل الهواتف الخاصة</h2>
+            <div class="section-title-en">Mobile-Specific Constraints</div>
+        </div>
+    </div>
+
+    <!-- Hardware Bottlenecks -->
+    <div class="card">
+        <div class="card-title">
+            <div class="card-icon icon-red">🔧</div>
+            اختناقات العتاد — Hardware Bottlenecks
+        </div>
+
+        <div class="grid-2">
+            <div class="callout callout-danger">
+                <div class="callout-title">🔋 Limited Battery — البطارية المحدودة</div>
+                <p style="margin-bottom: 12px;">الراديو اللاسلكي (Cellular Radio) هو أكبر مستهلك للبطارية. فهم حالاته ضروري:</p>
+                <div class="table-wrapper">
+                    <table style="font-size: 13px;">
+                        <thead>
+                            <tr><th>Radio State</th><th>الحالة</th><th>استهلاك البطارية</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Full Power</strong></td>
+                                <td>نقل البيانات بنشاط</td>
+                                <td><span class="badge badge-red">عالي جداً</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Low Power</strong></td>
+                                <td>انتظار (Idle) مع اتصال</td>
+                                <td><span class="badge badge-amber">متوسط</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Standby</strong></td>
+                                <td>غير متصل</td>
+                                <td><span class="badge badge-green">منخفض</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p style="margin-top: 12px; font-size: 14px;">
+                    <strong>Doze Mode:</strong> Android يعلق الوصول إلى الشبكة عندما يكون الجهاز ساكناً وغير موصول بالشاحن.<br>
+                    <strong>App Standby:</strong> تقييد التطبيقات غير المستخدمة بشكل متكرر.<br>
+                    <strong>Wakelocks:</strong> تجنب الاحتفاظ بالجهاز مستيقظاً دون داعٍ.
+                </p>
+            </div>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">🧠 Memory Constraints — قيود الذاكرة</div>
+                <p style="margin-bottom: 12px;">الهواتف لديها ذاكرة محدودة، والـ OS يقتل التطبيقات عند الضغط:</p>
+                <ul style="padding-right: 20px; line-height: 2;">
+                    <li><strong>Out of Memory (OOM):</strong> تخصيص Bitmap كبير بدون downsample</li>
+                    <li><strong>GC Pauses:</strong> Garbage Collection يتسبب في Jank (تقطيع UI)</li>
+                    <li><strong>Large Heap:</strong> يمكن طلبه لكنه يؤثر على Multitasking</li>
+                    <li><strong>Memory Leaks:</strong> Activity/Fragment references في Listeners</li>
+                </ul>
+                <div style="background: rgba(0,0,0,0.05); padding: 12px; border-radius: 8px; margin-top: 12px;">
+                    <strong>💡 نصيحة:</strong> استخدم <code>inSampleSize</code> للصور، 
+                    <code>WeakReference</code> للـ Callbacks، و <code>onTrimMemory()</code> لتحرير الموارد.
+                </div>
+            </div>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🌡️ CPU & Thermal Throttling — خنق الحرارة</div>
+                <p>
+                    عندما يسخن الجهاز (Gaming، Video processing)، يقلل الـ OS سرعة الـ CPU 
+                    (<strong>Thermal Throttling</strong>). هذا يعني:
+                </p>
+                <ul style="padding-right: 20px; margin-top: 12px; line-height: 2;">
+                    <li>Background tasks تُعلق أو تُؤجل</li>
+                    <li>Heavy computation يجب نقله إلى <strong>Background Thread</strong> أو <strong>Cloud</strong></li>
+                    <li>تجنب العمليات الحسابية المستمرة في Foreground</li>
+                </ul>
+            </div>
+
+            <div class="callout callout-success">
+                <div class="callout-title">💾 Local Storage Limits — قيود التخزين المحلي</div>
+                <p>
+                    التخزين على الهاتف محدود ومشترك بين جميع التطبيقات. استراتيجيات الإدارة:
+                </p>
+                <ul style="padding-right: 20px; margin-top: 12px; line-height: 2;">
+                    <li><strong>LRU Cache:</strong> إزالة أقل البيانات استخداماً</li>
+                    <li><strong>Cache Eviction:</strong> سياسات مسح ذكية (TTL, Size-based)</li>
+                    <li><strong>Disk Space Monitoring:</strong> التحقق من المساحة المتوفرة قبل التخزين</li>
+                    <li><strong>Encrypted Storage:</strong> DataStore / Keychain للبيانات الحساسة</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unreliable Networks -->
+    <div class="card">
+        <div class="card-title">
+            <div class="card-icon icon-amber">📶</div>
+            الشبكات غير الموثوقة — Unreliable Networks
+        </div>
+        <p style="margin-bottom: 20px;">
+            تطبيقك سيعمل على <strong>2G</strong> في المصعد، و <strong>5G</strong> في المنزل، و <strong>Wi-Fi</strong> ضعيف في المقهى. 
+            التصميم يجب أن يتكيف مع كل هذه الحالات:
+        </p>
+
+        <div class="grid-2">
+            <div>
+                <h4 style="font-family: 'Cairo', sans-serif; margin-bottom: 16px;">🔄 التبديل بين الشبكات</h4>
+                <div class="diagram-box" dir="ltr">
+<span class="node">[Wi-Fi Connected]</span> <span class="arrow">───►</span> <span class="label">High Quality Images</span>
+       │
+       │ <span class="label">User enters elevator</span>
+       ▼
+<span class="node">[Wi-Fi Lost]</span> <span class="arrow">───►</span> <span class="label">Queue Requests</span>
+       │
+       ▼
+<span class="node">[4G/5G Available]</span> <span class="arrow">───►</span> <span class="label">Resume Sync</span>
+       │
+       │ <span class="label">Signal drops to 2G</span>
+       ▼
+<span class="node">[2G/Edge]</span> <span class="arrow">───►</span> <span class="label">Low-res Images, Batch Requests</span>
+       │
+       │ <span class="label">No signal at all</span>
+       ▼
+<span class="node">[Offline Mode]</span> <span class="arrow">───►</span> <span class="label">Local DB + Queue + Retry</span>
+                </div>
+            </div>
+            <div>
+                <h4 style="font-family: 'Cairo', sans-serif; margin-bottom: 16px;">🏗️ استراتيجيات Offline-First Architecture</h4>
+                <div class="callout callout-success">
+                    <div class="callout-title">📦 Queue-Based Sync</div>
+                    <p>تخزين العمليات (Create/Update/Delete) في Queue محلي وتنفيذها عند عودة الشبكة.</p>
+                </div>
+                <div class="callout callout-info">
+                    <div class="callout-title">⚡ Optimistic UI</div>
+                    <p>عرض التغييرات فوراً على UI قبل تأكيد الخادم، مع إمكانية Rollback عند الفشل.</p>
+                </div>
+                <div class="callout callout-warning">
+                    <div class="callout-title">🔄 Conflict Resolution</div>
+                    <p>استخدام Timestamps (Last-Write-Wins) أو Operational Transform (OT) للبيانات المتزامنة.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Lifecycle -->
+    <div class="card">
+        <div class="card-title">
+            <div class="card-icon icon-blue">🔄</div>
+            آليات دورة حياة التطبيق — App Lifecycle Mechanics
+        </div>
+
+        <div class="grid-2">
+            <div>
+                <h4 style="font-family: 'Cairo', sans-serif; margin-bottom: 16px; color: var(--deep-navy);">📱 Android Lifecycle States</h4>
+                <div class="diagram-box" dir="ltr">
+<span class="comment">┌─────────────────────────────────────────────┐</span>
+<span class="comment">│           ANDROID ACTIVITY LIFECYCLE        │</span>
+<span class="comment">└─────────────────────────────────────────────┘</span>
+
+<span class="node">[Created]</span> <span class="arrow">──onStart()──►</span> <span class="node">[Started]</span>
+                                              │
+                    <span class="arrow">──onResume()──►</span> <span class="node">[Resumed]</span>  <span class="label">◄── User Interacting</span>
+                                              │
+                    <span class="arrow">──onPause()──►</span> <span class="node">[Paused]</span>   <span class="label">◄── Partially Visible</span>
+                                              │
+                    <span class="arrow">──onStop()──►</span> <span class="node">[Stopped]</span>  <span class="label">◄── Background</span>
+                                              │
+                    <span class="arrow">──onDestroy()──►</span> <span class="node">[Destroyed]</span> <span class="label">◄── Killed by OS</span>
+
+<span class="label">⚠️ onSaveInstanceState() → Save UI state before destruction</span>
+                </div>
+            </div>
+            <div>
+                <h4 style="font-family: 'Cairo', sans-serif; margin-bottom: 16px; color: var(--deep-navy);">🍎 iOS Lifecycle States</h4>
+                <div class="diagram-box" dir="ltr">
+<span class="comment">┌─────────────────────────────────────────────┐</span>
+<span class="comment">│              iOS APP LIFECYCLE              │</span>
+<span class="comment">└─────────────────────────────────────────────┘</span>
+
+<span class="node">[Not Running]</span> <span class="arrow">──launch──►</span> <span class="node">[Inactive]</span>
+                                              │
+                    <span class="arrow">──didBecomeActive──►</span> <span class="node">[Active]</span> <span class="label">◄── Foreground</span>
+                                              │
+                    <span class="arrow">──willResignActive──►</span> <span class="node">[Inactive]</span>
+                                              │
+                    <span class="arrow">──didEnterBackground──►</span> <span class="node">[Background]</span>
+                                              │
+                    <span class="arrow">──system kills──►</span> <span class="node">[Suspended]</span> <span class="label">◄── No code execution</span>
+
+<span class="label">⚠️ applicationDidEnterBackground() → Save critical state</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="callout callout-danger" style="margin-top: 24px;">
+            <div class="callout-title">⚠️ Process Death / Killed by OS — القتل بواسطة النظام</div>
+            <p>
+                عندما يكون الجهاز منخفض الذاكرة، يقتل الـ OS التطبيقات في الخلفية دون سابق إنذار. 
+                <strong>لا يمكنك منع هذا</strong> — لكن يمكنك التعافي منه:
+            </p>
+            <div class="grid-2" style="margin-top: 16px;">
+                <div style="background: rgba(255,255,255,0.5); padding: 16px; border-radius: 10px;">
+                    <strong>State Restoration Strategies:</strong>
+                    <ul style="margin-top: 8px; padding-right: 20px; line-height: 2;">
+                        <li><strong>SavedInstanceState:</strong> Bundle صغير (< 1MB) للبيانات البسيطة</li>
+                        <li><strong>Local DB:</strong> Room / Core Data للبيانات المعقدة</li>
+                        <li><strong>SharedPreferences / DataStore:</strong> الإعدادات والتفضيلات</li>
+                    </ul>
+                </div>
+                <div style="background: rgba(255,255,255,0.5); padding: 16px; border-radius: 10px;">
+                    <strong>Graceful Recovery:</strong>
+                    <ul style="margin-top: 8px; padding-right: 20px; line-height: 2;">
+                        <li>استعادة الـ Navigation Stack من الـ DB</li>
+                        <li>إعادة تحميل البيانات من Cache</li>
+                        <li>عرض Splash/Loading screen أثناء الاستعادة</li>
+                        <li>تجنب Crash loops عند البيانات الفاسدة</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Why Mobile is Different -->
+    <div class="card card-dark">
+        <div class="card-title">
+            <div class="card-icon icon-blue" style="background: rgba(56,189,248,0.2);">🎭</div>
+            لماذا تصميم Mobile مختلف جوهرياً عن Backend؟
+        </div>
+        <p style="margin-bottom: 24px;">
+            <strong>Mobile System Design</strong> يمثل تحولاً نموذجياً (Paradigm Shift) في التفكير الهندسي. 
+            الفروقات ليست تقنية فقط، بل فلسفية:
+        </p>
+        <div class="grid-2">
+            <div class="pillar" style="background: rgba(255,255,255,0.05); border-color: rgba(56,189,248,0.3);">
+                <div class="pillar-number" style="background: var(--crimson-alert);">!</div>
+                <div class="pillar-title" style="color: white;">Uncontrollable Environment</div>
+                <p style="color: rgba(255,255,255,0.7);">لا تملك الجهاز، لا تملك الـ OS، لا تملك الشبكة. أنت "ضيف" على جهاز المستخدم.</p>
+            </div>
+            <div class="pillar" style="background: rgba(255,255,255,0.05); border-color: rgba(56,189,248,0.3);">
+                <div class="pillar-number" style="background: var(--system-amber);">!</div>
+                <div class="pillar-title" style="color: white;">User-Driven UI Thread</div>
+                <p style="color: rgba(255,255,255,0.7);">المستخدم يتوقع استجابة فورية. أي تأخير > 16ms يُدرك كـ "بطء".</p>
+            </div>
+            <div class="pillar" style="background: rgba(255,255,255,0.05); border-color: rgba(56,189,248,0.3);">
+                <div class="pillar-number" style="background: var(--electric-blue);">!</div>
+                <div class="pillar-title" style="color: white;">Offline is the Default</div>
+                <p style="color: rgba(255,255,255,0.7);">في Backend، Offline = خطأ. في Mobile، Offline = حالة طبيعية يجب التصميم لها.</p>
+            </div>
+            <div class="pillar" style="background: rgba(255,255,255,0.05); border-color: rgba(56,189,248,0.3);">
+                <div class="pillar-number" style="background: var(--cyber-green);">!</div>
+                <div class="pillar-title" style="color: white;">Hardware Diversity</div>
+                <p style="color: rgba(255,255,255,0.7);">آلاف الأجهزة، أحجام شاشات مختلفة، إصدارات OS متفرقة، قدرات معالجة متباينة.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 4: MASTER DECISION MATRIX -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="section" id="sec4">
+    <div class="section-header">
+        <div class="section-number">4</div>
+        <div>
+            <h2 class="section-title">مصفوفة اتخاذ القرارات وملخص المقابلات</h2>
+            <div class="section-title-en">Master Decision Matrix & Interview Cheat Sheet</div>
+        </div>
+    </div>
+
+    <!-- TABLE 1: Mobile vs Backend -->
+    <div class="matrix-card" style="margin-bottom: 40px;">
+        <div class="matrix-header">
+            📊 Table 1: Mobile vs Backend System Design Breakdown
+        </div>
+        <div class="matrix-body">
+            <div class="table-wrapper" style="margin: 0; box-shadow: none; border-radius: 0;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 20%;">Dimension</th>
+                            <th style="width: 40%;">Backend System Design</th>
+                            <th style="width: 40%;">Mobile System Design</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Architecture Focus</strong></td>
+                            <td>Microservices, Load Balancers, DB Sharding, Caching Layers (Redis)</td>
+                            <td>Clean Architecture, MVVM/MVI, Repository Pattern, Dependency Injection</td>
+                        </tr>
+                        <tr>
+                            <td><strong>State Handling</strong></td>
+                            <td>Stateless requests, Session stored in Redis/DB</td>
+                            <td>Stateful UI, In-memory state, Local persistence, State restoration</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scaling Approach</strong></td>
+                            <td>Horizontal scaling (Add servers), Auto-scaling groups</td>
+                            <td>Vertical optimization (Reduce memory, Battery-efficient code, APK size)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Primary Metrics</strong></td>
+                            <td>QPS, Latency (p50/p99), Error rate, Throughput</td>
+                            <td>Frame time (ms), Battery drain (%/hr), APK size, Crash-free rate</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Failure Mode</strong></td>
+                            <td>500 errors, DB connection pool exhaustion, Cascade failures</td>
+                            <td>ANR, OOM crashes, Network timeouts, Process death by OS</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Deployment</strong></td>
+                            <td>CI/CD pipelines, Blue-green deployment, Canary releases</td>
+                            <td>App Store review (1-7 days), Phased rollout, Force update strategies</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Security Model</strong></td>
+                            <td>Firewall, WAF, IAM roles, Network segmentation</td>
+                            <td>Certificate pinning, Keychain/Keystore, Obfuscation, Root detection</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Observability</strong></td>
+                            <td>Prometheus, Grafana, Distributed tracing (Jaeger)</td>
+                            <td>Firebase Crashlytics, Performance Monitoring, ANR traces, Memory profiling</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLE 2: API Protocol Selection -->
+    <div class="matrix-card" style="margin-bottom: 40px;">
+        <div class="matrix-header" style="background: linear-gradient(135deg, #1E293B 0%, #334155 100%);">
+            📡 Table 2: API Protocol Selection Guide
+        </div>
+        <div class="matrix-body">
+            <div class="table-wrapper" style="margin: 0; box-shadow: none; border-radius: 0;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Scenario</th>
+                            <th>Best Protocol</th>
+                            <th>Why</th>
+                            <th>Trade-offs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Simple CRUD app (News, Blog)</td>
+                            <td><span class="badge badge-blue">REST</span></td>
+                            <td>Simple caching, Wide support, Easy debugging</td>
+                            <td>Over-fetching, Multiple round-trips for complex data</td>
+                        </tr>
+                        <tr>
+                            <td>Social feed with nested data</td>
+                            <td><span class="badge badge-purple">GraphQL</span></td>
+                            <td>Single request, Precise data fetching, Strong typing</td>
+                            <td>Complex caching, File upload challenges, Server complexity</td>
+                        </tr>
+                        <tr>
+                            <td>Real-time chat / Live tracking</td>
+                            <td><span class="badge badge-green">WebSocket</span></td>
+                            <td>Bidirectional, Low latency, Persistent connection</td>
+                            <td>Battery drain, Connection management, Scalability on server</td>
+                        </tr>
+                        <tr>
+                            <td>Server-sent notifications</td>
+                            <td><span class="badge badge-green">SSE</span></td>
+                            <td>Simplex streaming, HTTP-compatible, Auto-reconnect</td>
+                            <td>Unidirectional only, Limited browser support on mobile</td>
+                        </tr>
+                        <tr>
+                            <td>High-performance microservices</td>
+                            <td><span class="badge badge-amber">gRPC</span></td>
+                            <td>Binary Protobuf, HTTP/2 multiplexing, Strong contracts</td>
+                            <td>Proxy complexity, Debugging difficulty, Limited browser support</td>
+                        </tr>
+                        <tr>
+                            <td>File upload / Media streaming</td>
+                            <td><span class="badge badge-blue">REST + Multipart</span></td>
+                            <td>Standard support, Resumable uploads, CDN integration</td>
+                            <td>Large payload overhead, Connection stability issues</td>
+                        </tr>
+                        <tr>
+                            <td>IoT / Low-bandwidth devices</td>
+                            <td><span class="badge badge-amber">MQTT / CoAP</span></td>
+                            <td>Minimal overhead, Publish-subscribe, Designed for constrained devices</td>
+                            <td>Not standard for mobile, Requires broker infrastructure</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLE 3: Resource Constraint Mitigation -->
+    <div class="matrix-card" style="margin-bottom: 40px;">
+        <div class="matrix-header" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);">
+            🔧 Table 3: Resource Constraint Mitigation Tactics
+        </div>
+        <div class="matrix-body">
+            <div class="table-wrapper" style="margin: 0; box-shadow: none; border-radius: 0;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 22%;">Constraint</th>
+                            <th style="width: 30%;">System Risk</th>
+                            <th style="width: 48%;">Architectural Solution</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>🔋 Battery Drain</strong></td>
+                            <td>User uninstalls app; OS restricts background activity; Negative reviews</td>
+                            <td>
+                                • Batch network requests (JobScheduler/WorkManager)<br>
+                                • Use <strong>Firebase Cloud Messaging</strong> instead of polling<br>
+                                • Reduce GPS accuracy when app is backgrounded<br>
+                                • Implement exponential backoff for retries
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>🧠 Memory Pressure</strong></td>
+                            <td>OOM crashes; App killed by OS; GC jank; Poor multitasking</td>
+                            <td>
+                                • Image downsampling (Glide/Coil with <code>inSampleSize</code>)<br>
+                                • Use <strong>WeakReference</strong> for callbacks and listeners<br>
+                                • Implement <code>onTrimMemory()</code> to release caches<br>
+                                • Avoid memory leaks (LeakCanary detection)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>📶 Network Flakiness</strong></td>
+                            <td>Failed requests; Data inconsistency; Poor UX; Duplicate operations</td>
+                            <td>
+                                • <strong>Offline-First</strong> with local DB (Room/Core Data)<br>
+                                • Request queue with retry logic and deduplication<br>
+                                • Optimistic UI updates with rollback capability<br>
+                                • Network state awareness (ConnectivityManager)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>💾 Storage Limits</strong></td>
+                            <td>Cannot cache data; App bloat; Slow startup; User complaints</td>
+                            <td>
+                                • <strong>LRU Cache</strong> for images and API responses<br>
+                                • Compression before storage (Protobuf vs JSON)<br>
+                                • Periodic cache cleanup with TTL policies<br>
+                                • Store large files in external storage with cleanup
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>🌡️ Thermal Throttling</strong></td>
+                            <td>Reduced CPU speed; Background tasks suspended; Poor gaming/media UX</td>
+                            <td>
+                                • Offload heavy computation to <strong>Background Thread</strong> or cloud<br>
+                                • Reduce animation complexity when thermal state is critical<br>
+                                • Defer non-urgent sync operations until device cools<br>
+                                • Use <strong>Metal/Vulkan</strong> efficiently for graphics
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>⏱️ App Lifecycle Death</strong></td>
+                            <td>Lost user state; Navigation stack corruption; Data inconsistency</td>
+                            <td>
+                                • Persist UI state to <strong>ViewModel + SavedStateHandle</strong><br>
+                                • Save navigation state to local DB<br>
+                                • Implement graceful restoration with loading states<br>
+                                • Use <strong>ProcessLifecycleOwner</strong> for app-level awareness
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- INTERVIEW CHEAT SHEET -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="section" id="interview">
+    <div class="section-header">
+        <div class="section-number" style="background: linear-gradient(135deg, var(--electric-blue), var(--cyber-green));">★</div>
+        <div>
+            <h2 class="section-title">خطة مقابلة System Design للموبايل — 45 دقيقة</h2>
+            <div class="section-title-en">45-Minute Mobile System Design Interview Structure</div>
+        </div>
+    </div>
+
+    <div class="card" style="border: 2px solid var(--electric-blue); background: linear-gradient(145deg, #FFFFFF 0%, #F0F9FF 100%);">
+        <div class="card-title">
+            <div class="card-icon icon-blue">🎯</div>
+            Senior Mobile Architect Interview Tips
+        </div>
+        <p style="margin-bottom: 28px; font-size: 1.05rem;">
+            في مقابلة <strong>Mobile System Design</strong> لمدة 45 دقيقة، الهدف ليس إكمال التصميم، 
+            بل إظهار <strong>طريقة تفكير منظمة</strong>. اتبع هذا الإطار الزمني:
+        </p>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-time">0:00 → 0:10 (10 دقائق)</div>
+                <div class="timeline-title">1. Clarification — توضيح المتطلبات</div>
+                <p style="color: var(--text-secondary);">
+                    لا تبدأ بالحل! اسأل أولاً: <strong>DAU/MAU</strong>؟ <strong>Offline support</strong>؟ 
+                    <strong>Target platforms</strong> (Android/iOS/Both)؟ <strong>Real-time requirements</strong>؟ 
+                    <strong>Data sensitivity</strong> (GDPR/PII)؟ اكتب المتطلبات Functional و Non-Functional على السبورة.
+                </p>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-time">0:10 → 0:20 (10 دقائق)</div>
+                <div class="timeline-title">2. High-Level Architecture — البنية المعمارية العليا</div>
+                <p style="color: var(--text-secondary);">
+                    ارسم <strong>Data Flow Diagram</strong>: Mobile App → API Gateway → Backend Services → DB. 
+                    حدد <strong>Client-Server Boundaries</strong>، اختر البروتوكول (REST/GraphQL/WebSocket)، 
+                    وحدد <strong>Caching Strategy</strong> (Memory → Disk → Network).
+                </p>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-time">0:20 → 0:35 (15 دقيقة)</div>
+                <div class="timeline-title">3. Deep-Dives — الغوص في التفاصيل</div>
+                <p style="color: var(--text-secondary);">
+                    اختر 2-3 مجالات للتعمق: <strong>Offline-First Sync</strong> (Queue + Conflict Resolution)، 
+                    <strong>State Management</strong> (MVI + Unidirectional Data Flow)، 
+                    <strong>Image Loading Pipeline</strong> (Downsample + Cache + Cancel). 
+                    اشرح الـ <strong>Trade-offs</strong> بوضوح.
+                </p>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-time">0:35 → 0:45 (10 دقائق)</div>
+                <div class="timeline-title">4. Edge Cases & Bottlenecks — الحالات الطرفية</div>
+                <p style="color: var(--text-secondary);">
+                    ناقش: ماذا يحدث عند <strong>Process Death</strong>؟ كيف تتعامل مع <strong>Network Switching</strong> (WiFi → 2G)؟ 
+                    ما هي <strong>Battery implications</strong> للـ Sync strategy؟ كيف تضمن <strong>Data consistency</strong> 
+                    عند الـ Offline mode؟ اختتم بـ <strong>Summary</strong> واضح.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Reference Cards -->
+    <div class="grid-3" style="margin-top: 32px;">
+        <div class="callout callout-success">
+            <div class="callout-title">✅ DO — افعل</div>
+            <ul style="padding-right: 20px; line-height: 2; margin-top: 8px;">
+                <li>اسأل عن المتطلبات قبل الحل</li>
+                <li>فكر بصوت عالٍ (Think Aloud)</li>
+                <li>ناقش Trade-offs لكل قرار</li>
+                <li>استخدم أرقام (Latency, Size, Count)</li>
+                <li>اختر بروتوكول وبرر اختيارك</li>
+            </ul>
+        </div>
+        <div class="callout callout-danger">
+            <div class="callout-title">❌ DON'T — لا تفعل</div>
+            <ul style="padding-right: 20px; line-height: 2; margin-top: 8px;">
+                <li>لا تبدأ بالكود مباشرة</li>
+                <li>لا تتجاهل قيود Mobile (Battery, Memory)</li>
+                <li>لا تفترض شبكة مثالية</li>
+                <li>لا تنسى Offline mode</li>
+                <li>لا تتردد في طلب توضيح</li>
+            </ul>
+        </div>
+        <div class="callout callout-info">
+            <div class="callout-title">💡 KEY PHRASES — عبارات مفتاحية</div>
+            <ul style="padding-right: 20px; line-height: 2; margin-top: 8px;">
+                <li>"Let me clarify the requirements first..."</li>
+                <li>"The trade-off here is..."</li>
+                <li>"For mobile, we need to consider battery..."</li>
+                <li>"In the offline scenario..."</li>
+                <li>"Let me quantify that..."</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <h3>🚀 استمر في التعلم</h3>
+    <p>
+        هذا الدليل هو الجزء الأول من سلسلة Mobile System Design. 
+        استمر في التعمق في كل موضوع، وبنِ تطبيقات تجريبية لتطبيق هذه المفاهيم عملياً. 
+        التصميم الجيد ليس معرفة — بل ممارسة.
+    </p>
+    <div style="margin-top: 24px; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+        <span class="badge badge-blue">Mobile Architecture</span>
+        <span class="badge badge-green">System Design</span>
+        <span class="badge badge-amber">Interview Prep</span>
+        <span class="badge badge-purple">Senior Engineer</span>
+    </div>
+    <p style="margin-top: 32px; font-size: 14px; color: rgba(255,255,255,0.4);">
+        Generated as an Exhaustive Master Guide for Mobile System Design Basics · PART I
+    </p>
+</footer>
+
+<script>
+    // Active nav link on scroll
+    const sections = document.querySelectorAll('.section');
+    const navLinks = document.querySelectorAll('.nav-toc a');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (scrollY >= sectionTop - 200) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    });
+
+    // Smooth scroll
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = document.querySelector(link.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

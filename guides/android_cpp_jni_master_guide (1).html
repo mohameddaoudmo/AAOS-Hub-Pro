@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدليل الشامل لتطوير C++ منخفض المستوى وتوافق JNI في أندرويد</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@300;400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-slate: #0B192C;
+            --android-green: #3DDC84;
+            --electric-blue: #00D2FF;
+            --alert-orange: #FF9100;
+            --crimson-red: #FF5252;
+            --off-white: #F8F9FA;
+            --code-bg: #161B22;
+            --code-border: #30363D;
+            --card-bg: #FFFFFF;
+            --text-primary: #1A1A2E;
+            --text-secondary: #4A5568;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Tajawal', 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--off-white) 0%, #EEF2F7 100%);
+            color: var(--text-primary);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--deep-slate); }
+        ::-webkit-scrollbar-thumb { background: var(--android-green); border-radius: 5px; }
+        .hero {
+            background: linear-gradient(135deg, var(--deep-slate) 0%, #1a2a4a 100%);
+            color: white; padding: 80px 20px; text-align: center; position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: -50%; right: -10%; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(61,220,132,0.1) 0%, transparent 70%); border-radius: 50%;
+        }
+        .hero::after {
+            content: ''; position: absolute; bottom: -30%; left: -5%; width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(0,210,255,0.08) 0%, transparent 70%); border-radius: 50%;
+        }
+        .hero-badge {
+            display: inline-block; background: rgba(61, 220, 132, 0.15); border: 1px solid var(--android-green);
+            color: var(--android-green); padding: 8px 24px; border-radius: 50px; font-size: 0.9rem;
+            font-weight: 700; margin-bottom: 24px; letter-spacing: 1px;
+        }
+        .hero h1 { font-size: 2.8rem; font-weight: 900; margin-bottom: 16px; line-height: 1.3; }
+        .hero h1 span { color: var(--android-green); }
+        .hero-subtitle { font-size: 1.3rem; color: rgba(255,255,255,0.75); max-width: 800px; margin: 0 auto 30px; }
+        .hero-meta { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-top: 30px; }
+        .hero-meta-item { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; color: rgba(255,255,255,0.7); }
+        .hero-meta-item .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--electric-blue); }
+        .nav-container {
+            background: var(--deep-slate); padding: 0; position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .nav { max-width: 1200px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
+        .nav::-webkit-scrollbar { display: none; }
+        .nav a {
+            color: rgba(255,255,255,0.7); text-decoration: none; padding: 18px 24px;
+            font-weight: 600; font-size: 0.95rem; white-space: nowrap;
+            transition: all 0.3s; border-bottom: 3px solid transparent;
+        }
+        .nav a:hover, .nav a.active { color: var(--android-green); border-bottom-color: var(--android-green); background: rgba(61, 220, 132, 0.05); }
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        .section { margin-bottom: 60px; }
+        .section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 3px solid var(--deep-slate); }
+        .section-number {
+            background: linear-gradient(135deg, var(--android-green), #2DB86F); color: var(--deep-slate);
+            width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center;
+            justify-content: center; font-size: 1.5rem; font-weight: 900; flex-shrink: 0;
+            box-shadow: 0 8px 24px rgba(61, 220, 132, 0.3);
+        }
+        .section-title { font-size: 1.8rem; font-weight: 800; color: var(--deep-slate); }
+        .section-subtitle { color: var(--text-secondary); font-size: 1.05rem; margin-top: 4px; }
+        .card {
+            background: var(--card-bg); border-radius: 20px; padding: 32px; margin-bottom: 28px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
+        .card-title { font-size: 1.3rem; font-weight: 800; color: var(--deep-slate); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+        .card-title .icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .icon-green { background: rgba(61, 220, 132, 0.15); color: var(--android-green); }
+        .icon-blue { background: rgba(0, 210, 255, 0.15); color: var(--electric-blue); }
+        .icon-orange { background: rgba(255, 145, 0, 0.15); color: var(--alert-orange); }
+        .icon-red { background: rgba(255, 82, 82, 0.15); color: var(--crimson-red); }
+        .callout { border-radius: 16px; padding: 24px 28px; margin: 24px 0; position: relative; overflow: hidden; }
+        .callout::before { content: ''; position: absolute; top: 0; right: 0; width: 4px; height: 100%; }
+        .callout-info { background: linear-gradient(135deg, rgba(0, 210, 255, 0.08), rgba(0, 210, 255, 0.03)); border: 1px solid rgba(0, 210, 255, 0.2); }
+        .callout-info::before { background: var(--electric-blue); }
+        .callout-warning { background: linear-gradient(135deg, rgba(255, 145, 0, 0.08), rgba(255, 145, 0, 0.03)); border: 1px solid rgba(255, 145, 0, 0.2); }
+        .callout-warning::before { background: var(--alert-orange); }
+        .callout-danger { background: linear-gradient(135deg, rgba(255, 82, 82, 0.08), rgba(255, 82, 82, 0.03)); border: 1px solid rgba(255, 82, 82, 0.2); }
+        .callout-danger::before { background: var(--crimson-red); }
+        .callout-success { background: linear-gradient(135deg, rgba(61, 220, 132, 0.08), rgba(61, 220, 132, 0.03)); border: 1px solid rgba(61, 220, 132, 0.2); }
+        .callout-success::before { background: var(--android-green); }
+        .callout-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .callout-info .callout-title { color: var(--electric-blue); }
+        .callout-warning .callout-title { color: var(--alert-orange); }
+        .callout-danger .callout-title { color: var(--crimson-red); }
+        .callout-success .callout-title { color: #2DB86F; }
+        .code-block { background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 16px; overflow: hidden; margin: 24px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+        .code-header { background: #0D1117; padding: 12px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--code-border); }
+        .code-dots { display: flex; gap: 8px; }
+        .code-dots span { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #FF5F56; }
+        .dot-yellow { background: #FFBD2E; }
+        .dot-green { background: #27C93F; }
+        .code-lang { color: #8B949E; font-size: 0.85rem; font-weight: 600; font-family: 'Fira Code', monospace; margin-right: auto; }
+        .code-block pre { padding: 24px; overflow-x: auto; margin: 0; }
+        .code-block code { font-family: 'Fira Code', 'Consolas', 'Monaco', monospace; font-size: 0.9rem; line-height: 1.7; color: #E6EDF3; }
+        .code-block pre, .code-block code { direction: ltr; text-align: left; }
+        .kw { color: #FF7B72; font-weight: 600; }
+        .type { color: #79C0FF; }
+        .str { color: #A5D6FF; }
+        .num { color: #79C0FF; }
+        .comment { color: #8B949E; font-style: italic; }
+        .func { color: #D2A8FF; }
+        .memory-diagram { background: linear-gradient(135deg, #0D1117, #161B22); border-radius: 20px; padding: 32px; margin: 28px 0; border: 1px solid var(--code-border); color: #E6EDF3; }
+        .memory-title { text-align: center; font-size: 1.1rem; font-weight: 700; color: var(--android-green); margin-bottom: 24px; font-family: 'Fira Code', monospace; }
+        .memory-row { display: flex; gap: 16px; margin-bottom: 16px; align-items: stretch; }
+        .memory-cell { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px; text-align: center; font-family: 'Fira Code', monospace; font-size: 0.85rem; position: relative; transition: all 0.3s; }
+        .memory-cell:hover { background: rgba(255,255,255,0.08); transform: scale(1.02); }
+        .memory-cell.header { background: rgba(61, 220, 132, 0.15); border-color: rgba(61, 220, 132, 0.3); color: var(--android-green); font-weight: 700; }
+        .memory-cell.ptr { background: rgba(0, 210, 255, 0.1); border-color: rgba(0, 210, 255, 0.3); color: var(--electric-blue); }
+        .memory-cell.data { background: rgba(255, 145, 0, 0.1); border-color: rgba(255, 145, 0, 0.3); color: var(--alert-orange); }
+        .memory-cell.ref { background: rgba(255, 82, 82, 0.1); border-color: rgba(255, 82, 82, 0.3); color: var(--crimson-red); }
+        .memory-arrow { display: flex; align-items: center; justify-content: center; color: var(--android-green); font-size: 1.5rem; padding: 8px 0; }
+        .table-wrapper { overflow-x: auto; margin: 28px 0; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+        table { width: 100%; border-collapse: collapse; background: var(--card-bg); font-size: 0.95rem; }
+        thead { background: linear-gradient(135deg, var(--deep-slate), #1a2a4a); color: white; }
+        th { padding: 18px 20px; text-align: right; font-weight: 700; font-size: 0.95rem; letter-spacing: 0.5px; }
+        td { padding: 16px 20px; border-bottom: 1px solid rgba(0,0,0,0.06); color: var(--text-primary); }
+        tr:hover td { background: rgba(0, 210, 255, 0.03); }
+        tr:nth-child(even) { background: rgba(0,0,0,0.015); }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: 700; }
+        .badge-green { background: rgba(61, 220, 132, 0.15); color: #1a7a3e; }
+        .badge-blue { background: rgba(0, 210, 255, 0.15); color: #0077A3; }
+        .badge-orange { background: rgba(255, 145, 0, 0.15); color: #B36B00; }
+        .badge-red { background: rgba(255, 82, 82, 0.15); color: #C41E3A; }
+        .badge-purple { background: rgba(155, 89, 182, 0.15); color: #7D3C98; }
+        .styled-list { list-style: none; padding: 0; }
+        .styled-list li { padding: 12px 0; padding-right: 32px; position: relative; border-bottom: 1px solid rgba(0,0,0,0.04); }
+        .styled-list li::before { content: '▸'; position: absolute; right: 0; color: var(--android-green); font-weight: 900; font-size: 1.2rem; }
+        .styled-list li:last-child { border-bottom: none; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin: 24px 0; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 24px 0; }
+        .terminal { background: #0D1117; border-radius: 16px; padding: 24px; font-family: 'Fira Code', monospace; color: #E6EDF3; margin: 24px 0; border: 1px solid var(--code-border); }
+        .terminal-line { margin: 8px 0; direction: ltr; text-align: left; }
+        .terminal-prompt { color: var(--android-green); }
+        .terminal-error { color: var(--crimson-red); }
+        .terminal-info { color: var(--electric-blue); }
+        .tag-container { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+        .tag { background: linear-gradient(135deg, rgba(61, 220, 132, 0.1), rgba(0, 210, 255, 0.1)); border: 1px solid rgba(61, 220, 132, 0.3); color: var(--deep-slate); padding: 6px 16px; border-radius: 50px; font-size: 0.85rem; font-weight: 700; }
+        .footer { background: var(--deep-slate); color: white; padding: 60px 20px; text-align: center; margin-top: 80px; }
+        .footer h3 { font-size: 1.5rem; margin-bottom: 16px; }
+        .footer p { color: rgba(255,255,255,0.6); max-width: 600px; margin: 0 auto; }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.8rem; }
+            .section-title { font-size: 1.4rem; }
+            .card { padding: 20px; }
+            .memory-row { flex-direction: column; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+        }
+        html { scroll-behavior: smooth; }
+        .section { scroll-margin-top: 70px; }
+        .highlight-box { background: linear-gradient(135deg, var(--deep-slate), #1a2a4a); color: white; border-radius: 20px; padding: 32px; margin: 28px 0; position: relative; overflow: hidden; }
+        .highlight-box::before { content: ''; position: absolute; top: 0; right: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--android-green), var(--electric-blue)); }
+    </style>
+</head>
+<body>
+
+<!-- Hero Section -->
+<div class="hero">
+    <div class="hero-badge">AOSP MASTER GUIDE &middot; BLOCK 4 & 5</div>
+    <h1>الدليل الشامل لتطوير <span>C++</span> منخفض المستوى<br>وتوافق <span>JNI</span> في أندرويد</h1>
+    <p class="hero-subtitle">
+        مرجع احترافي متكامل لمهندسي الأنظمة يغطي مؤشرات الذاكرة الذكية في C++ الحديث، ونظام RefBase المخصص في AOSP، وأساسيات JNI، وإدارة المراجع، وتسجيل الدوال الأصلية
+    </p>
+    <div class="hero-meta">
+        <div class="hero-meta-item"><span class="dot"></span> Modern C++ Smart Pointers</div>
+        <div class="hero-meta-item"><span class="dot" style="background:#00D2FF"></span> Android RefBase Architecture</div>
+        <div class="hero-meta-item"><span class="dot" style="background:#FF9100"></span> JNI Interoperability</div>
+        <div class="hero-meta-item"><span class="dot" style="background:#FF5252"></span> Memory Management</div>
+    </div>
+</div>
+
+<!-- Navigation -->
+<div class="nav-container">
+    <nav class="nav">
+        <a href="#block4-cpp">البلوك 4: C++ الحديث</a>
+        <a href="#block4-refbase">RefBase &amp; sp/wp</a>
+        <a href="#block5-jni">البلوك 5: JNI</a>
+        <a href="#block5-memory">إدارة الذاكرة</a>
+        <a href="#block5-registration">تسجيل الدوال</a>
+        <a href="#comparisons">المقارنات</a>
+        <a href="#debugging">تصحيح الأخطاء</a>
+    </nav>
+</div>
+
+<div class="container">
+
+<!-- Section 1 -->
+<section class="section" id="block4-cpp">
+    <div class="section-header">
+        <div class="section-number">1</div>
+        <div>
+            <div class="section-title">أساسيات C++ الحديثة لمهندسي أندرويد</div>
+            <div class="section-subtitle">Modern C++ Smart Pointers &amp; Memory Ownership</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">
+            <div class="icon icon-green">&#128230;</div>
+            مفهوم الملكية والموارد (Memory Ownership &amp; RAII)
+        </div>
+        <p style="margin-bottom:16px; color: var(--text-secondary);">
+            في تطوير أنظمة أندرويد منخفضة المستوى، يعد فهم <strong>ملكية الذاكرة</strong> أمرًا حيويًا. يوفر C++ الحديث نموذجًا واضحًا لإدارة الموارد عبر <strong>RAII</strong> (Resource Acquisition Is Initialization).
+        </p>
+        <div class="grid-2">
+            <div style="padding:20px; background:rgba(61,220,132,0.05); border-radius:16px; border:1px solid rgba(61,220,132,0.15);">
+                <h4 style="color:var(--android-green); margin-bottom:12px;">&#128274; Value Semantics</h4>
+                <p style="font-size:0.95rem; color:var(--text-secondary);">النسخة تملك بياناتها بشكل مستقل. عند التعيين، يتم نسخ البيانات فعليًا. آمن لكن مكلف للكائنات الكبيرة.</p>
+            </div>
+            <div style="padding:20px; background:rgba(0,210,255,0.05); border-radius:16px; border:1px solid rgba(0,210,255,0.15);">
+                <h4 style="color:var(--electric-blue); margin-bottom:12px;">&#128279; Reference Semantics</h4>
+                <p style="font-size:0.95rem; color:var(--text-secondary);">المتغيرات تشير إلى نفس الكائن في الذاكرة. يتطلب إدارة صريحة للحياة لتجنب <strong>use-after-free</strong> أو <strong>double-free</strong>.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="callout callout-info">
+        <div class="callout-title">&#128161; Move Semantics</div>
+        <p>تسمح <code style="background:rgba(0,0,0,0.1); padding:2px 8px; border-radius:4px;">std::move</code> بنقل الملكية بدلاً من النسخ، مما يحسن الأداء بشكل كبير مع الكائنات الثقيلة مثل <code>std::vector</code> أو مؤشرات الملفات. في AOSP، يُستخدم بكثرة في HAL interfaces.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-title">
+            <div class="icon icon-blue">&#127919;</div>
+            Smart Pointers: الغوص العميق
+        </div>
+
+        <h4 style="margin:24px 0 12px; color:var(--deep-slate);">std::unique_ptr&lt;T&gt; &mdash; الملكية الفريدة</h4>
+        <p style="margin-bottom:16px; color:var(--text-secondary);">يضمن وجود مالك واحد فقط للمورد. لا يمكن نسخه، يمكن فقط نقله. تكلفة زمنية صفرية تقريبًا (<strong>O(1) overhead</strong>).</p>
+
+        <div class="code-block">
+            <div class="code-header">
+                <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                <span class="code-lang">C++</span>
+            </div>
+            <pre><code><span class="comment">// &#1573;&#1606;&#1588;&#1575;&#1569; unique_ptr &#1605;&#1593; custom deleter &#1604;&#1605;&#1604;&#1601;&#1575;&#1578; AOSP</span>
+<span class="kw">auto</span> <span class="func">fileDeleter</span> = [](FILE* fp) {
+    <span class="kw">if</span> (fp) <span class="func">fclose</span>(fp);
+};
+
+<span class="kw">std::unique_ptr</span>&lt;FILE, <span class="kw">decltype</span>(fileDeleter)&gt; <span class="func">safeFile</span>(
+    <span class="func">fopen</span>(<span class="str">"/data/local/tmp/log.txt"</span>, <span class="str">"w"</span>), 
+    fileDeleter
+);
+
+<span class="comment">// &#1606;&#1602;&#1604; &#1575;&#1604;&#1605;&#1604;&#1603;&#1610;&#1577; &#1573;&#1604;&#1609; &#1583;&#1575;&#1604;&#1577; &#1571;&#1582;&#1585;&#1609;</span>
+<span class="kw">void</span> <span class="func">processBuffer</span>(<span class="kw">std::unique_ptr</span>&lt;<span class="kw">uint8_t</span>[]&gt; buffer, <span class="kw">size_t</span> size) {
+    <span class="comment">// buffer &#1587;&#1610;&#1615;&#1581;&#1585;&#1585; &#1578;&#1604;&#1602;&#1575;&#1574;&#1610;&#1611;&#1575; &#1593;&#1606;&#1583; &#1575;&#1604;&#1582;&#1585;&#1608;&#1580; &#1605;&#1606; &#1575;&#1604;&#1606;&#1591;&#1575;&#1602;</span>
+}
+
+<span class="kw">auto</span> rawBuffer = <span class="kw">std::make_unique</span>&lt;<span class="kw">uint8_t</span>[]&gt;(4096);
+<span class="func">processBuffer</span>(<span class="kw">std::move</span>(rawBuffer), 4096);
+<span class="comment">// rawBuffer &#1575;&#1604;&#1570;&#1606; nullptr &mdash; &#1570;&#1605;&#1606; &#1578;&#1605;&#1575;&#1605;&#1611;&#1575;</span></code></pre>
+        </div>
+
+        <h4 style="margin:32px 0 12px; color:var(--deep-slate);">std::shared_ptr&lt;T&gt; &amp; std::weak_ptr&lt;T&gt; &mdash; العد التشاركي</h4>
+        <p style="margin-bottom:16px; color:var(--text-secondary);">يستخدم <strong>non-intrusive reference counting</strong> عبر <strong>control block</strong> منفصل. يدعم <strong>weak_ptr</strong> لكسر الاعتماديات الدائرية.</p>
+
+        <div class="memory-diagram">
+            <div class="memory-title">&#9633; Control Block Structure</div>
+            <div class="memory-row">
+                <div class="memory-cell header">Control Block</div>
+            </div>
+            <div class="memory-row">
+                <div class="memory-cell ref">strong_count<br><span style="font-size:0.75rem; color:#8B949E;">(atomic)</span></div>
+                <div class="memory-cell ref">weak_count<br><span style="font-size:0.75rem; color:#8B949E;">(atomic)</span></div>
+                <div class="memory-cell data">deleter<br><span style="font-size:0.75rem; color:#8B949E;">(type-erased)</span></div>
+                <div class="memory-cell data">allocator<br><span style="font-size:0.75rem; color:#8B949E;">(optional)</span></div>
+            </div>
+            <div class="memory-arrow">&#8595;</div>
+            <div class="memory-row">
+                <div class="memory-cell ptr" style="flex:1;">Managed Object T<br><span style="font-size:0.75rem; color:#8B949E;">Heap Allocation</span></div>
+            </div>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header">
+                <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                <span class="code-lang">C++</span>
+            </div>
+            <pre><code><span class="kw">class</span> <span class="type">AudioService</span> : <span class="kw">public</span> <span class="type">std::enable_shared_from_this</span>&lt;AudioService&gt; {
+<span class="kw">public</span>:
+    <span class="kw">std::shared_ptr</span>&lt;AudioService&gt; <span class="func">getShared</span>() {
+        <span class="kw">return</span> <span class="func">shared_from_this</span>(); <span class="comment">// &#1570;&#1605;&#1606; &mdash; &#1604;&#1575; &#1610;&#1615;&#1606;&#1588;&#1574; control block &#1580;&#1583;&#1610;&#1583;</span>
+    }
+};
+
+<span class="comment">// &#1603;&#1587;&#1585; &#1575;&#1604;&#1575;&#1593;&#1578;&#1605;&#1575;&#1583;&#1610;&#1577; &#1575;&#1604;&#1583;&#1575;&#1574;&#1585;&#1610;&#1577; &#1601;&#1610; HAL</span>
+<span class="kw">class</span> <span class="type">CameraSession</span> {
+    <span class="kw">std::weak_ptr</span>&lt;CameraDevice&gt; mDevice; <span class="comment">// weak &mdash; &#1604;&#1575; &#1610;&#1605;&#1606;&#1593; &#1575;&#1604;&#1578;&#1583;&#1605;&#1610;&#1585;</span>
+<span class="kw">public</span>:
+    <span class="kw">void</span> <span class="func">onFrameReady</span>() {
+        <span class="kw">auto</span> device = mDevice.<span class="func">lock</span>(); <span class="comment">// promote &#1573;&#1604;&#1609; shared_ptr</span>
+        <span class="kw">if</span> (device) {
+            device-&gt;<span class="func">notifyFrame</span>();
+        }
+        <span class="comment">// &#1573;&#1584;&#1575; &#1603;&#1575;&#1606; device &#1605;&#1615;&#1578;&#1604;&#1601;&#1611;&#1575;&#1548; lock() &#1610;&#1615;&#1585;&#1580;&#1593; nullptr &mdash; &#1570;&#1605;&#1606;</span>
+    }
+};</code></pre>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">
+            <div class="icon icon-red">&#129514;</div>
+            Code Sandbox: Memory Leak vs Safe Handling
+        </div>
+        <div class="grid-2">
+            <div>
+                <h5 style="color:var(--crimson-red); margin-bottom:12px;">&#10060; Raw Pointer (Memory Leak)</h5>
+                <div class="code-block" style="margin:0;">
+                    <div class="code-header"><span class="code-lang">C++ &mdash; Unsafe</span></div>
+                    <pre><code><span class="kw">void</span> <span class="func">leakyProcess</span>() {
+    <span class="type">SensorData</span>* data = <span class="kw">new</span> <span class="type">SensorData</span>();
+    <span class="kw">if</span> (<span class="func">someError</span>()) {
+        <span class="kw">return</span>; <span class="comment">// &#9888;&#65039; &#1578;&#1587;&#1585;&#1610;&#1576;! delete &#1594;&#1610;&#1585; &#1605;&#1615;&#1587;&#1578;&#1583;&#1593;&#1609;</span>
+    }
+    <span class="kw">delete</span> data;
+}</code></pre>
+                </div>
+            </div>
+            <div>
+                <h5 style="color:var(--android-green); margin-bottom:12px;">&#9989; Smart Pointer (Safe)</h5>
+                <div class="code-block" style="margin:0;">
+                    <div class="code-header"><span class="code-lang">C++ &mdash; Safe</span></div>
+                    <pre><code><span class="kw">void</span> <span class="func">safeProcess</span>() {
+    <span class="kw">auto</span> data = <span class="kw">std::make_unique</span>&lt;<span class="type">SensorData</span>&gt;();
+    <span class="kw">if</span> (<span class="func">someError</span>()) {
+        <span class="kw">return</span>; <span class="comment">// &#9989; &#1610;&#1615;&#1581;&#1585;&#1585; &#1578;&#1604;&#1602;&#1575;&#1574;&#1610;&#1611;&#1575;</span>
+    }
+} <span class="comment">// &#9989; &#1610;&#1615;&#1581;&#1585;&#1585; &#1578;&#1604;&#1602;&#1575;&#1574;&#1610;&#1611;&#1575; &#1593;&#1606;&#1583; &#1575;&#1604;&#1582;&#1585;&#1608;&#1580;</span></code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section 2 -->
+<section class="section" id="block4-refbase">
+    <div class="section-header">
+        <div class="section-number">2</div>
+        <div>
+            <div class="section-title">مؤشرات أندرويد المخصصة للنظام</div>
+            <div class="section-subtitle">Android RefBase, sp&lt;T&gt;, and wp&lt;T&gt;</div>
+        </div>
+    </div>
+
+    <div class="callout callout-warning">
+        <div class="callout-title">&#9888;&#65039; لماذا AOSP لا يستخدم std::shared_ptr؟</div>
+        <p>يستخدم AOSP نظام <strong>intrusive reference counting</strong> عبر <code>RefBase</code> لأسباب تاريخية وأدائية: (1) حجم أصغر للكائن &mdash; لا يحتاج control block منفصل، (2) كفاءة أعلى في <strong>cache locality</strong>، (3) تكامل عميق مع Binder IPC ومراحل تحميل المكتبات في AOSP.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-title">
+            <div class="icon icon-green">&#127959;&#65039;</div>
+            بنية android::RefBase
+        </div>
+        <p style="margin-bottom:20px; color:var(--text-secondary);">تُدار المراجع عبر عدادين ذريين: <strong>mStrong</strong> للمؤشرات القوية و<strong>mWeak</strong> للمؤشرات الضعيفة.</p>
+
+        <div class="memory-diagram">
+            <div class="memory-title">&#9633; RefBase Internal Layout</div>
+            <div class="memory-row">
+                <div class="memory-cell header" style="flex:2;">android::RefBase Object</div>
+            </div>
+            <div class="memory-row">
+                <div class="memory-cell ref">weakref_impl*<br>mRefs</div>
+                <div class="memory-cell data">vtable ptr<br>(virtual)</div>
+                <div class="memory-cell data">Derived<br>Members</div>
+            </div>
+            <div class="memory-arrow">&#8595;</div>
+            <div class="memory-row">
+                <div class="memory-cell header" style="flex:2;">weakref_impl (Control Block)</div>
+            </div>
+            <div class="memory-row">
+                <div class="memory-cell ref">mStrong<br><span style="font-size:0.7rem;">volatile int32_t</span></div>
+                <div class="memory-cell ref">mWeak<br><span style="font-size:0.7rem;">volatile int32_t</span></div>
+                <div class="memory-cell data">mBase<br><span style="font-size:0.7rem;">RefBase*</span></div>
+                <div class="memory-cell data">mFlags<br><span style="font-size:0.7rem;">OBJECT_LIFETIME_...</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-title">
+                <div class="icon icon-blue">&#128170;</div>
+                Strong Pointers (sp&lt;T&gt;)
+            </div>
+            <ul class="styled-list">
+                <li>تزيد <strong>mStrong</strong> عند الإنشاء</li>
+                <li>تنقصه عند التدمير</li>
+                <li>عندما يصل إلى صفر: يُستدعى destructor</li>
+                <li>الكائن يعيش طالما هناك <strong>sp</strong></li>
+            </ul>
+        </div>
+        <div class="card">
+            <div class="card-title">
+                <div class="icon icon-orange">&#128275;</div>
+                Weak Pointers (wp&lt;T&gt;)
+            </div>
+            <ul class="styled-list">
+                <li>تزيد <strong>mWeak</strong> فقط</li>
+                <li>لا تمنع تدمير الكائن</li>
+                <li>تُستخدم لكسر الاعتماديات الدائرية</li>
+                <li>الترويج عبر <code>.promote()</code> مع فحص nullptr</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+            <span class="code-lang">C++ &mdash; AOSP RefBase Module</span>
+        </div>
+        <pre><code><span class="comment">// include/utils/RefBase.h</span>
+<span class="kw">#include</span> &lt;utils/RefBase.h&gt;
+<span class="kw">#include</span> &lt;utils/StrongPointer.h&gt;
+<span class="kw">using namespace</span> android;
+
+<span class="kw">class</span> <span class="type">DisplayEngine</span> : <span class="kw">public</span> <span class="type">RefBase</span> {
+<span class="kw">public</span>:
+    <span class="func">DisplayEngine</span>() { <span class="func">ALOGD</span>(<span class="str">"DisplayEngine created"</span>); }
+    <span class="func">~DisplayEngine</span>() { <span class="func">ALOGD</span>(<span class="str">"DisplayEngine destroyed"</span>); }
+    <span class="kw">void</span> <span class="func">renderFrame</span>() { <span class="comment">/* ... */</span> }
+};
+
+<span class="comment">// ==================== Usage in System Service ====================</span>
+<span class="kw">class</span> <span class="type">SurfaceFlinger</span> {
+    <span class="kw">sp</span>&lt;DisplayEngine&gt; mPrimaryDisplay;
+    <span class="kw">wp</span>&lt;DisplayEngine&gt; mSecondaryDisplay; <span class="comment">// weak &mdash; &#1604;&#1575; &#1610;&#1605;&#1606;&#1593; &#1575;&#1604;&#1578;&#1583;&#1605;&#1610;&#1585;</span>
+<span class="kw">public</span>:
+    <span class="kw">void</span> <span class="func">initDisplays</span>() {
+        mPrimaryDisplay = <span class="kw">new</span> <span class="type">DisplayEngine</span>();
+        <span class="kw">sp</span>&lt;DisplayEngine&gt; sec = <span class="kw">new</span> <span class="type">DisplayEngine</span>();
+        mSecondaryDisplay = sec; <span class="comment">// &#1610;&#1615;&#1581;&#1608;&#1604; &#1578;&#1604;&#1602;&#1575;&#1574;&#1610;&#1611;&#1575; &#1573;&#1604;&#1609; weak</span>
+        <span class="comment">// sec &#1610;&#1582;&#1585;&#1580; &#1605;&#1606; &#1575;&#1604;&#1606;&#1591;&#1575;&#1602; &mdash; mSecondaryDisplay &#1604;&#1575; &#1610;&#1605;&#1606;&#1593; &#1575;&#1604;&#1578;&#1583;&#1605;&#1610;&#1585;</span>
+    }
+    <span class="kw">void</span> <span class="func">renderSecondary</span>() {
+        <span class="kw">sp</span>&lt;DisplayEngine&gt; engine = mSecondaryDisplay.<span class="func">promote</span>();
+        <span class="kw">if</span> (engine != <span class="kw">nullptr</span>) {
+            engine-&gt;<span class="func">renderFrame</span>(); <span class="comment">// &#9989; &#1570;&#1605;&#1606;</span>
+        } <span class="kw">else</span> {
+            <span class="func">ALOGW</span>(<span class="str">"Secondary display already destroyed!"</span>);
+        }
+    }
+};</code></pre>
+    </div>
+
+    <div class="callout callout-danger">
+        <div class="callout-title">&#128680; خطأ شائع: Creating sp from raw pointer</div>
+        <p>لا تُنشئ <strong>sp&lt;T&gt;</strong> يدويًا من مؤشر خام إذا كان الكائن يستخدم <strong>RefBase</strong>، لأن ذلك قد يؤدي إلى <strong>double-free</strong> أو <strong>use-after-free</strong>. استخدم دائمًا <code>new</code> مباشرة في <code>sp</code> أو استخدم <code>sp::make&lt;T&gt;()</code> إن توفرت.</p>
+    </div>
+</section>
+
+<!-- Section 3 -->
+<section class="section" id="block5-jni">
+    <div class="section-header">
+        <div class="section-number">3</div>
+        <div>
+            <div class="section-title">مدخل لربط الطبقات: JNI</div>
+            <div class="section-subtitle">JNI Fundamentals &amp; Architecture</div>
+        </div>
+    </div>
+
+    <div class="highlight-box">
+        <h3 style="margin-bottom:16px;">ما هو JNI؟</h3>
+        <p style="color:rgba(255,255,255,0.85); line-height:1.8;">
+            <strong>Java Native Interface (JNI)</strong> هو واجهة برمجة قياسية تتيح للكود المكتوب بلغة Java/Kotlin التفاعل مع الكود الأصلي المُكتب بلغة C/C++. في AOSP، يُستخدم JNI بكثافة في:
+        </p>
+        <div class="tag-container" style="margin-top:16px;">
+            <span class="tag">SurfaceFlinger</span>
+            <span class="tag">AudioFlinger</span>
+            <span class="tag">MediaCodec</span>
+            <span class="tag">OpenGL ES Drivers</span>
+            <span class="tag">Hardware Abstraction Layer</span>
+            <span class="tag">Keystore</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">
+            <div class="icon icon-blue">&#128260;</div>
+            تعيين أنواع البيانات (Data Type Mappings)
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Java Type</th>
+                        <th>JNI Native Type</th>
+                        <th>Native C++ Type</th>
+                        <th>Size</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>boolean</code></td><td><code>jboolean</code></td><td><code>uint8_t</code></td><td>8-bit unsigned</td></tr>
+                    <tr><td><code>byte</code></td><td><code>jbyte</code></td><td><code>int8_t</code></td><td>8-bit signed</td></tr>
+                    <tr><td><code>char</code></td><td><code>jchar</code></td><td><code>uint16_t</code></td><td>16-bit UTF-16</td></tr>
+                    <tr><td><code>short</code></td><td><code>jshort</code></td><td><code>int16_t</code></td><td>16-bit signed</td></tr>
+                    <tr><td><code>int</code></td><td><code>jint</code></td><td><code>int32_t</code></td><td>32-bit signed</td></tr>
+                    <tr><td><code>long</code></td><td><code>jlong</code></td><td><code>int64_t</code></td><td>64-bit signed</td></tr>
+                    <tr><td><code>float</code></td><td><code>jfloat</code></td><td><code>float</code></td><td>32-bit IEEE 754</td></tr>
+                    <tr><td><code>double</code></td><td><code>jdouble</code></td><td><code>double</code></td><td>64-bit IEEE 754</td></tr>
+                    <tr><td><code>Object</code></td><td><code>jobject</code></td><td><code>&mdash;</code></td><td>Reference</td></tr>
+                    <tr><td><code>String</code></td><td><code>jstring</code></td><td><code>&mdash;</code></td><td>Reference</td></tr>
+                    <tr><td><code>Class</code></td><td><code>jclass</code></td><td><code>&mdash;</code></td><td>Reference</td></tr>
+                    <tr><td><code>Array</code></td><td><code>jarray</code></td><td><code>&mdash;</code></td><td>Reference</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">
+            <div class="icon icon-orange">&#128221;</div>
+            تواقيع JNI (Method Signatures)
+        </div>
+        <p style="margin-bottom:20px; color:var(--text-secondary);">تستخدم JVM تواقيع داخلية لتعريف الدوال. يجب فهمها لتسجيل الدوال ديناميكيًا.</p>
+
+        <div class="code-block">
+            <div class="code-header">
+                <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                <span class="code-lang">JNI Type Descriptors</span>
+            </div>
+            <pre><code><span class="comment">// &#1571;&#1605;&#1579;&#1604;&#1577; &#1593;&#1604;&#1609; &#1575;&#1604;&#1578;&#1608;&#1575;&#1602;&#1610;&#1593; &#1575;&#1604;&#1583;&#1575;&#1582;&#1604;&#1610;&#1577;</span>
+<span class="str">"()V"</span>                    <span class="comment">// void method()</span>
+<span class="str">"(I)Z"</span>                   <span class="comment">// boolean method(int)</span>
+<span class="str">"(Ljava/lang/String;)J"</span>  <span class="comment">// long method(String)</span>
+<span class="str">"([I)Ljava/lang/String;"</span> <span class="comment">// String method(int[])</span>
+<span class="str">"(II[[B)V"</span>               <span class="comment">// void method(int, int, byte[][])</span>
+
+<span class="comment">// Mapping Reference:</span>
+<span class="comment">// B=byte, C=char, D=double, F=float, I=int, J=long</span>
+<span class="comment">// S=short, Z=boolean, V=void, L&lt;class&gt;=object, [&lt;type&gt;=array</span></code></pre>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">
+            <div class="icon icon-red">&#9889;</div>
+            مؤشر JNIEnv* وقواعد السلامة
+        </div>
+        <p style="margin-bottom:16px; color:var(--text-secondary);"><code>JNIEnv*</code> هو مؤشر على بيئة تنفيذ JNI الخاصة بالـ Thread. يحتوي على جدول دوال غير مباشر (<strong>indirect function table</strong>) يُستخدم لاستدعاء جميع عمليات JNI.</p>
+
+        <div class="callout callout-danger">
+            <div class="callout-title">&#9949; لا تشارك JNIEnv* عبر Threads!</div>
+            <p><code>JNIEnv*</code> خاص بـ <strong>Thread</strong> واحد. إذا احتاج Thread أصلي (C++) في الخلفية إلى استدعاء Java، يجب عليه:</p>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header">
+                <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                <span class="code-lang">C++ &mdash; Attach/Detach Pattern</span>
+            </div>
+            <pre><code><span class="kw">JavaVM</span>* g_vm = <span class="kw">nullptr</span>; <span class="comment">// &#1610;&#1615;&#1581;&#1601;&#1592; &#1601;&#1610; JNI_OnLoad</span>
+
+<span class="kw">JNIEXPORT jint</span> <span class="func">JNI_OnLoad</span>(<span class="kw">JavaVM</span>* vm, <span class="kw">void</span>* reserved) {
+    g_vm = vm;
+    <span class="kw">return</span> JNI_VERSION_1_6;
+}
+
+<span class="kw">void</span> <span class="func">backgroundWorker</span>() {
+    <span class="kw">JNIEnv</span>* env;
+    <span class="kw">jint</span> attachResult = g_vm-&gt;<span class="func">AttachCurrentThread</span>(&amp;env, <span class="kw">nullptr</span>);
+    <span class="kw">if</span> (attachResult != JNI_OK) {
+        <span class="kw">return</span>; <span class="comment">// &#1601;&#1588;&#1604; &#1575;&#1604;&#1585;&#1576;&#1591;</span>
+    }
+    <span class="comment">// &#9989; &#1575;&#1587;&#1578;&#1582;&#1583;&#1605; env &#1576;&#1571;&#1605;&#1575;&#1606; &#1607;&#1606;&#1575;</span>
+    <span class="comment">// ... JNI calls ...</span>
+    g_vm-&gt;<span class="func">DetachCurrentThread</span>(); <span class="comment">// &#9989; &#1604;&#1575; &#1578;&#1606;&#1587;&#1614; &#1575;&#1604;&#1601;&#1589;&#1604;!</span>
+}</code></pre>
+        </div>
+    </div>
+</section>
+
+<!-- Section 4 -->
+<section class="section" id="block5-memory">
+    <div class="section-header">
+        <div class="section-number">4</div>
+        <div>
+            <div class="section-title">إدارة الذاكرة وتفادي التسريبات في JNI</div>
+            <div class="section-subtitle">JNI Memory &amp; References Management</div>
+        </div>
+    </div>
+
+    <div class="callout callout-warning">
+        <div class="callout-title">&#9888;&#65039; الفجوة الحرجة</div>
+        <p>جامع القمامة في JVM (<strong>Garbage Collector</strong>) لا يستطيع إطلاقًا تحرير الذاكرة المخصصة في C++ عبر <code>malloc</code> أو <code>new</code>. هذه الذاكرة خارج نطاق JVM تمامًا. يجب عليك إدارتها يدويًا.</p>
+    </div>
+
+    <div class="grid-3">
+        <div class="card" style="border-top:4px solid var(--android-green);">
+            <div class="card-title">
+                <div class="icon icon-green">&#128205;</div>
+                Local References
+            </div>
+            <ul class="styled-list" style="font-size:0.9rem;">
+                <li>تُنشأ تلقائيًا</li>
+                <li>صالحة فقط داخل إطار الدالة الأصلية</li>
+                <li>تُحرر تلقائيًا عند العودة إلى Java</li>
+                <li>خطر <strong>Local Reference Table Overflow</strong></li>
+                <li>الحد الأقصى: 512 مرجع (افتراضي)</li>
+            </ul>
+            <div class="code-block" style="margin:16px 0 0;">
+                <pre><code><span class="comment">// Explicit cleanup</span>
+env-&gt;<span class="func">DeleteLocalRef</span>(jobj);</code></pre>
+            </div>
+        </div>
+
+        <div class="card" style="border-top:4px solid var(--electric-blue);">
+            <div class="card-title">
+                <div class="icon icon-blue">&#127758;</div>
+                Global References
+            </div>
+            <ul class="styled-list" style="font-size:0.9rem;">
+                <li>تدوم عبر استدعاءات متعددة</li>
+                <li>تُشارك بين Threads</li>
+                <li>لا تُحرر تلقائيًا &mdash; <strong>تسريب مؤكد</strong></li>
+                <li>تمنع GC من تدمير الكائن</li>
+                <li>يجب استدعاء <code>DeleteGlobalRef</code></li>
+            </ul>
+            <div class="code-block" style="margin:16px 0 0;">
+                <pre><code><span class="kw">jobject</span> global = env-&gt;<span class="func">NewGlobalRef</span>(local);
+<span class="comment">// ... use across calls ...</span>
+env-&gt;<span class="func">DeleteGlobalRef</span>(global);</code></pre>
+            </div>
+        </div>
+
+        <div class="card" style="border-top:4px solid var(--alert-orange);">
+            <div class="card-title">
+                <div class="icon icon-orange">&#128123;</div>
+                Weak Global References
+            </div>
+            <ul class="styled-list" style="font-size:0.9rem;">
+                <li>تدوم عبر استدعاءات</li>
+                <li><strong>لا تمنع</strong> GC من التدمير</li>
+                <li>يُرجع <code>NULL</code> إذا تُدمّر</li>
+                <li>مثالية للـ caches</li>
+                <li>يجب فحصها قبل الاستخدام</li>
+            </ul>
+            <div class="code-block" style="margin:16px 0 0;">
+                <pre><code><span class="kw">jweak</span> wref = env-&gt;<span class="func">NewWeakGlobalRef</span>(obj);
+<span class="kw">jobject</span> strong = env-&gt;<span class="func">NewLocalRef</span>(wref);
+<span class="kw">if</span> (strong) { <span class="comment">/* use */</span> }
+env-&gt;<span class="func">DeleteWeakGlobalRef</span>(wref);</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">
+            <div class="icon icon-red">&#129529;</div>
+            Native Memory Leaks: C++ vs JVM GC
+        </div>
+        <div class="memory-diagram">
+            <div class="memory-title">&#9633; Memory Ownership Boundary</div>
+            <div style="display:flex; gap:20px; flex-wrap:wrap;">
+                <div style="flex:1; min-width:280px;">
+                    <div class="memory-row">
+                        <div class="memory-cell header" style="flex:1;">JVM Heap</div>
+                    </div>
+                    <div class="memory-row">
+                        <div class="memory-cell data" style="flex:1;">Java Objects<br><span style="font-size:0.75rem; color:#8B949E;">Managed by GC</span></div>
+                    </div>
+                    <div class="memory-row">
+                        <div class="memory-cell ref" style="flex:1;">JNI GlobalRef<br><span style="font-size:0.75rem; color:#8B949E;">Prevents GC</span></div>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; color:var(--android-green); font-size:2rem;">&#8646;</div>
+                <div style="flex:1; min-width:280px;">
+                    <div class="memory-row">
+                        <div class="memory-cell header" style="flex:1; background:rgba(255,82,82,0.2); border-color:rgba(255,82,82,0.4); color:#FF5252;">Native Heap (C++)</div>
+                    </div>
+                    <div class="memory-row">
+                        <div class="memory-cell data" style="flex:1;">malloc / new<br><span style="font-size:0.75rem; color:#8B949E;">Manual free / delete</span></div>
+                    </div>
+                    <div class="memory-row">
+                        <div class="memory-cell ref" style="flex:1;">JNI LocalRef Table<br><span style="font-size:0.75rem; color:#8B949E;">Auto-cleared per frame</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header">
+                <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                <span class="code-lang">C++ &mdash; RAII Wrapper for JNI Strings</span>
+            </div>
+            <pre><code><span class="kw">class</span> <span class="type">JniString</span> {
+    <span class="kw">JNIEnv</span>* mEnv;
+    <span class="kw">jstring</span> mJstr;
+    <span class="kw">const char</span>* mCstr;
+<span class="kw">public</span>:
+    <span class="func">JniString</span>(<span class="kw">JNIEnv</span>* env, <span class="kw">jstring</span> jstr) 
+        : mEnv(env), mJstr(jstr), mCstr(env-&gt;<span class="func">GetStringUTFChars</span>(jstr, <span class="kw">nullptr</span>)) {}
+
+    <span class="func">~JniString</span>() {
+        mEnv-&gt;<span class="func">ReleaseStringUTFChars</span>(mJstr, mCstr);
+    }
+
+    <span class="kw">const char</span>* <span class="func">c_str</span>() <span class="kw">const</span> { <span class="kw">return</span> mCstr; }
+    <span class="kw">operator const char*</span>() <span class="kw">const</span> { <span class="kw">return</span> mCstr; }
+};
+
+<span class="comment">// Usage: &#1610;&#1615;&#1581;&#1585;&#1585; &#1578;&#1604;&#1602;&#1575;&#1574;&#1610;&#1611;&#1575; &#1593;&#1606;&#1583; &#1575;&#1604;&#1582;&#1585;&#1608;&#1580; &#1605;&#1606; &#1575;&#1604;&#1606;&#1591;&#1575;&#1602;</span>
+<span class="kw">void</span> <span class="func">processPath</span>(<span class="kw">JNIEnv</span>* env, <span class="kw">jstring</span> path) {
+    <span class="type">JniString</span> cPath(env, path);
+    <span class="func">ALOGD</span>(<span class="str">"Processing: %s"</span>, cPath.<span class="func">c_str</span>());
+} <span class="comment">// &#9989; ReleaseStringUTFChars called automatically</span></code></pre>
+        </div>
+    </div>
+</section>
+
+<!-- Section 5 -->
+<section class="section" id="block5-registration">
+    <div class="section-header">
+        <div class="section-number">5</div>
+        <div>
+            <div class="section-title">تسجيل الدوال المتقدم في JNI</div>
+            <div class="section-subtitle">Static vs Dynamic JNI Registration</div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-title">
+                <div class="icon icon-orange">&#128220;</div>
+                Static Native Registration (Legacy)
+            </div>
+            <ul class="styled-list">
+                <li>يعتمد على <strong>name mangling</strong> (<code>Java_com_example_package_Class_method</code>)</li>
+                <li>يتطلب تطابق اسم الحزمة والفئة تمامًا</li>
+                <li>بطيء في البحث عند التحميل الأول</li>
+                <li>يُعرقل obfuscation وإعادة البناء</li>
+                <li>صعب في الصيانة عند تغيير الحزم</li>
+            </ul>
+            <div class="code-block" style="margin:16px 0 0;">
+                <div class="code-header"><span class="code-lang">C++ &mdash; Static</span></div>
+                <pre><code><span class="kw">extern</span> <span class="str">"C"</span> <span class="kw">JNIEXPORT void</span> <span class="func">JNICALL</span>
+<span class="func">Java_com_android_server_DisplayService_nativeInit</span>(
+    <span class="kw">JNIEnv</span>* env, <span class="kw">jobject</span> thiz, <span class="kw">jint</span> displayId
+) {
+    <span class="comment">// ...</span>
+}</code></pre>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <div class="icon icon-green">&#9881;&#65039;</div>
+                Dynamic Native Registration (Best Practice)
+            </div>
+            <ul class="styled-list">
+                <li>يستخدم <code>JNI_OnLoad</code> و<code>JNINativeMethod</code></li>
+                <li>أسرع في التنفيذ &mdash; لا يوجد بحث runtime</li>
+                <li>يدعم obfuscation وإعادة البناء بحرية</li>
+                <li>أسهل في الصيانة والاختبار</li>
+                <li>مُوصى به رسميًا في AOSP</li>
+            </ul>
+            <div class="code-block" style="margin:16px 0 0;">
+                <div class="code-header"><span class="code-lang">C++ &mdash; Dynamic</span></div>
+                <pre><code><span class="kw">static</span> <span class="kw">JNINativeMethod</span> gMethods[] = {
+    {<span class="str">"nativeInit"</span>, <span class="str">"(I)V"</span>, (<span class="kw">void</span>*)<span class="func">nativeInit</span>},
+    {<span class="str">"nativeProcess"</span>, <span class="str">"([B)Z"</span>, (<span class="kw">void</span>*)<span class="func">nativeProcess</span>},
+};
+
+<span class="kw">JNIEXPORT jint</span> <span class="func">JNI_OnLoad</span>(<span class="kw">JavaVM</span>* vm, <span class="kw">void</span>* reserved) {
+    <span class="kw">JNIEnv</span>* env;
+    vm-&gt;<span class="func">GetEnv</span>((<span class="kw">void</span>**)&amp;env, JNI_VERSION_1_6);
+    <span class="kw">jclass</span> clazz = env-&gt;<span class="func">FindClass</span>(<span class="str">"com/android/server/DisplayService"</span>);
+    env-&gt;<span class="func">RegisterNatives</span>(clazz, gMethods, <span class="func">NELEM</span>(gMethods));
+    <span class="kw">return</span> JNI_VERSION_1_6;
+}</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">
+            <div class="icon icon-blue">&#128295;</div>
+            مكتبة أصلية كاملة: Dynamic Registration + Exception Safety
+        </div>
+        <div class="code-block">
+            <div class="code-header">
+                <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                <span class="code-lang">C++ &mdash; Complete Native Module</span>
+            </div>
+            <pre><code><span class="comment">// native_sensor.cpp</span>
+<span class="kw">#include</span> &lt;jni.h&gt;
+<span class="kw">#include</span> &lt;android/log.h&gt;
+<span class="kw">#include</span> &lt;vector&gt;
+<span class="kw">#include</span> &lt;stdexcept&gt;
+
+<span class="kw">#define</span> <span class="macro">LOG_TAG</span> <span class="str">"NativeSensor"</span>
+<span class="kw">#define</span> <span class="macro">LOGE</span>(...) <span class="func">__android_log_print</span>(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+
+<span class="kw">static</span> <span class="kw">void</span> <span class="func">throwJavaException</span>(<span class="kw">JNIEnv</span>* env, <span class="kw">const char</span>* msg) {
+    <span class="kw">jclass</span> exClass = env-&gt;<span class="func">FindClass</span>(<span class="str">"java/lang/RuntimeException"</span>);
+    env-&gt;<span class="func">ThrowNew</span>(exClass, msg);
+}
+
+<span class="kw">static</span> <span class="kw">jboolean</span> <span class="func">nativeProcessBuffer</span>(<span class="kw">JNIEnv</span>* env, <span class="kw">jobject</span> thiz, <span class="kw">jbyteArray</span> buffer) {
+    <span class="kw">jboolean</span> isCopy = JNI_FALSE;
+    <span class="kw">jsize</span> len = env-&gt;<span class="func">GetArrayLength</span>(buffer);
+
+    <span class="kw">if</span> (len == 0) {
+        <span class="func">throwJavaException</span>(env, <span class="str">"Empty buffer provided"</span>);
+        <span class="kw">return</span> JNI_FALSE;
+    }
+
+    <span class="kw">jbyte</span>* raw = env-&gt;<span class="func">GetByteArrayElements</span>(buffer, &amp;isCopy);
+    <span class="kw">if</span> (!raw) {
+        <span class="func">throwJavaException</span>(env, <span class="str">"Failed to access buffer"</span>);
+        <span class="kw">return</span> JNI_FALSE;
+    }
+
+    <span class="kw">try</span> {
+        <span class="kw">std::vector</span>&lt;<span class="kw">uint8_t</span>&gt; data(raw, raw + len);
+        <span class="comment">// Process data...</span>
+
+        env-&gt;<span class="func">ReleaseByteArrayElements</span>(buffer, raw, JNI_ABORT);
+        <span class="kw">return</span> JNI_TRUE;
+    } <span class="kw">catch</span> (<span class="kw">const</span> <span class="type">std::exception</span>&amp; e) {
+        env-&gt;<span class="func">ReleaseByteArrayElements</span>(buffer, raw, JNI_ABORT);
+        <span class="func">throwJavaException</span>(env, e.<span class="func">what</span>());
+        <span class="kw">return</span> JNI_FALSE;
+    }
+}
+
+<span class="kw">static</span> <span class="kw">JNINativeMethod</span> gSensorMethods[] = {
+    {<span class="str">"nativeProcessBuffer"</span>, <span class="str">"([B)Z"</span>, (<span class="kw">void</span>*)<span class="func">nativeProcessBuffer</span>},
+};
+
+<span class="kw">JNIEXPORT jint</span> <span class="func">JNI_OnLoad</span>(<span class="kw">JavaVM</span>* vm, <span class="kw">void</span>* reserved) {
+    <span class="kw">JNIEnv</span>* env;
+    <span class="kw">if</span> (vm-&gt;<span class="func">GetEnv</span>((<span class="kw">void</span>**)&amp;env, JNI_VERSION_1_6) != JNI_OK) {
+        <span class="kw">return</span> JNI_ERR;
+    }
+    <span class="kw">jclass</span> clazz = env-&gt;<span class="func">FindClass</span>(<span class="str">"com/example/SensorManager"</span>);
+    <span class="kw">if</span> (!clazz) <span class="kw">return</span> JNI_ERR;
+
+    <span class="kw">if</span> (env-&gt;<span class="func">RegisterNatives</span>(clazz, gSensorMethods, 
+        <span class="kw">sizeof</span>(gSensorMethods)/<span class="kw">sizeof</span>(gSensorMethods[0])) &lt; 0) {
+        <span class="kw">return</span> JNI_ERR;
+    }
+    <span class="kw">return</span> JNI_VERSION_1_6;
+}</code></pre>
+        </div>
+    </div>
+</section>
+
+<!-- Section 6 -->
+<section class="section" id="comparisons">
+    <div class="section-header">
+        <div class="section-number">6</div>
+        <div>
+            <div class="section-title">مصفوفات اتخاذ القرار والمقارنات</div>
+            <div class="section-subtitle">Decision Matrices &amp; Management Comparisons</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">
+            <div class="icon icon-blue">&#128200;</div>
+            جدول 1: مقارنة مؤشرات الذاكرة
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>المعيار</th>
+                        <th>std::unique_ptr</th>
+                        <th>std::shared_ptr</th>
+                        <th>android::sp&lt;T&gt;</th>
+                        <th>android::wp&lt;T&gt;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>الملكية</strong></td>
+                        <td><span class="badge badge-green">فريدة</span></td>
+                        <td><span class="badge badge-blue">تشاركية</span></td>
+                        <td><span class="badge badge-blue">تشاركية (قوية)</span></td>
+                        <td><span class="badge badge-orange">ضعيفة</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>الأداء</strong></td>
+                        <td><span class="badge badge-green">صفرية</span></td>
+                        <td><span class="badge badge-orange">atomic ops</span></td>
+                        <td><span class="badge badge-orange">atomic ops</span></td>
+                        <td><span class="badge badge-orange">atomic + promote</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Thread Safety</strong></td>
+                        <td><span class="badge badge-red">N/A</span></td>
+                        <td><span class="badge badge-green">آمن</span></td>
+                        <td><span class="badge badge-green">آمن</span></td>
+                        <td><span class="badge badge-green">آمن</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Intrusive</strong></td>
+                        <td><span class="badge badge-red">لا</span></td>
+                        <td><span class="badge badge-red">لا</span></td>
+                        <td><span class="badge badge-green">نعم (RefBase)</span></td>
+                        <td><span class="badge badge-green">نعم (RefBase)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cache Locality</strong></td>
+                        <td><span class="badge badge-green">ممتازة</span></td>
+                        <td><span class="badge badge-orange">جيدة</span></td>
+                        <td><span class="badge badge-green">ممتازة</span></td>
+                        <td><span class="badge badge-green">ممتازة</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>الاستخدام في AOSP</strong></td>
+                        <td><span class="badge badge-orange">محدود</span></td>
+                        <td><span class="badge badge-orange">محدود</span></td>
+                        <td><span class="badge badge-green">واسع</span></td>
+                        <td><span class="badge badge-green">واسع</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">
+            <div class="icon icon-orange">&#128203;</div>
+            جدول 2: أنواع مراجع JNI
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>المعيار</th>
+                        <th>Local Reference</th>
+                        <th>Global Reference</th>
+                        <th>Weak Global Reference</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>العمر</strong></td>
+                        <td>إطار الدالة فقط</td>
+                        <td>حتى <code>DeleteGlobalRef</code></td>
+                        <td>حتى GC أو <code>DeleteWeakGlobalRef</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>نطاق الـ Thread</strong></td>
+                        <td><span class="badge badge-red">خاص بالـ Thread</span></td>
+                        <td><span class="badge badge-green">عالمي</span></td>
+                        <td><span class="badge badge-green">عالمي</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>يمنع GC؟</strong></td>
+                        <td><span class="badge badge-green">نعم (مؤقتًا)</span></td>
+                        <td><span class="badge badge-green">نعم (دائمًا)</span></td>
+                        <td><span class="badge badge-red">لا</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>تنظيف يدوي</strong></td>
+                        <td><span class="badge badge-orange">اختياري</span></td>
+                        <td><span class="badge badge-red">إلزامي</span></td>
+                        <td><span class="badge badge-red">إلزامي</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>خطر التسريب</strong></td>
+                        <td><span class="badge badge-orange">منخفض (Table Overflow)</span></td>
+                        <td><span class="badge badge-red">عالٍ</span></td>
+                        <td><span class="badge badge-orange">منخفض</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">
+            <div class="icon icon-green">&#128187;</div>
+            جدول 3: تسجيل الدوال في JNI
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>المعيار</th>
+                        <th>Static (Java_...)</th>
+                        <th>Dynamic (RegisterNatives)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>سرعة البحث</strong></td>
+                        <td><span class="badge badge-orange">بطيء (linear search)</span></td>
+                        <td><span class="badge badge-green">سريع (direct mapping)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>المرونة</strong></td>
+                        <td><span class="badge badge-red">منخفضة</span></td>
+                        <td><span class="badge badge-green">عالية</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Obfuscation</strong></td>
+                        <td><span class="badge badge-red">غير مدعوم</span></td>
+                        <td><span class="badge badge-green">مدعوم</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>إعادة البناء</strong></td>
+                        <td><span class="badge badge-red">يتطلب تطابق الأسماء</span></td>
+                        <td><span class="badge badge-green">مستقل عن الأسماء</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>الصيانة</strong></td>
+                        <td><span class="badge badge-orange">صعبة</span></td>
+                        <td><span class="badge badge-green">سهلة</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>التوصية في AOSP</strong></td>
+                        <td><span class="badge badge-orange">مُهمل</span></td>
+                        <td><span class="badge badge-green">Best Practice</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- Debugging Section -->
+<section class="section" id="debugging">
+    <div class="section-header">
+        <div class="section-number" style="background:linear-gradient(135deg, #FF5252, #FF9100);">&#128295;</div>
+        <div>
+            <div class="section-title">نصائح مهندس أول لتصحيح الأخطاء الأصلية</div>
+            <div class="section-subtitle">Senior AOSP Architect Debugging Guide</div>
+        </div>
+    </div>
+
+    <div class="highlight-box">
+        <h3 style="margin-bottom:20px;">&#128230; قراءة Native Crash Tombstones</h3>
+        <p style="color:rgba(255,255,255,0.85); margin-bottom:16px;">عند حدوث crash أصلي، يُنشئ Android ملف <strong>tombstone</strong> في <code>/data/tombstones/</code>. يحتوي على:</p>
+        <div class="tag-container">
+            <span class="tag">Signal number (SIGSEGV, SIGABRT)</span>
+            <span class="tag">Fault address</span>
+            <span class="tag">Backtrace (unwind)</span>
+            <span class="tag">Register dump</span>
+            <span class="tag">Memory maps</span>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-title">
+                <div class="icon icon-red">&#128308;</div>
+                SIGSEGV (Segmentation Fault)
+            </div>
+            <ul class="styled-list">
+                <li>الوصول إلى ذاكرة غير مصرح بها</li>
+                <li> dereferencing <strong>nullptr</strong> أو مؤشر مُتلف</li>
+                <li>use-after-free مع RefBase</li>
+                <li>buffer overflow في native heap</li>
+            </ul>
+            <div class="terminal">
+                <div class="terminal-line"><span class="terminal-prompt">$</span> adb shell cat /data/tombstones/tombstone_01 | grep "signal"</div>
+                <div class="terminal-line"><span class="terminal-info">signal 11 (SIGSEGV), code 1 (SEGV_MAPERR)</span></div>
+                <div class="terminal-line"><span class="terminal-info">fault addr 0x00000000</span></div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">
+                <div class="icon icon-orange">&#128993;</div>
+                SIGABRT (Abort)
+            </div>
+            <ul class="styled-list">
+                <li>استدعاء <code>abort()</code> أو <code>__assert_fail</code></li>
+                <li>double-free في الذاكرة</li>
+                <li>heap corruption detected</li>
+                <li>JNI Local Reference Table Overflow</li>
+            </ul>
+            <div class="terminal">
+                <div class="terminal-line"><span class="terminal-prompt">$</span> adb shell cat /data/tombstones/tombstone_02 | grep "signal"</div>
+                <div class="terminal-line"><span class="terminal-info">signal 6 (SIGABRT), code -1 (SI_QUEUE)</span></div>
+                <div class="terminal-line"><span class="terminal-info">abort message: 'JNI ERROR: local reference table overflow'</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">
+            <div class="icon icon-green">&#129516;</div>
+            AddressSanitizer (ASan) في AOSP
+        </div>
+        <p style="margin-bottom:16px; color:var(--text-secondary);">ASan أداة قوية لاكتشاف أخطاء الذاكرة في الوقت الفعلي. يُمكن تفعيله في بناء AOSP عبر:</p>
+        <div class="code-block">
+            <div class="code-header">
+                <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                <span class="code-lang">Android.bp / CMake</span>
+            </div>
+            <pre><code><span class="comment">// Android.bp</span>
+cc_binary {
+    name: <span class="str">"my_native_service"</span>,
+    srcs: [<span class="str">"main.cpp"</span>],
+    sanitize: {
+        address: <span class="kw">true</span>,
+    },
+}
+
+<span class="comment">// CMakeLists.txt</span>
+<span class="func">set</span>(CMAKE_CXX_FLAGS <span class="str">"${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer"</span>)
+<span class="func">set</span>(CMAKE_LINKER_FLAGS <span class="str">"${CMAKE_LINKER_FLAGS} -fsanitize=address"</span>)</code></pre>
+        </div>
+        <div class="callout callout-success">
+            <div class="callout-title">&#9989; ما يكتشفه ASan</div>
+            <p>use-after-free &middot; heap-buffer-overflow &middot; stack-buffer-overflow &middot; global-buffer-overflow &middot; use-after-return &middot; initialization-order bugs &middot; memory leaks (مع LSan)</p>
+        </div>
+    </div>
+
+    <div class="callout callout-info">
+        <div class="callout-title">&#128161; نصيحة أخيرة من المهندس الأول</div>
+        <p>عند العمل على طبقات النظام في AOSP، اتبع دائمًا مبدأ <strong>defensive programming</strong>: افحص كل مؤشر قبل الاستخدام، استخدم <code>sp&lt;T&gt;</code> و<code>wp&lt;T&gt;</code> بدلاً من المؤشرات الخامة، ولا تثق أبدًا بمدخلات JNI القادمة من Java. اختبر كل مسار للأخطاء، واستخدم <strong>ASan</strong> في البيئة التطويرية قبل دمج الكود.</p>
+    </div>
+</section>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <h3>AOSP Low-Level C++ &amp; JNI Master Guide</h3>
+    <p>تم إعداد هذا الدليل كمرجع شامل لمهندسي الأنظمة العاملين على Android Open Source Project. يغطي البلوك 4 والبلوك 5 من خارطة طريق AOSP للتطوير منخفض المستوى.</p>
+    <div style="margin-top:24px; color:rgba(255,255,255,0.4); font-size:0.9rem;">
+        Block 4: Modern C++ Smart Pointers &middot; Block 5: JNI Interoperability &middot; 2026
+    </div>
+</div>
+
+</body>
+</html>

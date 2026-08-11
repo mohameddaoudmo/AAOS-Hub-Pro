@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الدليل الشامل للغة الواجهات AIDL Deep Dive والتوليد التلقائي لـ Stubs</title>
+<style>
+@page {
+    size: A4;
+    margin: 16mm 14mm;
+    background-color: #f8fafc;
+    @top-center { content: "الدليل الشامل لـ AIDL Deep Dive — البلوك 7: اليوم 13-14"; font-size: 9pt; color: #64748b; }
+    @bottom-center { content: "صفحة " counter(page) " من " counter(pages); font-size: 9pt; color: #64748b; }
+}
+
+:root {
+    --navy: #0f172a;
+    --royal: #2563eb;
+    --amber: #d97706;
+    --orange: #ea580c;
+    --rose: #e11d48;
+    --rose-bg: #fff1f2;
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-300: #cbd5e1;
+    --slate-400: #94a3b8;
+    --slate-500: #64748b;
+    --slate-600: #475569;
+    --slate-700: #334155;
+    --slate-800: #1e293b;
+    --slate-900: #0f172a;
+    --code-bg: #0f172a;
+    --code-text: #e2e8f0;
+    --keyword: #c084fc;
+    --type: #38bdf8;
+    --string: #a3e635;
+    --comment: #64748b;
+    --number: #f472b6;
+    --function: #fbbf24;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: "Segoe UI", "Tahoma", "Arial", sans-serif;
+    background: var(--slate-50);
+    color: var(--slate-800);
+    line-height: 1.85;
+    font-size: 11pt;
+    direction: rtl;
+    text-align: right;
+}
+
+.header-banner {
+    background: linear-gradient(135deg, var(--navy) 0%, #1e3a5f 100%);
+    color: white;
+    padding: 40px 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 40px rgba(15,23,42,0.25);
+    position: relative;
+    overflow: hidden;
+}
+.header-banner::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+}
+.header-banner h1 {
+    font-size: 22pt;
+    font-weight: 800;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+}
+.header-banner .subtitle {
+    font-size: 12pt;
+    opacity: 0.85;
+    position: relative;
+    z-index: 1;
+}
+.header-banner .badge {
+    display: inline-block;
+    background: var(--amber);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 9pt;
+    font-weight: 700;
+    margin-top: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+.section {
+    background: white;
+    border-radius: 10px;
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border-right: 4px solid var(--royal);
+}
+.section-title {
+    font-size: 16pt;
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--slate-200);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.section-title .icon {
+    width: 32px;
+    height: 32px;
+    background: var(--royal);
+    color: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14pt;
+    flex-shrink: 0;
+}
+
+.subsection-title {
+    font-size: 13pt;
+    font-weight: 700;
+    color: var(--slate-700);
+    margin: 22px 0 12px 0;
+    padding-right: 12px;
+    border-right: 3px solid var(--amber);
+}
+
+p {
+    margin-bottom: 14px;
+    text-align: justify;
+    color: var(--slate-700);
+}
+
+pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 18px;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-family: "Consolas", "Monaco", "Courier New", monospace;
+    font-size: 9.5pt;
+    line-height: 1.6;
+    margin: 16px 0;
+    border: 1px solid var(--slate-700);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    direction: ltr;
+    text-align: left;
+}
+code {
+    font-family: "Consolas", "Monaco", "Courier New", monospace;
+    direction: ltr;
+}
+:not(pre) > code {
+    background: var(--slate-100);
+    color: var(--rose);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10pt;
+    direction: ltr;
+    unicode-bidi: embed;
+}
+
+.kw { color: var(--keyword); font-weight: bold; }
+.ty { color: var(--type); }
+.st { color: var(--string); }
+.co { color: var(--comment); font-style: italic; }
+.nu { color: var(--number); }
+.fn { color: var(--function); }
+
+.warning-card {
+    background: var(--rose-bg);
+    border: 1px solid #fecdd3;
+    border-right: 4px solid var(--rose);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin: 18px 0;
+}
+.warning-card .warning-title {
+    color: var(--rose);
+    font-weight: 800;
+    font-size: 11pt;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.warning-card p { color: #881337; margin-bottom: 6px; }
+
+.info-card {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-right: 4px solid var(--royal);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin: 18px 0;
+}
+.info-card .info-title {
+    color: var(--royal);
+    font-weight: 800;
+    font-size: 11pt;
+    margin-bottom: 8px;
+}
+.info-card p { color: #1e3a5f; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0;
+    font-size: 10pt;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+th {
+    background: var(--navy);
+    color: white;
+    padding: 12px 14px;
+    text-align: right;
+    font-weight: 700;
+}
+td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--slate-200);
+    background: white;
+}
+tr:nth-child(even) td { background: var(--slate-50); }
+
+.diagram {
+    background: var(--slate-800);
+    color: #e2e8f0;
+    padding: 22px;
+    border-radius: 10px;
+    font-family: "Consolas", "Monaco", monospace;
+    font-size: 9pt;
+    line-height: 1.5;
+    overflow-x: auto;
+    margin: 18px 0;
+    direction: ltr;
+    text-align: left;
+    white-space: pre;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+.diagram .d-label { color: #fbbf24; font-weight: bold; }
+.diagram .d-arrow { color: #38bdf8; }
+.diagram .d-box { color: #a3e635; }
+.diagram .d-note { color: #94a3b8; }
+
+ul, ol {
+    margin: 12px 24px 18px 0;
+    padding-right: 18px;
+}
+li {
+    margin-bottom: 8px;
+    color: var(--slate-700);
+}
+
+.step-box {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid #7dd3fc;
+    border-right: 4px solid #0284c7;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 16px 0;
+}
+.step-box .step-num {
+    display: inline-block;
+    background: #0284c7;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-weight: 800;
+    font-size: 11pt;
+    margin-left: 10px;
+}
+.step-box .step-title {
+    font-weight: 800;
+    color: #0c4a6e;
+    font-size: 12pt;
+    display: inline;
+}
+
+.terminal {
+    background: #1a1a2e;
+    color: #00ff88;
+    padding: 18px;
+    border-radius: 10px;
+    font-family: "Consolas", monospace;
+    font-size: 9.5pt;
+    direction: ltr;
+    text-align: left;
+    margin: 14px 0;
+    border: 1px solid #333;
+}
+.terminal .prompt { color: #fbbf24; }
+.terminal .cmd { color: #38bdf8; }
+
+.highlight-box {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-right: 4px solid var(--amber);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 14px 0;
+}
+.highlight-box p { color: #78350f; margin: 0; }
+
+.footer {
+    text-align: center;
+    padding: 30px;
+    color: var(--slate-400);
+    font-size: 9pt;
+    border-top: 1px solid var(--slate-200);
+    margin-top: 40px;
+}
+
+@media print {
+    body { background: white; }
+    .section { box-shadow: none; border: 1px solid var(--slate-200); }
+    pre { white-space: pre-wrap; word-wrap: break-word; }
+}
+
+.container {
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 16px 0;
+}
+@media (max-width: 768px) {
+    .two-col { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="header-banner">
+    <h1>الدليل الشامل للغة الواجهات AIDL Deep Dive</h1>
+    <div class="subtitle">التوليد التلقائي لـ Stubs — البلوك 7: اليوم 13-14</div>
+    <div class="badge">Principal Mobile Systems Architect Guide</div>
+</div>
+
+<!-- Section 1: AIDL Philosophy & Stub/Proxy Architecture -->
+<div class="section">
+    <div class="section-title">
+        <div class="icon">١</div>
+        فلسفة AIDL وآلية عمل الـ Stub والـ Proxy
+    </div>
+
+    <div class="subsection-title">ما هي AIDL ولماذا نحتاجها؟</div>
+    <p>
+        <strong>AIDL (Android Interface Definition Language)</strong> هي لغة تعريف الواجهات الخاصة بنظام Android، 
+        تُستخدم لوصف العقود (Contracts) بين العمليات (Processes) عبر آلية <strong>Binder IPC</strong>. 
+        بدلاً من كتابة كود التسلسل والفك اليدوي عبر كائن <code>Parcel</code> — وهو ما يُعرّف بـ <em>Manual Parcel Marshalling</em> — 
+        توفر AIDL آلية توليد تلقائي (Auto-Generation) لملفات الـ <code>Stub</code> و <code>Proxy</code>، 
+        مما يضمن:
+    </p>
+    <ul>
+        <li>تقليل الأخطاء البشرية في عملية Serializing/Deserializing البيانات المعقدة.</li>
+        <li>توحيد عقد الاتصال (Interface Contract) بين العميل (Client) والخادم (Server).</li>
+        <li>دعم تعدد اللغات (Multi-Language): Java/Kotlin من جهة، وـ C++ NDK من جهة أخرى.</li>
+        <li>إدارة تلقائية لأرقام المعاملات (Transaction Codes) وتوجيه الاستدعاءات الداخلية.</li>
+    </ul>
+
+    <div class="info-card">
+        <div class="info-title">💡 لماذا لا نكتب Parcel يدوياً؟</div>
+        <p>
+            عند استخدام <code>Binder.transact(int code, Parcel data, Parcel reply, int flags)</code> يدوياً، 
+            يتحمل المطور مسؤولية: تسلسل كل معامل (Argument) بالترتيب الصحيح، 
+            مطابقة أنواع البيانات بين الجانبين، وإدارة استثناءات الـ <code>RemoteException</code>. 
+            AIDL تُولّد كل هذا آلياً عبر <code>aidl</code> compiler.
+        </p>
+    </div>
+
+    <div class="subsection-title">بنية Stub/Proxy Pattern — التفكيك المعماري</div>
+    <p>
+        عند بناء المشروع (Build)، يقوم مترجم AIDL بتحويل ملف <code>.aidl</code> إلى فئات Java/Kotlin أو C++ Headers 
+        وفقاً للـ <code>backend</code> المحدد. النمط المعماري الناتج يتبع نموذج <strong>Proxy Pattern</strong> الكلاسيكي:
+    </p>
+
+    <div class="diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    <span class="d-label">AIDL Stub/Proxy Architecture</span>                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   <span class="d-box">┌─────────────────┐</span>              <span class="d-arrow">Binder Driver (/dev/binder)</span>              │
+│   <span class="d-box">│  Client Process │</span>                    <span class="d-arrow">↕</span>                                  │
+│   <span class="d-box">│                 │</span>     <span class="d-arrow">transact()</span>     <span class="d-arrow">↕</span>     <span class="d-arrow">onTransact()</span>                  │
+│   <span class="d-box">│  ┌───────────┐  │</span>  <span class="d-arrow">──────────────→</span>  <span class="d-arrow">↕</span>  <span class="d-arrow">──────────────→</span>                  │
+│   <span class="d-box">│  │  Proxy    │  │</span>     Parcel          <span class="d-arrow">↕</span>        Parcel                  │
+│   <span class="d-box">│  │ (Bp*)     │  │</span>  (Marshalled)       <span class="d-arrow">↕</span>     (Unmarshalled)            │
+│   <span class="d-box">│  └─────┬─────┘  │</span>                    <span class="d-arrow">↕</span>                                  │
+│   <span class="d-box">│        │        │</span>                    <span class="d-arrow">↕</span>                                  │
+│   <span class="d-box">│  IInterface     │</span>                    <span class="d-arrow">↕</span>                                  │
+│   <span class="d-box">└────────┬────────┘</span>                    <span class="d-arrow">↕</span>                                  │
+│            │                              <span class="d-arrow">↕</span>                                  │
+│            │ <span class="d-note">extends</span>                    <span class="d-arrow">↕</span> <span class="d-note">extends</span>                        │
+│            ▼                              <span class="d-arrow">↕</span> ▼                                │
+│   <span class="d-box">┌─────────────────┐</span>                    <span class="d-arrow">↕</span>   <span class="d-box">┌─────────────────┐</span>          │
+│   <span class="d-box">│  IMyService     │</span><span class="d-note">◄─────────────────</span><span class="d-arrow">↕</span><span class="d-note">───►│  IMyService     │</span>          │
+│   <span class="d-box">│  (Generated)    │</span>  <span class="d-note">Shared Interface</span>  <span class="d-arrow">↕</span>   <span class="d-box">│  (Generated)    │</span>          │
+│   <span class="d-box">└─────────────────┘</span>                    <span class="d-arrow">↕</span>   <span class="d-box">└─────────────────┘</span>          │
+│                                        <span class="d-arrow">↕</span>                               │
+│   <span class="d-box">┌─────────────────┐</span>                    <span class="d-arrow">↕</span>   <span class="d-box">┌─────────────────┐</span>          │
+│   <span class="d-box">│  Server Process │</span>                    <span class="d-arrow">↕</span>   <span class="d-box">│  Stub (Bn*)     │</span>          │
+│   <span class="d-box">│                 │</span>                    <span class="d-arrow">↕</span>   <span class="d-box">│  Abstract Class │</span>          │
+│   <span class="d-box">│  ┌───────────┐  │</span>  <span class="d-arrow">←───────────────</span>  <span class="d-arrow">↕</span>   <span class="d-box">│  onTransact()   │</span>          │
+│   <span class="d-box">│  │Impl Class │  │</span>     Result        <span class="d-arrow">↕</span>   <span class="d-box">└────────┬────────┘</span>          │
+│   <span class="d-box">│  │(Concrete) │  │</span>     Parcel        <span class="d-arrow">↕</span>            │                      │
+│   <span class="d-box">│  └─────┬─────┘  │</span>                    <span class="d-arrow">↕</span>            │ <span class="d-note">implements</span>         │
+│   <span class="d-box">│        │        │</span>                    <span class="d-arrow">↕</span>            ▼                      │
+│   <span class="d-box">│  Service (Binder)│</span>                   <span class="d-arrow">↕</span>   <span class="d-box">┌─────────────────┐</span>          │
+│   <span class="d-box">└─────────────────┘</span>                   <span class="d-arrow">↕</span>   <span class="d-box">│  Binder (Native)│</span>          │
+│                                        <span class="d-arrow">↕</span>   <span class="d-box">└─────────────────┘</span>          │
+└─────────────────────────────────────────────────────────────────────────────┘
+    </div>
+
+    <div class="subsection-title">مكونات النمط المعماري بالتفصيل</div>
+
+    <div class="highlight-box">
+        <p><strong>١. IInterface:</strong> الواجهة الأساسية التي تُعرّف العقد. كل واجهة AIDL تُولّد واجهة Java/C++ 
+        تُرث من <code>IInterface</code> وتحتوي على ثابت <code>DESCRIPTOR</code> ورقم لكل method (مثل <code>TRANSACTION_getData = 1</code>).</p>
+    </div>
+
+    <div class="highlight-box">
+        <p><strong>٢. Proxy (العميل — BpInterface في C++):</strong> يعمل في Process العميل. يقوم بتسلسل (Marshal) 
+        المعاملات إلى <code>Parcel</code>، ثم يستدعي <code>transact()</code> عبر مؤشر الـ <code>IBinder</code>. 
+        ينتظر الرد في الاستدعاءات المتزامنة (Synchronous).</p>
+    </div>
+
+    <div class="highlight-box">
+        <p><strong>٣. Stub (الخادم — BnInterface في C++):</strong> فئة مجردة (Abstract) ترث من <code>Binder</code>. 
+        تُعيد كتابة <code>onTransact(int code, Parcel data, Parcel reply, int flags)</code> 
+        لتوجيه كل رمز معاملة (Transaction Code) إلى الـ Method المقابل في الـ Implementation.</p>
+    </div>
+
+    <div class="subsection-title">دعم تعدد اللغات — Cross-Language AIDL</div>
+    <p>
+        بدءاً من Android 10 (API 29)، أدخلت Google دعماً كاملاً لـ <strong>C++ NDK Backend</strong> 
+        عبر مترجم <code>aidl</code> مع الخيار <code>--lang cpp</code> أو <code>--lang ndk</code>. 
+        هذا يتيح كتابة خدمات IPC عالية الأداء بلغة C++17 مع الاستفادة من:
+    </p>
+    <ul>
+        <li><code>BnInterface&lt;T&gt;</code> — الفئة الأساسية للـ Stub في C++ NDK.</li>
+        <li><code>BpInterface&lt;T&gt;</code> — الفئة الأساسية للـ Proxy في C++ NDK.</li>
+        <li>إدارة الذاكرة عبر <code>sp&lt;IBinder&gt;</code> (Strong Pointer) و <code>wp&lt;IBinder&gt;</code> (Weak Pointer).</li>
+        <li>التوافق الكامل مع Java/Kotlin Clients عبر نفس ملف <code>.aidl</code>.</li>
+    </ul>
+
+    <pre><code class="language-cpp">// C++ NDK Backend — المولد تلقائياً من aidl compiler
+<span class="co">// IHardwareController.h (Generated)</span>
+<span class="kw">class</span> <span class="ty">IHardwareController</span> : <span class="kw">public</span> <span class="ty">::android::IInterface</span> {
+<span class="kw">public</span>:
+    <span class="kw">DECLARE_META_INTERFACE</span>(HardwareController)
+    <span class="kw">virtual</span> <span class="ty">::android::binder::Status</span> <span class="fn">readSensor</span>(
+        <span class="ty">int32_t</span> sensorId,
+        <span class="ty">SensorData*</span> outData) = <span class="nu">0</span>;
+    <span class="kw">virtual</span> <span class="ty">::android::binder::Status</span> <span class="fn">registerCallback</span>(
+        <span class="kw">const</span> <span class="ty">::android::sp&lt;IHardwareCallback&gt;&</span> callback) = <span class="nu">0</span>;
+};</code></pre>
+</div>
+
+<!-- Section 2: Directional Tags & Memory -->
+<div class="section">
+    <div class="section-title">
+        <div class="icon">٢</div>
+        محددات اتجاه البيانات والتحكم بالذاكرة
+    </div>
+
+    <div class="subsection-title">تحليل معمق للـ Directional Keywords</div>
+    <p>
+        في AIDL، تحدد الكلمات المفتاحية <code>in</code> و <code>out</code> و <code>inout</code> 
+        اتجاه تدفق البيانات عبر حدود العملية (Process Boundary). هذا التحديد ليس اختيارياً — 
+        فهو يؤثر مباشرة على أداء IPC واستهلاك الذاكرة.
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>المحدد</th>
+                <th>الاتجاه</th>
+                <th>سلوك التسلسل</th>
+                <th>حالات الاستخدام المثلى</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>in</code></td>
+                <td>من المتصل إلى المستدعى</td>
+                <td>تسلسل فقط في Parcel الـ data. لا يُعاد شيء في reply.</td>
+                <td>إرسال أوامر التحكم، إعدادات التكوين، بيانات للمعالجة.</td>
+            </tr>
+            <tr>
+                <td><code>out</code></td>
+                <td>من المستدعى إلى المتصل</td>
+                <td>لا يُرسل شيء في data. يُخصص كائن جديد في الخادم ويُعاد في reply.</td>
+                <td>قراءة حالة الحساسات، الحصول على نتائج الاستعلام.</td>
+            </tr>
+            <tr>
+                <td><code>inout</code></td>
+                <td>ثنائي الاتجاه</td>
+                <td>تسلسل في data + فك في الخادم + إعادة تسلسل في reply.</td>
+                <td>تعديل كائنات مركبة (State Objects) عبر العمليات.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="warning-card">
+        <div class="warning-title">⚠️ تحذير: تكلفة inout المضاعفة</div>
+        <p>
+            استخدام <code>inout</code> مع كائنات <code>parcelable</code> كبيرة يؤدي إلى <strong>تسلسل مزدوج</strong> 
+            (Double Marshalling): مرة للذهاب ومرة للعودة. هذا يضاعف استهلاك الذاكرة المؤقتة في Binder Buffer 
+            (الحد الأقصى الافتراضي ~1MB لكل Transaction).
+        </p>
+        <p>
+            <strong>التوصية:</strong> استخدم <code>inout</code> فقط عند الضرورة القصوى. للكائنات الكبيرة، 
+            فكّر في استخدام <code>SharedMemory</code> (ASharedMemory في Java / AHardwareBuffer في NDK).
+        </p>
+    </div>
+
+    <div class="subsection-title">التعامل مع الأنواع في AIDL</div>
+
+    <pre><code class="language-aidl"><span class="co">// IHardwareController.aidl — تعريف الواجهة مع محددات الاتجاه</span>
+<span class="kw">package</span> com.example.hardware;
+
+<span class="kw">import</span> com.example.hardware.SensorData;
+<span class="kw">import</span> com.example.hardware.IHardwareCallback;
+
+<span class="kw">interface</span> <span class="ty">IHardwareController</span> {
+    <span class="co">// in: إرسال أمر للخادم فقط — لا حاجة لرد البيانات</span>
+    <span class="ty">void</span> <span class="fn">setPowerMode</span>(<span class="kw">in</span> <span class="ty">int</span> mode);
+
+    <span class="co">// out: الخادم يملأ الكائن ويعيده — لا نرسل بيانات مسبقة</span>
+    <span class="ty">void</span> <span class="fn">getSensorData</span>(<span class="kw">out</span> <span class="ty">SensorData</span> data);
+
+    <span class="co">// inout: نرسل كائن مبدئي والخادم يعدله ويعيده</span>
+    <span class="ty">void</span> <span class="fn">updateConfiguration</span>(<span class="kw">inout</span> <span class="ty">SensorData</span> config);
+
+    <span class="co">// List&lt;T&gt; يتطلب دائماً in أو out أو inout</span>
+    <span class="ty">void</span> <span class="fn">batchRead</span>(<span class="kw">in</span> <span class="ty">List&lt;Integer&gt;</span> sensorIds, <span class="kw">out</span> <span class="ty">List&lt;SensorData&gt;</span> results);
+
+    <span class="co">// oneway: استدعاء غير متزامن — لا يمكن استخدام out/inout</span>
+    <span class="kw">oneway</span> <span class="ty">void</span> <span class="fn">notifyEvent</span>(<span class="kw">in</span> <span class="ty">int</span> eventType);
+}</code></pre>
+
+    <div class="info-card">
+        <div class="info-title">📋 قواعد الأنواع في AIDL</div>
+        <p>
+            <strong>الأنواع الأولية (Primitives):</strong> <code>byte</code>, <code>short</code>, <code>int</code>, 
+            <code>long</code>, <code>char</code>, <code>boolean</code>, <code>float</code>, <code>double</code> 
+            — لا تتطلب محدد اتجاه لأنها تُمرر بالقيمة (Pass-by-Value).
+        </p>
+        <p>
+            <strong>String و CharSequence:</strong> يمكن استخدام <code>in</code> فقط (افتراضياً). 
+            <code>String</code> غير قابل للتعديل (Immutable) لذا لا فائدة من <code>out</code>.
+        </p>
+        <p>
+            <strong>Parcelable:</strong> يجب تحديد الاتجاه صراحةً. الكائنات المركبة تُمرر بالمرجعية عبر التسلسل.
+        </p>
+        <p>
+            <strong>IBinder:</strong> يُمرر كمرجع Binder مباشر — لا يحتاج محدد اتجاه.
+        </p>
+    </div>
+
+    <pre><code class="language-aidl"><span class="co">// SensorData.aidl — تعريف Parcelable</span>
+<span class="kw">package</span> com.example.hardware;
+
+<span class="kw">parcelable</span> <span class="ty">SensorData</span> {
+    <span class="ty">long</span> timestamp;
+    <span class="ty">float</span> x;
+    <span class="ty">float</span> y;
+    <span class="ty">float</span> z;
+    <span class="ty">int</span> accuracy;
+    <span class="ty">String</span> sensorName;
+}</code></pre>
+</div>
+
+<!-- Section 3: Synchronous vs oneway -->
+<div class="section">
+    <div class="section-title">
+        <div class="icon">٣</div>
+        المفاضلة بين الاتصال التزامني وغير التزامني
+    </div>
+
+    <div class="subsection-title">الاستدعاء المتزامن (Synchronous) — السلوك الافتراضي</div>
+    <p>
+        بشكل افتراضي، كل Method في واجهة AIDL هي <strong>متزامنة</strong>. عند استدعاء Method عبر الـ Proxy:
+    </p>
+    <ol>
+        <li>خيط المتصل (Caller Thread) يُسلسل المعاملات إلى <code>Parcel</code>.</li>
+        <li>يُرسل الـ Transaction عبر Binder Driver باستخدام <code>ioctl(BINDER_WRITE_READ)</code>.</li>
+        <li>خيط المتصل يُعلق (Blocks) انتظاراً للرد من خيط الخادم (Server Thread).</li>
+        <li>خيط الخادم يستقبل الطلب عبر <code>onTransact()</code>، ينفذ المنطق، ويكتب الرد.</li>
+        <li>خيط المتصل يستيقظ ويستلم الـ <code>Parcel</code> الناتج.</li>
+    </ol>
+
+    <div class="warning-card">
+        <div class="warning-title">⚠️ خطر انسداد خيط المتصل (Caller Thread Blocking)</div>
+        <p>
+            إذا كان الـ Method يستغرق أكثر من <strong>٥ ثوانٍ</strong> (ANR Threshold)، 
+            سيُظهر النظام رسالة <strong>Application Not Responding (ANR)</strong> للمستخدم. 
+            لا تُنفّذ عمليات I/O ثقيلة أو حسابات معقدة عبر IPC متزامن.
+        </p>
+    </div>
+
+    <div class="warning-card">
+        <div class="warning-title">⚠️ خطر استنزاف مجمع الخيوط (Thread Pool Exhaustion)</div>
+        <p>
+            خدمة Binder تستخدم <strong>مجمع خيوط محدود</strong> (افتراضياً 16 خيطاً في معظم الأحيان). 
+            إذا استدعى العميل Method متزامنة وانتظر، وفي نفس الوقت استدعى الخادم Method أخرى في العميل، 
+            قد يحدث <strong>Deadlock</strong> بسبب نفاد الخيوط المتاحة.
+        </p>
+    </div>
+
+    <div class="subsection-title">الاستدعاء غير المتزامن — oneway</div>
+    <p>
+        عند إضافة الكلمة المفتاحية <code>oneway</code> قبل Method في AIDL، يتغير السلوك تماماً:
+    </p>
+    <ul>
+        <li><strong>Fire-and-Forget:</strong> لا ينتظر المتصل أي رد. الـ Method تُرسل وتُنسى.</li>
+        <li><strong>تخزين مؤقت:</strong> يضع Binder Driver الـ Transaction في Queue داخلية (Buffer) 
+            ويعيد التحكم فوراً للمتصل.</li>
+        <li><strong>لا يمكن استخدام out/inout:</strong> لأنه لا يوجد Parcel رد (reply = null).</li>
+        <li><strong>يجب أن يكون العائد void:</strong> لا يمكن إرجاع قيمة في oneway.</li>
+        <li><strong>لا يمكن رمي استثناءات متزامنة:</strong> الاستثناءات لا تُنقل عبر oneway.</li>
+    </ul>
+
+    <pre><code class="language-aidl"><span class="co">// IHardwareCallback.aidl — واجهة رد النداء غير المتزامنة</span>
+<span class="kw">package</span> com.example.hardware;
+
+<span class="kw">import</span> com.example.hardware.SensorData;
+
+<span class="kw">interface</span> <span class="ty">IHardwareCallback</span> {
+    <span class="co">// oneway: إشعار فوري لا ينتظر رد — مثالي للأحداث المستمرة</span>
+    <span class="kw">oneway</span> <span class="ty">void</span> <span class="fn">onSensorDataChanged</span>(<span class="kw">in</span> <span class="ty">SensorData</span> data);
+
+    <span class="co">// oneway: إشعار خطأ — لا يمكن استخدام out</span>
+    <span class="kw">oneway</span> <span class="ty">void</span> <span class="fn">onError</span>(<span class="kw">in</span> <span class="ty">int</span> errorCode, <span class="kw">in</span> <span class="ty">String</span> message);
+}</code></pre>
+
+    <div class="subsection-title">جدول المقارنة الشامل</div>
+    <table>
+        <thead>
+            <tr>
+                <th>الخاصية</th>
+                <th>Synchronous (Default)</th>
+                <th>Asynchronous (oneway)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>حظر خيط المتصل</td>
+                <td>نعم — ينتظر الرد</td>
+                <td>لا — يعود فوراً</td>
+            </tr>
+            <tr>
+                <td>نوع العائد</td>
+                <td>أي نوع مسموح به</td>
+                <td>يجب أن يكون <code>void</code></td>
+            </tr>
+            <tr>
+                <td>المعاملات الاتجاهية</td>
+                <td><code>in</code>, <code>out</code>, <code>inout</code></td>
+                <td><code>in</code> فقط</td>
+            </tr>
+            <tr>
+                <td>الاستثناءات</td>
+                <td>يُنقل <code>RemoteException</code></td>
+                <td>لا يُنقل أي استثناء</td>
+            </tr>
+            <tr>
+                <td>ضمان التسليم</td>
+                <td>مضمون (أو فشل واضح)</td>
+                <td>Best-effort (قد يُفقد إذا امتلأ Buffer)</td>
+            </tr>
+            <tr>
+                <td>حالات الاستخدام</td>
+                <td>طلب/رد، قراءة بيانات</td>
+                <td>الأحداث، التسجيل، الإشعارات</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="subsection-title">نمط Callbacks غير المتزامن — Two-Way Async</div>
+    <p>
+        لتحقيق اتصال غير متزامن ثنائي الاتجاه (العميل يستدعي الخادم، والخادم يُرسل أحداثاً للعميل لاحقاً)، 
+        نستخدم <strong>واجهة Callback منفصلة</strong>. العميل يُمرر كائن <code>IHardwareCallback</code> 
+        (الذي هو في الواقع <code>Binder</code>) إلى الخادم، والخادم يستدعي Methods الـ <code>oneway</code> 
+        عليه عند حدوث الأحداث.
+    </p>
+
+    <div class="diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│              <span class="d-label">Two-Way Async Communication Pattern</span>                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   <span class="d-box">Client Process</span>                              <span class="d-box">Server Process</span>              │
+│   ┌──────────────────────┐                   ┌──────────────────────┐       │
+│   │ 1. bindService()     │  ──transact()──►  │ 2. onBind() returns  │       │
+│   │    (Intent)          │                   │    IHardwareController│       │
+│   └──────────────────────┘                   └──────────────────────┘       │
+│            │                                          │                     │
+│            ▼                                          ▼                     │
+│   ┌──────────────────────┐                   ┌──────────────────────┐       │
+│   │ 3. registerCallback  │  ──transact()──►  │ 4. Store callback    │       │
+│   │    (IHardwareCallback)│                  │    reference (sp&lt;...&gt;)│       │
+│   └──────────────────────┘                   └──────────────────────┘       │
+│            │                                          │                     │
+│            │                                          │                     │
+│            │         <span class="d-note">[Event Occurs on Hardware]</span>      │                     │
+│            │                                          ▼                     │
+│            │         ◄────oneway transact()────  ┌──────────────────────┐   │
+│            │         (non-blocking)              │ 5. callback-&gt;         │   │
+│            ▼                                      │    onSensorDataChanged│   │
+│   ┌──────────────────────┐                       └──────────────────────┘   │
+│   │ 6. UI Update         │                                                  │
+│   │    (on main thread)  │                                                  │
+│   └──────────────────────┘                                                  │
+│                                                                             │
+│   <span class="d-note">Note: Step 5 uses oneway to avoid blocking the server's worker thread.</span>   │
+└─────────────────────────────────────────────────────────────────────────────┘
+    </div>
+</div>
+
+<!-- Section 4: End-to-End Production Implementation -->
+<div class="section">
+    <div class="section-title">
+        <div class="icon">٤</div>
+        تطبيق عملي متكامل لتطوير بروتوكول IPC
+    </div>
+
+    <div class="step-box">
+        <span class="step-num">١</span>
+        <span class="step-title">تعريف ملفات واجهة AIDL</span>
+    </div>
+    <p>
+        نبدأ بتعريف الواجهات والأنواع المخصصة في مجلد <code>src/main/aidl/</code> 
+        (لـ Java/Kotlin) أو <code>src/main/cpp/aidl/</code> (لـ C++ NDK).
+    </p>
+
+    <pre><code class="language-aidl"><span class="co">// IHardwareController.aidl</span>
+<span class="co">// المسار: src/main/aidl/com/example/hardware/IHardwareController.aidl</span>
+<span class="kw">package</span> com.example.hardware;
+
+<span class="kw">import</span> com.example.hardware.SensorData;
+<span class="kw">import</span> com.example.hardware.IHardwareCallback;
+
+<span class="kw">interface</span> <span class="ty">IHardwareController</span> {
+    <span class="co">/** تفعيل/إيقاف حساس معين */</span>
+    <span class="ty">boolean</span> <span class="fn">enableSensor</span>(<span class="kw">in</span> <span class="ty">int</span> sensorId, <span class="kw">in</span> <span class="ty">boolean</span> enabled);
+
+    <span class="co">/** قراءة لقطة واحدة من الحساس — متزامن */</span>
+    <span class="ty">SensorData</span> <span class="fn">readSensor</span>(<span class="kw">in</span> <span class="ty">int</span> sensorId);
+
+    <span class="co">/** تسجيل مستمع للأحداث غير المتزامنة */</span>
+    <span class="ty">void</span> <span class="fn">registerCallback</span>(<span class="kw">in</span> <span class="ty">IHardwareCallback</span> callback);
+
+    <span class="co">/** إلغاء تسجيل المستمع */</span>
+    <span class="ty">void</span> <span class="fn">unregisterCallback</span>(<span class="kw">in</span> <span class="ty">IHardwareCallback</span> callback);
+
+    <span class="co">/** إشعار غير متزامن بتغيير وضع الطاقة */</span>
+    <span class="kw">oneway</span> <span class="ty">void</span> <span class="fn">setPowerModeAsync</span>(<span class="kw">in</span> <span class="ty">int</span> mode);
+}</code></pre>
+
+    <pre><code class="language-aidl"><span class="co">// IHardwareCallback.aidl — واجهة رد النداء</span>
+<span class="co">// المسار: src/main/aidl/com/example/hardware/IHardwareCallback.aidl</span>
+<span class="kw">package</span> com.example.hardware;
+
+<span class="kw">import</span> com.example.hardware.SensorData;
+
+<span class="kw">interface</span> <span class="ty">IHardwareCallback</span> {
+    <span class="kw">oneway</span> <span class="ty">void</span> <span class="fn">onSensorDataChanged</span>(<span class="kw">in</span> <span class="ty">SensorData</span> data);
+    <span class="kw">oneway</span> <span class="ty">void</span> <span class="fn">onSensorStatusChanged</span>(<span class="kw">in</span> <span class="ty">int</span> sensorId, <span class="kw">in</span> <span class="ty">int</span> status);
+}</code></pre>
+
+    <pre><code class="language-aidl"><span class="co">// SensorData.aidl — نوع Parcelable مخصص</span>
+<span class="co">// المسار: src/main/aidl/com/example/hardware/SensorData.aidl</span>
+<span class="kw">package</span> com.example.hardware;
+
+<span class="kw">parcelable</span> <span class="ty">SensorData</span> {
+    <span class="ty">long</span> timestampNanos;
+    <span class="ty">float</span> valuesX;
+    <span class="ty">float</span> valuesY;
+    <span class="ty">float</span> valuesZ;
+    <span class="ty">int</span> accuracy;
+    <span class="ty">String</span> sensorName;
+    <span class="ty">boolean</span> isValid;
+}</code></pre>
+
+    <div class="step-box">
+        <span class="step-num">٢</span>
+        <span class="step-title">تنفيذ الخادم الأصلي C++ NDK Backend</span>
+    </div>
+    <p>
+        يُرث تنفيذ الخادم من <code>BnHardwareController</code> (المولد تلقائياً) ويُعيد كتابة 
+        <code>onTransact()</code> لتوجيه الاستدعاءات. يجب استخدام <code>std::mutex</code> 
+        لحماية قائمة الـ Callbacks من Race Conditions.
+    </p>
+
+    <pre><code class="language-cpp"><span class="co">// HardwareControllerServer.cpp</span>
+<span class="co">// C++17 NDK Backend Implementation</span>
+
+<span class="kw">#include</span> <span class="st">&lt;android/binder_ibinder.h&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;android/binder_interface_utils.h&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;aidl/com/example/hardware/BnHardwareController.h&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;aidl/com/example/hardware/BpHardwareCallback.h&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;mutex&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;thread&gt;</span>
+
+<span class="kw">using namespace</span> <span class="ty">aidl::com::example::hardware</span>;
+<span class="kw">using namespace</span> <span class="ty">::ndk</span>;
+
+<span class="kw">class</span> <span class="ty">HardwareControllerImpl</span> : <span class="kw">public</span> <span class="ty">BnHardwareController</span> {
+<span class="kw">private</span>:
+    <span class="ty">std::mutex</span> <span class="fn">mCallbackMutex</span>;
+    <span class="ty">std::vector&lt;::android::sp&lt;IHardwareCallback&gt;&gt;</span> <span class="fn">mCallbacks</span>;
+    <span class="ty">std::atomic&lt;bool&gt;</span> <span class="fn">mRunning</span>{<span class="nu">false</span>};
+    <span class="ty">std::thread</span> <span class="fn">mEventThread</span>;
+
+<span class="kw">public</span>:
+    <span class="fn">HardwareControllerImpl</span>() {
+        <span class="co">// بدء خيط توليد الأحداث المحاكى</span>
+        <span class="fn">mRunning</span> = <span class="nu">true</span>;
+        <span class="fn">mEventThread</span> = <span class="ty">std::thread</span>([<span class="kw">this</span>]() { <span class="fn">eventLoop</span>(); });
+    }
+
+    <span class="fn">~HardwareControllerImpl</span>() {
+        <span class="fn">mRunning</span> = <span class="nu">false</span>;
+        <span class="kw">if</span> (<span class="fn">mEventThread</span>.<span class="fn">joinable</span>()) {
+            <span class="fn">mEventThread</span>.<span class="fn">join</span>();
+        }
+    }
+
+    <span class="co">// ───────────────────────────────────────────────</span>
+    <span class="co">// تنفيذ Methods الواجهة</span>
+    <span class="co">// ───────────────────────────────────────────────</span>
+
+    <span class="ty">::android::binder::Status</span> <span class="fn">enableSensor</span>(<span class="ty">int32_t</span> sensorId, <span class="ty">bool</span> enabled,
+                                            <span class="ty">bool*</span> outSuccess) <span class="kw">override</span> {
+        <span class="co">// التحقق من صلاحيات المتصل</span>
+        <span class="co">// ... منطق التفعيل الفعلي للحساس ...</span>
+        *outSuccess = <span class="nu">true</span>;
+        <span class="kw">return</span> <span class="ty">::android::binder::Status</span>::<span class="fn">ok</span>();
+    }
+
+    <span class="ty">::android::binder::Status</span> <span class="fn">readSensor</span>(<span class="ty">int32_t</span> sensorId,
+                                          <span class="ty">SensorData*</span> outData) <span class="kw">override</span> {
+        <span class="co">// قراءة لقطة من الحساس (متزامن)</span>
+        outData-&gt;timestampNanos = <span class="fn">::android::elapsedRealtimeNano</span>();
+        outData-&gt;valuesX = <span class="nu">1.0f</span>;
+        outData-&gt;valuesY = <span class="nu">2.0f</span>;
+        outData-&gt;valuesZ = <span class="nu">3.0f</span>;
+        outData-&gt;accuracy = <span class="nu">3</span>;
+        outData-&gt;sensorName = <span class="st">"Accelerometer"</span>;
+        outData-&gt;isValid = <span class="nu">true</span>;
+        <span class="kw">return</span> <span class="ty">::android::binder::Status</span>::<span class="fn">ok</span>();
+    }
+
+    <span class="ty">::android::binder::Status</span> <span class="fn">registerCallback</span>(
+            <span class="kw">const</span> <span class="ty">::android::sp&lt;IHardwareCallback&gt;&</span> callback) <span class="kw">override</span> {
+        <span class="ty">std::lock_guard&lt;std::mutex&gt;</span> <span class="fn">lock</span>(<span class="fn">mCallbackMutex</span>);
+
+        <span class="co">// التحقق من عدم التسجيل المكرر</span>
+        <span class="kw">for</span> (<span class="kw">const auto</span>& cb : <span class="fn">mCallbacks</span>) {
+            <span class="kw">if</span> (<span class="fn">cb</span>-&gt;<span class="fn">asBinder</span>() == <span class="fn">callback</span>-&gt;<span class="fn">asBinder</span>()) {
+                <span class="kw">return</span> <span class="ty">::android::binder::Status</span>::<span class="fn">fromServiceSpecificError</span>(<span class="nu">1</span>,
+                    <span class="st">"Callback already registered"</span>);
+            }
+        }
+        <span class="fn">mCallbacks</span>.<span class="fn">push_back</span>(callback);
+        <span class="kw">return</span> <span class="ty">::android::binder::Status</span>::<span class="fn">ok</span>();
+    }
+
+    <span class="ty">::android::binder::Status</span> <span class="fn">unregisterCallback</span>(
+            <span class="kw">const</span> <span class="ty">::android::sp&lt;IHardwareCallback&gt;&</span> callback) <span class="kw">override</span> {
+        <span class="ty">std::lock_guard&lt;std::mutex&gt;</span> <span class="fn">lock</span>(<span class="fn">mCallbackMutex</span>);
+        <span class="kw">auto</span> it = <span class="fn">std::remove_if</span>(<span class="fn">mCallbacks</span>.<span class="fn">begin</span>(), <span class="fn">mCallbacks</span>.<span class="fn">end</span>(),
+            [&amp;](<span class="kw">const auto</span>& cb) {
+                <span class="kw">return</span> <span class="fn">cb</span>-&gt;<span class="fn">asBinder</span>() == <span class="fn">callback</span>-&gt;<span class="fn">asBinder</span>();
+            });
+        <span class="fn">mCallbacks</span>.<span class="fn">erase</span>(it, <span class="fn">mCallbacks</span>.<span class="fn">end</span>());
+        <span class="kw">return</span> <span class="ty">::android::binder::Status</span>::<span class="fn">ok</span>();
+    }
+
+    <span class="ty">::android::binder::Status</span> <span class="fn">setPowerModeAsync</span>(<span class="ty">int32_t</span> mode) <span class="kw">override</span> {
+        <span class="co">// oneway — لا يرد شيء، ينفذ في الخلفية</span>
+        <span class="kw">return</span> <span class="ty">::android::binder::Status</span>::<span class="fn">ok</span>();
+    }
+
+<span class="kw">private</span>:
+    <span class="ty">void</span> <span class="fn">eventLoop</span>() {
+        <span class="kw">while</span> (<span class="fn">mRunning</span>) {
+            <span class="ty">std::this_thread::sleep_for</span>(<span class="ty">std::chrono::milliseconds</span>(<span class="nu">100</span>));
+
+            <span class="ty">SensorData</span> data;
+            data.timestampNanos = <span class="fn">::android::elapsedRealtimeNano</span>();
+            data.valuesX = <span class="nu">static_cast&lt;float&gt;</span>(<span class="fn">rand</span>()) / <span class="nu">RAND_MAX</span>;
+            data.valuesY = <span class="nu">static_cast&lt;float&gt;</span>(<span class="fn">rand</span>()) / <span class="nu">RAND_MAX</span>;
+            data.valuesZ = <span class="nu">static_cast&lt;float&gt;</span>(<span class="fn">rand</span>()) / <span class="nu">RAND_MAX</span>;
+            data.accuracy = <span class="nu">3</span>;
+            data.sensorName = <span class="st">"Accelerometer"</span>;
+            data.isValid = <span class="nu">true</span>;
+
+            <span class="co">// إرسال الحدث لجميع المستمعين — محمي بـ Mutex</span>
+            <span class="ty">std::vector&lt;::android::sp&lt;IHardwareCallback&gt;&gt;</span> callbacks;
+            {
+                <span class="ty">std::lock_guard&lt;std::mutex&gt;</span> <span class="fn">lock</span>(<span class="fn">mCallbackMutex</span>);
+                callbacks = <span class="fn">mCallbacks</span>;
+            }
+
+            <span class="kw">for</span> (<span class="kw">const auto</span>& cb : callbacks) {
+                <span class="co">// oneway — لا يحظر خيط الخادم</span>
+                <span class="kw">auto</span> status = <span class="fn">cb</span>-&gt;<span class="fn">onSensorDataChanged</span>(data);
+                <span class="kw">if</span> (!status.<span class="fn">isOk</span>()) {
+                    <span class="co">// قد يكون العميل قد انتهى — إزالته لاحقاً عبر linkToDeath</span>
+                }
+            }
+        }
+    }
+};</code></pre>
+
+    <div class="step-box">
+        <span class="step-num">٣</span>
+        <span class="step-title">تكامل عميل Kotlin مع إدارة دورة الحياة</span>
+    </div>
+    <p>
+        يتضمن العميل: ربط الخدمة (<code>bindService</code>)، الحصول على الـ Proxy عبر <code>asInterface()</code>، 
+        وتسجيل <code>DeathRecipient</code> لاكتشاف انهيار الخدمة.
+    </p>
+
+    <pre><code class="language-kotlin"><span class="co">// HardwareControllerClient.kt</span>
+<span class="co">// Kotlin Client with Lifecycle-Aware Service Binding</span>
+
+<span class="kw">package</span> com.example.hardware.client
+
+<span class="kw">import</span> android.content.ComponentName
+<span class="kw">import</span> android.content.Context
+<span class="kw">import</span> android.content.Intent
+<span class="kw">import</span> android.content.ServiceConnection
+<span class="kw">import</span> android.os.*
+<span class="kw">import</span> android.os.IBinder.DeathRecipient
+<span class="kw">import</span> android.util.Log
+<span class="kw">import</span> androidx.lifecycle.DefaultLifecycleObserver
+<span class="kw">import</span> androidx.lifecycle.LifecycleOwner
+<span class="kw">import</span> kotlinx.coroutines.*
+<span class="kw">import</span> kotlinx.coroutines.flow.MutableStateFlow
+<span class="kw">import</span> kotlinx.coroutines.flow.StateFlow
+
+<span class="kw">class</span> <span class="ty">HardwareControllerClient</span>(
+    <span class="kw">private val</span> context: <span class="ty">Context</span>,
+    <span class="kw">private val</span> coroutineScope: <span class="ty">CoroutineScope</span> = <span class="ty">CoroutineScope</span>(<span class="ty">Dispatchers.Main</span>)
+) : <span class="ty">DefaultLifecycleObserver</span> {
+
+    <span class="kw">companion object</span> {
+        <span class="kw">private const val</span> TAG = <span class="st">"HardwareClient"</span>
+    }
+
+    <span class="co">// ── State Flows للملاحظة Reactive ──</span>
+    <span class="kw">private val</span> _connectionState = <span class="ty">MutableStateFlow</span>&lt;<span class="ty">ConnectionState</span>&gt;(<span class="ty">ConnectionState.Disconnected</span>)
+    <span class="kw">val</span> connectionState: <span class="ty">StateFlow</span>&lt;<span class="ty">ConnectionState</span>&gt; = _connectionState
+
+    <span class="kw">private val</span> _sensorData = <span class="ty">MutableStateFlow</span>&lt;<span class="ty">SensorData?</span>&gt;(<span class="kw">null</span>)
+    <span class="kw">val</span> sensorData: <span class="ty">StateFlow</span>&lt;<span class="ty">SensorData?</span>&gt; = _sensorData
+
+    <span class="co">// ── IPC References ──</span>
+    <span class="kw">@Volatile</span> <span class="kw">private var</span> hardwareController: <span class="ty">IHardwareController?</span> = <span class="kw">null</span>
+    <span class="kw">@Volatile</span> <span class="kw">private var</span> serviceBinder: <span class="ty">IBinder?</span> = <span class="kw">null</span>
+
+    <span class="co">// ── Death Recipient لاكتشاف انهيار الخدمة ──</span>
+    <span class="kw">private val</span> deathRecipient = <span class="ty">DeathRecipient</span> {
+        Log.<span class="fn">w</span>(TAG, <span class="st">"Service process died! Attempting reconnection..."</span>)
+        coroutineScope.<span class="fn">launch</span>(<span class="ty">Dispatchers.Main</span>) {
+            _connectionState.<span class="fn">value</span> = <span class="ty">ConnectionState.Disconnected</span>
+            <span class="fn">cleanupConnection</span>()
+            <span class="co">// إعادة الربط التلقائي بعد تأخير</span>
+            <span class="fn">delay</span>(<span class="nu">2000</span>)
+            <span class="fn">connect</span>()
+        }
+    }
+
+    <span class="co">// ── Callback Implementation ──</span>
+    <span class="kw">private val</span> callback = <span class="kw">object</span> : <span class="ty">IHardwareCallback.Stub</span>() {
+        <span class="kw">override fun</span> <span class="fn">onSensorDataChanged</span>(data: <span class="ty">SensorData</span>) {
+            <span class="co">// يُستدعى في Binder Thread — ننقل إلى Main Thread</span>
+            coroutineScope.<span class="fn">launch</span>(<span class="ty">Dispatchers.Main</span>) {
+                _sensorData.<span class="fn">value</span> = data
+            }
+        }
+
+        <span class="kw">override fun</span> <span class="fn">onSensorStatusChanged</span>(sensorId: <span class="ty">Int</span>, status: <span class="ty">Int</span>) {
+            Log.<span class="fn">d</span>(TAG, <span class="st">"Sensor $sensorId status changed to $status"</span>)
+        }
+    }
+
+    <span class="co">// ── ServiceConnection ──</span>
+    <span class="kw">private val</span> serviceConnection = <span class="kw">object</span> : <span class="ty">ServiceConnection</span> {
+        <span class="kw">override fun</span> <span class="fn">onServiceConnected</span>(name: <span class="ty">ComponentName</span>?, service: <span class="ty">IBinder</span>?) {
+            service ?: <span class="kw">return</span>
+            serviceBinder = service
+
+            <span class="co">// تسجيل DeathRecipient لمراقبة حالة العملية</span>
+            <span class="kw">try</span> {
+                service.<span class="fn">linkToDeath</span>(deathRecipient, <span class="nu">0</span>)
+            } <span class="kw">catch</span> (e: <span class="ty">RemoteException</span>) {
+                Log.<span class="fn">e</span>(TAG, <span class="st">"Failed to link death recipient"</span>, e)
+                <span class="kw">return</span>
+            }
+
+            <span class="co">// الحصول على Proxy عبر asInterface()</span>
+            hardwareController = <span class="ty">IHardwareController.Stub</span>.<span class="fn">asInterface</span>(service)
+
+            <span class="co">// تسجيل الـ Callback للأحداث غير المتزامنة</span>
+            <span class="kw">try</span> {
+                hardwareController?.<span class="fn">registerCallback</span>(callback)
+            } <span class="kw">catch</span> (e: <span class="ty">RemoteException</span>) {
+                Log.<span class="fn">e</span>(TAG, <span class="st">"Failed to register callback"</span>, e)
+            }
+
+            _connectionState.<span class="fn">value</span> = <span class="ty">ConnectionState.Connected</span>
+            Log.<span class="fn">i</span>(TAG, <span class="st">"Connected to HardwareController service"</span>)
+        }
+
+        <span class="kw">override fun</span> <span class="fn">onServiceDisconnected</span>(name: <span class="ty">ComponentName</span>?) {
+            Log.<span class="fn">w</span>(TAG, <span class="st">"Service disconnected unexpectedly"</span>)
+            <span class="fn">cleanupConnection</span>()
+            _connectionState.<span class="fn">value</span> = <span class="ty">ConnectionState.Disconnected</span>
+        }
+    }
+
+    <span class="co">// ── Public API ──</span>
+
+    <span class="kw">fun</span> <span class="fn">connect</span>() {
+        <span class="kw">if</span> (_connectionState.<span class="fn">value</span> == <span class="ty">ConnectionState.Connected</span>) <span class="kw">return</span>
+
+        _connectionState.<span class="fn">value</span> = <span class="ty">ConnectionState.Connecting</span>
+
+        <span class="kw">val</span> intent = <span class="ty">Intent</span>(<span class="st">"com.example.hardware.IHardwareController"</span>).<span class="fn">apply</span> {
+            <span class="fn">setPackage</span>(<span class="st">"com.example.hardware.service"</span>)
+        }
+
+        <span class="kw">val</span> bound = context.<span class="fn">bindService</span>(
+            intent,
+            serviceConnection,
+            <span class="ty">Context.BIND_AUTO_CREATE</span> <span class="kw">or</span> <span class="ty">Context.BIND_ABOVE_CLIENT</span>
+        )
+
+        <span class="kw">if</span> (!bound) {
+            Log.<span class="fn">e</span>(TAG, <span class="st">"Failed to bind to service"</span>)
+            _connectionState.<span class="fn">value</span> = <span class="ty">ConnectionState.Error</span>(<span class="st">"Bind failed"</span>)
+        }
+    }
+
+    <span class="kw">fun</span> <span class="fn">disconnect</span>() {
+        <span class="fn">cleanupConnection</span>()
+        <span class="kw">try</span> {
+            context.<span class="fn">unbindService</span>(serviceConnection)
+        } <span class="kw">catch</span> (e: <span class="ty">IllegalArgumentException</span>) {
+            <span class="co">// Service was not bound</span>
+        }
+        _connectionState.<span class="fn">value</span> = <span class="ty">ConnectionState.Disconnected</span>
+    }
+
+    <span class="kw">suspend fun</span> <span class="fn">readSensor</span>(sensorId: <span class="ty">Int</span>): <span class="ty">Result&lt;SensorData&gt;</span> =
+        <span class="kw">withContext</span>(<span class="ty">Dispatchers.IO</span>) {
+            <span class="kw">try</span> {
+                <span class="kw">val</span> controller = hardwareController
+                    ?: <span class="kw">return</span>@withContext <span class="ty">Result</span>.<span class="fn">failure</span>(<span class="ty">IllegalStateException</span>(<span class="st">"Not connected"</span>))
+                <span class="ty">Result</span>.<span class="fn">success</span>(controller.<span class="fn">readSensor</span>(sensorId))
+            } <span class="kw">catch</span> (e: <span class="ty">RemoteException</span>) {
+                <span class="ty">Result</span>.<span class="fn">failure</span>(e)
+            }
+        }
+
+    <span class="kw">fun</span> <span class="fn">setPowerModeAsync</span>(mode: <span class="ty">Int</span>) {
+        <span class="kw">try</span> {
+            hardwareController?.<span class="fn">setPowerModeAsync</span>(mode)
+        } <span class="kw">catch</span> (e: <span class="ty">RemoteException</span>) {
+            Log.<span class="fn">e</span>(TAG, <span class="st">"Failed to set power mode"</span>, e)
+        }
+    }
+
+    <span class="co">// ── Lifecycle Observer ──</span>
+    <span class="kw">override fun</span> <span class="fn">onStart</span>(owner: <span class="ty">LifecycleOwner</span>) {
+        <span class="fn">connect</span>()
+    }
+
+    <span class="kw">override fun</span> <span class="fn">onStop</span>(owner: <span class="ty">LifecycleOwner</span>) {
+        <span class="fn">disconnect</span>()
+    }
+
+    <span class="co">// ── Private Helpers ──</span>
+    <span class="kw">private fun</span> <span class="fn">cleanupConnection</span>() {
+        <span class="kw">try</span> {
+            hardwareController?.<span class="fn">unregisterCallback</span>(callback)
+        } <span class="kw">catch</span> (e: <span class="ty">RemoteException</span>) {
+            <span class="co">// Service may already be dead</span>
+        }
+        serviceBinder?.<span class="fn">unlinkToDeath</span>(deathRecipient, <span class="nu">0</span>)
+        hardwareController = <span class="kw">null</span>
+        serviceBinder = <span class="kw">null</span>
+    }
+
+    <span class="kw">sealed class</span> <span class="ty">ConnectionState</span> {
+        <span class="kw">object</span> <span class="ty">Disconnected</span> : <span class="ty">ConnectionState</span>()
+        <span class="kw">object</span> <span class="ty">Connecting</span> : <span class="ty">ConnectionState</span>()
+        <span class="kw">object</span> <span class="ty">Connected</span> : <span class="ty">ConnectionState</span>()
+        <span class="kw">data class</span> <span class="ty">Error</span>(<span class="kw">val</span> message: <span class="ty">String</span>) : <span class="ty">ConnectionState</span>()
+    }
+}</code></pre>
+
+    <div class="info-card">
+        <div class="info-title">📋 نقاط أساسية في كود العميل</div>
+        <p>
+            <strong>linkToDeath:</strong> يسمح باكتشاف انهيار عملية الخادم (Process Death) فوراً، 
+            مما يُتيح إعادة الربط التلقائي أو إشعار المستخدم.
+        </p>
+        <p>
+            <strong>Callback on Binder Thread:</strong> استدعاءات <code>IHardwareCallback</code> تأتي في خيط Binder الداخلي. 
+            يجب نقل العمل إلى <code>Main Thread</code> قبل تحديث واجهة المستخدم.
+        </p>
+        <p>
+            <strong>Lifecycle Awareness:</strong> باستخدام <code>DefaultLifecycleObserver</code>، 
+            يتم ربط الخدمة تلقائياً عند <code>onStart()</code> وفك الربط عند <code>onStop()</code> 
+            لتجنب تسريبات الذاكرة (Memory Leaks).
+        </p>
+    </div>
+</div>
+
+<!-- Section 5: Diagnostics, CLI Testing & Best Practices -->
+<div class="section">
+    <div class="section-title">
+        <div class="icon">٥</div>
+        أدوات الاختبار والتشخيص وتفادي الأخطاء
+    </div>
+
+    <div class="subsection-title">اختبار خدمات AIDL من سطر الأوامر (ADB)</div>
+    <p>
+        يمكن اختبار خدمات AIDL مباشرةً من Terminal باستخدام أوامر <code>service call</code> و <code>cmd</code>. 
+        هذه الطريقة مفيدة للتشخيص السريع دون الحاجة لكتابة تطبيق عميل كامل.
+    </p>
+
+    <div class="terminal">
+<span class="prompt">$</span> <span class="cmd">adb shell service list | grep hardware</span>
+<span class="co"># عرض جميع الخدمات المسجلة التي تحتوي على "hardware"</span>
+
+<span class="prompt">$</span> <span class="cmd">adb shell service call hardware_controller 1 i32 0</span>
+<span class="co"># استدعاء Method رقم 1 (enableSensor) مع معامل int32 = 0</span>
+<span class="co"># الرقم 1 يتوافق مع TRANSACTION_enableSensor = 1</span>
+
+<span class="prompt">$</span> <span class="cmd">adb shell cmd activity service call com.example.hardware/.HardwareService 1</span>
+<span class="co"># استخدام cmd activity للوصول إلى خدمة محددة بالاسم الكامل</span>
+
+<span class="prompt">$</span> <span class="cmd">adb shell dumpsys activity service com.example.hardware/.HardwareService</span>
+<span class="co"># عرض معلومات تشخيصية عن حالة الخدمة والـ Connections النشطة</span>
+
+<span class="prompt">$</span> <span class="cmd">adb shell service check hardware_controller</span>
+<span class="co"># التحقق من توفر الخدمة وعملها</span>
+    </div>
+
+    <div class="subsection-title">تدقيق الأمان — Identity Clearance & Permission Checks</div>
+    <p>
+        داخل الـ <code>Stub</code>، يمكن التحقق من هوية المتصل (Caller Identity) باستخدام 
+        <code>Binder.getCallingUid()</code> و <code>Binder.getCallingPid()</code>. 
+        يجب استخدام <code>clearCallingIdentity()</code> و <code>restoreCallingIdentity()</code> 
+        عند الحاجة لتنفيذ عمليات تتطلب صلاحيات النظام داخل سياق الخادم.
+    </p>
+
+    <pre><code class="language-kotlin"><span class="co">// داخل Stub — التحقق من صلاحيات المتصل</span>
+<span class="kw">override fun</span> <span class="fn">onTransact</span>(code: <span class="ty">Int</span>, data: <span class="ty">Parcel</span>, reply: <span class="ty">Parcel</span>?, flags: <span class="ty">Int</span>): <span class="ty">Boolean</span> {
+    <span class="kw">when</span> (code) {
+        <span class="ty">TRANSACTION_readSensor</span> -> {
+            <span class="co">// ── التحقق من صلاحية الوصول ──</span>
+            <span class="kw">val</span> callingUid = <span class="ty">Binder</span>.<span class="fn">getCallingUid</span>()
+            <span class="kw">val</span> callingPid = <span class="ty">Binder</span>.<span class="fn">getCallingPid</span>()
+
+            <span class="kw">if</span> (!<span class="fn">isAuthorized</span>(callingUid)) {
+                <span class="co">// رفض الوصول — لا نرمي استثناء هنا لمنع تسريب معلومات</span>
+                reply?.<span class="fn">writeException</span>(<span class="ty">SecurityException</span>(<span class="st">"Unauthorized access"</span>))
+                <span class="kw">return</span> <span class="nu">true</span>
+            }
+
+            <span class="co">// ── Identity Clearance ──</span>
+            <span class="co">// عند الحاجة لتنفيذ عملية تحتاج صلاحيات النظام</span>
+            <span class="kw">val</span> originalId = <span class="ty">Binder</span>.<span class="fn">clearCallingIdentity</span>()
+            <span class="kw">try</span> {
+                <span class="co">// تنفيذ العملية بصلاحيات النظام (System Identity)</span>
+                <span class="kw">val</span> result = <span class="fn">performSystemOperation</span>()
+                reply?.<span class="fn">writeNoException</span>()
+                reply?.<span class="fn">writeTypedObject</span>(result, <span class="nu">0</span>)
+            } <span class="kw">finally</span> {
+                <span class="co">// استعادة الهوية الأصلية إلزامياً</span>
+                <span class="ty">Binder</span>.<span class="fn">restoreCallingIdentity</span>(originalId)
+            }
+            <span class="kw">return</span> <span class="nu">true</span>
+        }
+    }
+    <span class="kw">return super</span>.<span class="fn">onTransact</span>(code, data, reply, flags)
+}</code></pre>
+
+    <div class="warning-card">
+        <div class="warning-title">⚠️ خطر نسيان restoreCallingIdentity()</div>
+        <p>
+            نسيان استدعاء <code>Binder.restoreCallingIdentity()</code> داخل <code>finally</code> block 
+            يعني أن جميع الاستدعاءات اللاحقة ستُنفذ بصلاحيات النظام، مما يُسبب <strong>ثغرة أمان خطيرة</strong> 
+            (Privilege Escalation Vulnerability).
+        </p>
+    </div>
+
+    <div class="subsection-title">المآخذ الشائعة وتفاديها</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>المشكلة</th>
+                <th>السبب الجذري</th>
+                <th>الحل الوقائي</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>DeadObjectException</code></td>
+                <td>انتهت عملية الخادم (Process Death) بينما العميل يحتفظ بمرجع <code>IBinder</code> قديم.</td>
+                <td>استخدم <code>linkToDeath()</code> مع <code>DeathRecipient</code> لاكتشاف الانهيار وإعادة الربط.</td>
+            </tr>
+            <tr>
+                <td>استنزاف مجمع الخيوط</td>
+                <td>استدعاءات متزامنة متداخلة بين عميل وخادم تستهلك جميع الخيوط المتاحة.</td>
+                <td>استخدم <code>oneway</code> للـ Callbacks. تجنب الاستدعاءات المتبادلة المتزامنة.</td>
+            </tr>
+            <tr>
+                <td>تسريب ذاكرة Callbacks</td>
+                <td>تسجيل Callback دون إلغاء تسجيله عند فك الربط.</td>
+                <td>استدعِ <code>unregisterCallback()</code> دائماً في <code>onServiceDisconnected()</code> أو <code>onDestroy()</code>.</td>
+            </tr>
+            <tr>
+                <td>ANR في العميل</td>
+                <td>استدعاء IPC متزامن من Main Thread UI.</td>
+                <td>نفّذ جميع استدعاءات IPC في خيط خلفي (<code>Coroutine</code>، <code>AsyncTask</code>، أو <code>HandlerThread</code>).</td>
+            </tr>
+            <tr>
+                <td>TransactionTooLargeException</td>
+                <td>حجم البيانات المرسلة يتجاوز ~1MB (Binder Buffer Limit).</td>
+                <td>استخدم <code>SharedMemory</code> للبيانات الضخمة. قسّم البيانات إلى أجزاء (Chunking).</td>
+            </tr>
+            <tr>
+                <td>Race Condition في Callbacks</td>
+                <td>الوصول المتزامن لقائمة Callbacks من خيوط متعددة.</td>
+                <td>استخدم <code>std::mutex</code> (C++) أو <code>synchronized</code> / <code>ReentrantLock</code> (Java/Kotlin).</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="subsection-title">أفضل الممارسات الإنتاجية (Production Best Practices)</div>
+
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><strong>١. تصميم الواجهات:</strong> حافظ على الواجهات صغيرة ومركزة. كل Method يجب أن يؤدي وظيفة واحدة واضحة. تجنب "God Interfaces" التي تحتوي على عشرات Methods.</p>
+        </div>
+        <div class="highlight-box">
+            <p><strong>٢. التعامل مع الأخطاء:</strong> لا تعتمد على <code>oneway</code> للعمليات الحرجة. استخدم استدعاءات متزامنة مع <code>try/catch</code> لـ <code>RemoteException</code>.</p>
+        </div>
+        <div class="highlight-box">
+            <p><strong>٣. إدارة دورة الحياة:</strong> استخدم <code>LifecycleObserver</code> أو <code>ServiceConnection</code> مداراً لضمان فك الربط دائماً.</p>
+        </div>
+        <div class="highlight-box">
+            <p><strong>٤. التوثيق:</strong> علّق كل Method في ملف <code>.aidl</code> بـ Javadoc. الوثائق هي العقد الحقيقي بين الفرق.</p>
+        </div>
+        <div class="highlight-box">
+            <p><strong>٥. اختبار الوحدات:</strong> استخدم <code>ServiceTesting</code> مع <code>Robolectric</code> أو <code>AndroidJUnit4</code> لاختبار الـ Stub دون الحاجة لعملية حقيقية.</p>
+        </div>
+        <div class="highlight-box">
+            <p><strong>٦. مراقبة الأداء:</strong> استخدم <code>systrace</code> و <code>atrace</code> لتتبع تأخيرات IPC. ابحث عن <code>binder_transaction</code> events.</p>
+        </div>
+    </div>
+
+    <div class="subsection-title">تشخيص الأداء باستخدام Systrace و ATrace</div>
+
+    <div class="terminal">
+<span class="prompt">$</span> <span class="cmd">adb shell atrace --async_start -c -b 32768 binder</span>
+<span class="co"># بدء تتبع أحداث Binder بشكل غير متزامن</span>
+
+<span class="prompt">$</span> <span class="cmd">adb shell atrace --async_stop -o /data/local/tmp/binder_trace.html</span>
+<span class="co"># إيقاف التتبع وحفظ النتائج</span>
+
+<span class="prompt">$</span> <span class="cmd">adb shell am trace-ipc start --dump-file /data/local/tmp/ipc.log</span>
+<span class="co"># تتبع IPC للتطبيق المحدد (Android 11+)</span>
+
+<span class="prompt">$</span> <span class="cmd">adb logcat -s "HardwareClient" "HardwareService" "Binder"</span>
+<span class="co"># مراقبة السجلات الخاصة بالعميل والخادم ونظام Binder</span>
+    </div>
+
+    <div class="info-card">
+        <div class="info-title">🔧 ملف Android.bp — إعدادات بناء AIDL في AOSP</div>
+        <p>
+            عند العمل في بيئة AOSP (Android Open Source Project)، يُعرّف ملف <code>Android.bp</code> 
+            كيفية توليد الـ Stubs من ملفات <code>.aidl</code>:
+        </p>
+    </div>
+
+    <pre><code class="language-cpp"><span class="co">// Android.bp — AIDL Compilation Configuration</span>
+<span class="fn">aidl_interface</span> {
+    name: <span class="st">"com.example.hardware.controller"</span>,
+    srcs: [<span class="st">"aidl/**/*.aidl"</span>],
+    stability: <span class="st">"vintf"</span>,  <span class="co">// أو "unstable" للتطبيقات العادية</span>
+    backend: {
+        java: {
+            enabled: <span class="nu">true</span>,
+            platform_apis: <span class="nu">true</span>,
+        },
+        cpp: {
+            enabled: <span class="nu">true</span>,
+        },
+        ndk: {
+            enabled: <span class="nu">true</span>,
+        },
+    },
+}</code></pre>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <p>الدليل الشامل للغة الواجهات AIDL Deep Dive — البلوك 7: اليوم 13-14</p>
+    <p>Principal Mobile Systems Architect & Android OS / Low-Level IPC Specialist</p>
+    <p style="margin-top: 8px; color: #94a3b8;">تم إنشاء هذا المرجع كوثيقة تقنية تعليمية — يُسمح بالطباعة والتوزيع للأغراض التعليمية</p>
+</div>
+
+</div>
+</body>
+</html>

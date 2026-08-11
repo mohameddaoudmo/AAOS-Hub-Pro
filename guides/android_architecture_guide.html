@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدليل الشامل لمعماريات وأساليب تصميم أندرويد</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Tajawal:wght@300;400;500;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #073042; --navy-light: #0a4560; --green: #3DDC84; --green-dark: #2db86a;
+            --purple: #7F52FF; --purple-light: #9b7aff; --teal: #00838F; --teal-light: #00a8b8;
+            --bg: #F9F9FB; --bg-card: #FFFFFF; --text-primary: #1a1a2e; --text-secondary: #4a4a6a;
+            --text-muted: #7a7a9a; --border: #e2e2ea; --code-bg: #1E2A38; --code-bg-light: #253448;
+            --shadow-sm: 0 2px 8px rgba(7,48,66,0.06); --shadow-md: 0 8px 24px rgba(7,48,66,0.1);
+            --shadow-lg: 0 16px 48px rgba(7,48,66,0.12); --radius: 16px; --radius-sm: 10px; --radius-xs: 6px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Cairo', 'Tajawal', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg); color: var(--text-primary); line-height: 1.85; font-size: 17px; overflow-x: hidden;
+        }
+        .hero {
+            background: linear-gradient(135deg, var(--navy) 0%, #0a3d52 50%, var(--teal) 100%);
+            color: white; padding: 80px 24px 100px; text-align: center; position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: -50%; right: -20%; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(61,220,132,0.15) 0%, transparent 70%); border-radius: 50%;
+        }
+        .hero::after {
+            content: ''; position: absolute; bottom: -30%; left: -10%; width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(127,82,255,0.12) 0%, transparent 70%); border-radius: 50%;
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15); padding: 8px 20px;
+            border-radius: 50px; font-size: 14px; font-weight: 600; margin-bottom: 24px; position: relative; z-index: 1;
+        }
+        .hero-badge .dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.2); } }
+        .hero h1 { font-size: 3.2rem; font-weight: 800; margin-bottom: 16px; position: relative; z-index: 1; line-height: 1.3; }
+        .hero h1 span { color: var(--green); }
+        .hero-subtitle { font-size: 1.25rem; opacity: 0.85; max-width: 700px; margin: 0 auto 40px; position: relative; z-index: 1; font-weight: 300; }
+        .hero-meta { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; position: relative; z-index: 1; }
+        .hero-meta-item { display: flex; align-items: center; gap: 8px; font-size: 15px; opacity: 0.8; }
+        .nav-container { position: sticky; top: 0; z-index: 100; background: rgba(249,249,251,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+        .nav { max-width: 1200px; margin: 0 auto; padding: 12px 24px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+        .nav::-webkit-scrollbar { display: none; }
+        .nav a { text-decoration: none; color: var(--text-secondary); font-weight: 600; font-size: 14px; padding: 8px 16px; border-radius: 50px; white-space: nowrap; transition: all 0.3s ease; border: 1px solid transparent; }
+        .nav a:hover, .nav a.active { background: var(--navy); color: white; border-color: var(--navy); }
+        .container { max-width: 1100px; margin: 0 auto; padding: 48px 24px; }
+        .section { margin-bottom: 64px; }
+        .section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid var(--border); }
+        .section-icon { width: 56px; height: 56px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+        .section-icon.arch { background: linear-gradient(135deg, var(--navy), var(--teal)); color: white; }
+        .section-icon.creational { background: linear-gradient(135deg, var(--green), var(--teal)); color: white; }
+        .section-icon.structural { background: linear-gradient(135deg, var(--purple), var(--navy)); color: white; }
+        .section-icon.behavioral { background: linear-gradient(135deg, var(--teal), var(--green)); color: white; }
+        .section-icon.matrix { background: linear-gradient(135deg, var(--navy), var(--purple)); color: white; }
+        .section-title-group h2 { font-size: 1.8rem; font-weight: 800; color: var(--navy); margin-bottom: 4px; }
+        .section-title-group p { color: var(--text-muted); font-size: 15px; }
+        .qa-card { background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow-sm); margin-bottom: 24px; overflow: hidden; border: 1px solid var(--border); transition: box-shadow 0.3s ease; }
+        .qa-card:hover { box-shadow: var(--shadow-md); }
+        .qa-question { padding: 24px 28px; cursor: pointer; display: flex; align-items: flex-start; gap: 16px; transition: background 0.2s ease; user-select: none; }
+        .qa-question:hover { background: rgba(127,82,255,0.03); }
+        .qa-toggle { width: 32px; height: 32px; border-radius: 50%; background: var(--bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease; color: var(--purple); font-size: 18px; font-weight: 700; }
+        .qa-card.open .qa-toggle { transform: rotate(180deg); background: var(--purple); color: white; }
+        .qa-q-text { flex: 1; }
+        .qa-q-text h3 { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); line-height: 1.5; }
+        .qa-q-meta { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: 700; letter-spacing: 0.3px; }
+        .badge-green { background: rgba(61,220,132,0.12); color: #1a7a4a; }
+        .badge-purple { background: rgba(127,82,255,0.12); color: #5a32cc; }
+        .badge-teal { background: rgba(0,131,143,0.12); color: #006a75; }
+        .badge-navy { background: rgba(7,48,66,0.12); color: #052a3a; }
+        .badge-orange { background: rgba(255,152,0,0.12); color: #c77700; }
+        .qa-answer { max-height: 0; overflow: hidden; transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .qa-card.open .qa-answer { max-height: 8000px; }
+        .qa-answer-inner { padding: 0 28px 28px 76px; }
+        .qa-answer-inner p { margin-bottom: 16px; color: var(--text-secondary); }
+        .qa-answer-inner strong { color: var(--text-primary); }
+        .qa-answer-inner ul, .qa-answer-inner ol { margin: 16px 0; padding-right: 24px; }
+        .qa-answer-inner li { margin-bottom: 10px; color: var(--text-secondary); }
+        .qa-answer-inner li::marker { color: var(--purple); }
+        .code-block { background: var(--code-bg); border-radius: var(--radius-sm); overflow: hidden; margin: 20px 0; border: 1px solid #2a3a4e; }
+        .code-header { background: var(--code-bg-light); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #2a3a4e; }
+        .code-lang { font-size: 12px; font-weight: 700; color: var(--green); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px; }
+        .code-dots { display: flex; gap: 6px; }
+        .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+        .dot-red { background: #ff5f56; } .dot-yellow { background: #ffbd2e; } .dot-green { background: #27c93f; }
+        pre { padding: 20px; overflow-x: auto; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 14px; line-height: 1.7; color: #e2e8f0; }
+        pre code { font-family: inherit; }
+        .k { color: #c792ea; } .s { color: #c3e88d; } .c { color: #546e7a; font-style: italic; }
+        .f { color: #82aaff; } .t { color: #ffcb6b; } .n { color: #f78c6c; }
+        .p { color: #89ddff; } .v { color: #f07178; }
+        .callout { border-radius: var(--radius-sm); padding: 20px 24px; margin: 20px 0; display: flex; gap: 16px; align-items: flex-start; }
+        .callout-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+        .callout-info { background: linear-gradient(135deg, rgba(0,131,143,0.08), rgba(0,131,143,0.04)); border-right: 4px solid var(--teal); }
+        .callout-info .callout-icon { background: var(--teal); color: white; }
+        .callout-warning { background: linear-gradient(135deg, rgba(255,152,0,0.08), rgba(255,152,0,0.04)); border-right: 4px solid #ff9800; }
+        .callout-warning .callout-icon { background: #ff9800; color: white; }
+        .callout-tip { background: linear-gradient(135deg, rgba(61,220,132,0.08), rgba(61,220,132,0.04)); border-right: 4px solid var(--green); }
+        .callout-tip .callout-icon { background: var(--green); color: white; }
+        .callout-danger { background: linear-gradient(135deg, rgba(244,67,54,0.08), rgba(244,67,54,0.04)); border-right: 4px solid #f44336; }
+        .callout-danger .callout-icon { background: #f44336; color: white; }
+        .callout-content h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--text-primary); }
+        .callout-content p { margin: 0; font-size: 15px; }
+        .table-wrapper { overflow-x: auto; margin: 24px 0; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; background: var(--bg-card); font-size: 15px; }
+        thead th { background: linear-gradient(135deg, var(--navy), var(--navy-light)); color: white; padding: 16px 20px; text-align: right; font-weight: 700; font-size: 14px; letter-spacing: 0.3px; }
+        tbody td { padding: 16px 20px; border-bottom: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; }
+        tbody tr:hover { background: rgba(127,82,255,0.03); }
+        tbody tr:last-child td { border-bottom: none; }
+        .table-tag { display: inline-block; padding: 3px 10px; border-radius: 50px; font-size: 12px; font-weight: 700; margin: 2px; }
+        .flow-diagram { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; padding: 24px; background: linear-gradient(135deg, rgba(7,48,66,0.03), rgba(0,131,143,0.03)); border-radius: var(--radius-sm); margin: 20px 0; border: 1px dashed var(--border); }
+        .flow-box { padding: 12px 20px; border-radius: var(--radius-xs); font-weight: 700; font-size: 14px; text-align: center; min-width: 120px; }
+        .flow-box.view { background: rgba(127,82,255,0.15); color: var(--purple); border: 2px solid var(--purple); }
+        .flow-box.presenter { background: rgba(0,131,143,0.15); color: var(--teal); border: 2px solid var(--teal); }
+        .flow-box.model { background: rgba(61,220,132,0.15); color: var(--green-dark); border: 2px solid var(--green); }
+        .flow-box.data { background: rgba(7,48,66,0.1); color: var(--navy); border: 2px solid var(--navy); }
+        .flow-arrow { font-size: 20px; color: var(--text-muted); font-weight: 700; }
+        .patterns-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-top: 24px; }
+        .pattern-card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; transition: all 0.3s ease; }
+        .pattern-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--purple-light); }
+        .pattern-header { padding: 20px 24px; background: linear-gradient(135deg, rgba(7,48,66,0.04), rgba(127,82,255,0.04)); border-bottom: 1px solid var(--border); }
+        .pattern-header h4 { font-size: 1.1rem; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
+        .pattern-header .pattern-sub { font-size: 13px; color: var(--text-muted); font-weight: 600; }
+        .pattern-body { padding: 20px 24px; }
+        .pattern-body p { color: var(--text-secondary); font-size: 15px; margin-bottom: 12px; }
+        .pattern-body .code-block { margin: 12px 0 0; }
+        .pattern-body .code-block pre { padding: 14px; font-size: 12.5px; }
+        .matrix-section { background: linear-gradient(135deg, var(--navy), #0a3d52); border-radius: var(--radius); padding: 40px; color: white; margin-bottom: 40px; }
+        .matrix-section .section-header { border-bottom-color: rgba(255,255,255,0.15); }
+        .matrix-section .section-title-group h2 { color: white; }
+        .matrix-section .section-title-group p { color: rgba(255,255,255,0.7); }
+        .matrix-table-wrapper { overflow-x: auto; border-radius: var(--radius-sm); margin-top: 24px; }
+        .matrix-table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); font-size: 14px; }
+        .matrix-table thead th { background: rgba(255,255,255,0.1); color: var(--green); padding: 16px; text-align: right; font-weight: 700; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        .matrix-table tbody td { padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.85); vertical-align: top; }
+        .matrix-table tbody tr:hover { background: rgba(255,255,255,0.05); }
+        .matrix-tag { display: inline-block; padding: 3px 10px; border-radius: 50px; font-size: 11px; font-weight: 700; margin: 2px; background: rgba(61,220,132,0.2); color: var(--green); }
+        .matrix-tag.purple { background: rgba(127,82,255,0.25); color: var(--purple-light); }
+        .matrix-tag.teal { background: rgba(0,131,143,0.25); color: var(--teal-light); }
+        .matrix-tag.orange { background: rgba(255,152,0,0.2); color: #ffb74d; }
+        .summary-card { background: linear-gradient(135deg, var(--bg-card), #f0f0f5); border: 2px solid var(--green); border-radius: var(--radius); padding: 40px; position: relative; overflow: hidden; }
+        .summary-card::before { content: ''; position: absolute; top: 0; right: 0; width: 200px; height: 200px; background: radial-gradient(circle, rgba(61,220,132,0.1) 0%, transparent 70%); }
+        .summary-card h3 { font-size: 1.5rem; font-weight: 800; color: var(--navy); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .summary-card ul { list-style: none; padding: 0; }
+        .summary-card li { padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 12px; color: var(--text-secondary); }
+        .summary-card li:last-child { border-bottom: none; }
+        .summary-card li .check { width: 24px; height: 24px; background: var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; flex-shrink: 0; margin-top: 2px; }
+        .footer { text-align: center; padding: 40px 24px; color: var(--text-muted); font-size: 14px; border-top: 1px solid var(--border); margin-top: 40px; }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; } .hero-subtitle { font-size: 1rem; } .section-title-group h2 { font-size: 1.4rem; }
+            .patterns-grid { grid-template-columns: 1fr; } .qa-answer-inner { padding: 0 20px 20px 60px; }
+            .matrix-section { padding: 24px; } .flow-diagram { flex-direction: column; } .flow-arrow { transform: rotate(90deg); }
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+        @media print { .nav-container, .qa-toggle { display: none; } .qa-answer { max-height: none !important; } .hero { background: var(--navy) !important; -webkit-print-color-adjust: exact; } }
+    </style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+    <div class="hero-badge">
+        <span class="dot"></span>
+        Master Guide — Android Architecture & Design Patterns
+    </div>
+    <h1>الدليل الشامل لـ <span>معماريات أندرويد</span><br>وأنماط التصميم البرمجي</h1>
+    <p class="hero-subtitle">
+        مرجع احترافي متكامل يغطي كل ما يحتاجه المهندس المعماري السينيور لاتخاذ قرارات تصميمية سليمة في مشاريع Kotlin وأندرويد
+    </p>
+    <div class="hero-meta">
+        <div class="hero-meta-item">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            5 أقسام رئيسية
+        </div>
+        <div class="hero-meta-item">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            Kotlin Code Snippets
+        </div>
+        <div class="hero-meta-item">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Q&A + Decision Matrix
+        </div>
+    </div>
+</header>
+
+<!-- NAVIGATION -->
+<nav class="nav-container">
+    <div class="nav">
+        <a href="#architecture" class="active">المعماريات</a>
+        <a href="#creational">الإنشائية</a>
+        <a href="#structural">الهيكلية</a>
+        <a href="#behavioral">السلوكية</a>
+        <a href="#matrix">مصفوفة القرار</a>
+        <a href="#summary">الخلاصة</a>
+    </div>
+</nav>
+
+<main class="container">
+
+<!-- SECTION 1: ARCHITECTURE PATTERNS -->
+<section class="section" id="architecture">
+    <div class="section-header">
+        <div class="section-icon arch">🏗️</div>
+        <div class="section-title-group">
+            <h2>معماريات أندرويد — Android Architecture Patterns</h2>
+            <p>فهم تطور المعماريات من MVC إلى MVI وكيفية اختيار النمط المناسب لكل مشروع</p>
+        </div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="qa-card open">
+        <div class="qa-question" onclick="toggleCard(this)">
+            <div class="qa-toggle">▼</div>
+            <div class="qa-q-text">
+                <h3>ما هو الفرق بين MVC و MVP و MVVM و MVI، وكيف تطورت معماريات أندرويد عبر هذه الأنماط؟</h3>
+                <div class="qa-q-meta">
+                    <span class="badge badge-purple">Architecture Evolution</span>
+                    <span class="badge badge-green">Kotlin</span>
+                    <span class="badge badge-teal">Jetpack</span>
+                </div>
+            </div>
+        </div>
+        <div class="qa-answer">
+            <div class="qa-answer-inner">
+                <p>تطورت معماريات أندرويد بشكل تدريجي لحل مشكلة <strong>Coupling</strong> العالي بين واجهة المستخدم (UI) ومنطق الأعمال (Business Logic). فيما يلي رحلة التطور:</p>
+
+                <h4 style="color:var(--navy); margin:24px 0 12px; font-size:1.1rem;">1. MVC (Model-View-Controller)</h4>
+                <p>في MVC، يتحكم <strong>Controller</strong> في كل شيء. المشكلة في أندرويد أن <code>Activity</code> أو <code>Fragment</code> يُجبر على أن يكون Controller وView في آن واحد، مما يؤدي إلى <strong>God Activity</strong> ضخمة يصعب اختبارها.</p>
+
+                <div class="flow-diagram">
+                    <div class="flow-box view">View (Activity)</div>
+                    <span class="flow-arrow">⟷</span>
+                    <div class="flow-box presenter">Controller</div>
+                    <span class="flow-arrow">⟷</span>
+                    <div class="flow-box model">Model</div>
+                </div>
+
+                <div class="callout callout-danger">
+                    <div class="callout-icon">⚠️</div>
+                    <div class="callout-content">
+                        <h4>لماذا MVC لم يعد مستحسناً في أندرويد؟</h4>
+                        <p>لأن <code>Activity</code> تتحمل مسؤولية تحديث UI ومعالجة الأحداث والتحكم في البيانات في آن واحد. اختبار الوحدات (Unit Testing) يصبح شبه مستحيل.</p>
+                    </div>
+                </div>
+
+                <h4 style="color:var(--navy); margin:24px 0 12px; font-size:1.1rem;">2. MVP (Model-View-Presenter)</h4>
+                <p>في MVP، نفصل <strong>Presenter</strong> عن <code>Activity</code> عبر Interface. الـ Presenter يحتوي على المنطق ويُعلم الـ View بالتحديثات عبر Contract.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="c">// MVP Contract</span>
+<span class="k">interface</span> <span class="t">LoginContract</span> {
+    <span class="k">interface</span> <span class="t">View</span> {
+        <span class="k">fun</span> <span class="f">showLoading</span>()
+        <span class="k">fun</span> <span class="f">hideLoading</span>()
+        <span class="k">fun</span> <span class="f">showError</span>(<span class="v">message</span>: <span class="t">String</span>)
+        <span class="k">fun</span> <span class="f">navigateToHome</span>()
+    }
+    <span class="k">interface</span> <span class="t">Presenter</span> {
+        <span class="k">fun</span> <span class="f">login</span>(<span class="v">username</span>: <span class="t">String</span>, <span class="v">password</span>: <span class="t">String</span>)
+    }
+}
+
+<span class="c">// Presenter Implementation</span>
+<span class="k">class</span> <span class="t">LoginPresenter</span>(
+    <span class="k">private val</span> <span class="v">view</span>: <span class="t">LoginContract.View</span>,
+    <span class="k">private val</span> <span class="v">repository</span>: <span class="t">UserRepository</span>
+) : <span class="t">LoginContract.Presenter</span> {
+    <span class="k">override fun</span> <span class="f">login</span>(<span class="v">username</span>: <span class="t">String</span>, <span class="v">password</span>: <span class="t">String</span>) {
+        <span class="v">view</span>.<span class="f">showLoading</span>()
+        <span class="v">repository</span>.<span class="f">authenticate</span>(<span class="v">username</span>, <span class="v">password</span>)
+            .<span class="f">enqueue</span>(<span class="k">object</span> : <span class="t">Callback</span>&lt;<span class="t">User</span>&gt; {
+                <span class="k">override fun</span> <span class="f">onResponse</span>(<span class="v">call</span>: <span class="t">Call</span>&lt;<span class="t">User</span>&gt;, <span class="v">response</span>: <span class="t">Response</span>&lt;<span class="t">User</span>&gt;) {
+                    <span class="v">view</span>.<span class="f">hideLoading</span>()
+                    <span class="k">if</span> (<span class="v">response</span>.<span class="f">isSuccessful</span>) <span class="v">view</span>.<span class="f">navigateToHome</span>()
+                    <span class="k">else</span> <span class="v">view</span>.<span class="f">showError</span>(<span class="s">"Invalid credentials"</span>)
+                }
+                <span class="k">override fun</span> <span class="f">onFailure</span>(<span class="v">call</span>: <span class="t">Call</span>&lt;<span class="t">User</span>&gt;, <span class="v">t</span>: <span class="t">Throwable</span>) {
+                    <span class="v">view</span>.<span class="f">hideLoading</span>()
+                    <span class="v">view</span>.<span class="f">showError</span>(<span class="v">t</span>.<span class="v">message</span> ?: <span class="s">"Unknown error"</span>)
+                }
+            })
+    }
+}</code></pre>
+                </div>
+
+                <div class="callout callout-warning">
+                    <div class="callout-icon">⚡</div>
+                    <div class="callout-content">
+                        <h4>عيب MVP الكبير</h4>
+                        <p>الـ Presenter يحتفظ بـ Reference للـ View (Activity) مما يسبب <strong>Memory Leaks</strong> إذا لم تُدير دورة الحياة (Lifecycle) بعناية. كما أن كل تحديث للبيانات يتطلب استدعاءً صريحاً للـ View.</p>
+                    </div>
+                </div>
+
+                <h4 style="color:var(--navy); margin:24px 0 12px; font-size:1.1rem;">3. MVVM (Model-View-ViewModel)</h4>
+                <p>في MVVM، يحل <strong>ViewModel</strong> محل Presenter. الفرق الجوهري: الـ ViewModel لا يعرف الـ View! بدلاً من ذلك، يُعرض البيانات عبر <strong>Observable</strong> patterns مثل <code>LiveData</code> أو <code>StateFlow</code>.</p>
+
+                <div class="flow-diagram">
+                    <div class="flow-box view">View (Compose/XML)</div>
+                    <span class="flow-arrow">⟵</span>
+                    <div class="flow-box presenter">ViewModel</div>
+                    <span class="flow-arrow">⟵</span>
+                    <div class="flow-box model">Model / UseCase</div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="k">class</span> <span class="t">LoginViewModel</span>(
+    <span class="k">private val</span> <span class="v">loginUseCase</span>: <span class="t">LoginUseCase</span>
+) : <span class="t">ViewModel</span>() {
+
+    <span class="k">private val</span> <span class="v">_uiState</span> = <span class="t">MutableStateFlow</span>(<span class="t">LoginUiState</span>())
+    <span class="k">val</span> <span class="v">uiState</span>: <span class="t">StateFlow</span>&lt;<span class="t">LoginUiState</span>&gt; = <span class="v">_uiState</span>.<span class="f">asStateFlow</span>()
+
+    <span class="k">fun</span> <span class="f">login</span>(<span class="v">username</span>: <span class="t">String</span>, <span class="v">password</span>: <span class="t">String</span>) {
+        <span class="v">viewModelScope</span>.<span class="f">launch</span> {
+            <span class="v">_uiState</span>.<span class="v">value</span> = <span class="v">_uiState</span>.<span class="v">value</span>.<span class="f">copy</span>(<span class="v">isLoading</span> = <span class="k">true</span>)
+            <span class="k">val</span> <span class="v">result</span> = <span class="v">loginUseCase</span>(<span class="v">username</span>, <span class="v">password</span>)
+            <span class="v">_uiState</span>.<span class="v">value</span> = <span class="k">when</span> (<span class="v">result</span>) {
+                <span class="k">is</span> <span class="t">Result.Success</span> -> <span class="v">_uiState</span>.<span class="v">value</span>.<span class="f">copy</span>(<span class="v">isLoading</span> = <span class="k">false</span>, <span class="v">isLoggedIn</span> = <span class="k">true</span>)
+                <span class="k">is</span> <span class="t">Result.Error</span> -> <span class="v">_uiState</span>.<span class="v">value</span>.<span class="f">copy</span>(<span class="v">isLoading</span> = <span class="k">false</span>, <span class="v">error</span> = <span class="v">result</span>.<span class="v">message</span>)
+            }
+        }
+    }
+}
+
+<span class="k">data class</span> <span class="t">LoginUiState</span>(
+    <span class="k">val</span> <span class="v">isLoading</span>: <span class="t">Boolean</span> = <span class="k">false</span>,
+    <span class="k">val</span> <span class="v">isLoggedIn</span>: <span class="t">Boolean</span> = <span class="k">false</span>,
+    <span class="k">val</span> <span class="v">error</span>: <span class="t">String</span>? = <span class="k">null</span>
+)</code></pre>
+                </div>
+
+                <h4 style="color:var(--navy); margin:24px 0 12px; font-size:1.1rem;">4. MVI (Model-View-Intent)</h4>
+                <p>MVI يأخذ MVVM إلى مستوى أعلى من <strong>Predictability</strong> عبر <strong>Unidirectional Data Flow</strong>. كل تغيير في الـ State يتم عبر <strong>Intent</strong> (Action) واحد، والـ State دائماً Immutable.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="c">// MVI: Single Immutable State + Sealed Class for Intents</span>
+<span class="k">sealed class</span> <span class="t">LoginIntent</span> {
+    <span class="k">data class</span> <span class="t">EnterUsername</span>(<span class="k">val</span> <span class="v">value</span>: <span class="t">String</span>) : <span class="t">LoginIntent</span>()
+    <span class="k">data class</span> <span class="t">EnterPassword</span>(<span class="k">val</span> <span class="v">value</span>: <span class="t">String</span>) : <span class="t">LoginIntent</span>()
+    <span class="k">object</span> <span class="t">SubmitLogin</span> : <span class="t">LoginIntent</span>()
+    <span class="k">object</span> <span class="t">DismissError</span> : <span class="t">LoginIntent</span>()
+}
+
+<span class="k">data class</span> <span class="t">LoginState</span>(
+    <span class="k">val</span> <span class="v">username</span>: <span class="t">String</span> = <span class="s">""</span>,
+    <span class="k">val</span> <span class="v">password</span>: <span class="t">String</span> = <span class="s">""</span>,
+    <span class="k">val</span> <span class="v">isLoading</span>: <span class="t">Boolean</span> = <span class="k">false</span>,
+    <span class="k">val</span> <span class="v">error</span>: <span class="t">String</span>? = <span class="k">null</span>,
+    <span class="k">val</span> <span class="v">isSuccess</span>: <span class="t">Boolean</span> = <span class="k">false</span>
+) {
+    <span class="k">val</span> <span class="v">isSubmitEnabled</span>: <span class="t">Boolean</span>
+        <span class="k">get</span>() = <span class="v">username</span>.<span class="f">isNotBlank</span>() && <span class="v">password</span>.<span class="f">length</span> >= <span class="n">6</span>
+}
+
+<span class="k">class</span> <span class="t">LoginViewModel</span> : <span class="t">ViewModel</span>() {
+    <span class="k">private val</span> <span class="v">_state</span> = <span class="t">MutableStateFlow</span>(<span class="t">LoginState</span>())
+    <span class="k">val</span> <span class="v">state</span> = <span class="v">_state</span>.<span class="f">asStateFlow</span>()
+
+    <span class="k">fun</span> <span class="f">processIntent</span>(<span class="v">intent</span>: <span class="t">LoginIntent</span>) {
+        <span class="k">when</span> (<span class="v">intent</span>) {
+            <span class="k">is</span> <span class="t">LoginIntent.EnterUsername</span> ->
+                <span class="v">_state</span>.<span class="v">value</span> = <span class="v">_state</span>.<span class="v">value</span>.<span class="f">copy</span>(<span class="v">username</span> = <span class="v">intent</span>.<span class="v">value</span>)
+            <span class="k">is</span> <span class="t">LoginIntent.EnterPassword</span> ->
+                <span class="v">_state</span>.<span class="v">value</span> = <span class="v">_state</span>.<span class="v">value</span>.<span class="f">copy</span>(<span class="v">password</span> = <span class="v">intent</span>.<span class="v">value</span>)
+            <span class="k">is</span> <span class="t">LoginIntent.SubmitLogin</span> -> <span class="f">performLogin</span>()
+            <span class="k">is</span> <span class="t">LoginIntent.DismissError</span> ->
+                <span class="v">_state</span>.<span class="v">value</span> = <span class="v">_state</span>.<span class="v">value</span>.<span class="f">copy</span>(<span class="v">error</span> = <span class="k">null</span>)
+        }
+    }
+}</code></pre>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>النمط</th>
+                                <th>اتجاه البيانات</th>
+                                <th>قابلية الاختبار</th>
+                                <th>التعقيد</th>
+                                <th>الحالة (State)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>MVC</strong></td>
+                                <td>ثنائي الاتجاه</td>
+                                <td>صعب جداً</td>
+                                <td>بسيط</td>
+                                <td>غير محددة</td>
+                            </tr>
+                            <tr>
+                                <td><strong>MVP</strong></td>
+                                <td>ثنائي الاتجاه</td>
+                                <td>متوسط</td>
+                                <td>متوسط</td>
+                                <td>غير محددة</td>
+                            </tr>
+                            <tr>
+                                <td><strong>MVVM</strong></td>
+                                <td>أحادي الاتجاه تقريباً</td>
+                                <td>سهل</td>
+                                <td>متوسط</td>
+                                <td>متعددة (LiveData/Flow)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>MVI</strong></td>
+                                <td>أحادي الاتجاه صارم</td>
+                                <td>سهل جداً</td>
+                                <td>معقد</td>
+                                <td>حالة واحدة غير قابلة للتغيير (Single Immutable State)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="qa-card">
+        <div class="qa-question" onclick="toggleCard(this)">
+            <div class="qa-toggle">▼</div>
+            <div class="qa-q-text">
+                <h3>ما هو Unidirectional Data Flow (UDF) في MVVM/MVI، ولماذا يُعتبر حاسماً لـ Jetpack Compose؟</h3>
+                <div class="qa-q-meta">
+                    <span class="badge badge-purple">UDF</span>
+                    <span class="badge badge-green">Jetpack Compose</span>
+                    <span class="badge badge-teal">State Management</span>
+                </div>
+            </div>
+        </div>
+        <div class="qa-answer">
+            <div class="qa-answer-inner">
+                <p><strong>Unidirectional Data Flow (UDF)</strong> يعني أن البيانات تتدفق في اتجاه واحد فقط: <strong>Event → Update State → Recompose UI</strong>. لا يوجد تدفق معاكس من UI إلى ViewModel مباشرةً عبر تعديل State.</p>
+
+                <div class="flow-diagram">
+                    <div class="flow-box view">User Event</div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-box presenter">ViewModel</div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-box model">New State</div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-box data">UI Recomposition</div>
+                </div>
+
+                <h4 style="color:var(--navy); margin:20px 0 10px; font-size:1.05rem;">لماذا UDF ضروري لـ Jetpack Compose؟</h4>
+                <ul>
+                    <li><strong>Recomposition هو دالة State:</strong> Compose يُعيد رسم UI تلقائياً عند تغير State. إذا كان State متعدد المصادر (Multiple Sources of Truth)، تصبح Recomposition غير متوقعة.</li>
+                    <li><strong>Predictability:</strong> كل State يأتي من مصدر واحد (Single Source of Truth) وهو الـ ViewModel.</li>
+                    <li><strong>Time-Travel Debugging:</strong> يمكنك تسجيل كل State وتشغيله للخلف/الأمام لأن State دائماً Immutable.</li>
+                    <li><strong>Testability:</strong> اختبار ViewModel يصبح اختبار دالة State خالصة: <code>f(intent) = newState</code>.</li>
+                </ul>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN — Jetpack Compose + UDF</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="k">@Composable</span>
+<span class="k">fun</span> <span class="f">LoginScreen</span>(
+    <span class="v">viewModel</span>: <span class="t">LoginViewModel</span> = <span class="f">viewModel</span>()
+) {
+    <span class="k">val</span> <span class="v">state</span> <span class="k">by</span> <span class="v">viewModel</span>.<span class="v">state</span>.<span class="f">collectAsState</span>()
+
+    <span class="t">Column</span>(<span class="v">modifier</span> = <span class="t">Modifier</span>.<span class="f">padding</span>(<span class="n">16</span>.<span class="v">dp</span>)) {
+        <span class="t">OutlinedTextField</span>(
+            <span class="v">value</span> = <span class="v">state</span>.<span class="v">username</span>,
+            <span class="v">onValueChange</span> = { <span class="v">viewModel</span>.<span class="f">processIntent</span>(<span class="t">LoginIntent.EnterUsername</span>(<span class="v">it</span>)) },
+            <span class="v">label</span> = { <span class="t">Text</span>(<span class="s">"Username"</span>) }
+        )
+        <span class="t">Button</span>(
+            <span class="v">onClick</span> = { <span class="v">viewModel</span>.<span class="f">processIntent</span>(<span class="t">LoginIntent.SubmitLogin</span>) },
+            <span class="v">enabled</span> = <span class="v">state</span>.<span class="v">isSubmitEnabled</span>
+        ) {
+            <span class="k">if</span> (<span class="v">state</span>.<span class="v">isLoading</span>) {
+                <span class="t">CircularProgressIndicator</span>(<span class="v">modifier</span> = <span class="t">Modifier</span>.<span class="f">size</span>(<span class="n">20</span>.<span class="v">dp</span>))
+            } <span class="k">else</span> {
+                <span class="t">Text</span>(<span class="s">"Login"</span>)
+            }
+        }
+        <span class="v">state</span>.<span class="v">error</span>?.<span class="f">let</span> { <span class="v">error</span> ->
+            <span class="t">Text</span>(<span class="v">text</span> = <span class="v">error</span>, <span class="v">color</span> = <span class="t">Color.Red</span>)
+        }
+    }
+}</code></pre>
+                </div>
+
+                <div class="callout callout-tip">
+                    <div class="callout-icon">💡</div>
+                    <div class="callout-content">
+                        <h4>نصيحة Senior Architect</h4>
+                        <p>في Compose، تجنب استخدام <code>rememberSaveable</code> لحالة معقدة. دع الـ ViewModel يملك الـ State ودع Compose يُعيد الرسم فقط. هذا يحميك من فقدان البيانات عند تغيير الإعدادات (Configuration Changes).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="qa-card">
+        <div class="qa-question" onclick="toggleCard(this)">
+            <div class="qa-toggle">▼</div>
+            <div class="qa-q-text">
+                <h3>كيف تُطبق Clean Architecture في أندرويد (Presentation, Domain, Data Layers)؟</h3>
+                <div class="qa-q-meta">
+                    <span class="badge badge-purple">Clean Architecture</span>
+                    <span class="badge badge-navy">Layered Architecture</span>
+                    <span class="badge badge-green">Dependency Rule</span>
+                </div>
+            </div>
+        </div>
+        <div class="qa-answer">
+            <div class="qa-answer-inner">
+                <p><strong>Clean Architecture</strong> (من Robert C. Martin) تُفصل التطبيق إلى طبقات متحدة المركز (Concentric Layers)، حيث تُشير Dependencies دائماً للداخل. القاعدة الذهبية: <strong>"Inner layers know nothing about outer layers."</strong></p>
+
+                <div class="flow-diagram">
+                    <div class="flow-box data">Presentation Layer<br><small>(UI, ViewModel, Compose)</small></div>
+                    <span class="flow-arrow">⟵</span>
+                    <div class="flow-box presenter">Domain Layer<br><small>(UseCases, Entities, Repository Interfaces)</small></div>
+                    <span class="flow-arrow">⟵</span>
+                    <div class="flow-box model">Data Layer<br><small>(Repository Impl, Room, Retrofit, DTOs)</small></div>
+                </div>
+
+                <h4 style="color:var(--navy); margin:24px 0 12px; font-size:1.1rem;">1. Domain Layer — قلب التطبيق</h4>
+                <p>هذه الطبقة خالصة من أي إطار عمل (Framework-agnostic). تحتوي على:</p>
+                <ul>
+                    <li><strong>Entities:</strong> كائنات العمل الأساسية (مثل <code>User</code>, <code>Product</code>)</li>
+                    <li><strong>UseCases (Interactors):</strong> كل UseCase يمثل عملية واحدة في الأعمال (مثل <code>GetUserProfileUseCase</code>)</li>
+                    <li><strong>Repository Interfaces:</strong> عقود (Contracts) فقط بدون Implementation</li>
+                </ul>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN — Domain Layer</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="c">// domain/model/User.kt — Pure Kotlin, no Android dependencies</span>
+<span class="k">data class</span> <span class="t">User</span>(
+    <span class="k">val</span> <span class="v">id</span>: <span class="t">String</span>,
+    <span class="k">val</span> <span class="v">name</span>: <span class="t">String</span>,
+    <span class="k">val</span> <span class="v">email</span>: <span class="t">String</span>,
+    <span class="k">val</span> <span class="v">profileUrl</span>: <span class="t">String</span>?
+)
+
+<span class="c">// domain/repository/UserRepository.kt — Interface only</span>
+<span class="k">interface</span> <span class="t">UserRepository</span> {
+    <span class="k">suspend fun</span> <span class="f">getUser</span>(<span class="v">id</span>: <span class="t">String</span>): <span class="t">Result</span>&lt;<span class="t">User</span>&gt;
+    <span class="k">fun</span> <span class="f">observeUsers</span>(): <span class="t">Flow</span>&lt;<span class="t">List</span>&lt;<span class="t">User</span>&gt;&gt;
+}
+
+<span class="c">// domain/usecase/GetUserProfileUseCase.kt</span>
+<span class="k">class</span> <span class="t">GetUserProfileUseCase</span>(
+    <span class="k">private val</span> <span class="v">repository</span>: <span class="t">UserRepository</span>
+) {
+    <span class="k">suspend operator fun</span> <span class="f">invoke</span>(<span class="v">userId</span>: <span class="t">String</span>): <span class="t">Result</span>&lt;<span class="t">User</span>&gt; {
+        <span class="k">return</span> <span class="v">repository</span>.<span class="f">getUser</span>(<span class="v">userId</span>)
+    }
+}</code></pre>
+                </div>
+
+                <h4 style="color:var(--navy); margin:24px 0 12px; font-size:1.1rem;">2. Data Layer — Implementation & Frameworks</h4>
+                <p>تحتوي على Implementation للـ Repository Interfaces وتتعامل مع:</p>
+                <ul>
+                    <li><strong>Remote Data Source:</strong> Retrofit APIs</li>
+                    <li><strong>Local Data Source:</strong> Room Database</li>
+                    <li><strong>DTOs (Data Transfer Objects):</strong> نماذج JSON الخام</li>
+                    <li><strong>Mappers:</strong> تحويل DTOs إلى Domain Models</li>
+                </ul>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN — Data Layer</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="c">// data/remote/dto/UserDto.kt</span>
+<span class="k">data class</span> <span class="t">UserDto</span>(
+    <span class="k">@SerializedName</span>(<span class="s">"user_id"</span>) <span class="k">val</span> <span class="v">userId</span>: <span class="t">String</span>,
+    <span class="k">@SerializedName</span>(<span class="s">"full_name"</span>) <span class="k">val</span> <span class="v">fullName</span>: <span class="t">String</span>,
+    <span class="k">@SerializedName</span>(<span class="s">"email_address"</span>) <span class="k">val</span> <span class="v">emailAddress</span>: <span class="t">String</span>,
+    <span class="k">@SerializedName</span>(<span class="s">"avatar_url"</span>) <span class="k">val</span> <span class="v">avatarUrl</span>: <span class="t">String</span>?
+)
+
+<span class="c">// data/remote/mapper/UserMapper.kt</span>
+<span class="k">object</span> <span class="t">UserMapper</span> {
+    <span class="k">fun</span> <span class="f">toDomain</span>(<span class="v">dto</span>: <span class="t">UserDto</span>): <span class="t">User</span> = <span class="t">User</span>(
+        <span class="v">id</span> = <span class="v">dto</span>.<span class="v">userId</span>,
+        <span class="v">name</span> = <span class="v">dto</span>.<span class="v">fullName</span>,
+        <span class="v">email</span> = <span class="v">dto</span>.<span class="v">emailAddress</span>,
+        <span class="v">profileUrl</span> = <span class="v">dto</span>.<span class="v">avatarUrl</span>
+    )
+}
+
+<span class="c">// data/repository/UserRepositoryImpl.kt</span>
+<span class="k">class</span> <span class="t">UserRepositoryImpl</span>(
+    <span class="k">private val</span> <span class="v">remoteDataSource</span>: <span class="t">UserRemoteDataSource</span>,
+    <span class="k">private val</span> <span class="v">localDataSource</span>: <span class="t">UserLocalDataSource</span>,
+    <span class="k">private val</span> <span class="v">mapper</span>: <span class="t">UserMapper</span>
+) : <span class="t">UserRepository</span> {
+
+    <span class="k">override suspend fun</span> <span class="f">getUser</span>(<span class="v">id</span>: <span class="t">String</span>): <span class="t">Result</span>&lt;<span class="t">User</span>&gt; {
+        <span class="k">return try</span> {
+            <span class="k">val</span> <span class="v">localUser</span> = <span class="v">localDataSource</span>.<span class="f">getUserById</span>(<span class="v">id</span>)
+            <span class="k">if</span> (<span class="v">localUser</span> != <span class="k">null</span>) {
+                <span class="t">Result</span>.<span class="f">success</span>(<span class="v">localUser</span>)
+            } <span class="k">else</span> {
+                <span class="k">val</span> <span class="v">dto</span> = <span class="v">remoteDataSource</span>.<span class="f">fetchUser</span>(<span class="v">id</span>)
+                <span class="k">val</span> <span class="v">domainUser</span> = <span class="v">mapper</span>.<span class="f">toDomain</span>(<span class="v">dto</span>)
+                <span class="v">localDataSource</span>.<span class="f">saveUser</span>(<span class="v">domainUser</span>)
+                <span class="t">Result</span>.<span class="f">success</span>(<span class="v">domainUser</span>)
+            }
+        } <span class="k">catch</span> (<span class="v">e</span>: <span class="t">Exception</span>) {
+            <span class="t">Result</span>.<span class="f">failure</span>(<span class="v">e</span>)
+        }
+    }
+
+    <span class="k">override fun</span> <span class="f">observeUsers</span>(): <span class="t">Flow</span>&lt;<span class="t">List</span>&lt;<span class="t">User</span>&gt;&gt; {
+        <span class="k">return</span> <span class="v">localDataSource</span>.<span class="f">observeAllUsers</span>()
+    }
+}</code></pre>
+                </div>
+
+                <h4 style="color:var(--navy); margin:24px 0 12px; font-size:1.1rem;">3. DTOs vs Domain Models vs Entities</h4>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>النوع</th>
+                                <th>الموقع</th>
+                                <th>الغرض</th>
+                                <th>مثال</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>DTO</strong></td>
+                                <td>Data Layer</td>
+                                <td>تعكس هيكل JSON الخام من API</td>
+                                <td><code>UserDto</code> مع <code>@SerializedName</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Domain Model</strong></td>
+                                <td>Domain Layer</td>
+                                <td>كيان العمل النظيف بدون annotations</td>
+                                <td><code>User</code> بحقول نظيفة</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Entity</strong></td>
+                                <td>Data Layer (Room)</td>
+                                <td>تعكس هيكل الجدول في قاعدة البيانات</td>
+                                <td><code>UserEntity</code> مع <code>@Entity</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="callout callout-info">
+                    <div class="callout-icon">ℹ️</div>
+                    <div class="callout-content">
+                        <h4>لماذا نفصل Domain Model عن DTO؟</h4>
+                        <p>لأن هيكل API قد يتغير (تغيير أسماء الحقول، إضافة/حذف حقول) دون أن يؤثر على منطق الأعمال. الـ Domain Model يبقى مستقراً بينما Mappers يتعاملون مع التغييرات.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="qa-card">
+        <div class="qa-question" onclick="toggleCard(this)">
+            <div class="qa-toggle">▼</div>
+            <div class="qa-q-text">
+                <h3>متى تستخدم MVVM مقابل MVI مقابل Clean Architecture؟ ما هي عتبات تعقيد التطبيق؟</h3>
+                <div class="qa-q-meta">
+                    <span class="badge badge-purple">Decision Making</span>
+                    <span class="badge badge-orange">Complexity Thresholds</span>
+                </div>
+            </div>
+        </div>
+        <div class="qa-answer">
+            <div class="qa-answer-inner">
+                <p>اختيار المعمارية ليس ديناً، بل هو <strong>توازن بين التعقيد والفائدة</strong>. إليك العتبات العملية:</p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>حجم التطبيق</th>
+                                <th>الشاشات</th>
+                                <th>الفريق</th>
+                                <th>النمط المُوصى به</th>
+                                <th>السبب</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>صغير جداً</strong></td>
+                                <td>1-3 شاشات</td>
+                                <td>1 مطور</td>
+                                <td>MVVM بسيط</td>
+                                <td>Over-engineering يقتل السرعة</td>
+                            </tr>
+                            <tr>
+                                <td><strong>صغير-متوسط</strong></td>
+                                <td>4-10 شاشات</td>
+                                <td>2-3 مطورين</td>
+                                <td>MVVM + Repository Pattern</td>
+                                <td>توازن جيد بين التنظيم والسرعة</td>
+                            </tr>
+                            <tr>
+                                <td><strong>متوسط</strong></td>
+                                <td>10-20 شاشة</td>
+                                <td>3-5 مطورين</td>
+                                <td>Clean Architecture + MVVM</td>
+                                <td>فصل UseCases يُسهل التعاون</td>
+                            </tr>
+                            <tr>
+                                <td><strong>كبير</strong></td>
+                                <td>20+ شاشة</td>
+                                <td>5+ مطورين</td>
+                                <td>Clean Architecture + MVI</td>
+                                <td>State مركزي يُسهل Debugging والتنسيق</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Enterprise</strong></td>
+                                <td>Multi-module</td>
+                                <td>فريقان+</td>
+                                <td>Clean Architecture + MVI + Modularization</td>
+                                <td>كل Module يملك Domain Layer خاص</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="callout callout-tip">
+                    <div class="callout-icon">💡</div>
+                    <div class="callout-content">
+                        <h4>قاعدة الذهب للمهندس المعماري</h4>
+                        <p>ابدأ بـ <strong>أبسط نمط يحل المشكلة</strong>. لا تُطبق Clean Architecture لتطبيق To-Do بسيط. لكن إذا رأيت أن <code>ViewModel</code> يتضخم (Fat ViewModel) أو أن اختبار الأعمال يصعب، فهذه إشارة لإدخال UseCases.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 2: CREATIONAL PATTERNS -->
+<section class="section" id="creational">
+    <div class="section-header">
+        <div class="section-icon creational">🔨</div>
+        <div class="section-title-group">
+            <h2>أنماط التصميم الإنشائية — Creational Patterns</h2>
+            <p>أنماط تتحكم في آلية إنشاء الكائنات لضمان مرونة وإعادة استخدام الكود</p>
+        </div>
+    </div>
+
+    <div class="patterns-grid">
+        <!-- Singleton -->
+        <div class="pattern-card">
+            <div class="pattern-header">
+                <h4>Singleton Pattern</h4>
+                <div class="pattern-sub">ضمان وجود نسخة واحدة فقط من الكائن</div>
+            </div>
+            <div class="pattern-body">
+                <p><strong>السؤال:</strong> كيف تضمن أن يكون لديك نسخة واحدة فقط من كائن مثل قاعدة البيانات أو عميل HTTP؟</p>
+                <p><strong>الموقف الحقيقي:</strong> <code>Room Database</code> و <code>Retrofit</code> يجب أن يكونا Singletons لتجنب تسرب الذاكرة وضمان Thread Safety.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN — Thread-Safe Singleton</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="c">// Method 1: Kotlin 'object' (eager, thread-safe)</span>
+<span class="k">object</span> <span class="t">RetrofitClient</span> {
+    <span class="k">val</span> <span class="v">apiService</span>: <span class="t">ApiService</span> <span class="k">by lazy</span> {
+        <span class="t">Retrofit</span>.<span class="f">Builder</span>()
+            .<span class="f">baseUrl</span>(<span class="s">"https://api.example.com/"</span>)
+            .<span class="f">addConverterFactory</span>(<span class="t">GsonConverterFactory</span>.<span class="f">create</span>())
+            .<span class="f">build</span>()
+            .<span class="f">create</span>(<span class="t">ApiService</span>::<span class="k">class</span>.<span class="v">java</span>)
+    }
+}
+
+<span class="c">// Method 2: Double-Check Locking (when you need parameters)</span>
+<span class="k">class</span> <span class="t">DatabaseManager</span> <span class="k">private constructor</span>(<span class="k">context</span>: <span class="t">Context</span>) {
+    <span class="k">companion object</span> {
+        <span class="k">@Volatile</span>
+        <span class="k">private var</span> <span class="v">instance</span>: <span class="t">DatabaseManager</span>? = <span class="k">null</span>
+
+        <span class="k">fun</span> <span class="f">getInstance</span>(<span class="v">context</span>: <span class="t">Context</span>): <span class="t">DatabaseManager</span> {
+            <span class="k">return</span> <span class="v">instance</span> ?: <span class="k">synchronized</span>(<span class="k">this</span>) {
+                <span class="v">instance</span> ?: <span class="t">DatabaseManager</span>(<span class="v">context</span>.<span class="v">applicationContext</span>).<span class="k">also</span> {
+                    <span class="v">instance</span> = <span class="v">it</span>
+                }
+            }
+        }
+    }
+}</code></pre>
+                </div>
+
+                <div class="callout callout-warning" style="margin-top:12px;">
+                    <div class="callout-icon">⚠️</div>
+                    <div class="callout-content">
+                        <h4>تحذير: Overusing Singleton هو Anti-Pattern</h4>
+                        <p>Singletons يصعبون Unit Testing لأنها Global State. استخدم <strong>Dependency Injection</strong> (Hilt/Koin) بدلاً من الوصول المباشر للـ Singletons.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Factory -->
+        <div class="pattern-card">
+            <div class="pattern-header">
+                <h4>Factory & Abstract Factory</h4>
+                <div class="pattern-sub">إنشاء كائنات ديناميكياً بناءً على السياق</div>
+            </div>
+            <div class="pattern-body">
+                <p><strong>السؤال:</strong> كيف تُنشئ كائنات مختلفة من نفس النوع بناءً على runtime conditions؟</p>
+                <p><strong>الموقف الحقيقي:</strong> بوابات دفع مختلفة حسب المنطقة (Stripe, PayPal, Tap)، أو إنشاء <code>ViewModel</code> عبر <code>ViewModelProvider.Factory</code>.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN — Factory Pattern</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="c">// Payment Strategy Interface</span>
+<span class="k">interface</span> <span class="t">PaymentProcessor</span> {
+    <span class="k">suspend fun</span> <span class="f">processPayment</span>(<span class="v">amount</span>: <span class="t">Double</span>): <span class="t">Result</span>&lt;<span class="t">String</span>&gt;
+}
+
+<span class="k">class</span> <span class="t">StripeProcessor</span> : <span class="t">PaymentProcessor</span> { ... }
+<span class="k">class</span> <span class="t">PayPalProcessor</span> : <span class="t">PaymentProcessor</span> { ... }
+
+<span class="c">// Factory</span>
+<span class="k">object</span> <span class="t">PaymentFactory</span> {
+    <span class="k">fun</span> <span class="f">createProcessor</span>(<span class="v">region</span>: <span class="t">String</span>): <span class="t">PaymentProcessor</span> {
+        <span class="k">return when</span> (<span class="v">region</span>) {
+            <span class="s">"US"</span> -> <span class="t">StripeProcessor</span>()
+            <span class="s">"EU"</span> -> <span class="t">PayPalProcessor</span>()
+            <span class="s">"MENA"</span> -> <span class="t">TapProcessor</span>()
+            <span class="k">else</span> -> <span class="k">throw</span> <span class="t">IllegalArgumentException</span>(<span class="s">"Unsupported region"</span>)
+        }
+    }
+}
+
+<span class="c">// ViewModelProvider.Factory (Android built-in)</span>
+<span class="k">class</span> <span class="t">MyViewModelFactory</span>(
+    <span class="k">private val</span> <span class="v">repository</span>: <span class="t">UserRepository</span>
+) : <span class="t">ViewModelProvider.Factory</span> {
+    <span class="k">override fun</span> <span class="f">&lt;T : ViewModel&gt; create</span>(<span class="v">modelClass</span>: <span class="t">Class</span>&lt;<span class="t">T</span>&gt;): <span class="t">T</span> {
+        <span class="k">return when</span> {
+            <span class="v">modelClass</span>.<span class="f">isAssignableFrom</span>(<span class="t">UserViewModel</span>::<span class="k">class</span>.<span class="v">java</span>) ->
+                <span class="t">UserViewModel</span>(<span class="v">repository</span>) <span class="k">as</span> <span class="t">T</span>
+            <span class="k">else</span> -> <span class="k">throw</span> <span class="t">IllegalArgumentException</span>(<span class="s">"Unknown ViewModel"</span>)
+        }
+    }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Builder -->
+        <div class="pattern-card">
+            <div class="pattern-header">
+                <h4>Builder Pattern</h4>
+                <div class="pattern-sub">بناء كائنات معقدة خطوة بخطوة</div>
+            </div>
+            <div class="pattern-body">
+                <p><strong>السؤال:</strong> كيف تُنشئ كائنات ذات عدد كبير من الإعدادات الاختيارية دون Constructor معقد؟</p>
+                <p><strong>الموقف الحقيقي:</strong> <code>AlertDialog.Builder</code>، <code>NotificationCompat.Builder</code>، أو طلبات HTTP معقدة.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN — Builder with DSL</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="c">// Custom HTTP Request Builder</span>
+<span class="k">class</span> <span class="t">HttpRequest</span> <span class="k">private constructor</span>(
+    <span class="k">val</span> <span class="v">url</span>: <span class="t">String</span>,
+    <span class="k">val</span> <span class="v">method</span>: <span class="t">String</span>,
+    <span class="k">val</span> <span class="v">headers</span>: <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">String</span>&gt;,
+    <span class="k">val</span> <span class="v">body</span>: <span class="t">String</span>?,
+    <span class="k">val</span> <span class="v">timeout</span>: <span class="t">Int</span>
+) {
+    <span class="k">class</span> <span class="t">Builder</span>(<span class="k">private val</span> <span class="v">url</span>: <span class="t">String</span>) {
+        <span class="k">private var</span> <span class="v">method</span> = <span class="s">"GET"</span>
+        <span class="k">private var</span> <span class="v">headers</span> = <span class="f">mutableMapOf</span>&lt;<span class="t">String</span>, <span class="t">String</span>&gt;()
+        <span class="k">private var</span> <span class="v">body</span>: <span class="t">String</span>? = <span class="k">null</span>
+        <span class="k">private var</span> <span class="v">timeout</span> = <span class="n">30_000</span>
+
+        <span class="k">fun</span> <span class="f">method</span>(<span class="v">method</span>: <span class="t">String</span>) = <span class="k">apply</span> { <span class="k">this</span>.<span class="v">method</span> = <span class="v">method</span> }
+        <span class="k">fun</span> <span class="f">header</span>(<span class="v">key</span>: <span class="t">String</span>, <span class="v">value</span>: <span class="t">String</span>) = <span class="k">apply</span> { <span class="v">headers</span>[<span class="v">key</span>] = <span class="v">value</span> }
+        <span class="k">fun</span> <span class="f">body</span>(<span class="v">body</span>: <span class="t">String</span>) = <span class="k">apply</span> { <span class="k">this</span>.<span class="v">body</span> = <span class="v">body</span> }
+        <span class="k">fun</span> <span class="f">timeout</span>(<span class="v">ms</span>: <span class="t">Int</span>) = <span class="k">apply</span> { <span class="k">this</span>.<span class="v">timeout</span> = <span class="v">ms</span> }
+
+        <span class="k">fun</span> <span class="f">build</span>() = <span class="t">HttpRequest</span>(<span class="v">url</span>, <span class="v">method</span>, <span class="v">headers</span>, <span class="v">body</span>, <span class="v">timeout</span>)
+    }
+}
+
+<span class="c">// Usage</span>
+<span class="k">val</span> <span class="v">request</span> = <span class="t">HttpRequest</span>.<span class="f">Builder</span>(<span class="s">"https://api.example.com/user"</span>)
+    .<span class="f">method</span>(<span class="s">"POST"</span>)
+    .<span class="f">header</span>(<span class="s">"Authorization"</span>, <span class="s">"Bearer token"</span>)
+    .<span class="f">header</span>(<span class="s">"Content-Type"</span>, <span class="s">"application/json"</span>)
+    .<span class="f">body</span>(<span class="s">"{\"name\":\"Ahmed\"}"</span>)
+    .<span class="f">timeout</span>(<span class="n">10_000</span>)
+    .<span class="f">build</span>()</code></pre>
+                </div>
+
+                <div class="callout callout-tip" style="margin-top:12px;">
+                    <div class="callout-icon">💡</div>
+                    <div class="callout-content">
+                        <h4>نصيحة: استخدم Kotlin DSL</h4>
+                        <p>في Kotlin، يمكنك استخدام <code>apply</code> و <code>named parameters</code> لتحقيق نفس نتيجة Builder Pattern بشكل أقصر وأنظف.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 3: STRUCTURAL PATTERNS -->
+<section class="section" id="structural">
+    <div class="section-header">
+        <div class="section-icon structural">🧱</div>
+        <div class="section-title-group">
+            <h2>أنماط التصميم الهيكلية — Structural Patterns</h2>
+            <p>أنماط تُنظم العلاقات بين الكائنات والكلاسات لبناء هياكل مرنة وقابلة للتوسع</p>
+        </div>
+    </div>
+
+    <div class="patterns-grid">
+        <!-- Adapter -->
+        <div class="pattern-card">
+            <div class="pattern-header">
+                <h4>Adapter Pattern</h4>
+                <div class="pattern-sub">توحيد واجهات غير متوافقة</div>
+            </div>
+            <div class="pattern-body">
+                <p><strong>السؤال:</strong> كيف تُستخدم كلاس/واجهة قديمة أو طرف ثالث لا تتوافق مع كودك الحالي؟</p>
+                <p><strong>الموقف الحقيقي:</strong> <code>RecyclerView.Adapter</code> يُحوّل Domain Models إلى ViewHolders. أو ربط API قديم بتطبيقك الجديد.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN — Adapter Pattern</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="c">// Legacy Payment API (3rd party SDK)</span>
+<span class="k">class</span> <span class="t">LegacyPaymentSdk</span> {
+    <span class="k">fun</span> <span class="f">makePayment</span>(<span class="v">amountInCents</span>: <span class="t">Int</span>, <span class="v">currencyCode</span>: <span class="t">String</span>) { ... }
+}
+
+<span class="c">// Our modern interface</span>
+<span class="k">interface</span> <span class="t">ModernPaymentGateway</span> {
+    <span class="k">fun</span> <span class="f">pay</span>(<span class="v">amount</span>: <span class="t">Double</span>, <span class="v">currency</span>: <span class="t">Currency</span>)
+}
+
+<span class="c">// Adapter bridges the gap</span>
+<span class="k">class</span> <span class="t">LegacyPaymentAdapter</span>(
+    <span class="k">private val</span> <span class="v">legacySdk</span>: <span class="t">LegacyPaymentSdk</span>
+) : <span class="t">ModernPaymentGateway</span> {
+    <span class="k">override fun</span> <span class="f">pay</span>(<span class="v">amount</span>: <span class="t">Double</span>, <span class="v">currency</span>: <span class="t">Currency</span>) {
+        <span class="k">val</span> <span class="v">cents</span> = (<span class="v">amount</span> * <span class="n">100</span>).<span class="f">toInt</span>()
+        <span class="v">legacySdk</span>.<span class="f">makePayment</span>(<span class="v">cents</span>, <span class="v">currency</span>.<span class="v">currencyCode</span>)
+    }
+}
+
+<span class="c">// RecyclerView.Adapter is the most common Android Adapter</span>
+<span class="k">class</span> <span class="t">ProductAdapter</span>(
+    <span class="k">private val</span> <span class="v">onItemClick</span>: (<span class="t">Product</span>) -> <span class="t">Unit</span>
+) : <span class="t">ListAdapter</span>&lt;<span class="t">Product</span>, <span class="t">ProductViewHolder</span>&gt;(<span class="t">ProductDiffCallback</span>()) {
+
+    <span class="k">override fun</span> <span class="f">onCreateViewHolder</span>(<span class="v">parent</span>: <span class="t">ViewGroup</span>, <span class="v">viewType</span>: <span class="t">Int</span>): <span class="t">ProductViewHolder</span> {
+        <span class="k">val</span> <span class="v">binding</span> = <span class="t">ItemProductBinding</span>.<span class="f">inflate</span>(
+            <span class="t">LayoutInflater</span>.<span class="f">from</span>(<span class="v">parent</span>.<span class="v">context</span>), <span class="v">parent</span>, <span class="k">false</span>
+        )
+        <span class="k">return</span> <span class="t">ProductViewHolder</span>(<span class="v">binding</span>, <span class="v">onItemClick</span>)
+    }
+
+    <span class="k">override fun</span> <span class="f">onBindViewHolder</span>(<span class="v">holder</span>: <span class="t">ProductViewHolder</span>, <span class="v">position</span>: <span class="t">Int</span>) {
+        <span class="v">holder</span>.<span class="f">bind</span>(<span class="f">getItem</span>(<span class="v">position</span>))
+    }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Decorator -->
+        <div class="pattern-card">
+            <div class="pattern-header">
+                <h4>Decorator Pattern</h4>
+                <div class="pattern-sub">إضافة وظائف ديناميكياً دون تعديل الكلاس الأصلي</div>
+            </div>
+            <div class="pattern-body">
+                <p><strong>السؤال:</strong> كيف تُضيف وظائف (Logging, Auth, Caching) لكائن موجود دون وراثته؟</p>
+                <p><strong>الموقف الحقيقي:</strong> إضافة <strong>Interceptors</strong> لـ Retrofit (Logging, Authentication Headers, Retry Logic).</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN — Decorator Pattern</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="c">// Base interface</span>
+<span class="k">interface</span> <span class="t">HttpClient</span> {
+    <span class="k">suspend fun</span> <span class="f">execute</span>(<span class="v">request</span>: <span class="t">HttpRequest</span>): <span class="t">HttpResponse</span>
+}
+
+<span class="c">// Concrete implementation</span>
+<span class="k">class</span> <span class="t">OkHttpClientWrapper</span> : <span class="t">HttpClient</span> {
+    <span class="k">override suspend fun</span> <span class="f">execute</span>(<span class="v">request</span>: <span class="t">HttpRequest</span>): <span class="t">HttpResponse</span> { ... }
+}
+
+<span class="c">// Decorator: Logging</span>
+<span class="k">class</span> <span class="t">LoggingHttpClient</span>(
+    <span class="k">private val</span> <span class="v">wrapped</span>: <span class="t">HttpClient</span>
+) : <span class="t">HttpClient</span> {
+    <span class="k">override suspend fun</span> <span class="f">execute</span>(<span class="v">request</span>: <span class="t">HttpRequest</span>): <span class="t">HttpResponse</span> {
+        <span class="t">Log</span>.<span class="f">d</span>(<span class="s">"HTTP"</span>, <span class="s">"→ ${request.method} ${request.url}"</span>)
+        <span class="k">val</span> <span class="v">response</span> = <span class="v">wrapped</span>.<span class="f">execute</span>(<span class="v">request</span>)
+        <span class="t">Log</span>.<span class="f">d</span>(<span class="s">"HTTP"</span>, <span class="s">"← ${response.statusCode}"</span>)
+        <span class="k">return</span> <span class="v">response</span>
+    }
+}
+
+<span class="c">// Decorator: Auth Header</span>
+<span class="k">class</span> <span class="t">AuthHttpClient</span>(
+    <span class="k">private val</span> <span class="v">wrapped</span>: <span class="t">HttpClient</span>,
+    <span class="k">private val</span> <span class="v">tokenProvider</span>: () -> <span class="t">String</span>
+) : <span class="t">HttpClient</span> {
+    <span class="k">override suspend fun</span> <span class="f">execute</span>(<span class="v">request</span>: <span class="t">HttpRequest</span>): <span class="t">HttpResponse</span> {
+        <span class="k">val</span> <span class="v">authenticated</span> = <span class="v">request</span>.<span class="f">copy</span>(
+            <span class="v">headers</span> = <span class="v">request</span>.<span class="v">headers</span> + (<span class="s">"Authorization"</span> to <span class="s">"Bearer ${tokenProvider()}"</span>)
+        )
+        <span class="k">return</span> <span class="v">wrapped</span>.<span class="f">execute</span>(<span class="v">authenticated</span>)
+    }
+}
+
+<span class="c">// Compose decorators</span>
+<span class="k">val</span> <span class="v">client</span> = <span class="t">LoggingHttpClient</span>(
+    <span class="t">AuthHttpClient</span>(
+        <span class="t">OkHttpClientWrapper</span>(),
+        <span class="v">tokenProvider</span> = { <span class="t">TokenManager</span>.<span class="v">getToken</span>() }
+    )
+)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Facade -->
+        <div class="pattern-card">
+            <div class="pattern-header">
+                <h4>Facade Pattern</h4>
+                <div class="pattern-sub">تبسيط واجهة معقدة عبر واجهة موحدة</div>
+            </div>
+            <div class="pattern-body">
+                <p><strong>السؤال:</strong> كيف تُبسط تفاعل مطوريك مع SDK معقد أو نظام فرعي كبير؟</p>
+                <p><strong>الموقف الحقيقي:</strong> MediaPlayer Manager، CameraX Wrapper، أو Biometric Auth Helper.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN — Facade Pattern</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="c">// Complex subsystem: CameraX + ML Kit + Storage</span>
+<span class="k">class</span> <span class="t">CameraManager</span>(<span class="k">private val</span> <span class="v">context</span>: <span class="t">Context</span>) { ... }
+<span class="k">class</span> <span class="t">BarcodeAnalyzer</span> { ... }
+<span class="k">class</span> <span class="t">ImageStorage</span>(<span class="k">private val</span> <span class="v">context</span>: <span class="t">Context</span>) { ... }
+
+<span class="c">// Facade: Simple unified interface</span>
+<span class="k">class</span> <span class="t">ScannerFacade</span>(<span class="k">context</span>: <span class="t">Context</span>) {
+    <span class="k">private val</span> <span class="v">camera</span> = <span class="t">CameraManager</span>(<span class="v">context</span>)
+    <span class="k">private val</span> <span class="v">analyzer</span> = <span class="t">BarcodeAnalyzer</span>()
+    <span class="k">private val</span> <span class="v">storage</span> = <span class="t">ImageStorage</span>(<span class="v">context</span>)
+
+    <span class="k">fun</span> <span class="f">startScanning</span>(
+        <span class="v">lifecycleOwner</span>: <span class="t">LifecycleOwner</span>,
+        <span class="v">previewView</span>: <span class="t">PreviewView</span>,
+        <span class="v">onBarcodeDetected</span>: (<span class="t">String</span>) -> <span class="t">Unit</span>
+    ) {
+        <span class="v">camera</span>.<span class="f">initialize</span>(<span class="v">lifecycleOwner</span>, <span class="v">previewView</span>)
+        <span class="v">camera</span>.<span class="f">setAnalyzer</span> { <span class="v">imageProxy</span> ->
+            <span class="k">val</span> <span class="v">barcode</span> = <span class="v">analyzer</span>.<span class="f">scan</span>(<span class="v">imageProxy</span>)
+            <span class="v">barcode</span>?.<span class="f">let</span> { <span class="v">onBarcodeDetected</span>(<span class="v">it</span>) }
+        }
+    }
+
+    <span class="k">fun</span> <span class="f">captureAndSave</span>(<span class="v">onSaved</span>: (<span class="t">Uri</span>) -> <span class="t">Unit</span>) {
+        <span class="v">camera</span>.<span class="f">takePicture</span> { <span class="v">bitmap</span> ->
+            <span class="k">val</span> <span class="v">uri</span> = <span class="v">storage</span>.<span class="f">save</span>(<span class="v">bitmap</span>)
+            <span class="v">onSaved</span>(<span class="v">uri</span>)
+        }
+    }
+
+    <span class="k">fun</span> <span class="f">release</span>() {
+        <span class="v">camera</span>.<span class="f">shutdown</span>()
+    }
+}</code></pre>
+                </div>
+
+                <div class="callout callout-info" style="margin-top:12px;">
+                    <div class="callout-icon">ℹ️</div>
+                    <div class="callout-content">
+                        <h4>الفائدة</h4>
+                        <p>مطورو الفريق لا يحتاجون لمعرفة تعقيد CameraX أو ML Kit. يستخدمون <code>ScannerFacade</code> البسيط فقط.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Proxy -->
+        <div class="pattern-card">
+            <div class="pattern-header">
+                <h4>Proxy Pattern</h4>
+                <div class="pattern-sub">التحكم في الوصول أو التحميل الكسول</div>
+            </div>
+            <div class="pattern-body">
+                <p><strong>السؤال:</strong> كيف تتحكم في الوصول لكائن مكلف (Heavy Object) أو تحميله كسولاً (Lazy Loading)؟</p>
+                <p><strong>الموقف الحقيقي:</strong> Lazy initialization لصور عالية الدقة، أو التحقق من الصلاحيات قبل الوصول لخدمة حساسة.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN — Proxy Pattern</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="c">// Subject interface</span>
+<span class="k">interface</span> <span class="t">ImageLoader</span> {
+    <span class="k">fun</span> <span class="f">loadImage</span>(<span class="v">url</span>: <span class="t">String</span>): <span class="t">Bitmap</span>
+}
+
+<span class="c">// Real subject: Heavy operation</span>
+<span class="k">class</span> <span class="t">RealImageLoader</span>(<span class="k">private val</span> <span class="v">context</span>: <span class="t">Context</span>) : <span class="t">ImageLoader</span> {
+    <span class="k">override fun</span> <span class="f">loadImage</span>(<span class="v">url</span>: <span class="t">String</span>): <span class="t">Bitmap</span> {
+        <span class="c">// Expensive: network + decode + resize</span>
+        <span class="k">return</span> <span class="t">BitmapFactory</span>.<span class="f">decodeStream</span>(<span class="t">URL</span>(<span class="v">url</span>).<span class="f">openStream</span>())
+    }
+}
+
+<span class="c">// Proxy: Lazy loading + Caching</span>
+<span class="k">class</span> <span class="t">CachedImageLoader</span>(
+    <span class="k">private val</span> <span class="v">realLoader</span>: <span class="t">ImageLoader</span>
+) : <span class="t">ImageLoader</span> {
+    <span class="k">private val</span> <span class="v">cache</span> = <span class="t">LruCache</span>&lt;<span class="t">String</span>, <span class="t">Bitmap</span>&gt;(<span class="n">50</span>)
+
+    <span class="k">override fun</span> <span class="f">loadImage</span>(<span class="v">url</span>: <span class="t">String</span>): <span class="t">Bitmap</span> {
+        <span class="v">cache</span>.<span class="f">get</span>(<span class="v">url</span>)?.<span class="f">let</span> { <span class="k">return</span> <span class="v">it</span> }
+        <span class="k">val</span> <span class="v">bitmap</span> = <span class="v">realLoader</span>.<span class="f">loadImage</span>(<span class="v">url</span>)
+        <span class="v">cache</span>.<span class="f">put</span>(<span class="v">url</span>, <span class="v">bitmap</span>)
+        <span class="k">return</span> <span class="v">bitmap</span>
+    }
+}
+
+<span class="c">// Protection Proxy: Access control</span>
+<span class="k">class</span> <span class="t">SecureImageLoader</span>(
+    <span class="k">private val</span> <span class="v">realLoader</span>: <span class="t">ImageLoader</span>,
+    <span class="k">private val</span> <span class="v">isPremium</span>: () -> <span class="t">Boolean</span>
+) : <span class="t">ImageLoader</span> {
+    <span class="k">override fun</span> <span class="f">loadImage</span>(<span class="v">url</span>: <span class="t">String</span>): <span class="t">Bitmap</span> {
+        <span class="k">if</span> (!<span class="f">isPremium</span>()) {
+            <span class="k">throw</span> <span class="t">SecurityException</span>(<span class="s">"Premium feature required"</span>)
+        }
+        <span class="k">return</span> <span class="v">realLoader</span>.<span class="f">loadImage</span>(<span class="v">url</span>)
+    }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 4: BEHAVIORAL PATTERNS -->
+<section class="section" id="behavioral">
+    <div class="section-header">
+        <div class="section-icon behavioral">⚡</div>
+        <div class="section-title-group">
+            <h2>أنماط التصميم السلوكية والمعمارية — Behavioral & Architectural Patterns</h2>
+            <p>أنماط تُدير التواصل بين الكائنات وتُنظم سلوك التطبيق وردود الفعل</p>
+        </div>
+    </div>
+
+    <div class="patterns-grid">
+        <!-- Observer -->
+        <div class="pattern-card">
+            <div class="pattern-header">
+                <h4>Observer Pattern</h4>
+                <div class="pattern-sub">الإشعار التلقائي بتغييرات الحالة</div>
+            </div>
+            <div class="pattern-body">
+                <p><strong>السؤال:</strong> كيف تُعلم مكونات متعددة بتغيّر في البيانات دون ربطها ببعضها؟</p>
+                <p><strong>الموقف الحقيقي:</strong> <code>StateFlow</code>، <code>SharedFlow</code>، <code>LiveData</code> — كلها تطبيقات حديثة للـ Observer Pattern في أندرويد.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN — StateFlow & SharedFlow</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="k">class</span> <span class="t">NewsViewModel</span>(
+    <span class="k">private val</span> <span class="v">repository</span>: <span class="t">NewsRepository</span>
+) : <span class="t">ViewModel</span>() {
+
+    <span class="c">// StateFlow: Hot observable with initial value, replays last value</span>
+    <span class="k">private val</span> <span class="v">_articles</span> = <span class="t">MutableStateFlow</span>&lt;<span class="t">List</span>&lt;<span class="t">Article</span>&gt;&gt;(<span class="f">emptyList</span>())
+    <span class="k">val</span> <span class="v">articles</span>: <span class="t">StateFlow</span>&lt;<span class="t">List</span>&lt;<span class="t">Article</span>&gt;&gt; = <span class="v">_articles</span>.<span class="f">asStateFlow</span>()
+
+    <span class="c">// SharedFlow: Events that should not be replayed (one-time events)</span>
+    <span class="k">private val</span> <span class="v">_events</span> = <span class="t">MutableSharedFlow</span>&lt;<span class="t">NewsEvent</span>&gt;(<span class="v">extraBufferCapacity</span> = <span class="n">1</span>)
+    <span class="k">val</span> <span class="v">events</span> = <span class="v">_events</span>.<span class="f">asSharedFlow</span>()
+
+    <span class="k">fun</span> <span class="f">loadNews</span>() {
+        <span class="v">viewModelScope</span>.<span class="f">launch</span> {
+            <span class="v">repository</span>.<span class="f">fetchLatest</span>()
+                .<span class="f">catch</span> { <span class="v">e</span> ->
+                    <span class="v">_events</span>.<span class="f">tryEmit</span>(<span class="t">NewsEvent</span>.<span class="t">ShowError</span>(<span class="v">e</span>.<span class="v">message</span> ?: <span class="s">"Unknown"</span>))
+                }
+                .<span class="f">collect</span> { <span class="v">list</span> ->
+                    <span class="v">_articles</span>.<span class="v">value</span> = <span class="v">list</span>
+                }
+        }
+    }
+}
+
+<span class="c">// In Compose: UI observes automatically</span>
+<span class="k">@Composable</span>
+<span class="k">fun</span> <span class="f">NewsScreen</span>(<span class="v">viewModel</span>: <span class="t">NewsViewModel</span> = <span class="f">viewModel</span>()) {
+    <span class="k">val</span> <span class="v">articles</span> <span class="k">by</span> <span class="v">viewModel</span>.<span class="v">articles</span>.<span class="f">collectAsState</span>()
+    <span class="k">val</span> <span class="v">context</span> = <span class="t">LocalContext</span>.<span class="v">current</span>
+
+    <span class="c">// Collect one-time events</span>
+    <span class="t">LaunchedEffect</span>(<span class="t">Unit</span>) {
+        <span class="v">viewModel</span>.<span class="v">events</span>.<span class="f">collect</span> { <span class="v">event</span> ->
+            <span class="k">when</span> (<span class="v">event</span>) {
+                <span class="k">is</span> <span class="t">NewsEvent.ShowError</span> ->
+                    <span class="t">Toast</span>.<span class="f">makeText</span>(<span class="v">context</span>, <span class="v">event</span>.<span class="v">message</span>, <span class="t">Toast</span>.<span class="v">LENGTH_SHORT</span>).<span class="f">show</span>()
+            }
+        }
+    }
+
+    <span class="t">LazyColumn</span> {
+        <span class="v">items</span>(<span class="v">articles</span>) { <span class="v">article</span> ->
+            <span class="t">ArticleItem</span>(<span class="v">article</span>)
+        }
+    }
+}</code></pre>
+                </div>
+
+                <div class="callout callout-info" style="margin-top:12px;">
+                    <div class="callout-icon">ℹ️</div>
+                    <div class="callout-content">
+                        <h4>StateFlow vs SharedFlow</h4>
+                        <p>استخدم <strong>StateFlow</strong> للحالة التي يجب الاحتفاظ بها (UI State). استخدم <strong>SharedFlow</strong> للأحداث لمرة واحدة (Navigation, Snackbar, Toast) لأنها لا تُعاد تشغيلها عند تغيير الإعدادات.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Repository -->
+        <div class="pattern-card">
+            <div class="pattern-header">
+                <h4>Repository Pattern</h4>
+                <div class="pattern-sub">مصدر واحد للحقيقة للبيانات</div>
+            </div>
+            <div class="pattern-body">
+                <p><strong>السؤال:</strong> كيف تُدّرج البيانات من مصادر متعددة (Local + Remote) بشكل موحد؟</p>
+                <p><strong>الموقف الحقيقي:</strong> جلب المقالات من Room (Offline) وتحديثها من Retrofit (Remote) بشكل شفاف.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN — Repository with Single Source of Truth</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="k">class</span> <span class="t">ArticleRepositoryImpl</span>(
+    <span class="k">private val</span> <span class="v">remote</span>: <span class="t">ArticleRemoteDataSource</span>,
+    <span class="k">private val</span> <span class="v">local</span>: <span class="t">ArticleLocalDataSource</span>,
+    <span class="k">private val</span> <span class="v">networkMonitor</span>: <span class="t">NetworkMonitor</span>
+) : <span class="t">ArticleRepository</span> {
+
+    <span class="k">override fun</span> <span class="f">getArticles</span>(): <span class="t">Flow</span>&lt;<span class="t">Resource</span>&lt;<span class="t">List</span>&lt;<span class="t">Article</span>&gt;&gt;&gt; = <span class="v">flow</span> {
+        <span class="v">emit</span>(<span class="t">Resource</span>.<span class="t">Loading</span>)
+
+        <span class="c">// 1. Emit cached data immediately (fast UI)</span>
+        <span class="k">val</span> <span class="v">cached</span> = <span class="v">local</span>.<span class="f">getArticles</span>().<span class="f">first</span>()
+        <span class="k">if</span> (<span class="v">cached</span>.<span class="f">isNotEmpty</span>()) {
+            <span class="v">emit</span>(<span class="t">Resource</span>.<span class="t">Success</span>(<span class="v">cached</span>))
+        }
+
+        <span class="c">// 2. Fetch from remote if online</span>
+        <span class="k">if</span> (<span class="v">networkMonitor</span>.<span class="f">isOnline</span>()) {
+            <span class="k">try</span> {
+                <span class="k">val</span> <span class="v">remoteArticles</span> = <span class="v">remote</span>.<span class="f">fetchArticles</span>()
+                <span class="v">local</span>.<span class="f">saveArticles</span>(<span class="v">remoteArticles</span>)
+                <span class="v">emit</span>(<span class="t">Resource</span>.<span class="t">Success</span>(<span class="v">remoteArticles</span>))
+            } <span class="k">catch</span> (<span class="v">e</span>: <span class="t">Exception</span>) {
+                <span class="v">emit</span>(<span class="t">Resource</span>.<span class="t">Error</span>(<span class="v">e</span>.<span class="v">message</span> ?: <span class="s">"Network error"</span>, <span class="v">cached</span>))
+            }
+        } <span class="k">else if</span> (<span class="v">cached</span>.<span class="f">isEmpty</span>()) {
+            <span class="v">emit</span>(<span class="t">Resource</span>.<span class="t">Error</span>(<span class="s">"No internet and no cache"</span>, <span class="k">null</span>))
+        }
+    }.<span class="f">flowOn</span>(<span class="t">Dispatchers</span>.<span class="v">IO</span>)
+}
+
+<span class="k">sealed class</span> <span class="t">Resource</span>&lt;<span class="k">out</span> <span class="t">T</span>&gt; {
+    <span class="k">object</span> <span class="t">Loading</span> : <span class="t">Resource</span>&lt;<span class="t">Nothing</span>&gt;()
+    <span class="k">data class</span> <span class="t">Success</span>&lt;<span class="k">out</span> <span class="t">T</span>&gt;(<span class="k">val</span> <span class="v">data</span>: <span class="t">T</span>) : <span class="t">Resource</span>&lt;<span class="t">T</span>&gt;()
+    <span class="k">data class</span> <span class="t">Error</span>&lt;<span class="k">out</span> <span class="t">T</span>&gt;(
+        <span class="k">val</span> <span class="v">message</span>: <span class="t">String</span>,
+        <span class="k">val</span> <span class="v">data</span>: <span class="t">T</span>? = <span class="k">null</span>
+    ) : <span class="t">Resource</span>&lt;<span class="t">T</span>&gt;()
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Strategy -->
+        <div class="pattern-card">
+            <div class="pattern-header">
+                <h4>Strategy Pattern</h4>
+                <div class="pattern-sub">تبديل الخوارزميات ديناميكياً</div>
+            </div>
+            <div class="pattern-body">
+                <p><strong>السؤال:</strong> كيف تُبدل سلوك الكائن في Runtime دون تعديل الكود الأصلي؟</p>
+                <p><strong>الموقف الحقيقي:</strong> خوارزميات ترتيب مختلفة، Feature Flags، أو حسابات ضريبة متعددة حسب الدولة.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN — Strategy Pattern</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="c">// Strategy interface</span>
+<span class="k">interface</span> <span class="t">SortingStrategy</span> {
+    <span class="k">fun</span> <span class="f">sort</span>(<span class="v">products</span>: <span class="t">List</span>&lt;<span class="t">Product</span>&gt;): <span class="t">List</span>&lt;<span class="t">Product</span>&gt;
+}
+
+<span class="c">// Concrete strategies</span>
+<span class="k">class</span> <span class="t">PriceAscendingStrategy</span> : <span class="t">SortingStrategy</span> {
+    <span class="k">override fun</span> <span class="f">sort</span>(<span class="v">products</span>: <span class="t">List</span>&lt;<span class="t">Product</span>&gt;) =
+        <span class="v">products</span>.<span class="f">sortedBy</span> { <span class="v">it</span>.<span class="v">price</span> }
+}
+
+<span class="k">class</span> <span class="t">PriceDescendingStrategy</span> : <span class="t">SortingStrategy</span> {
+    <span class="k">override fun</span> <span class="f">sort</span>(<span class="v">products</span>: <span class="t">List</span>&lt;<span class="t">Product</span>&gt;) =
+        <span class="v">products</span>.<span class="f">sortedByDescending</span> { <span class="v">it</span>.<span class="v">price</span> }
+}
+
+<span class="k">class</span> <span class="t">RatingStrategy</span> : <span class="t">SortingStrategy</span> {
+    <span class="k">override fun</span> <span class="f">sort</span>(<span class="v">products</span>: <span class="t">List</span>&lt;<span class="t">Product</span>&gt;) =
+        <span class="v">products</span>.<span class="f">sortedByDescending</span> { <span class="v">it</span>.<span class="v">rating</span> }
+}
+
+<span class="c">// Context</span>
+<span class="k">class</span> <span class="t">ProductSorter</span>(<span class="k">private var</span> <span class="v">strategy</span>: <span class="t">SortingStrategy</span>) {
+    <span class="k">fun</span> <span class="f">setStrategy</span>(<span class="v">newStrategy</span>: <span class="t">SortingStrategy</span>) {
+        <span class="k">this</span>.<span class="v">strategy</span> = <span class="v">newStrategy</span>
+    }
+    <span class="k">fun</span> <span class="f">sort</span>(<span class="v">products</span>: <span class="t">List</span>&lt;<span class="t">Product</span>&gt;) = <span class="v">strategy</span>.<span class="f">sort</span>(<span class="v">products</span>)
+}
+
+<span class="c">// Usage in ViewModel</span>
+<span class="k">class</span> <span class="t">ProductViewModel</span> : <span class="t">ViewModel</span>() {
+    <span class="k">private val</span> <span class="v">sorter</span> = <span class="t">ProductSorter</span>(<span class="t">PriceAscendingStrategy</span>())
+
+    <span class="k">fun</span> <span class="f">onSortSelected</span>(<span class="v">sortType</span>: <span class="t">SortType</span>) {
+        <span class="k">val</span> <span class="v">strategy</span> = <span class="k">when</span> (<span class="v">sortType</span>) {
+            <span class="t">SortType</span>.<span class="v">PRICE_ASC</span> -> <span class="t">PriceAscendingStrategy</span>()
+            <span class="t">SortType</span>.<span class="v">PRICE_DESC</span> -> <span class="t">PriceDescendingStrategy</span>()
+            <span class="t">SortType</span>.<span class="v">RATING</span> -> <span class="t">RatingStrategy</span>()
+        }
+        <span class="v">sorter</span>.<span class="f">setStrategy</span>(<span class="v">strategy</span>)
+        <span class="c">// Re-sort and emit new state...</span>
+    }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- State -->
+        <div class="pattern-card">
+            <div class="pattern-header">
+                <h4>State Pattern</h4>
+                <div class="pattern-sub">إدارة آلة الحالة (State Machine)</div>
+            </div>
+            <div class="pattern-body">
+                <p><strong>السؤال:</strong> كيف تُدير حالات UI معقدة (Loading, Success, Error, Empty) دون <code>if-else</code> متداخلة؟</p>
+                <p><strong>الموقف الحقيقي:</strong> مشغل الموسيقى (Idle, Playing, Paused, Buffering)، أو خطوات معالجة الطلب.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN — State Pattern with Sealed Interface</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="k">sealed interface</span> <span class="t">PlaybackState</span> {
+    <span class="k">val</span> <span class="v">isPlaying</span>: <span class="t">Boolean</span>
+    <span class="k">fun</span> <span class="f">play</span>(): <span class="t">PlaybackState</span>
+    <span class="k">fun</span> <span class="f">pause</span>(): <span class="t">PlaybackState</span>
+    <span class="k">fun</span> <span class="f">stop</span>(): <span class="t">PlaybackState</span>
+}
+
+<span class="k">data object</span> <span class="t">IdleState</span> : <span class="t">PlaybackState</span> {
+    <span class="k">override val</span> <span class="v">isPlaying</span> = <span class="k">false</span>
+    <span class="k">override fun</span> <span class="f">play</span>() = <span class="t">PlayingState</span>(<span class="f">System.currentTimeMillis</span>())
+    <span class="k">override fun</span> <span class="f">pause</span>() = <span class="k">this</span>
+    <span class="k">override fun</span> <span class="f">stop</span>() = <span class="k">this</span>
+}
+
+<span class="k">data class</span> <span class="t">PlayingState</span>(<span class="k">val</span> <span class="v">startTime</span>: <span class="t">Long</span>) : <span class="t">PlaybackState</span> {
+    <span class="k">override val</span> <span class="v">isPlaying</span> = <span class="k">true</span>
+    <span class="k">override fun</span> <span class="f">play</span>() = <span class="k">this</span>
+    <span class="k">override fun</span> <span class="f">pause</span>() = <span class="t">PausedState</span>(<span class="f">elapsedTime</span>())
+    <span class="k">override fun</span> <span class="f">stop</span>() = <span class="t">IdleState</span>
+    <span class="k">private fun</span> <span class="f">elapsedTime</span>() = <span class="f">System.currentTimeMillis</span>() - <span class="v">startTime</span>
+}
+
+<span class="k">data class</span> <span class="t">PausedState</span>(<span class="k">val</span> <span class="v">elapsedMs</span>: <span class="t">Long</span>) : <span class="t">PlaybackState</span> {
+    <span class="k">override val</span> <span class="v">isPlaying</span> = <span class="k">false</span>
+    <span class="k">override fun</span> <span class="f">play</span>() = <span class="t">PlayingState</span>(<span class="f">System.currentTimeMillis</span>() - <span class="v">elapsedMs</span>)
+    <span class="k">override fun</span> <span class="f">pause</span>() = <span class="k">this</span>
+    <span class="k">override fun</span> <span class="f">stop</span>() = <span class="t">IdleState</span>
+}
+
+<span class="k">class</span> <span class="t">MediaPlayer</span> {
+    <span class="k">private var</span> <span class="v">state</span>: <span class="t">PlaybackState</span> = <span class="t">IdleState</span>
+
+    <span class="k">fun</span> <span class="f">play</span>() { <span class="v">state</span> = <span class="v">state</span>.<span class="f">play</span>() }
+    <span class="k">fun</span> <span class="f">pause</span>() { <span class="v">state</span> = <span class="v">state</span>.<span class="f">pause</span>() }
+    <span class="k">fun</span> <span class="f">stop</span>() { <span class="v">state</span> = <span class="v">state</span>.<span class="f">stop</span>() }
+    <span class="k">fun</span> <span class="f">isPlaying</span>() = <span class="v">state</span>.<span class="v">isPlaying</span>
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Command -->
+        <div class="pattern-card">
+            <div class="pattern-header">
+                <h4>Command Pattern</h4>
+                <div class="pattern-sub">تغليف الطلبات ككائنات</div>
+            </div>
+            <div class="pattern-body">
+                <p><strong>السؤال:</strong> كيف تُغلّف عملية ككائن لتُنفذ لاحقاً، أو تُلغي، أو تُجدول؟</p>
+                <p><strong>الموقف الحقيقي:</strong> Undo/Redo في محرر نصوص، أو Queue للطلبات في حالة Offline.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">KOTLIN — Command Pattern</span>
+                        <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+                    </div>
+                    <pre><code><span class="c">// Command interface</span>
+<span class="k">interface</span> <span class="t">Command</span> {
+    <span class="k">suspend fun</span> <span class="f">execute</span>()
+    <span class="k">suspend fun</span> <span class="f">undo</span>()
+}
+
+<span class="c">// Concrete command: Sync when back online</span>
+<span class="k">class</span> <span class="t">SyncArticleCommand</span>(
+    <span class="k">private val</span> <span class="v">article</span>: <span class="t">Article</span>,
+    <span class="k">private val</span> <span class="v">remote</span>: <span class="t">ArticleRemoteDataSource</span>,
+    <span class="k">private val</span> <span class="v">local</span>: <span class="t">ArticleLocalDataSource</span>
+) : <span class="t">Command</span> {
+    <span class="k">private var</span> <span class="v">previousSyncStatus</span>: <span class="t">Boolean</span> = <span class="k">false</span>
+
+    <span class="k">override suspend fun</span> <span class="f">execute</span>() {
+        <span class="v">previousSyncStatus</span> = <span class="v">article</span>.<span class="v">isSynced</span>
+        <span class="k">val</span> <span class="v">response</span> = <span class="v">remote</span>.<span class="f">createArticle</span>(<span class="v">article</span>)
+        <span class="v">local</span>.<span class="f">markAsSynced</span>(<span class="v">article</span>.<span class="v">id</span>, <span class="v">response</span>.<span class="v">serverId</span>)
+    }
+
+    <span class="k">override suspend fun</span> <span class="f">undo</span>() {
+        <span class="v">local</span>.<span class="f">updateSyncStatus</span>(<span class="v">article</span>.<span class="v">id</span>, <span class="v">previousSyncStatus</span>)
+    }
+}
+
+<span class="c">// Invoker: Command Queue for offline support</span>
+<span class="k">class</span> <span class="t">OfflineCommandQueue</span>(
+    <span class="k">private val</span> <span class="v">networkMonitor</span>: <span class="t">NetworkMonitor</span>
+) {
+    <span class="k">private val</span> <span class="v">queue</span> = <span class="t">ArrayDeque</span>&lt;<span class="t">Command</span>&gt;()
+    <span class="k">private val</span> <span class="v">history</span> = <span class="t">ArrayDeque</span>&lt;<span class="t">Command</span>&gt;()
+
+    <span class="k">fun</span> <span class="f">enqueue</span>(<span class="v">command</span>: <span class="t">Command</span>) {
+        <span class="v">queue</span>.<span class="f">addLast</span>(<span class="v">command</span>)
+        <span class="f">processQueue</span>()
+    }
+
+    <span class="k">private fun</span> <span class="f">processQueue</span>() {
+        <span class="k">if</span> (!<span class="v">networkMonitor</span>.<span class="f">isOnline</span>()) <span class="k">return</span>
+        <span class="t">CoroutineScope</span>(<span class="t">Dispatchers</span>.<span class="v">IO</span>).<span class="f">launch</span> {
+            <span class="k">while</span> (<span class="v">queue</span>.<span class="f">isNotEmpty</span>()) {
+                <span class="k">val</span> <span class="v">cmd</span> = <span class="v">queue</span>.<span class="f">removeFirst</span>()
+                <span class="k">try</span> {
+                    <span class="v">cmd</span>.<span class="f">execute</span>()
+                    <span class="v">history</span>.<span class="f">addLast</span>(<span class="v">cmd</span>)
+                } <span class="k">catch</span> (<span class="v">e</span>: <span class="t">Exception</span>) {
+                    <span class="v">queue</span>.<span class="f">addFirst</span>(<span class="v">cmd</span>) <span class="c">// Retry later</span>
+                    <span class="k">break</span>
+                }
+            }
+        }
+    }
+
+    <span class="k">suspend fun</span> <span class="f">undoLast</span>() {
+        <span class="v">history</span>.<span class="f">removeLastOrNull</span>()?.<span class="f">undo</span>()
+    }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 5: DECISION MATRIX -->
+<section class="section" id="matrix">
+    <div class="matrix-section">
+        <div class="section-header">
+            <div class="section-icon matrix">📊</div>
+            <div class="section-title-group">
+                <h2>مصفوفة اتخاذ القرار — Practical Decision Matrix</h2>
+                <p>متى تستخدم كل نمط؟ دليل سريع يُوافق المشكلة على الحل الأمثل</p>
+            </div>
+        </div>
+
+        <div class="matrix-table-wrapper">
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th style="width:28%;">المشكلة / السيناريو</th>
+                        <th style="width:28%;">النمط / المعمارية المُوصى بها</th>
+                        <th style="width:44%;">الأدوات والميزات الرئيسية في Kotlin</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>تطبيق بسيط (1-3 شاشات) مع بيانات محلية فقط</td>
+                        <td><span class="matrix-tag">MVVM</span></td>
+                        <td><span class="matrix-tag purple">ViewModel</span> <span class="matrix-tag teal">LiveData</span> <span class="matrix-tag">Room</span></td>
+                    </tr>
+                    <tr>
+                        <td>تطبيق متوسط يحتاج Offline Support مع Remote Sync</td>
+                        <td><span class="matrix-tag">MVVM + Repository</span></td>
+                        <td><span class="matrix-tag purple">Room + Retrofit</span> <span class="matrix-tag teal">Flow</span> <span class="matrix-tag">WorkManager</span></td>
+                    </tr>
+                    <tr>
+                        <td>تطبيق كبير بفريق متعدد مع complext business logic</td>
+                        <td><span class="matrix-tag">Clean Architecture + MVI</span></td>
+                        <td><span class="matrix-tag purple">UseCases</span> <span class="matrix-tag teal">StateFlow</span> <span class="matrix-tag">Sealed Classes</span> <span class="matrix-tag orange">Hilt DI</span></td>
+                    </tr>
+                    <tr>
+                        <td>معالجة نماذج معقدة (Forms) بخطوات متعددة وتحقق</td>
+                        <td><span class="matrix-tag">MVI + State Machine</span></td>
+                        <td><span class="matrix-tag purple">Sealed Interface</span> <span class="matrix-tag teal">copy()</span> <span class="matrix-tag">Derived State</span></td>
+                    </tr>
+                    <tr>
+                        <td>تكامل SDK خارجي بواجهة معقدة أو قديمة</td>
+                        <td><span class="matrix-tag">Facade + Adapter</span></td>
+                        <td><span class="matrix-tag purple">Extension Functions</span> <span class="matrix-tag teal">Wrapper Class</span></td>
+                    </tr>
+                    <tr>
+                        <td>دعم بوابات دفع متعددة حسب المنطقة</td>
+                        <td><span class="matrix-tag">Strategy + Factory</span></td>
+                        <td><span class="matrix-tag purple">when expression</span> <span class="matrix-tag teal">Interface Segregation</span></td>
+                    </tr>
+                    <tr>
+                        <td>إدارة حالة مشغل موسيقى / فيديو (Idle, Playing, Paused)</td>
+                        <td><span class="matrix-tag">State Pattern</span></td>
+                        <td><span class="matrix-tag purple">Sealed Interface</span> <span class="matrix-tag teal">data object</span></td>
+                    </tr>
+                    <tr>
+                        <td>Queue للطلبات أثناء عدم الاتصال (Offline Queue)</td>
+                        <td><span class="matrix-tag">Command + Observer</span></td>
+                        <td><span class="matrix-tag purple">ArrayDeque</span> <span class="matrix-tag teal">CoroutineScope</span> <span class="matrix-tag">Flow</span></td>
+                    </tr>
+                    <tr>
+                        <td>إضافة Logging / Auth Headers لكل طلب HTTP</td>
+                        <td><span class="matrix-tag">Decorator Pattern</span></td>
+                        <td><span class="matrix-tag purple">OkHttp Interceptors</span> <span class="matrix-tag teal">Wrapper</span></td>
+                    </tr>
+                    <tr>
+                        <td>صور كبيرة تحتاج Lazy Loading + Caching</td>
+                        <td><span class="matrix-tag">Proxy + Singleton</span></td>
+                        <td><span class="matrix-tag purple">LruCache</span> <span class="matrix-tag teal">lazy {}</span> <span class="matrix-tag">Coil/Glide</span></td>
+                    </tr>
+                    <tr>
+                        <td>تطبيق Enterprise Multi-Module بفريقين+</td>
+                        <td><span class="matrix-tag">Clean Arch + Modularization</span></td>
+                        <td><span class="matrix-tag purple">Gradle Modules</span> <span class="matrix-tag teal">Feature Module</span> <span class="matrix-tag orange">Hilt</span></td>
+                    </tr>
+                    <tr>
+                        <td>نظام إشعارات معقد (Notification Channels, Actions)</td>
+                        <td><span class="matrix-tag">Builder Pattern</span></td>
+                        <td><span class="matrix-tag purple">NotificationCompat.Builder</span> <span class="matrix-tag teal">apply {}</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- SUMMARY -->
+<section class="section" id="summary">
+    <div class="summary-card">
+        <h3>🎯 نصائح Senior Architect — خلاصة ذهبية</h3>
+        <ul>
+            <li>
+                <span class="check">✓</span>
+                <div>
+                    <strong>تجنب Over-Engineering:</strong> لا تُطبق Clean Architecture لتطبيق To-Do بسيط. ابدأ بأبسط نمط يحل المشكلة، ثم طوّر عندما يتضخم الكود.
+                </div>
+            </li>
+            <li>
+                <span class="check">✓</span>
+                <div>
+                    <strong>State هو الملك:</strong> في عالم Jetpack Compose، اجعل State مركزياً في ViewModel ولا تُنشئ Multiple Sources of Truth. كل State يجب أن يكون Immutable.
+                </div>
+            </li>
+            <li>
+                <span class="check">✓</span>
+                <div>
+                    <strong>Dependency Injection ضروري:</strong> استخدم Hilt أو Koin من اليوم الأول. Singletons المباشرة تجعل الاختبار مستحيلاً.
+                </div>
+            </li>
+            <li>
+                <span class="check">✓</span>
+                <div>
+                    <strong>فصل Domain عن Framework:</strong> Domain Layer يجب أن يكون Pure Kotlin. لا تُدخل Android SDK أو Retrofit في UseCases.
+                </div>
+            </li>
+            <li>
+                <span class="check">✓</span>
+                <div>
+                    <strong>اختبر المنطق لا الـ UI:</strong> 80% من اختباراتك يجب أن تكون Unit Tests للـ UseCases و ViewModels. UI Tests مكلفة وبطيئة.
+                </div>
+            </li>
+            <li>
+                <span class="check">✓</span>
+                <div>
+                    <strong>Sealed Classes هي صديقك:</strong> استخدم <code>sealed interface</code> لتمثيل State و Events. هذا يُجبر Compiler على التعامل مع كل الحالات (Exhaustive when).
+                </div>
+            </li>
+            <li>
+                <span class="check">✓</span>
+                <div>
+                    <strong>Repository Pattern للبيانات:</strong> دائماً استخدم Repository كـ Single Source of Truth. لا تدع ViewModel يتحدث مباشرةً مع Retrofit أو Room.
+                </div>
+            </li>
+            <li>
+                <span class="check">✓</span>
+                <div>
+                    <strong>Flow على LiveData:</strong> في Compose و Kotlin Coroutines، <code>StateFlow</code> و <code>SharedFlow</code> هما المعيار الحديث. LiveData مفيد فقط في XML Views.
+                </div>
+            </li>
+        </ul>
+    </div>
+</section>
+
+</main>
+
+<footer class="footer">
+    <p>تم إعداد هذا الدليل كمرجع شامل لمهندسي أندرويد السينيور · <span style="color:var(--green); font-weight:700;">Kotlin & Android Architecture Patterns</span></p>
+    <p style="margin-top:8px; opacity:0.7;">Built with modern HTML, CSS Grid, and interactive Q&A accordions · Fully RTL Arabic Support</p>
+</footer>
+
+<script>
+    // Accordion toggle
+    function toggleCard(element) {
+        const card = element.closest('.qa-card');
+        const wasOpen = card.classList.contains('open');
+
+        // Close all cards in the same section (optional: comment out for multiple open)
+        // card.closest('.section').querySelectorAll('.qa-card').forEach(c => c.classList.remove('open'));
+
+        if (!wasOpen) {
+            card.classList.add('open');
+        } else {
+            card.classList.remove('open');
+        }
+    }
+
+    // Active nav link on scroll
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav a');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (scrollY >= sectionTop - 120) {
+                current = section.getAttribute('id');
+            }
+        });
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    });
+
+    // Smooth scroll for nav links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

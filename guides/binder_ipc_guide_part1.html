@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الدليل الشامل لمحرك التواصل Binder IPC وعزل العمليات - الجزء الأول</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+@page {
+  size: A4;
+  margin: 16mm 14mm;
+  background-color: #f8fafc;
+  @top-center { content: "الدليل الشامل لمحرك Binder IPC — الجزء الأول"; font-size: 9pt; color: #64748b; }
+  @bottom-center { content: "صفحة " counter(page) " من " counter(pages); font-size: 9pt; color: #64748b; }
+}
+:root {
+  --header-bg: #0f172a; --accent-blue: #2563eb; --accent-purple: #7c3aed;
+  --accent-red: #e11d48; --warn-bg: #fff1f2; --code-bg: #0f172a;
+  --text-primary: #1e293b; --text-secondary: #475569; --card-bg: #ffffff;
+  --border-color: #e2e8f0; --diagram-bg: #f1f5f9;
+}
+body {
+  font-family: "Segoe UI", "Tahoma", "Arial", "Noto Sans Arabic", sans-serif;
+  background-color: #f8fafc; color: var(--text-primary); line-height: 1.85;
+  font-size: 11.5pt; direction: rtl; text-align: right;
+}
+.header-banner {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+  color: #ffffff; padding: 2.5rem 2rem; text-align: center;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.25);
+  position: relative; overflow: hidden; margin-bottom: 2rem;
+}
+.header-banner::before {
+  content: ""; position: absolute; top: -50%; right: -20%; width: 60%; height: 200%;
+  background: radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.header-banner h1 { font-size: 1.85rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -0.5px; }
+.header-banner .subtitle { font-size: 1rem; opacity: 0.85; font-weight: 500; }
+.header-banner .meta {
+  margin-top: 1rem; font-size: 0.85rem; opacity: 0.7;
+  display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;
+}
+.header-banner .badge {
+  background: rgba(255,255,255,0.12); padding: 0.25rem 0.75rem;
+  border-radius: 20px; border: 1px solid rgba(255,255,255,0.15);
+}
+.container { max-width: 210mm; margin: 0 auto; padding: 0 1rem; }
+.section {
+  background: var(--card-bg); border-radius: 14px; padding: 1.75rem 2rem;
+  margin-bottom: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  border: 1px solid var(--border-color); page-break-inside: avoid;
+}
+.section-title {
+  font-size: 1.35rem; font-weight: 700; color: var(--header-bg);
+  margin-bottom: 1.25rem; padding-bottom: 0.6rem;
+  border-bottom: 3px solid var(--accent-blue);
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.section-title .icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; background: var(--accent-blue);
+  color: #fff; border-radius: 8px; font-size: 1rem; font-weight: 700;
+}
+.subsection-title {
+  font-size: 1.1rem; font-weight: 700; color: var(--accent-purple);
+  margin: 1.5rem 0 0.75rem 0; padding-right: 0.75rem;
+  border-right: 4px solid var(--accent-purple);
+}
+p { margin-bottom: 1rem; text-align: justify; text-align-last: right; color: var(--text-primary); }
+pre, code { direction: ltr !important; text-align: left !important; unicode-bidi: embed; }
+pre {
+  background: var(--code-bg); color: #e2e8f0; padding: 1.25rem; border-radius: 10px;
+  overflow-x: auto; font-family: "Fira Code", "Consolas", "Monaco", "Courier New", monospace;
+  font-size: 9.5pt; line-height: 1.6; margin: 1rem 0;
+  border: 1px solid #334155; box-shadow: inset 0 2px 8px rgba(0,0,0,0.3);
+}
+code {
+  background: #f1f5f9; color: #0f172a; padding: 0.15rem 0.4rem; border-radius: 4px;
+  font-family: "Fira Code", "Consolas", "Monaco", "Courier New", monospace;
+  font-size: 0.92em; border: 1px solid #e2e8f0;
+}
+pre code { background: transparent; color: inherit; padding: 0; border: none; font-size: inherit; }
+.keyword { color: #c084fc; font-weight: 600; }
+.type { color: #38bdf8; }
+.string { color: #a3e635; }
+.comment { color: #94a3b8; font-style: italic; }
+.function { color: #fbbf24; }
+.number { color: #fb923c; }
+.macro { color: #f472b6; }
+.code-caption {
+  background: #1e293b; color: #94a3b8; padding: 0.4rem 1.25rem;
+  font-size: 0.8rem; border-radius: 10px 10px 0 0; margin-bottom: -0.5rem;
+  border: 1px solid #334155; border-bottom: none;
+  font-family: "Fira Code", monospace;
+}
+.diagram-box {
+  background: var(--diagram-bg); border: 2px dashed #cbd5e1;
+  border-radius: 12px; padding: 1.5rem; margin: 1.25rem 0; overflow-x: auto;
+}
+.diagram-box pre {
+  background: transparent; color: var(--text-primary); border: none;
+  box-shadow: none; padding: 0; margin: 0; font-size: 9pt; line-height: 1.4;
+}
+.diagram-legend { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 0.75rem; font-size: 0.85rem; }
+.legend-item { display: flex; align-items: center; gap: 0.4rem; }
+.legend-color { width: 14px; height: 14px; border-radius: 3px; }
+.info-card {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-right: 5px solid var(--accent-blue); padding: 1rem 1.25rem;
+  border-radius: 8px; margin: 1rem 0;
+}
+.info-card strong { color: var(--accent-blue); }
+.warning-card {
+  background: var(--warn-bg); border-right: 5px solid var(--accent-red);
+  padding: 1rem 1.25rem; border-radius: 8px; margin: 1rem 0;
+}
+.warning-card strong { color: var(--accent-red); }
+.purple-card {
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+  border-right: 5px solid var(--accent-purple); padding: 1rem 1.25rem;
+  border-radius: 8px; margin: 1rem 0;
+}
+.purple-card strong { color: var(--accent-purple); }
+ul, ol { margin: 0.75rem 1.5rem 1rem 0; padding-right: 1.5rem; }
+li { margin-bottom: 0.5rem; }
+.comparison-table {
+  width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 10.5pt;
+}
+.comparison-table th {
+  background: var(--header-bg); color: #fff; padding: 0.75rem 1rem;
+  text-align: right; font-weight: 600;
+}
+.comparison-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); text-align: right; }
+.comparison-table tr:nth-child(even) { background: #f8fafc; }
+.comparison-table tr:hover { background: #f1f5f9; }
+.timeline { position: relative; padding-right: 2rem; margin: 1.5rem 0; }
+.timeline::before {
+  content: ""; position: absolute; right: 8px; top: 0; bottom: 0; width: 3px;
+  background: linear-gradient(to bottom, var(--accent-blue), var(--accent-purple));
+  border-radius: 3px;
+}
+.timeline-step { position: relative; margin-bottom: 1.5rem; padding-right: 1.5rem; }
+.timeline-step::before {
+  content: attr(data-step); position: absolute; right: -2rem; top: 0;
+  width: 28px; height: 28px; background: var(--accent-blue); color: #fff;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 700; border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+}
+.timeline-step-title { font-weight: 700; color: var(--header-bg); font-size: 1.05rem; margin-bottom: 0.4rem; }
+.memory-layout {
+  display: flex; flex-direction: column; gap: 2px; margin: 1rem 0;
+  border: 2px solid #334155; border-radius: 8px; overflow: hidden;
+  font-family: "Fira Code", monospace; font-size: 9pt;
+}
+.memory-row { display: flex; align-items: center; padding: 0.4rem 0.75rem; color: #fff; }
+.memory-row .offset { width: 80px; color: #94a3b8; font-size: 0.85em; flex-shrink: 0; }
+.memory-row .bytes { flex: 1; font-family: monospace; letter-spacing: 1px; }
+.memory-row .desc { width: 160px; text-align: left; color: #cbd5e1; font-size: 0.85em; }
+.document-footer {
+  margin-top: 3rem; padding: 1.5rem; background: var(--header-bg);
+  color: rgba(255,255,255,0.7); text-align: center;
+  border-radius: 14px 14px 0 0; font-size: 0.9rem;
+}
+.document-footer a { color: #60a5fa; text-decoration: none; }
+@media print {
+  body { background: #fff; }
+  .section { box-shadow: none; border: 1px solid #ddd; }
+  pre { white-space: pre-wrap; word-wrap: break-word; }
+}
+</style>
+</head>
+<body>
+
+<div class="header-banner">
+  <h1>الدليل الشامل لمحرك التواصل Binder IPC وعزل العمليات</h1>
+  <div class="subtitle">الجزء الأول — البلوك 6: اليوم 11-12</div>
+  <div class="meta">
+    <span class="badge">📘 Android OS Internals</span>
+    <span class="badge">🔧 Low-Level IPC</span>
+    <span class="badge">⚡ Performance & Security</span>
+    <span class="badge">🛡️ Process Isolation</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ============================================================ -->
+<!-- SECTION 1: Process Isolation & Binder Philosophy             -->
+<!-- ============================================================ -->
+<div class="section">
+  <div class="section-title">
+    <span class="icon">1</span>
+    عزل العمليات وفلسفة مشغل Binder
+  </div>
+
+  <div class="subsection-title">نموذج عزل العمليات في Linux مقابل نموذج أمان Android</div>
+  <p>
+    يُعدّ <strong>عزل العمليات (Process Isolation)</strong> من الركائز الأساسية التي تبنى عليها أنظمة التشغيل الحديثة. في نواة Linux، يتم تخصيص مساحة عنوان (Address Space) منفصلة لكل عملية (Process)، مما يضمن أن ذاكرة العملية A لا يمكنها الوصول المباشر إلى ذاكرة العملية B إلا عبر آليات IPC (Inter-Process Communication) مراقبة من النواة.
+  </p>
+  <p>
+    في Android، يتم ترقية هذا النموذج عبر مفهوم <strong>Sandboxing</strong>: كل تطبيق يعمل بـ <code>UID</code> فريد (User ID) ومجموعة <code>GID</code> خاصة به، ويتم تشغيله في عملية <code>zygote</code> منفصلة. هذا يعني أن حتى لو تم اختراق تطبيق واحد، فإن الوصول إلى بيانات تطبيق آخر يتطلب تجاوز آليات IPC والأمان في النواة.
+  </p>
+
+  <div class="diagram-box">
+    <pre>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        Android Process Isolation Model                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐   │
+│   │   App Process A  │     │   App Process B  │     │  System Server   │   │
+│   │   (UID: 10001)   │     │   (UID: 10002)   │     │   (UID: 1000)    │   │
+│   │  ┌────────────┐  │     │  ┌────────────┐  │     │  ┌────────────┐  │   │
+│   │  │ User Space │  │     │  │ User Space │  │     │  │ User Space │  │   │
+│   │  │  Address   │  │     │  │  Address   │  │     │  │  Address   │  │   │
+│   │  │   Space    │  │     │  │   Space    │  │     │  │   Space    │  │   │
+│   │  └─────┬──────┘  │     │  └─────┬──────┘  │     │  └─────┬──────┘  │   │
+│   │        │         │     │        │         │     │        │         │   │
+│   │   ┌────┴────┐    │     │   ┌────┴────┐    │     │   ┌────┴────┐    │   │
+│   │   │ /dev/   │◄───┼─────┼──►│ /dev/   │    │     │   │ /dev/   │    │   │
+│   │   │ binder  │    │     │   │ binder  │    │     │   │ binder  │    │   │
+│   │   └────┬────┘    │     │   └────┬────┘    │     │   └────┬────┘    │   │
+│   └────────┼─────────┘     └────────┼─────────┘     └────────┼─────────┘   │
+│            │                        │                        │             │
+│            └────────────────────────┼────────────────────────┘             │
+│                                     ▼                                      │
+│   ╔══════════════════════════════════════════════════════════════════════╗  │
+│   ║                    Binder Kernel Driver (/dev/binder)               ║  │
+│   ║         Trusted Middleman — Validates UID/PID on every transaction  ║  │
+│   ╚══════════════════════════════════════════════════════════════════════╝  │
+│                                     │                                      │
+│                              ┌──────┴──────┐                               │
+│                              │ Linux Kernel │                              │
+│                              │  Memory Mgmt │                              │
+│                              └─────────────┘                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+    </pre>
+    <div class="diagram-legend">
+      <div class="legend-item"><div class="legend-color" style="background:#2563eb"></div> مساحة عنوان العملية</div>
+      <div class="legend-item"><div class="legend-color" style="background:#7c3aed"></div> حدود IPC (IPC Boundary)</div>
+      <div class="legend-item"><div class="legend-color" style="background:#0f172a"></div> نواة Linux + Binder Driver</div>
+    </div>
+  </div>
+
+  <div class="subsection-title">لماذا آليات IPC التقليدية غير كافية لنظام تشغيل متنقل؟</div>
+  <p>
+    تدعم Linux عدة آليات IPC تقليدية مثل <code>Unix Domain Sockets</code>، <code>Shared Memory (shm)</code>، و <code>System V Message Queues</code>. لكن هذه الآليات تواجه تحديات جوهرية في بيئة Android:
+  </p>
+  <ul>
+    <li><strong>الأمان (Security):</strong> لا تُجري Sockets التحقق من هوية المرسل (UID/PID) بشكل موثوق على كل رسالة، مما يُسهّل هجمات انتحال الهوية (Identity Spoofing).</li>
+    <li><strong>استهلاك الطاقة (Power Consumption):</strong> آليات النسخ المزدوج (Double-Copy) في Sockets تُرهق وحدة المعالجة والذاكرة، مما يقلل عمر البطارية.</li>
+    <li><strong>تأخير الاستجابة (Latency):</strong> في نظام متنقل، يجب أن تكتمل مكالمات IPC في أجزاء من الميلي ثانية. آليات System V IPC تتطلب سياقات تبديل (Context Switches) مكلفة.</li>
+    <li><strong>إدارة دورة الحياة (Lifecycle Management):</strong> Android يحتاج إلى آلية IPC تدعم "الموت الودي" (Graceful Death) لعمليات الخدمة وإعادة تشغيلها تلقائياً عند الطلب.</li>
+  </ul>
+
+  <div class="purple-card">
+    <strong>💡 الفلسفة الأساسية لـ Binder:</strong> بدلاً من أن تكون IPC مجرد "أنبوب نقل بيانات"، صمّم Binder ليكون <strong>إطار عمل موجه للكائنات (Object-Oriented IPC Framework)</strong>. يمكن للعميل استدعاء طرق (Methods) على كائن بعيد كما لو كان محلياً، مع ضمانات أمان مدمجة على مستوى النواة.
+  </div>
+
+  <div class="subsection-title">دور مشغل <code>/dev/binder</code> في فضاء النواة</div>
+  <p>
+    يعمل <code>Binder Kernel Driver</code> كـ <strong>وسيط موثوق به (Trusted Middleman)</strong> بين جميع عمليات Android. عند فتح أي عملية لملف الجهاز <code>/dev/binder</code>، تقوم النواة بتسجيل:
+  </p>
+  <ul>
+    <li><code>PID</code> (معرّف العملية) الخاص بالمتصل.</li>
+    <li><code>UID</code> (معرّف المستخدم) الخاص بالتطبيق.</li>
+    <li>حجم المخزن المؤقت (Buffer) المخصص عبر <code>mmap()</code>.</li>
+  </ul>
+  <p>
+    عند وصول أي معاملة (Transaction)، يتحقق Binder Driver من هوية المرسل ويُرفقها كبيانات وصفية (Metadata) في الرسالة الواردة إلى الخادم، مما يتيح للخادم اتخاذ قرارات أمان دقيقة عبر <code>Binder.getCallingUid()</code>.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 2: Memory Architecture & Single-Copy Mechanics       -->
+<!-- ============================================================ -->
+<div class="section">
+  <div class="section-title">
+    <span class="icon">2</span>
+    بنية الذاكرة وآلية النسخ الأحادي (Single-Copy)
+  </div>
+
+  <div class="subsection-title">تكلفة النسخ المزدوج في IPC التقليدي</div>
+  <p>
+    في آليات IPC الكلاسيكية مثل Pipes أو Sockets، تمر البيانات عبر مسار يتضمن <strong>نسختين</strong>:
+  </p>
+  <ol>
+    <li><strong>النسخة الأولى:</strong> نسخ البيانات من مساحة عنوان العميل (User Space) إلى مخزن مؤقت داخل النواة (Kernel Space).</li>
+    <li><strong>النسخة الثانية:</strong> نسخ البيانات من مخزن النواة إلى مساحة عنوان الخادم (User Space).</li>
+  </ol>
+
+  <div class="diagram-box">
+    <pre>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    Traditional IPC: Double-Copy Overhead                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   Client Process                    Kernel Space                 Server     │
+│   User Space                                                             │
+│                                                                             │
+│   ┌──────────────┐                ┌──────────────┐                ┌──────┐   │
+│   │  App Buffer  │─── COPY 1 ───►│ Kernel Buffer│─── COPY 2 ───►│ App  │   │
+│   │   (User)     │   (memcpy)     │   (Kernel)   │   (memcpy)     │Buffer│   │
+│   └──────────────┘                └──────────────┘                └──────┘   │
+│                                                                             │
+│   ⚠️  تكلفة: نسختان من memcpy + تبديل سياق (Context Switch) × 2            │
+│   ⚠️  استهلاك ذاكرة مضاعف (Kernel Buffer مؤقت + App Buffer نهائي)           │
+│   ⚠️  تلويث ذاكرة التخزين المؤقت (Cache Pollution) بسبب مرور البيانات      │
+└─────────────────────────────────────────────────────────────────────────────┘
+    </pre>
+  </div>
+
+  <div class="subsection-title">تحسين Binder عبر <code>mmap()</code> وآلية النسخة الواحدة</div>
+  <p>
+    يستخدم Binder تقنية ذكية تعتمد على <code>mmap()</code> لتقليل النسخ إلى <strong>نسخة واحدة فقط (Single-Copy)</strong>:
+  </p>
+  <ul>
+    <li>عند بدء تشغيل العملية، يستدعي Binder User-Space دالة <code>mmap()</code> على <code>/dev/binder</code> لتخصيص منطقة ذاكرة مشتركة بين العملية والنواة.</li>
+    <li>عندما يريد العميل إرسال بيانات، يكتبها مباشرة في هذه المنطقة المشتركة (نسخة واحدة فقط من User Space إلى Kernel-Mapped Buffer).</li>
+    <li>الخادم يقرأ البيانات من <strong>نفس</strong> المنطقة المشتركة دون الحاجة إلى نسخ ثانٍ — يتم فقط تعديل جدول صفحات الذاكرة (Page Table) ليُظهر أن هذه الصفحات تنتمي الآن إلى مساحة عنوان الخادم.</li>
+  </ul>
+
+  <div class="diagram-box">
+    <pre>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│              Binder IPC: Single-Copy via mmap() Optimization                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   Client Process                    Kernel Space                 Server     │
+│   User Space                                                             │
+│                                                                             │
+│   ┌──────────────┐                ┌──────────────────────────────┐           │
+│   │  App Buffer  │─── COPY 1 ───►│  Shared Memory Region        │           │
+│   │   (User)     │   (memcpy)     │  (mmap'd via /dev/binder)    │           │
+│   └──────────────┘                └──────────────┬───────────────┘           │
+│                                                │                           │
+│                                                │  Page Table Remap          │
+│                                                │  (Zero-Copy Read)          │
+│                                                ▼                           │
+│                                         ┌──────────────┐                   │
+│                                         │  App Buffer  │                   │
+│                                         │   (User)     │                   │
+│                                         └──────────────┘                   │
+│                                                                             │
+│   ✅  نسخة واحدة فقط (Client → Shared Region)                              │
+│   ✅  القراءة عبر إعادة تعيين الصفحات (Page Table Manipulation)             │
+│   ✅  لا يوجد Buffer مؤقت إضافي في Kernel Space                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+    </pre>
+  </div>
+
+  <div class="info-card">
+    <strong>🔬 التفاصيل التقنية لـ <code>mmap()</code>:</strong> عند استدعاء <code>mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0)</code> على واصف ملف <code>/dev/binder</code>، تقوم النواة بتخصيص صفحات ذاكرة افتراضية (Virtual Pages) لا تُحجز فعلياً إلا عند الكتابة (Copy-on-Write). هذا يعني أن العملية لا تستهلك ذاكرة فعلية إلا عند الحاجة، مما يُحسّن كثافة الذاكرة (Memory Density) في الأنظمة ذات الموارد المحدودة.
+  </div>
+
+  <div class="subsection-title">حدود مخزن Binder وفهم <code>TransactionTooLargeException</code></div>
+  <p>
+    يأتي التحسين السابق مع قيود صارمة. يتم تخصيص مخزن Binder بسعة <strong>1 ميغابايت (1MB)</strong> افتراضياً لكل عملية تطبيق، وهذا المخزن <strong>مشترك</strong> بين جميع المعاملات النشطة (Active Transactions) في نفس الوقت.
+  </p>
+
+  <div class="warning-card">
+    <strong>⚠️ خطر TransactionTooLargeException:</strong> إذا حاولت إرسال Parcel يتجاوز الحجم المتاح (مثلاً قائمة كبيرة من الكائنات أو Bitmap ضخم)، يرمي Binder Driver استثناء <code>TransactionTooLargeException</code>. هذا ليس عيباً — بل آلية حماية لمنع عملية واحدة من احتكار كل موارد IPC في النظام.
+  </div>
+
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th>المعيار</th>
+        <th>IPC التقليدي (Sockets)</th>
+        <th>Binder IPC</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>عدد نسخ البيانات</td>
+        <td>2 نسخ (Double-Copy)</td>
+        <td>1 نسخة (Single-Copy)</td>
+      </tr>
+      <tr>
+        <td>تبديل السياق (Context Switches)</td>
+        <td>2× (Client→Kernel, Kernel→Server)</td>
+        <td>1× (بفضل Thread Pool)</td>
+      </tr>
+      <tr>
+        <td>التحقق من الهوية (UID/PID)</td>
+        <td>غير موثوق / يتطلب تطبيق يدوي</td>
+        <td>مُدمج في كل Transaction</td>
+      </tr>
+      <tr>
+        <td>إدارة دورة حياة الكائنات</td>
+        <td>غير مدعومة</td>
+        <td>Reference Counting مدمج</td>
+      </tr>
+      <tr>
+        <td>حدود حجم البيانات</td>
+        <td>مرنة (تعتمد على النظام)</td>
+        <td>1MB مشترك (صارم)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 3: Internal Mechanics of Parcel                      -->
+<!-- ============================================================ -->
+<div class="section">
+  <div class="section-title">
+    <span class="icon">3</span>
+    ميكانيكية عمل الـ Parcel وتشريح البيانات
+  </div>
+
+  <div class="subsection-title">ما هو <code>Parcel</code> في ذاكرة Android؟</div>
+  <p>
+    <code>Parcel</code> هو حاوية تسلسل خفيفة الوزن (Lightweight Serialization Container) تُستخدم لنقل البيانات بين العمليات عبر Binder. على عكس <code>Serializable</code> في Java الذي يعتمد على انعكاس (Reflection) وبطيء، يستخدم Parcel <strong>تسلسلاً ثنائياً مباشراً (Binary Flattening)</strong> إلى ذاكرة متجاورة (Contiguous Memory).
+  </p>
+  <p>
+    يتم تخزين بيانات Parcel في مخزن مؤقت خام (Raw Buffer) يُديره Native Code عبر فئة C++ <code>android::Parcel</code>، بينما يعرض Java/Kotlin واجهة عالية المستوى تُترجم المكالمات إلى هذه الطبقة الأصلية.
+  </p>
+
+  <div class="subsection-title">التخطيط الثنائي (Binary Layout) للبيانات المُسلّسة</div>
+  <p>
+    يتم ترتيب البيانات داخل Parcel بشكل مسطح (Flat) مع مراعاة محاذاة 4 بايت (32-bit Alignment). إليك التخطيط الداخلي:
+  </p>
+
+  <div class="memory-layout">
+    <div class="memory-row" style="background:#1e293b;">
+      <span class="offset">Offset 0x00</span>
+      <span class="bytes">00 00 00 00 │ 00 00 00 00</span>
+      <span class="desc">Header (8 bytes)</span>
+    </div>
+    <div class="memory-row" style="background:#0f172a;">
+      <span class="offset">Offset 0x08</span>
+      <span class="bytes">2A 00 00 00 │ 00 00 00 00</span>
+      <span class="desc">int32_t value = 42</span>
+    </div>
+    <div class="memory-row" style="background:#1e293b;">
+      <span class="offset">Offset 0x10</span>
+      <span class="bytes">48 00 00 00 │ 65 00 00 00</span>
+      <span class="desc">UTF-16 'H' 'e'</span>
+    </div>
+    <div class="memory-row" style="background:#0f172a;">
+      <span class="offset">Offset 0x18</span>
+      <span class="bytes">6C 00 00 00 │ 6C 00 00 00</span>
+      <span class="desc">UTF-16 'l' 'l'</span>
+    </div>
+    <div class="memory-row" style="background:#1e293b;">
+      <span class="offset">Offset 0x20</span>
+      <span class="bytes">6F 00 00 00 │ 00 00 00 00</span>
+      <span class="desc">UTF-16 'o' + null</span>
+    </div>
+    <div class="memory-row" style="background:#0f172a;">
+      <span class="offset">Offset 0x28</span>
+      <span class="bytes">00 00 00 00 │ 00 00 00 00</span>
+      <span class="desc">IBinder Ref (handle)</span>
+    </div>
+    <div class="memory-row" style="background:#1e293b;">
+      <span class="offset">Offset 0x30</span>
+      <span class="bytes">00 00 00 00 │ 00 00 00 00</span>
+      <span class="desc">File Descriptor (fd)</span>
+    </div>
+    <div class="memory-row" style="background:#0f172a;">
+      <span class="offset">Offset 0x38</span>
+      <span class="bytes">FF FF FF FF │ 00 00 00 00</span>
+      <span class="desc">Object Null Marker</span>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <strong>📐 قواعد المحاذاة (Alignment Rules):</strong>
+    <ul style="margin-top:0.5rem; margin-bottom:0;">
+      <li>جميع الأعداد الصحيحة (int32, int64) تُحاذى على حدود 4 بايت.</li>
+      <li>النصوص (Strings) تُخزن بترميز UTF-16 مع بايتات طول مسبق (Length Prefix).</li>
+      <li>مراجع <code>IBinder</code> تُخزن كـ Handles (أعداد صحيحة) في العملية البعيدة، ويتم ترجمتها بواسطة Binder Driver.</li>
+      <li>واصفات الملفات (File Descriptors) تُمرر عبر آلية <code>SCM_RIGHTS</code> في النواة.</li>
+    </ul>
+  </div>
+
+  <div class="subsection-title">مؤشرات الإزاحة (Offset Pointers) وإدارة الذاكرة</div>
+  <p>
+    تحتفظ فئة <code>Parcel</code> بمؤشرين رئيسيين:
+  </p>
+  <ul>
+    <li><code>mData</code>: مؤشر إلى بداية المخزن المؤقت (Buffer Start).</li>
+    <li><code>mDataPos</code>: موضع الكتابة/القراءة الحالي (Current Read/Write Position).</li>
+    <li><code>mDataSize</code>: إجمالي حجم البيانات المكتوبة.</li>
+    <li><code>mDataCapacity</code>: السعة القصوى للمخزن المؤقت قبل إعادة التخصيص.</li>
+  </ul>
+  <p>
+    عند كتابة بيانات جديدة، يتم التحقق أولاً من توفر مساحة كافية. إذا لم تكن كافية، يتم استدعاء <code>realloc()</code> لتوسيع المخزن المؤقت مع الحفاظ على المحتوى السابق. هذا يعني أن Parcel يُعدّ <strong>مخزناً مؤقتاً ديناميكياً (Dynamic Buffer)</strong> يتكيف مع حجم البيانات.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 4: End-to-End IPC Trace                              -->
+<!-- ============================================================ -->
+<div class="section">
+  <div class="section-title">
+    <span class="icon">4</span>
+    تتبع مسار التواصل بين عمليتين (End-to-End Trace)
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-step" data-step="1">
+      <div class="timeline-step-title">بناء Parcel وإصدار ioctl(BINDER_WRITE_READ)</div>
+      <p>
+        في العملية العميلة، يقوم التطبيق بإنشاء كائن <code>Parcel</code> وكتابة البيانات (Primitives, Strings, IBinder refs) بترتيب محدد. ثم يتم تمرير هذا Parcel إلى طبقة Native عبر <code>IBinder::transact()</code>، والتي تُنشئ هيكل <code>binder_write_read</code> وتستدعي <code>ioctl(fd, BINDER_WRITE_READ, &bwr)</code>.
+      </p>
+      <div class="code-caption">// Client Side — C++ Native Binder</div>
+      <pre dir="ltr"><code class="language-cpp"><span class="comment">// إنشاء Parcel فارغ وتعبئته بالبيانات</span>
+<span class="type">Parcel</span> <span class="function">data</span>;
+<span class="function">data.writeInterfaceToken</span>(<span class="string">"android.app.IActivityManager"</span>);
+<span class="function">data.writeInt32</span>(<span class="number">1001</span>);          <span class="comment">// كتابة int32_t</span>
+<span class="function">data.writeString16</span>(<span class="string">u"hello"</span>);   <span class="comment">// كتابة String16 (UTF-16)</span>
+
+<span class="comment">// إعداد هيكل binder_write_read</span>
+<span class="keyword">struct</span> <span class="type">binder_write_read</span> <span class="function">bwr</span>;
+<span class="function">memset</span>(&amp;bwr, <span class="number">0</span>, <span class="keyword">sizeof</span>(bwr));
+
+<span class="comment">// كتابة أمر BC_TRANSACTION في مخزن الكتابة</span>
+<span class="type">uint32_t</span> <span class="function">cmd</span>[<span class="number">2</span>];
+cmd[<span class="number">0</span>] = <span class="macro">BC_TRANSACTION</span>;
+cmd[<span class="number">1</span>] = (<span class="type">uint32_t</span>)<span class="function">data.ipcData</span>();  <span class="comment">// مؤشر إلى بيانات Parcel</span>
+
+bwr.write_buffer = (<span class="type">binder_uintptr_t</span>)cmd;
+bwr.write_size   = <span class="keyword">sizeof</span>(cmd);
+bwr.write_consumed = <span class="number">0</span>;
+
+<span class="comment">// الاستدعاء النظامي — الانتقال إلى فضاء النواة</span>
+<span class="type">int</span> <span class="function">res</span> = <span class="function">ioctl</span>(mProcess-&gt;mDriverFD, <span class="macro">BINDER_WRITE_READ</span>, &amp;bwr);</code></pre>
+    </div>
+
+    <div class="timeline-step" data-step="2">
+      <div class="timeline-step-title">الانتقال إلى فضاء النواة والتحقق من بيانات الاعتماد</div>
+      <p>
+        عند استلام النواة لاستدعاء <code>ioctl</code>، يُنفّذ Binder Driver التحققات التالية:
+      </p>
+      <ul>
+        <li>التحقق من صلاحية واصف الملف (FD) المرتبط بـ <code>/dev/binder</code>.</li>
+        <li>استخراج <code>UID</code> و <code>PID</code> للعملية المتصلة من هيكل <code>task_struct</code> الخاص بالنواة.</li>
+        <li>التحقق من أن المعاملة موجهة إلى Service مسجلة (عبر <code>Context Manager</code> إذا كانت أول معاملة).</li>
+      </ul>
+      <div class="purple-card">
+        <strong>🔐 التحقق من الأمان:</strong> لا يمكن تزوير UID/PID لأن Binder Driver يقرأها مباشرة من نواة Linux (<code>current-&gt;cred-&gt;uid</code>) وليس من User Space. هذا يضمن أن هوية المرسل موثوقة بنسبة 100%.
+      </div>
+    </div>
+
+    <div class="timeline-step" data-step="3">
+      <div class="timeline-step-title">ترجمة مراجع الكائنات المحلية إلى مقابض بعيدة</div>
+      <p>
+        إذا احتوى Parcel على مراجع <code>IBinder</code> محلية (مثل <code>BpBinder</code>)، يقوم Binder Driver بـ <strong>ترجمة العناوين (Address Translation)</strong>:
+      </p>
+      <ul>
+        <li>الكائنات المحلية (Local Objects) تُحوّل إلى Handles (أرقام صحيحة) يفهمها العملية البعيدة.</li>
+        <li>الكائنات البعيدة (Remote Handles) تُحوّل إلى مؤشرات كائنات محلية إذا كانت موجودة في جدول الترجمة.</li>
+        <li>يتم تحديث <code>refs->desc</code> (File Descriptor) عبر آلية SCM_RIGHTS.</li>
+      </ul>
+      <div class="diagram-box">
+        <pre>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    Object Translation in Binder Driver                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   Client Side                          Kernel                         Server│
+│   Local Object Table                   Translation                    Handle│
+│   (proc->nodes)                        Table                          Table │
+│                                                                             │
+│   ┌─────────────┐                     ┌─────────────┐               ┌──────┐  │
+│   │ node #5     │─── translate ──────►│ handle #3   │──────────────►│ ref  │  │
+│   │ (BBinder)   │                     │ (for procB) │               │ #3   │  │
+│   └─────────────┘                     └─────────────┘               └──────┘  │
+│                                                                             │
+│   ┌─────────────┐                     ┌─────────────┐               ┌──────┐  │
+│   │ handle #7   │◄── translate ───────│ node #2     │◄──────────────│ ref  │  │
+│   │ (BpBinder)  │                     │ (from procB)│               │ #2   │  │
+│   └─────────────┘                     └─────────────┘               └──────┘  │
+│                                                                             │
+│   الكائن المحلي (Local) يُرسل كـ Handle بعيد                               │
+│   الـ Handle البعيد يُستقبل كـ مؤشر كائن محلي                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+        </pre>
+      </div>
+    </div>
+
+    <div class="timeline-step" data-step="4">
+      <div class="timeline-step-title">إيقاظ تجمع خيوط العملية الخادمة (IPCThreadState)</div>
+      <p>
+        بعد التحقق والترجمة، يضع Binder Driver المعاملة في قائمة الانتظار (Work Queue) الخاصة بالعملية الهدف. إذا كانت العملية نائمة، يتم إرسال إشارة <code>wake_up_interruptible()</code> لإيقاظ أحد خيوط <code>IPCThreadState</code> في تجمع الخيوط (Thread Pool).
+      </p>
+      <p>
+        يستخدم Android نموذج <strong>تجمع خيوط IPC (IPC Thread Pool)</strong> بدلاً من إنشاء خيط جديد لكل معاملة. يتم تسجيل الخيوط عبر <code>BC_REGISTER_LOOPER</code> و <code>BC_ENTER_LOOPER</code>.
+      </p>
+      <div class="code-caption">// Server Thread Pool Registration</div>
+      <pre dir="ltr"><code class="language-cpp"><span class="comment">// تسجيل الخيط الحالي كـ IPC Thread في Binder Driver</span>
+<span class="type">Parcel</span> <span class="function">reply</span>;
+<span class="type">IPCThreadState</span>* <span class="function">self</span> = <span class="type">IPCThreadState</span>::<span class="function">self</span>();
+
+<span class="comment">// إرسال أمر BC_ENTER_LOOPER لإعلام النواة</span>
+<span class="type">uint32_t</span> <span class="function">cmd</span> = <span class="macro">BC_ENTER_LOOPER</span>;
+<span class="function">self-&gt;writeInParcel</span>(&amp;cmd, <span class="keyword">sizeof</span>(cmd));
+
+<span class="comment">// الدخول في حلقة الاستماع (Event Loop)</span>
+<span class="keyword">while</span> (<span class="number">1</span>) {
+    <span class="comment">// انتظار ioctl(BINDER_WRITE_READ) واردة</span>
+    <span class="function">self-&gt;talkWithDriver</span>(<span class="keyword">true</span>);
+
+    <span class="comment">// معالجة المعاملات الواردة</span>
+    <span class="keyword">while</span> (<span class="function">self-&gt;executeCommand</span>(cmd) == <span class="macro">NO_ERROR</span>) {
+        <span class="comment">// تنفيذ الأمر وإرسال الرد</span>
+    }
+}</code></pre>
+    </div>
+
+    <div class="timeline-step" data-step="5">
+      <div class="timeline-step-title">فك تسلسل Parcel وإرجاع رد الاستجابة</div>
+      <p>
+        يستقبل الخادم Parcel عبر <code>BBinder::onTransact()</code>، ويقوم بفك تسلسل البيانات بالترتيب الدقيق نفسه الذي كُتبت به. أي خطأ في ترتيب القراءة (مثلاً قراءة String قبل int) سيؤدي إلى <strong>فساد الذاكرة (Memory Corruption)</strong> أو <code>Parcel mismatch crash</code>.
+      </p>
+      <p>
+        بعد معالجة الطلب، يُنشئ الخادم Parcel رد (<code>reply</code>) ويرسله عبر <code>sendReply()</code>، والذي يُصدر <code>ioctl(BINDER_WRITE_READ)</code> بالاتجاه المعاكس.
+      </p>
+      <div class="code-caption">// Server Side — BBinder::onTransact()</div>
+      <pre dir="ltr"><code class="language-cpp"><span class="keyword">virtual</span> <span class="type">status_t</span> <span class="function">onTransact</span>(
+    <span class="type">uint32_t</span> <span class="function">code</span>,
+    <span class="keyword">const</span> <span class="type">Parcel</span>&amp; <span class="function">data</span>,
+    <span class="type">Parcel</span>* <span class="function">reply</span>,
+    <span class="type">uint32_t</span> <span class="function">flags</span>
+) {
+    <span class="comment">// التحقق من واجهة الواجهة (Interface Token)</span>
+    <span class="function">data.checkInterface</span>(<span class="keyword">this</span>);
+
+    <span class="keyword">switch</span> (code) {
+        <span class="keyword">case</span> <span class="macro">MY_TRANSACTION</span>: {
+            <span class="comment">// قراءة البيانات بالترتيب الدقيق</span>
+            <span class="type">int32_t</span> <span class="function">userId</span> = <span class="function">data.readInt32</span>();
+            <span class="type">String16</span> <span class="function">name</span> = <span class="function">data.readString16</span>();
+
+            <span class="comment">// معالجة المنطق التجاري...</span>
+
+            <span class="comment">// كتابة الرد</span>
+            <span class="function">reply-&gt;writeInt32</span>(<span class="macro">NO_ERROR</span>);
+            <span class="function">reply-&gt;writeString16</span>(<span class="string">u"success"</span>);
+            <span class="keyword">return</span> <span class="macro">NO_ERROR</span>;
+        }
+        <span class="keyword">default</span>:
+            <span class="keyword">return</span> <span class="type">BBinder</span>::<span class="function">onTransact</span>(code, data, reply, flags);
+    }
+}</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 5: Low-Level Practical Implementation                -->
+<!-- ============================================================ -->
+<div class="section">
+  <div class="section-title">
+    <span class="icon">5</span>
+    تطبيق عملي متكامل لتسلسل واستقبال البيانات
+  </div>
+
+  <div class="subsection-title">تطبيق C++ Native باستخدام Native Binder</div>
+  <p>
+    يوضح المثال التالي كيفية بناء خدمة Binder أصلية (Native Service) من الصفر باستخدام <code>BpBinder</code> (وكيل العميل) و <code>BBinder</code> (تنفيذ الخادم). يُركز المثال على التسلسل الصريح (Explicit Serialization) لتجنب أي غموض.
+  </p>
+
+  <div class="code-caption">// IMyService.h — تعريف الواجهة (Interface Definition)</div>
+  <pre dir="ltr"><code class="language-cpp"><span class="comment">// ============================================================</span>
+<span class="comment">// IMyService.h — تعريف واجهة خدمة Binder أصلية</span>
+<span class="comment">// ============================================================</span>
+<span class="macro">#ifndef</span> <span class="function">IMY_SERVICE_H</span>
+<span class="macro">#define</span> <span class="function">IMY_SERVICE_H</span>
+
+<span class="macro">#include</span> &lt;binder/IInterface.h&gt;
+<span class="macro">#include</span> &lt;binder/Parcel.h&gt;
+
+<span class="keyword">namespace</span> <span class="type">android</span> {
+
+<span class="comment">// معرّف المعاملات — يجب أن يكون فريداً عالمياً</span>
+<span class="keyword">enum</span> {
+    <span class="macro">TRANSACT_ADD_USER</span> = <span class="type">IBinder</span>::<span class="macro">FIRST_CALL_TRANSACTION</span> + <span class="number">0</span>,
+    <span class="macro">TRANSACT_GET_USER</span> = <span class="type">IBinder</span>::<span class="macro">FIRST_CALL_TRANSACTION</span> + <span class="number">1</span>,
+};
+
+<span class="comment">// ============================================================</span>
+<span class="comment">// الواجهة المجردة (Abstract Interface)</span>
+<span class="comment">// ============================================================</span>
+<span class="keyword">class</span> <span class="type">IMyService</span> : <span class="keyword">public</span> <span class="type">IInterface</span> {
+<span class="keyword">public</span>:
+    <span class="macro">DECLARE_META_INTERFACE</span>(MyService);
+
+    <span class="comment">// الطرق المجردة (Abstract Methods)</span>
+    <span class="keyword">virtual</span> <span class="type">status_t</span> <span class="function">addUser</span>(<span class="type">int32_t</span> <span class="function">userId</span>, <span class="keyword">const</span> <span class="type">String16</span>&amp; <span class="function">name</span>) = <span class="number">0</span>;
+    <span class="keyword">virtual</span> <span class="type">status_t</span> <span class="function">getUser</span>(<span class="type">int32_t</span> <span class="function">userId</span>, <span class="type">String16</span>* <span class="function">outName</span>) = <span class="number">0</span>;
+};
+
+<span class="comment">// ============================================================</span>
+<span class="comment">// BpMyService — الوكيل على جانب العميل (Client-Side Proxy)</span>
+<span class="comment">// ============================================================</span>
+<span class="keyword">class</span> <span class="type">BpMyService</span> : <span class="keyword">public</span> <span class="type">BpInterface</span>&lt;<span class="type">IMyService</span>&gt; {
+<span class="keyword">public</span>:
+    <span class="function">BpMyService</span>(<span class="keyword">const</span> <span class="type">sp</span>&lt;<span class="type">IBinder</span>&gt;&amp; <span class="function">impl</span>);
+
+    <span class="keyword">virtual</span> <span class="type">status_t</span> <span class="function">addUser</span>(<span class="type">int32_t</span> <span class="function">userId</span>, <span class="keyword">const</span> <span class="type">String16</span>&amp; <span class="function">name</span>);
+    <span class="keyword">virtual</span> <span class="type">status_t</span> <span class="function">getUser</span>(<span class="type">int32_t</span> <span class="function">userId</span>, <span class="type">String16</span>* <span class="function">outName</span>);
+};
+
+<span class="comment">// ============================================================</span>
+<span class="comment">// BnMyService — الهيكل الأساسي على جانب الخادم (Server Stub)</span>
+<span class="comment">// ============================================================</span>
+<span class="keyword">class</span> <span class="type">BnMyService</span> : <span class="keyword">public</span> <span class="type">BnInterface</span>&lt;<span class="type">IMyService</span>&gt; {
+<span class="keyword">public</span>:
+    <span class="keyword">virtual</span> <span class="type">status_t</span> <span class="function">onTransact</span>(
+        <span class="type">uint32_t</span> <span class="function">code</span>,
+        <span class="keyword">const</span> <span class="type">Parcel</span>&amp; <span class="function">data</span>,
+        <span class="type">Parcel</span>* <span class="function">reply</span>,
+        <span class="type">uint32_t</span> <span class="function">flags</span>
+    );
+};
+
+} <span class="comment">// namespace android</span>
+<span class="macro">#endif</span></code></pre>
+
+  <div class="code-caption">// BpMyService.cpp — تنفيذ الوكيل (Proxy Implementation)</div>
+  <pre dir="ltr"><code class="language-cpp"><span class="comment">// ============================================================</span>
+<span class="comment">// BpMyService.cpp — تنفيذ الوكيل على جانب العميل</span>
+<span class="comment">// يُظهر التسلسل الصريح (Explicit Serialization)</span>
+<span class="comment">// ============================================================</span>
+<span class="macro">#include</span> "IMyService.h"
+
+<span class="keyword">namespace</span> <span class="type">android</span> {
+
+<span class="type">status_t</span> <span class="type">BpMyService</span>::<span class="function">addUser</span>(<span class="type">int32_t</span> <span class="function">userId</span>, <span class="keyword">const</span> <span class="type">String16</span>&amp; <span class="function">name</span>) {
+    <span class="comment">// إنشاء Parcel للبيانات (Input) والرد (Output)</span>
+    <span class="type">Parcel</span> <span class="function">data</span>, <span class="function">reply</span>;
+
+    <span class="comment">// كتابة Interface Token للتحقق من الهوية</span>
+    <span class="function">data.writeInterfaceToken</span>(<span class="function">IMyService::getInterfaceDescriptor</span>());
+
+    <span class="comment">// ───────────────────────────────────────────────</span>
+    <span class="comment">// التسلسل الصريح — يجب أن يتطابق مع ترتيب القراءة</span>
+    <span class="comment">// في BnMyService::onTransact() بالضبط</span>
+    <span class="comment">// ───────────────────────────────────────────────</span>
+    <span class="function">data.writeInt32</span>(userId);    <span class="comment">// 4 bytes, aligned</span>
+    <span class="function">data.writeString16</span>(name);   <span class="comment">// UTF-16 with length prefix</span>
+
+    <span class="comment">// إرسال المعاملة عبر Binder — TF_ONE_WAY = غير متزامن</span>
+    <span class="type">status_t</span> <span class="function">status</span> = <span class="function">remote</span>()-&gt;<span class="function">transact</span>(
+        <span class="macro">TRANSACT_ADD_USER</span>,   <span class="comment">// رمز المعاملة</span>
+        data,                <span class="comment">// Parcel الدخل</span>
+        &amp;reply,              <span class="comment">// Parcel الرد</span>
+        <span class="number">0</span>                    <span class="comment">// flags (0 = متزامن)</span>
+    );
+
+    <span class="keyword">if</span> (status != <span class="macro">NO_ERROR</span>) {
+        <span class="macro">ALOGE</span>(<span class="string">"addUser transaction failed: %d"</span>, status);
+        <span class="keyword">return</span> status;
+    }
+
+    <span class="comment">// قراءة نتيجة الاستجابة</span>
+    <span class="keyword">return</span> <span class="function">reply.readInt32</span>();
+}
+
+<span class="type">status_t</span> <span class="type">BpMyService</span>::<span class="function">getUser</span>(<span class="type">int32_t</span> <span class="function">userId</span>, <span class="type">String16</span>* <span class="function">outName</span>) {
+    <span class="type">Parcel</span> <span class="function">data</span>, <span class="function">reply</span>;
+    <span class="function">data.writeInterfaceToken</span>(<span class="function">IMyService::getInterfaceDescriptor</span>());
+    <span class="function">data.writeInt32</span>(userId);
+
+    <span class="type">status_t</span> <span class="function">status</span> = <span class="function">remote</span>()-&gt;<span class="function">transact</span>(
+        <span class="macro">TRANSACT_GET_USER</span>, data, &amp;reply, <span class="number">0</span>
+    );
+
+    <span class="keyword">if</span> (status == <span class="macro">NO_ERROR</span>) {
+        *outName = <span class="function">reply.readString16</span>();
+    }
+    <span class="keyword">return</span> status;
+}
+
+} <span class="comment">// namespace android</span></code></pre>
+
+  <div class="code-caption">// BnMyService.cpp — تنفيذ الخادم (Server Stub)</div>
+  <pre dir="ltr"><code class="language-cpp"><span class="comment">// ============================================================</span>
+<span class="comment">// BnMyService.cpp — تنفيذ الهيكل الأساسي على جانب الخادم</span>
+<span class="comment">// يُظهر فك التسلسل بالترتيب الدقيق لتجنب Parcel Mismatch</span>
+<span class="comment">// ============================================================</span>
+<span class="macro">#include</span> "IMyService.h"
+
+<span class="keyword">namespace</span> <span class="type">android</span> {
+
+<span class="type">status_t</span> <span class="type">BnMyService</span>::<span class="function">onTransact</span>(
+    <span class="type">uint32_t</span> <span class="function">code</span>,
+    <span class="keyword">const</span> <span class="type">Parcel</span>&amp; <span class="function">data</span>,
+    <span class="type">Parcel</span>* <span class="function">reply</span>,
+    <span class="type">uint32_t</span> <span class="function">flags</span>
+) {
+    <span class="comment">// التحقق من Interface Token — يمنع استدعاءات غير مصرح بها</span>
+    <span class="function">data.checkInterface</span>(<span class="keyword">this</span>);
+
+    <span class="keyword">switch</span> (code) {
+        <span class="keyword">case</span> <span class="macro">TRANSACT_ADD_USER</span>: {
+            <span class="comment">// ───────────────────────────────────────────────</span>
+            <span class="comment">// فك التسلسل بالترتيب الدقيق نفسه الذي كُتبت به</span>
+            <span class="comment">// أي خطأ هنا = Parcel Mismatch Crash!</span>
+            <span class="comment">// ───────────────────────────────────────────────</span>
+            <span class="type">int32_t</span> <span class="function">userId</span> = <span class="function">data.readInt32</span>();
+            <span class="type">String16</span> <span class="function">name</span> = <span class="function">data.readString16</span>();
+
+            <span class="comment">// استدعاء التنفيذ الفعلي (Implemented by subclass)</span>
+            <span class="type">status_t</span> <span class="function">result</span> = <span class="function">addUser</span>(userId, name);
+
+            <span class="comment">// كتابة الرد</span>
+            <span class="function">reply-&gt;writeInt32</span>(result);
+            <span class="keyword">return</span> <span class="macro">NO_ERROR</span>;
+        }
+
+        <span class="keyword">case</span> <span class="macro">TRANSACT_GET_USER</span>: {
+            <span class="type">int32_t</span> <span class="function">userId</span> = <span class="function">data.readInt32</span>();
+            <span class="type">String16</span> <span class="function">name</span>;
+
+            <span class="type">status_t</span> <span class="function">result</span> = <span class="function">getUser</span>(userId, &amp;name);
+
+            <span class="function">reply-&gt;writeInt32</span>(result);
+            <span class="function">reply-&gt;writeString16</span>(name);
+            <span class="keyword">return</span> <span class="macro">NO_ERROR</span>;
+        }
+
+        <span class="keyword">default</span>:
+            <span class="comment">// تمرير إلى BBinder للمعاملات غير المعروفة</span>
+            <span class="keyword">return</span> <span class="type">BBinder</span>::<span class="function">onTransact</span>(code, data, reply, flags);
+    }
+}
+
+} <span class="comment">// namespace android</span></code></pre>
+
+  <div class="warning-card">
+    <strong>⚠️ تحذير Parcel Mismatch:</strong> يجب أن يتطابق ترتيب <code>readXxx()</code> في الخادم تماماً مع ترتيب <code>writeXxx()</code> في العميل. إذا كتبت <code>writeInt32()</code> ثم <code>writeString16()</code> في العميل، يجب أن تقرأ <code>readInt32()</code> ثم <code>readString16()</code> في الخادم. أي انحراف يؤدي إلى قراءة بيانات خاطئة من الذاكرة.
+  </div>
+
+  <div class="subsection-title">تطبيق Kotlin باستخدام Parcelable</div>
+  <p>
+    في طبقة التطبيق (Application Layer)، يستخدم Android واجهة <code>Parcelable</code> لتسلسل الكائنات عبر Binder. على عكس <code>Serializable</code>، يتطلب <code>Parcelable</code> كتابة تعليمات التسلسل يدوياً، مما يوفر أداءً أعلى بكثير لأنه يتجنب الانعكاس (Reflection).
+  </p>
+
+  <div class="code-caption">// Kotlin — Parcelable Data Class Implementation</div>
+  <pre dir="ltr"><code class="language-kotlin"><span class="keyword">package</span> com.example.binderdemo
+
+<span class="keyword">import</span> android.os.Parcel
+<span class="keyword">import</span> android.os.Parcelable
+
+<span class="comment">/**</span>
+<span class="comment"> * كيان بيانات يُستخدم في IPC عبر Binder</span>
+<span class="comment"> * يُظهر التسلسل والاستعادة الصريحة لتجنب Parcel Mismatch</span>
+<span class="comment"> *</span>
+<span class="comment"> * ⚠️  مهم جداً: يجب أن يتطابق ترتيب writeString() / writeInt()</span>
+<span class="comment"> *     مع ترتيب readString() / readInt() بالضبط!</span>
+<span class="comment"> */</span>
+<span class="keyword">data class</span> <span class="type">UserProfile</span>(
+    <span class="keyword">val</span> <span class="function">userId</span>: <span class="type">Int</span>,
+    <span class="keyword">val</span> <span class="function">userName</span>: <span class="type">String</span>,
+    <span class="keyword">val</span> <span class="function">email</span>: <span class="type">String</span>,
+    <span class="keyword">val</span> <span class="function">isActive</span>: <span class="type">Boolean</span>,
+    <span class="keyword">val</span> <span class="function">score</span>: <span class="type">Double</span>
+) : <span class="type">Parcelable</span> {
+
+    <span class="comment">/**</span>
+<span class="comment">     * المنشئ الثانوي — يُستخدم لفك التسلسل من Parcel</span>
+<span class="comment">     * ترتيب القراءة يجب أن يتطابق مع ترتيب الكتابة في writeToParcel()</span>
+<span class="comment">     */</span>
+    <span class="keyword">constructor</span>(parcel: <span class="type">Parcel</span>) : <span class="keyword">this</span>(
+        <span class="comment">// 1. قراءة Int (4 bytes, aligned)</span>
+        parcel.<span class="function">readInt</span>(),
+
+        <span class="comment">// 2. قراءة String (UTF-16 مع طول مسبق)</span>
+        parcel.<span class="function">readString</span>() ?: <span class="string">""</span>,
+
+        <span class="comment">// 3. قراءة String ثانية</span>
+        parcel.<span class="function">readString</span>() ?: <span class="string">""</span>,
+
+        <span class="comment">// 4. قراءة Boolean (يُخزن كـ Int: 1 = true, 0 = false)</span>
+        parcel.<span class="function">readByte</span>() != <span class="number">0.toByte</span>(),
+
+        <span class="comment">// 5. قراءة Double (8 bytes, aligned to 4)</span>
+        parcel.<span class="function">readDouble</span>()
+    )
+
+    <span class="comment">/**</span>
+<span class="comment">     * التسلسل الصريح — يجب أن يتطابق مع ترتيب القراءة في المنشئ</span>
+<span class="comment">     */</span>
+    <span class="keyword">override fun</span> <span class="function">writeToParcel</span>(parcel: <span class="type">Parcel</span>, flags: <span class="type">Int</span>) {
+        <span class="comment">// 1. كتابة Int</span>
+        parcel.<span class="function">writeInt</span>(userId)
+
+        <span class="comment">// 2. كتابة String</span>
+        parcel.<span class="function">writeString</span>(userName)
+
+        <span class="comment">// 3. كتابة String</span>
+        parcel.<span class="function">writeString</span>(email)
+
+        <span class="comment">// 4. كتابة Boolean كـ Byte</span>
+        parcel.<span class="function">writeByte</span>(<span class="keyword">if</span> (isActive) <span class="number">1</span> <span class="keyword">else</span> <span class="number">0</span>)
+
+        <span class="comment">// 5. كتابة Double</span>
+        parcel.<span class="function">writeDouble</span>(score)
+    }
+
+    <span class="comment">/**</span>
+<span class="comment">     * وصف المحتوى — يُستخدم في Binder لتحديد ما إذا كان</span>
+<span class="comment">     * Parcel يحتوي على File Descriptors (FDs)</span>
+<span class="comment">     */</span>
+    <span class="keyword">override fun</span> <span class="function">describeContents</span>(): <span class="type">Int</span> = <span class="number">0</span>
+
+    <span class="comment">/**</span>
+<span class="comment">     * الكائن المُنشئ (CREATOR) — مطلوب من واجهة Parcelable</span>
+<span class="comment">     */</span>
+    <span class="keyword">companion object</span> <span class="type">CREATOR</span> : <span class="type">Parcelable.Creator</span>&lt;<span class="type">UserProfile</span>&gt; {
+        <span class="keyword">override fun</span> <span class="function">createFromParcel</span>(parcel: <span class="type">Parcel</span>): <span class="type">UserProfile</span> {
+            <span class="keyword">return</span> <span class="type">UserProfile</span>(parcel)
+        }
+
+        <span class="keyword">override fun</span> <span class="function">newArray</span>(size: <span class="type">Int</span>): <span class="type">Array</span>&lt;<span class="type">UserProfile</span>?&gt; {
+            <span class="keyword">return</span> <span class="function">arrayOfNulls</span>(size)
+        }
+    }
+}</code></pre>
+
+  <div class="code-caption">// Kotlin — AIDL Service Implementation with Security Check</div>
+  <pre dir="ltr"><code class="language-kotlin"><span class="keyword">package</span> com.example.binderdemo
+
+<span class="keyword">import</span> android.app.Service
+<span class="keyword">import</span> android.content.Intent
+<span class="keyword">import</span> android.os.Binder
+<span class="keyword">import</span> android.os.IBinder
+<span class="keyword">import</span> android.os.Parcel
+<span class="keyword">import</span> android.os.RemoteException
+<span class="keyword">import</span> android.util.Log
+
+<span class="comment">/**</span>
+<span class="comment"> * خدمة AIDL مع التحقق من صلاحيات العملية المتصلة</span>
+<span class="comment"> * يُظهر كيفية استخدام Binder.getCallingUid() لمنع</span>
+<span class="comment"> * هجمات تصعيد الصلاحيات (Privilege Escalation)</span>
+<span class="comment"> */</span>
+<span class="keyword">class</span> <span class="type">SecureUserService</span> : <span class="type">Service</span>() {
+
+    <span class="keyword">companion object</span> {
+        <span class="keyword">private const val</span> <span class="function">TAG</span> = <span class="string">"SecureUserService"</span>
+
+        <span class="comment">// قائمة UID مسموح لها بالوصول (Whitelist)</span>
+        <span class="keyword">private val</span> <span class="function">ALLOWED_UIDS</span> = <span class="function">setOf</span>(
+            <span class="number">1000</span>,   <span class="comment">// System Server</span>
+            <span class="number">1001</span>,   <span class="comment">// Phone</span>
+            <span class="number">2000</span>    <span class="comment">// Shell (ADB)</span>
+        )
+    }
+
+    <span class="comment">/**</span>
+<span class="comment">     * تنفيذ AIDL Interface — يتضمن التحقق من الأمان</span>
+<span class="comment">     */</span>
+    <span class="keyword">private val</span> <span class="function">binder</span> = <span class="keyword">object</span> : <span class="type">IUserService.Stub</span>() {
+
+        <span class="keyword">override fun</span> <span class="function">getUserProfile</span>(userId: <span class="type">Int</span>): <span class="type">UserProfile</span> {
+            <span class="comment">// ───────────────────────────────────────────────</span>
+            <span class="comment">// التحقق من الأمان: من الذي يطلب هذه البيانات؟</span>
+            <span class="comment">// ───────────────────────────────────────────────</span>
+            <span class="keyword">val</span> <span class="function">callingUid</span> = <span class="type">Binder</span>.<span class="function">getCallingUid</span>()
+            <span class="keyword">val</span> <span class="function">callingPid</span> = <span class="type">Binder</span>.<span class="function">getCallingPid</span>()
+
+            <span class="type">Log</span>.<span class="function">d</span>(TAG, <span class="string">"getUserProfile called by UID=$callingUid, PID=$callingPid"</span>)
+
+            <span class="comment">// رفض الوصول إذا لم يكن UID في القائمة المسموحة</span>
+            <span class="keyword">if</span> (callingUid !<span class="keyword">in</span> ALLOWED_UIDS) {
+                <span class="type">Log</span>.<span class="function">w</span>(TAG, <span class="string">"Access denied for UID=$callingUid"</span>)
+                <span class="keyword">throw</span> <span class="type">SecurityException</span>(
+                    <span class="string">"Permission denied: UID $callingUid not authorized"</span>
+                )
+            }
+
+            <span class="comment">// ───────────────────────────────────────────────</span>
+            <span class="comment">// المنطق التجاري — يُنفذ فقط بعد التحقق من الأمان</span>
+            <span class="comment">// ───────────────────────────────────────────────</span>
+            <span class="keyword">return</span> <span class="type">UserProfile</span>(
+                userId = userId,
+                userName = <span class="string">"User_$userId"</span>,
+                email = <span class="string">"user$userId@example.com"</span>,
+                isActive = <span class="keyword">true</span>,
+                score = <span class="number">95.5</span>
+            )
+        }
+
+        <span class="keyword">override fun</span> <span class="function">onTransact</span>(
+            code: <span class="type">Int</span>,
+            data: <span class="type">Parcel</span>,
+            reply: <span class="type">Parcel</span>?,
+            flags: <span class="type">Int</span>
+        ): <span class="type">Boolean</span> {
+            <span class="comment">// يمكن إضافة تسجيل أو مراقبة على مستوى أعلى هنا</span>
+            <span class="keyword">return super</span>.<span class="function">onTransact</span>(code, data, reply, flags)
+        }
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onBind</span>(intent: <span class="type">Intent</span>): <span class="type">IBinder</span> {
+        <span class="type">Log</span>.<span class="function">i</span>(TAG, <span class="string">"Service bound by: ${intent.`package`}"</span>)
+        <span class="keyword">return</span> binder
+    }
+}</code></pre>
+
+  <div class="info-card">
+    <strong>📌 ملاحظة هامة حول <code>Binder.getCallingUid()</code>:</strong> هذه الدالة تعيد UID العملية التي أرسلت المعاملة الحالية. يجب استدعاؤها <strong>قبل</strong> إجراء أي IPC آخر (مثل الوصول إلى ContentProvider أو ActivityManager) لأن أي IPC داخلي سيستبدل "هوية المتصل" (Calling Identity) بهوية العملية الحالية.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 6: Diagnostics, Profiling & Security Inspection      -->
+<!-- ============================================================ -->
+<div class="section">
+  <div class="section-title">
+    <span class="icon">6</span>
+    أدوات التشخيص والأمان والمراقبة
+  </div>
+
+  <div class="subsection-title">فحص المعاملات النشطة باستخدام <code>dumpsys binder_state</code></div>
+  <p>
+    يوفر Android أداة <code>dumpsys</code> للوصول إلى حالة النظام الداخلية. بالنسبة لـ Binder، يمكن استخدام <code>dumpsys binder_state</code> لعرض إحصائيات حية عن:
+  </p>
+  <ul>
+    <li>عدد المعاملات النشطة (Active Transactions) لكل عملية.</li>
+    <li>حجم المخزن المؤقت المستخدم (Buffer Usage) مقابل السعة الإجمالية.</li>
+    <li>قائمة العمليات التي تنتظر رداً (Waiting Processes).</li>
+    <li>عدد خيوط IPC المسجلة (Registered IPC Threads).</li>
+  </ul>
+
+  <div class="code-caption">// Shell — فحص حالة Binder في النظام</div>
+  <pre dir="ltr"><code class="language-cpp"><span class="comment">// عرض إحصائيات Binder العامة</span>
+$ adb shell dumpsys binder_state
+
+<span class="comment">// مثال على المخرجات المتوقعة:</span>
+<span class="comment">// binder state:</span>
+<span class="comment">// BC_TRANSACTION: 15234 calls</span>
+<span class="comment">// BC_REPLY: 15234 calls</span>
+<span class="comment">// threads: 45 registered, 12 active</span>
+<span class="comment">// nodes: 1287 local, 342 remote</span>
+<span class="comment">// pending transactions: 3 (PID 1234, 5678, 9012)</span>
+
+<span class="comment">// عرض معلومات Binder لعملية محددة</span>
+$ adb shell cat /d/binder/proc/<PID>
+
+<span class="comment">// مثال: فحص عملية System Server (PID عادةً ما يكون منخفضاً)</span>
+$ adb shell cat /d/binder/proc/$(adb shell pidof system_server)
+
+<span class="comment">// عرض حدود المخزن المؤقت (Buffer Limits) لكل عملية</span>
+$ adb shell cat /d/binder/proc/buffers
+
+<span class="comment">// مراقبة معاملات Binder في الوقت الفعلي (يتطلب Root)</span>
+$ adb shell cat /d/binder/transactions | head -n 50</code></pre>
+
+  <div class="diagram-box">
+    <pre>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    Binder Diagnostics Output Structure                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Process: com.android.systemui (PID: 1847)                                  │
+│  ├── Threads: 8 registered, 3 active                                      │
+│  ├── Buffer Usage: 256KB / 1MB (25%)                                        │
+│  ├── Local Nodes: 45                                                        │
+│  ├── Remote Refs: 127                                                       │
+│  ├── Pending Transactions:                                                  │
+│  │   ├── Transaction #1: PID 2345 → system_server (waiting 12ms)           │
+│  │   └── Transaction #2: PID 3456 → media_server (waiting 45ms)              │
+│  └── Death Recipients: 3 registered                                         │
+│                                                                             │
+│  ⚠️  WARNING: Process com.example.app (PID: 5678)                           │
+│      Buffer at 95% capacity — Risk of TransactionTooLargeException!       │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+    </pre>
+  </div>
+
+  <div class="subsection-title">المراقبة عبر <code>/d/binder/proc</code> وتحليل الاختناقات</div>
+  <p>
+    يُعدّ نظام الملفات الافتراضي <code>/d/binder/</code> (DebugFS) مصدراً غنياً لمعلومات التشخيص. يمكن للمطورين المخضرمين قراءة هذه الملفات لفهم:
+  </p>
+  <ul>
+    <li><strong>الاختناقات (Bottlenecks):</strong> عمليات ذات معاملات معلقة لفترات طويلة تشير إلى خدمة بطيئة أو حالة Deadlock.</li>
+    <li><strong>تسريبات الذاكرة (Memory Leaks):</strong> زيادة مستمرة في عدد <code>Local Nodes</code> دون انخفاض تشير إلى عدم تحرير Binder Objects.</li>
+    <li><strong>هجمات الحرمان (DoS):</strong> عملية واحدة تستهلك نسبة عالية من المخزن المؤقت (Buffer) تشير إلى محاولة استنزاف الموارد.</li>
+  </ul>
+
+  <div class="code-caption">// C++ — قراءة معلومات Binder من DebugFS برمجياً</div>
+  <pre dir="ltr"><code class="language-cpp"><span class="comment">// ============================================================</span>
+<span class="comment">// BinderDiagnostics.cpp — قراءة معلومات التشخيص برمجياً</span>
+<span class="comment">// ============================================================</span>
+<span class="macro">#include</span> &lt;fstream&gt;
+<span class="macro">#include</span> &lt;sstream&gt;
+<span class="macro">#include</span> &lt;string&gt;
+<span class="macro">#include</span> &lt;android/log.h&gt;
+
+<span class="keyword">class</span> <span class="type">BinderDiagnostics</span> {
+<span class="keyword">public</span>:
+    <span class="comment">/**</span>
+<span class="comment">     * قراءة إحصائيات Binder لعملية محددة</span>
+<span class="comment">     */</span>
+    <span class="keyword">static</span> <span class="type">bool</span> <span class="function">checkBufferPressure</span>(<span class="type">pid_t</span> <span class="function">pid</span>, <span class="type">float</span>&amp; <span class="function">usagePercent</span>) {
+        <span class="type">std::string</span> <span class="function">path</span> = <span class="string">"/d/binder/proc/"</span> + <span class="type">std</span>::<span class="function">to_string</span>(pid);
+        <span class="type">std::ifstream</span> <span class="function">file</span>(path);
+
+        <span class="keyword">if</span> (!file.<span class="function">is_open</span>()) {
+            <span class="macro">ALOGE</span>(<span class="string">"Failed to open %s"</span>, path.<span class="function">c_str</span>());
+            <span class="keyword">return</span> <span class="keyword">false</span>;
+        }
+
+        <span class="type">std::string</span> <span class="function">line</span>;
+        <span class="type">size_t</span> <span class="function">used</span> = <span class="number">0</span>, <span class="function">total</span> = <span class="number">0</span>;
+
+        <span class="keyword">while</span> (<span class="type">std</span>::<span class="function">getline</span>(file, line)) {
+            <span class="keyword">if</span> (line.<span class="function">find</span>(<span class="string">"buffer:"</span>) != <span class="type">std</span>::<span class="type">string</span>::<span class="function">npos</span>) {
+                <span class="comment">// تحليل السطر: "buffer: 256KB / 1024KB"</span>
+                <span class="type">std</span>::<span class="type">sscanf</span>(line.<span class="function">c_str</span>(), 
+                    <span class="string">"buffer: %zuKB / %zuKB"</span>, &amp;used, &amp;total);
+            }
+        }
+
+        <span class="keyword">if</span> (total > <span class="number">0</span>) {
+            usagePercent = (<span class="keyword">float</span>)used / total * <span class="number">100.0f</span>;
+
+            <span class="keyword">if</span> (usagePercent > <span class="number">80.0f</span>) {
+                <span class="macro">ALOGW</span>(<span class="string">"Binder buffer at %.1f%% — Risk of TransactionTooLarge!"</span>, 
+                      usagePercent);
+            }
+            <span class="keyword">return</span> <span class="keyword">true</span>;
+        }
+
+        <span class="keyword">return</span> <span class="keyword">false</span>;
+    }
+};</code></pre>
+
+  <div class="subsection-title">تدقيق الأمان: التحقق من UID/PID ومنع تصعيد الصلاحيات</div>
+  <p>
+    يُعدّ التحقق من هوية المتصل (Caller Identity) من أهم آليات الأمان في Android IPC. يجب على كل خدمة Binder (سواءً Native أو Java) التحقق من <code>UID</code> و <code>PID</code> قبل تنفيذ أي عملية حساسة.
+  </p>
+
+  <div class="warning-card">
+    <strong>🚨 خطأ شائع خطير:</strong> استدعاء <code>Binder.getCallingUid()</code> <strong>بعد</strong> إجراء IPC داخلي (مثل قراءة SharedPreferences أو الوصول إلى ContentProvider) سيعيد UID العملية الحالية (Self) بدلاً من UID المتصل الأصلي. يجب حفظ القيمة في متغير محلي فور دخول المعاملة.
+  </div>
+
+  <div class="code-caption">// C++ — Native Security Audit with IPCThreadState</div>
+  <pre dir="ltr"><code class="language-cpp"><span class="comment">// ============================================================</span>
+<span class="comment">// SecurityAudit.cpp — تدقيق أمان أصلي على مستوى Native</span>
+<span class="comment">// ============================================================</span>
+<span class="macro">#include</span> &lt;binder/IPCThreadState.h&gt;
+<span class="macro">#include</span> &lt;android/log.h&gt;
+
+<span class="keyword">class</span> <span class="type">SecurityManager</span> {
+<span class="keyword">public</span>:
+    <span class="comment">/**</span>
+<span class="comment">     * التحقق من أن المتصل يملك صلاحية النظام (System UID)</span>
+<span class="comment">     */</span>
+    <span class="keyword">static</span> <span class="type">bool</span> <span class="function">enforceSystemOrRoot</span>() {
+        <span class="comment">// الحصول على UID/PID من Binder Kernel Driver</span>
+        <span class="type">uid_t</span> <span class="function">callingUid</span> = <span class="type">IPCThreadState</span>::<span class="function">self</span>()-&gt;<span class="function">getCallingUid</span>();
+        <span class="type">pid_t</span> <span class="function">callingPid</span> = <span class="type">IPCThreadState</span>::<span class="function">self</span>()-&gt;<span class="function">getCallingPid</span>();
+
+        <span class="macro">ALOGD</span>(<span class="string">"Transaction from UID=%d, PID=%d"</span>, callingUid, callingPid);
+
+        <span class="comment">// AID_SYSTEM = 1000, AID_ROOT = 0</span>
+        <span class="keyword">if</span> (callingUid != <span class="number">1000</span> &amp;&amp; callingUid != <span class="number">0</span>) {
+            <span class="macro">ALOGE</span>(<span class="string">"Permission denied: UID %d not authorized"</span>, callingUid);
+            <span class="keyword">return</span> <span class="keyword">false</span>;
+        }
+
+        <span class="keyword">return</span> <span class="keyword">true</span>;
+    }
+
+    <span class="comment">/**</span>
+<span class="comment">     * التحقق من أن المتصل يملك تصريحاً محدداً</span>
+<span class="comment">     * (يتطلب PackageManagerService عبر IPC — احذر من تغيير الهوية!)</span>
+<span class="comment">     */</span>
+    <span class="keyword">static</span> <span class="type">bool</span> <span class="function">checkPermission</span>(<span class="keyword">const</span> <span class="type">String16</span>&amp; <span class="function">permission</span>) {
+        <span class="comment">// حفظ هوية المتصل قبل أي IPC داخلي</span>
+        <span class="type">uid_t</span> <span class="function">savedUid</span> = <span class="type">IPCThreadState</span>::<span class="function">self</span>()-&gt;<span class="function">getCallingUid</span>();
+        <span class="type">pid_t</span> <span class="function">savedPid</span> = <span class="type">IPCThreadState</span>::<span class="function">self</span>()-&gt;<span class="function">getCallingPid</span>();
+
+        <span class="comment">// ... يمكن الآن إجراء IPC داخلي بأمان ...</span>
+
+        <span class="comment">// استخدام savedUid بدلاً من getCallingUid() بعد IPC</span>
+        <span class="keyword">return</span> <span class="function">verifyPermissionWithPackageManager</span>(savedUid, permission);
+    }
+};</code></pre>
+
+  <div class="code-caption">// Kotlin — Java Layer Security Best Practices</div>
+  <pre dir="ltr"><code class="language-kotlin"><span class="keyword">package</span> com.example.security
+
+<span class="keyword">import</span> android.os.Binder
+<span class="keyword">import</span> android.os.Process
+<span class="keyword">import</span> android.content.pm.PackageManager
+
+<span class="comment">/**</span>
+<span class="comment"> * أدوات مساعدة للتحقق من الأمان في طبقة Java/Kotlin</span>
+<span class="comment"> */</span>
+<span class="keyword">object</span> <span class="type">BinderSecurityUtils</span> {
+
+    <span class="comment">/**</span>
+<span class="comment">     * التحقق من أن المتصل هو تطبيق نظام موثوق</span>
+<span class="comment">     */</span>
+    <span class="keyword">fun</span> <span class="function">enforceSystemCaller</span>() {
+        <span class="keyword">val</span> <span class="function">uid</span> = <span class="type">Binder</span>.<span class="function">getCallingUid</span>()
+        <span class="keyword">val</span> <span class="function">pid</span> = <span class="type">Binder</span>.<span class="function">getCallingPid</span>()
+
+        <span class="keyword">when</span> (uid) {
+            <span class="type">Process</span>.SYSTEM_UID,
+            <span class="type">Process</span>.PHONE_UID,
+            <span class="type">Process.SHELL_UID</span> -&gt; {
+                <span class="comment">// مسموح — تطبيق نظام</span>
+            }
+            <span class="keyword">else</span> -&gt; {
+                <span class="keyword">throw</span> <span class="type">SecurityException</span>(
+                    <span class="string">"Caller UID=$uid, PID=$pid is not authorized. "</span> +
+                    <span class="string">"Only system apps may access this service."</span>
+                )
+            }
+        }
+    }
+
+    <span class="comment">/**</span>
+<span class="comment">     * التحقق من تصريح محدد للمتصل</span>
+<span class="comment">     * يستخدم PackageManager للتحقق من AndroidManifest.xml</span>
+<span class="comment">     */</span>
+    <span class="keyword">fun</span> <span class="function">enforcePermission</span>(
+        pm: <span class="type">PackageManager</span>,
+        permission: <span class="type">String</span>
+    ) {
+        <span class="comment">// حفظ الهوية قبل أي IPC</span>
+        <span class="keyword">val</span> <span class="function">callingUid</span> = <span class="type">Binder</span>.<span class="function">getCallingUid</span>()
+
+        <span class="comment">// PackageManager.checkUidPermission يُجري IPC داخلياً!</span>
+        <span class="keyword">val</span> <span class="function">result</span> = pm.<span class="function">checkUidPermission</span>(permission, callingUid)
+
+        <span class="keyword">if</span> (result != <span class="type">PackageManager</span>.PERMISSION_GRANTED) {
+            <span class="keyword">throw</span> <span class="type">SecurityException</span>(
+                <span class="string">"Permission $permission not granted to UID $callingUid"</span>
+            )
+        }
+    }
+
+    <span class="comment">/**</span>
+<span class="comment">     * التحقق من أن المتصل هو نفس التطبيق (Same-App Verification)</span>
+<span class="comment">     * مفيد لمنع الوصول من تطبيقات أخرى حتى لو كانت تملك نفس التصريح</span>
+<span class="comment">     */</span>
+    <span class="keyword">fun</span> <span class="function">enforceSameApp</span>(expectedUid: <span class="type">Int</span>) {
+        <span class="keyword">val</span> <span class="function">callingUid</span> = <span class="type">Binder</span>.<span class="function">getCallingUid</span>()
+        <span class="keyword">if</span> (callingUid != expectedUid) {
+            <span class="keyword">throw</span> <span class="type">SecurityException</span>(
+                <span class="string">"Cross-app access denied. Expected UID=$expectedUid, "</span> +
+                <span class="string">"but got UID=$callingUid"</span>
+            )
+        }
+    }
+}</code></pre>
+
+  <div class="subsection-title">أفضل الممارسات لأداء IPC عالي الكفاءة</div>
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th>الممارسة</th>
+        <th>الوصف</th>
+        <th>التأثير</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>تقليل حجم Parcel</td>
+        <td>تجنب إرسال Bitmap كاملة؛ استخدم URI أو Thumbnail</td>
+        <td>يمنع TransactionTooLargeException</td>
+      </tr>
+      <tr>
+        <td>استخدام ONE_WAY</td>
+        <td>للعمليات غير المتزامنة (Fire-and-Forget)، استخدم TF_ONE_WAY</td>
+        <td>يقلل تأخير الانتظار (Blocking Time)</td>
+      </tr>
+      <tr>
+        <td>تجميع المعاملات</td>
+        <td>أرسل عدة عمليات في Parcel واحد بدلاً من معاملات منفصلة</td>
+        <td>يقلل Context Switches</td>
+      </tr>
+      <tr>
+        <td>Cache Local Objects</td>
+        <td>احتفظ بمرجع IBinder محلي لتجنب البحث المتكرر في ServiceManager</td>
+        <td>يقلل Latency بنسبة 30-50%</td>
+      </tr>
+      <tr>
+        <td>تجنب IPC في Main Thread</td>
+        <td>نفذ جميع IPC في خيط خلفي (Background Thread)</td>
+        <td>يمنع ANR (Application Not Responding)</td>
+      </tr>
+      <tr>
+        <td>Reference Counting</td>
+        <td>استخدم sp&lt;&gt; و wp&lt;&gt; في C++ لتجنب تسريبات Binder Objects</td>
+        <td>يمنع Memory Leaks و Binder Thread Starvation</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="purple-card">
+    <strong>🎯 الخلاصة المعمارية:</strong> يُعدّ Binder IPC العمود الفقري لكل تواصل بين العمليات في Android. فهمه العميق — من آلية <code>mmap()</code> للنسخة الواحدة، إلى قواعد محاذاة <code>Parcel</code>، إلى التحقق من <code>UID/PID</code> — يُميّز المهندس المتمرس عن المبتدئ. كل استدعاء <code>transact()</code> يمر بـ 5 مراحل حرجة: بناء Parcel → ioctl → Kernel Validation → Object Translation → Thread Wakeup → Reply Serialization. إتقان هذه المراحل يعني إتقان Android OS Internals.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- FOOTER                                                       -->
+<!-- ============================================================ -->
+<div class="document-footer">
+  <p>الدليل الشامل لمحرك التواصل Binder IPC وعزل العمليات — الجزء الأول</p>
+  <p>بلوك 6: اليوم 11-12 | Android OS Internals & Low-Level IPC</p>
+  <p style="margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.6;">
+    تم إعداد هذا المرجع بأسلوب تقني احترافي — يتضمن شيفرات C++ Native و Kotlin Parcelable وأدوات تشخيص النواة
+  </p>
+</div>
+
+</div> <!-- end container -->
+</body>
+</html>

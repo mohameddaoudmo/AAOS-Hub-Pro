@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="دليل معماري شامل لبنات بناء تصميم أنظمة الهواتف المحمولة - الجزء الثاني">
+<title>PART II: Mobile System Design Building Blocks | الدليل المعماري الشامل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Tajawal:wght@300;400;500;700;800;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --deep-slate: #0F172A;
+    --cyan-electric: #06B6D4;
+    --emerald: #10B981;
+    --amber: #F59E0B;
+    --crimson: #EF4444;
+    --soft-bg: #F8FAFC;
+    --card-bg: #FFFFFF;
+    --text-primary: #1E293B;
+    --text-secondary: #64748B;
+    --border-light: #E2E8F0;
+    --code-bg: #1E293B;
+    --code-text: #E2E8F0;
+    --gradient-hero: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; font-size: 16px; }
+  body {
+    font-family: 'Tajawal', 'Cairo', 'Segoe UI', sans-serif;
+    background-color: var(--soft-bg);
+    color: var(--text-primary);
+    line-height: 1.8;
+    overflow-x: hidden;
+  }
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: var(--soft-bg); }
+  ::-webkit-scrollbar-thumb { background: var(--cyan-electric); border-radius: 5px; }
+  ::-webkit-scrollbar-thumb:hover { background: #0891b2; }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cairo', 'Tajawal', sans-serif;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--deep-slate);
+  }
+  h1 { font-size: 2.5rem; }
+  h2 { font-size: 2rem; margin-top: 3rem; margin-bottom: 1.5rem; }
+  h3 { font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--deep-slate); }
+  h4 { font-size: 1.25rem; margin-top: 2rem; margin-bottom: 0.75rem; color: #334155; }
+  p { margin-bottom: 1.25rem; font-size: 1.05rem; color: var(--text-primary); }
+  a { color: var(--cyan-electric); text-decoration: none; transition: color 0.2s; }
+  a:hover { color: #0891b2; text-decoration: underline; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+  nav {
+    position: sticky; top: 0; z-index: 1000;
+    background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(6, 182, 212, 0.2); padding: 0.75rem 0;
+  }
+  nav .container { display: flex; justify-content: space-between; align-items: center; }
+  .nav-brand {
+    font-family: 'Cairo', sans-serif; font-weight: 800; font-size: 1.25rem;
+    color: var(--cyan-electric); letter-spacing: -0.5px;
+  }
+  .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+  .nav-links a { color: #cbd5e1; font-weight: 500; font-size: 0.9rem; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--cyan-electric); text-decoration: none; }
+  .hero {
+    background: var(--gradient-hero); color: white;
+    padding: 5rem 0 4rem; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -50%; right: -10%;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 70%);
+    border-radius: 50%; pointer-events: none;
+  }
+  .hero::after {
+    content: ''; position: absolute; bottom: -30%; left: -5%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%);
+    border-radius: 50%; pointer-events: none;
+  }
+  .hero-content { position: relative; z-index: 1; text-align: center; }
+  .hero-badge {
+    display: inline-block; background: rgba(6, 182, 212, 0.15);
+    color: var(--cyan-electric); border: 1px solid rgba(6, 182, 212, 0.3);
+    padding: 0.5rem 1.25rem; border-radius: 9999px; font-size: 0.875rem;
+    font-weight: 700; margin-bottom: 1.5rem; letter-spacing: 0.5px;
+  }
+  .hero h1 { color: white; font-size: 3rem; margin-bottom: 1rem; font-weight: 900; }
+  .hero p { color: #94a3b8; font-size: 1.25rem; max-width: 700px; margin: 0 auto 2rem; }
+  .hero-meta { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-top: 2rem; }
+  .hero-meta-item { text-align: center; }
+  .hero-meta-item .number {
+    display: block; font-size: 2rem; font-weight: 900;
+    color: var(--cyan-electric); font-family: 'Cairo', sans-serif;
+  }
+  .hero-meta-item .label { font-size: 0.875rem; color: #94a3b8; font-weight: 500; }
+  section { padding: 3rem 0; }
+  .section-header {
+    margin-bottom: 2.5rem; padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-light);
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .section-number {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 48px; height: 48px; background: var(--cyan-electric);
+    color: white; font-weight: 900; font-size: 1.25rem;
+    border-radius: 12px; font-family: 'Cairo', sans-serif; flex-shrink: 0;
+  }
+  .section-title-wrapper h2 { margin: 0; font-size: 1.75rem; }
+  .section-title-wrapper .section-subtitle {
+    color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.25rem;
+  }
+  .card {
+    background: var(--card-bg); border-radius: 16px; padding: 2rem;
+    margin-bottom: 2rem; box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-light);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover { box-shadow: var(--shadow-lg); }
+  .card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
+  .card-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.25rem;
+  }
+  .card-icon.cyan { background: rgba(6, 182, 212, 0.1); color: var(--cyan-electric); }
+  .card-icon.emerald { background: rgba(16, 185, 129, 0.1); color: var(--emerald); }
+  .card-icon.amber { background: rgba(245, 158, 11, 0.1); color: var(--amber); }
+  .card-icon.crimson { background: rgba(239, 68, 68, 0.1); color: var(--crimson); }
+  .card-title { font-size: 1.25rem; font-weight: 700; color: var(--deep-slate); margin: 0; }
+  .callout {
+    border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0;
+    border-right: 4px solid; position: relative;
+  }
+  .callout.info { background: rgba(6, 182, 212, 0.05); border-color: var(--cyan-electric); }
+  .callout.success { background: rgba(16, 185, 129, 0.05); border-color: var(--emerald); }
+  .callout.warning { background: rgba(245, 158, 11, 0.05); border-color: var(--amber); }
+  .callout.danger { background: rgba(239, 68, 68, 0.05); border-color: var(--crimson); }
+  .callout-title {
+    font-weight: 800; font-size: 1.1rem; margin-bottom: 0.5rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .callout.info .callout-title { color: var(--cyan-electric); }
+  .callout.success .callout-title { color: var(--emerald); }
+  .callout.warning .callout-title { color: var(--amber); }
+  .callout.danger .callout-title { color: var(--crimson); }
+  pre, code { font-family: 'Fira Code', 'Consolas', 'Monaco', monospace; font-size: 0.9rem; }
+  pre {
+    background: var(--code-bg); color: var(--code-text); padding: 1.5rem;
+    border-radius: 12px; overflow-x: auto; margin: 1.5rem 0;
+    line-height: 1.6; border: 1px solid #334155; position: relative;
+  }
+  pre[dir="ltr"] { direction: ltr; text-align: left; }
+  code {
+    background: rgba(6, 182, 212, 0.1); color: var(--cyan-electric);
+    padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.85em;
+  }
+  pre code { background: transparent; color: inherit; padding: 0; font-size: inherit; }
+  .code-header {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #0f172a; padding: 0.5rem 1rem;
+    border-radius: 12px 12px 0 0; border: 1px solid #334155;
+    border-bottom: none; margin-bottom: -1px;
+    font-family: 'Fira Code', monospace; font-size: 0.8rem; color: #94a3b8;
+  }
+  .code-lang {
+    background: rgba(6, 182, 212, 0.2); color: var(--cyan-electric);
+    padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: 600;
+  }
+  .table-wrapper {
+    overflow-x: auto; margin: 2rem 0;
+    border-radius: 12px; box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-light);
+  }
+  table { width: 100%; border-collapse: collapse; background: var(--card-bg); font-size: 0.95rem; }
+  thead { background: var(--deep-slate); color: white; }
+  th { padding: 1rem 1.25rem; text-align: right; font-weight: 700; font-family: 'Cairo', sans-serif; white-space: nowrap; }
+  td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-light); color: var(--text-primary); vertical-align: top; }
+  tbody tr:hover { background: rgba(6, 182, 212, 0.03); }
+  tbody tr:last-child td { border-bottom: none; }
+  .badge {
+    display: inline-block; padding: 0.25rem 0.75rem;
+    border-radius: 9999px; font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 0.5px; margin-left: 0.5rem; white-space: nowrap;
+  }
+  .badge-cyan { background: rgba(6, 182, 212, 0.1); color: #0891b2; }
+  .badge-emerald { background: rgba(16, 185, 129, 0.1); color: #059669; }
+  .badge-amber { background: rgba(245, 158, 11, 0.1); color: #d97706; }
+  .badge-crimson { background: rgba(239, 68, 68, 0.1); color: #dc2626; }
+  .badge-slate { background: rgba(100, 116, 139, 0.1); color: #475569; }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+  .compare-card {
+    background: var(--card-bg); border-radius: 12px; padding: 1.5rem;
+    border: 1px solid var(--border-light); border-top: 4px solid var(--cyan-electric);
+  }
+  .compare-card h4 { margin-top: 0; color: var(--deep-slate); font-size: 1.1rem; }
+  .compare-card ul { margin: 0; padding-right: 1.25rem; color: var(--text-secondary); }
+  .compare-card li { margin-bottom: 0.5rem; }
+  .decision-flow { display: flex; flex-direction: column; gap: 1rem; margin: 2rem 0; }
+  .decision-node {
+    background: var(--card-bg); border: 2px solid var(--border-light);
+    border-radius: 12px; padding: 1.25rem; position: relative; transition: all 0.2s;
+  }
+  .decision-node:hover { border-color: var(--cyan-electric); box-shadow: var(--shadow-md); }
+  .decision-node::after {
+    content: '▼'; position: absolute; bottom: -1.5rem; left: 50%;
+    transform: translateX(-50%); color: var(--cyan-electric); font-size: 0.75rem;
+  }
+  .decision-node:last-child::after { display: none; }
+  .node-question { font-weight: 700; color: var(--deep-slate); margin-bottom: 0.5rem; font-size: 1.1rem; }
+  .node-answer { color: var(--text-secondary); font-size: 0.95rem; }
+  ul, ol { margin-bottom: 1.25rem; padding-right: 1.5rem; }
+  li { margin-bottom: 0.75rem; }
+  .interview-box {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+    color: white; border-radius: 16px; padding: 2rem;
+    margin: 2rem 0; position: relative; overflow: hidden;
+  }
+  .interview-box::before {
+    content: ''; position: absolute; top: 0; right: 0;
+    width: 150px; height: 150px;
+    background: radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 70%);
+  }
+  .interview-box h3 { color: var(--cyan-electric); margin-top: 0; font-size: 1.5rem; }
+  .interview-box p, .interview-box li { color: #cbd5e1; }
+  .interview-box ul { margin-top: 1rem; }
+  .interview-box li::marker { color: var(--cyan-electric); }
+  footer {
+    background: var(--deep-slate); color: #94a3b8;
+    text-align: center; padding: 3rem 0; margin-top: 4rem;
+    border-top: 1px solid rgba(6, 182, 212, 0.2);
+  }
+  footer p { color: #94a3b8; margin: 0; }
+  @media (max-width: 768px) {
+    h1 { font-size: 1.75rem; } h2 { font-size: 1.5rem; }
+    .hero h1 { font-size: 2rem; } .hero p { font-size: 1rem; }
+    .nav-links { display: none; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .card { padding: 1.25rem; }
+    pre { padding: 1rem; font-size: 0.8rem; }
+    th, td { padding: 0.75rem; font-size: 0.85rem; }
+  }
+  @media print { nav { display: none; } .hero { padding: 2rem 0; } .card { break-inside: avoid; } }
+  .text-cyan { color: var(--cyan-electric); }
+  .text-emerald { color: var(--emerald); }
+  .text-amber { color: var(--amber); }
+  .text-crimson { color: var(--crimson); }
+  .text-center { text-align: center; }
+  .mt-2 { margin-top: 2rem; } .mb-2 { margin-bottom: 2rem; }
+  .fw-bold { font-weight: 700; }
+  .checklist { list-style: none; padding: 0; }
+  .checklist li { position: relative; padding-right: 2rem; margin-bottom: 1rem; }
+  .checklist li::before {
+    content: '✓'; position: absolute; right: 0; top: 2px;
+    color: var(--emerald); font-weight: 900; width: 24px; height: 24px;
+    background: rgba(16, 185, 129, 0.1); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem;
+  }
+  .diagram-box {
+    background: var(--code-bg); color: var(--code-text); border-radius: 12px;
+    padding: 1.5rem; margin: 1.5rem 0; font-family: 'Fira Code', monospace;
+    direction: ltr; text-align: left; border: 1px solid #334155;
+    overflow-x: auto; line-height: 1.6;
+  }
+  .diagram-box .comment { color: #6b7280; }
+  .diagram-box .keyword { color: #c084fc; }
+  .diagram-box .string { color: #4ade80; }
+  .diagram-box .component { color: #60a5fa; }
+  .diagram-box .arrow { color: #fbbf24; }
+  .highlight-box {
+    background: linear-gradient(135deg, rgba(6,182,212,0.05) 0%, rgba(16,185,129,0.05) 100%);
+    border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 12px;
+    padding: 1.5rem; margin: 1.5rem 0;
+  }
+  .highlight-box h4 { margin-top: 0; color: var(--deep-slate); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <div class="nav-brand">Mobile System Design</div>
+    <ul class="nav-links">
+      <li><a href="#ch4">الفصل 4</a></li>
+      <li><a href="#ch5">الفصل 5</a></li>
+      <li><a href="#ch6">الفصل 6</a></li>
+      <li><a href="#ch7">الفصل 7</a></li>
+      <li><a href="#ch8">الفصل 8</a></li>
+      <li><a href="#ch9">الفصل 9</a></li>
+      <li><a href="#ch10">الفصل 10</a></li>
+      <li><a href="#matrices">المصفوفات</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container hero-content">
+    <div class="hero-badge">الجزء الثاني &bull; الدليل المعماري الشامل</div>
+    <h1>لبنات بناء تصميم أنظمة الهواتف المحمولة</h1>
+    <p>دليل احترافي متكامل يغطي الأنماط المعمارية، تصميم طبقات الشبكة والتخزين، التصميم الداعم للعمل بدون إنترنت، التحديثات المباشرة، أساسيات الأداء، والأمان — مُعدٌّ بعناية لمهندسي الأنظمة وأسئلة المقابلات التقنية.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><span class="number">7</span><span class="label">فصول معمارية</span></div>
+      <div class="hero-meta-item"><span class="number">4</span><span class="label">مصفوفات قرارات</span></div>
+      <div class="hero-meta-item"><span class="number">∞</span><span class="label">تحليلات مقابلة</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+<section id="ch4">
+  <div class="section-header">
+    <div class="section-number">4</div>
+    <div class="section-title-wrapper">
+      <h2>أنماط معمارية التطبيقات</h2>
+      <div class="section-subtitle">App Architecture Patterns — اختيار النمط المعماري والتفكير الطبقي</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon cyan">⚙</div>
+      <h3 class="card-title">مقارنة سريعة: MVC vs MVP vs MVVM vs MVI vs Clean Architecture</h3>
+    </div>
+    <p>عند تصميم تطبيقات الهواتف المحمولة على نطاق واسع، يُعدّ اختيار النمط المعماري (Architecture Pattern) قرارًا استراتيجيًا يؤثر على قابلية الاختبار (Testability)، وقابلية الصيانة (Maintainability)، ومرونة التوسع (Scalability). فيما يلي تحليل معمقي للأنماط الأكثر شيوعًا:</p>
+
+    <h4>1. MVC (Model-View-Controller)</h4>
+    <p>في هذا النمط الكلاسيكي، يتحمل <strong>Controller</strong> مسؤولية استقبال مدخلات المستخدم وتحديث <strong>Model</strong>، بينما يقوم <strong>View</strong> بعرض البيانات. المشكلة الجوهرية في تطبيقات الهواتف أن <code>View</code> و <code>Controller</code> يميلان للارتباط الشديد (Tight Coupling)، مما يجعل الاختبارات الوحدية (Unit Testing) صعبة للغاية. يُستخدم هذا النمط غالبًا في تطبيقات iOS التقليدية مع <code>UIViewController</code> الذي يجمع بين المنطق والعرض.</p>
+
+    <div class="diagram-box">
+<span class="comment"># MVC Data Flow</span>
+User Input <span class="arrow">→</span> <span class="component">Controller</span> <span class="arrow">→</span> <span class="component">Model</span> (update state)
+                     <span class="arrow">↓</span>
+              <span class="component">View</span> <span class="arrow">←</span> (observes/renders)
+<span class="comment"># Problem: View and Controller are often the same class in mobile (e.g., UIViewController)</span>
+    </div>
+
+    <h4>2. MVP (Model-View-Presenter)</h4>
+    <p>يُقدّم <strong>Presenter</strong> كوسيط (Mediator) بين <code>View</code> و <code>Model</code>. الـ <code>View</code> هنا تكون "Passive View" أي أنها لا تحتوي على منطق تقريبًا. الـ <code>Presenter</code> يستقبل الأحداث من <code>View</code>، يعالجها، ويُرجع أوامر العرض مرة أخرى. هذا يُحسّن الاختبار لأن الـ <code>Presenter</code> يمكن اختباره بمعزل عن إطار العمل (Framework-Independent Logic)، لكنه يؤدي إلى كتابة كمية كبيرة من الشفرة الوسيطة (Boilerplate Code).</p>
+
+    <h4>3. MVVM (Model-View-ViewModel)</h4>
+    <p>يُعدّ من أكثر الأنماط شيوعًا في تطبيقات Android و iOS الحديثة. يحتوي <strong>ViewModel</strong> على حالة العرض (Presentation State) كبيانات قابلة للملاحظة (Observable Data). يستخدم <code>Data Binding</code> أو <code>StateFlow</code> / <code>LiveData</code> لنقل الحالة من الـ <code>ViewModel</code> إلى الـ <code>View</code>. التدفق هنا ثنائي الاتجاه (Bidirectional) في بعض التطبيقات، لكنه يميل للاتجاه الواحد (Unidirectional) في التطبيقات الحديثة.</p>
+
+    <div class="callout info">
+      <div class="callout-title">💡 تحليل المقابلة</div>
+      <p>عند مناقشة MVVM في مقابلة، اذكر دائمًا الفرق بين <strong>ViewModel</strong> كمفهوم معماري (Presentation Logic) و <strong>AndroidX ViewModel</strong> كفئة إطار عمل تتعامل مع دورة حياة الشاشة (Lifecycle Awareness). هذا يُظهر فهمًا عميقًا للطبقات.</p>
+    </div>
+
+    <h4>4. MVI (Model-View-Intent)</h4>
+    <p>يُبني على فكرة <strong>التدفق الواحد غير القابل للتغيير (Unidirectional Immutable Data Flow)</strong>. كل تفاعل من المستخدم يُمثّل بـ <code>Intent</code>، يُعالج لإنتاج <code>State</code> جديدة تمامًا. يضمن هذا النمط أن حالة التطبيق في أي لحظة هي نتيجة تسلسل محدد من الأحداث، مما يُسهّل تصحيح الأخطاء (Time-Travel Debugging). التحدي الرئيسي هو التعامل مع الحالات المتوسطة (Transient States) والأحداث الجانبية (Side Effects / One-shot Events).</p>
+
+    <h4>5. Clean Architecture</h4>
+    <p>ليس نمطًا بحد ذاته، بل هو <strong>فلسفة طبقية (Layered Philosophy)</strong> تفرض فصل المسؤوليات (Separation of Concerns) عبر طبقات متحدة المركز (Concentric Layers):</p>
+    <ul>
+      <li><strong>Domain Layer:</strong> تحتوي على كيانات العمل (Business Entities)، و حالات الاستخدام (Use Cases)، ومنطق العمل النقي (Pure Business Logic) — وهي مستقلة تمامًا عن إطار العمل.</li>
+      <li><strong>Data Layer:</strong> تتعامل مع المستودعات (Repositories)، ومصادر البيانات (Data Sources)، وشبكات الاتصال (Network APIs)، وقواعد البيانات المحلية (Local Databases).</li>
+      <li><strong>Presentation Layer:</strong> تتعامل مع وحدات العرض (UI Views)، ونماذج العرض (ViewModels)، وانبعاث حالة واجهة المستخدم (UI State Emission).</li>
+    </ul>
+  </div>
+
+  <div class="interview-box">
+    <h3>🎯 كيف تُبرّر اختيارك المعماري في المقابلة (45 دقيقة)</h3>
+    <p>في جلسة تصميم نظام محمول (Mobile System Design Interview)، يجب أن يكون اختيارك مبررًا بناءً على:</p>
+    <ul>
+      <li><strong>حجم الفريق:</strong> MVVM + Clean Architecture مثالي للفرق الكبيرة (>10 مهندسين) لأنه يفرض حدودًا واضحة.</li>
+      <li><strong>تعقيد الحالة:</strong> إذا كانت الشاشة تحتوي على حالات متداخلة كثيرًا (Complex UI State)، فإن MVI يُقلل من الأخطاء.</li>
+      <li><strong>سرعة التطوير:</strong> MVP أو MVVM البسيط قد يكون أفضل لـ MVP (Minimum Viable Product) مع فريق صغير.</li>
+      <li><strong>قابلية الاختبار:</strong> اذكر دائمًا كيف سيسهل نمطك كتابة الـ Unit Tests دون الحاجة لـ Android Emulator أو iOS Simulator.</li>
+      <li><strong>التوافق مع التقنيات:</strong> في Android، MVVM مع <code>Jetpack ViewModel</code> و <code>StateFlow</code> هو الخيار الأكثر أمانًا. في iOS، <code>MVVM</code> مع <code>Combine</code> أو <code>RxSwift</code> شائع.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon emerald">🔄</div>
+      <h3 class="card-title">حقن التبعيات (Dependency Injection — DI)</h3>
+    </div>
+    <p>يُعدّ DI أمرًا <strong>إلزاميًا</strong> في التطبيقات الكبيرة لثلاثة أسباب جوهرية:</p>
+    <ol>
+      <li><strong>فك الارتباط (Decoupling):</strong> لا يجب أن يعرف الـ <code>ViewModel</code> كيف يتم إنشاء الـ <code>Repository</code>، بل يتلقاه كتبعية.</li>
+      <li><strong>إمكانية المحاكاة (Mockability):</strong> في الاختبارات، يمكن حقن نسخ وهمية (Mock Implementations) لاختبار الوحدات بمعزل.</li>
+      <li><strong>إدارة النطاقات (Scope Management):</strong> التحكم في دورة حياة الكائنات (Singleton vs Activity Scope vs Fragment Scope).</li>
+    </ol>
+    <p>في Android، يُستخدم <strong>Hilt</strong> (بناءً على Dagger) لأنه يقلل من الشفرة الوسيطة. في iOS، يُستخدم <strong>Swinject</strong> أو <strong>Factory</strong> pattern مع Protocol-Oriented Programming. في Flutter، يُستخدم <strong>GetIt</strong> أو <strong>Provider</strong> للوصول إلى التبعيات.</p>
+
+    <div class="code-header">
+      <span>Dependency Injection Example</span>
+      <span class="code-lang">Kotlin + Hilt</span>
+    </div>
+    <pre dir="ltr"><code>@Module
+@InstallIn(SingletonComponent::class)
+object NetworkModule {
+    @Provides
+    @Singleton
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+}
+
+@HiltViewModel
+class UserViewModel @Inject constructor(
+    private val getUserUseCase: GetUserUseCase,
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel() { ... }</code></pre>
+  </div>
+</section>
+
+<section id="ch5">
+  <div class="section-header">
+    <div class="section-number">5</div>
+    <div class="section-title-wrapper">
+      <h2>تصميم طبقة الشبكة</h2>
+      <div class="section-subtitle">Networking Layer Design — تصميم عميل HTTP قوي واستراتيجيات التواصل</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon cyan">🌐</div>
+      <h3 class="card-title">تصميم عميل API مركزي (Centralized API Client)</h3>
+    </div>
+    <p>تُعدّ طبقة الشبكة العمود الفقري لأي تطبيق محمول حديث. يجب أن يكون عميل HTTP مركزيًا (Centralized) يدير جميع الاتصالات الصادرة. في Android، يُستخدم <strong>OkHttp</strong> مع <strong>Retrofit</strong>. في iOS، يُستخدم <strong>Alamofire</strong> أو <strong>URLSession</strong> مع أغلفة مخصصة (Wrappers).</p>
+
+    <h4>سلسلة المعترضات (Interceptor Pipeline)</h4>
+    <p>يجب تصميم خط أنابيب (Pipeline) من المعترضات (Interceptors) لمعالجة المخاوف المشتركة (Cross-Cutting Concerns):</p>
+    <ul>
+      <li><strong>Auth Interceptor:</strong> إرفاق رموز المصادقة (Bearer Token) تلقائيًا مع كل طلب.</li>
+      <li><strong>Logging Interceptor:</strong> تسجيل الطلبات والاستجابات في بيئات التطوير فقط.</li>
+      <li><strong>Header Interceptor:</strong> إضافة رؤوس ثابتة مثل <code>Accept: application/json</code> و <code>User-Agent</code> و <code>App-Version</code>.</li>
+      <li><strong>Retry Interceptor:</strong> إعادة المحاولة تلقائيًا للطلبات الآمنة (Idempotent Requests) عند فشل الشبكة.</li>
+    </ul>
+
+    <div class="code-header">
+      <span>OkHttp Interceptor Chain</span>
+      <span class="code-lang">Kotlin</span>
+    </div>
+    <pre dir="ltr"><code>val okHttpClient = OkHttpClient.Builder()
+    .addInterceptor(AuthInterceptor(tokenProvider))
+    .addInterceptor(HeaderInterceptor(appVersion))
+    .addNetworkInterceptor(loggingInterceptor)
+    .connectTimeout(15, TimeUnit.SECONDS)
+    .readTimeout(30, TimeUnit.SECONDS)
+    .writeTimeout(30, TimeUnit.SECONDS)
+    .connectionPool(ConnectionPool(5, 5, TimeUnit.MINUTES))
+    .build()</code></pre>
+
+    <h4>دعم البيئات المتعددة (Multi-Environment Support)</h4>
+    <p>يجب أن يدعم العميل التبديل السلس بين بيئات التطوير (Development)، والاختبار (Staging)، والإنتاج (Production) دون تعديل الشفرة المصدرية (Source Code). يُنفذ ذلك عبر <code>BuildConfig</code> في Android أو <code>XCConfig</code> في iOS.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon amber">⚠</div>
+      <h3 class="card-title">معالجة الأخطاء والمهل الزمنية وإعادة المحاولة</h3>
+    </div>
+    <p>تصنيف الأخطاء في طبقة الشبكة هو المفتاح لتجربة مستخدم مرنة:</p>
+    <div class="grid-3">
+      <div class="compare-card" style="border-top-color: var(--crimson);">
+        <h4>Network Failure</h4>
+        <ul>
+          <li>انقطاع الاتصال</li>
+          <li>DNS Resolution فاشل</li>
+          <li>Timeout على مستوى المقبس (Socket)</li>
+        </ul>
+      </div>
+      <div class="compare-card" style="border-top-color: var(--amber);">
+        <h4>HTTP 4xx / 5xx</h4>
+        <ul>
+          <li>401 Unauthorized → إعادة تفريغ الرمز (Token Refresh)</li>
+          <li>429 Too Many Requests → Backoff</li>
+          <li>500 Server Error → إعادة محاولة محدودة</li>
+        </ul>
+      </div>
+      <div class="compare-card" style="border-top-color: var(--cyan-electric);">
+        <h4>Parsing Errors</h4>
+        <ul>
+          <li>JSON Malformed</li>
+          <li>Missing Required Fields</li>
+          <li>Type Mismatch (e.g., String vs Int)</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4>خوارزمية التراجع الأسي مع الاختلال (Exponential Backoff with Jitter)</h4>
+    <p>لمنع مشكلة <strong>Thundering Herd</strong> (حين يتزامن آلاف العملاء في إعادة المحاولة في نفس اللحظة)، يُستخدم التراجع الأسي مع إضافة عنصر عشوائي (Jitter):</p>
+
+    <div class="code-header">
+      <span>Exponential Backoff with Jitter</span>
+      <span class="code-lang">Pseudocode</span>
+    </div>
+    <pre dir="ltr"><code>function calculateBackoff(attempt, baseDelay, maxDelay):
+    exponential = baseDelay * (2 ^ attempt)
+    jitter = random(0, exponential)  // Full Jitter
+    return min(exponential + jitter, maxDelay)
+
+// Example: base=100ms, max=10s
+// Attempt 1: ~100-200ms
+// Attempt 2: ~200-400ms
+// Attempt 3: ~400-800ms
+// Attempt 4: ~800-1600ms
+// ... capped at 10 seconds</code></pre>
+
+    <div class="callout warning">
+      <div class="callout-title">⚠ تحذير معماري</div>
+      <p>لا تعيد محاولة الطلبات غير الآمنة (Non-Idempotent) مثل POST تلقائيًا بدون آلية deduplication (مثل <code>Idempotency-Key</code> header). خلاف ذلك، قد تؤدي إلى إنشاء طلبات مكررة (Duplicate Charges أو Duplicate Posts).</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon emerald">📄</div>
+      <h3 class="card-title">استراتيجيات الترقيم (Pagination Strategies)</h3>
+    </div>
+    <p>اختيار استراتيجية الترقيم يؤثر بشكل مباشر على أداء قاعدة البيانات وتجربة المستخدم:</p>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>الاستراتيجية</th>
+            <th>الآلية</th>
+            <th>الإيجابيات</th>
+            <th>السلبيات</th>
+            <th>الاستخدام الأمثل</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Offset-based</strong></td>
+            <td><code>?page=3&limit=20</code></td>
+            <td>سهل التنفيذ؛ قابل للقفز لأي صفحة</td>
+            <td>أداء ضعيف مع Offset كبير (O(n) in DB); مشاكل العناصر المكررة/المفقودة في التغذيات الحية (Live Feeds)</td>
+            <td>قوائم ثابتة نسبيًا؛ جداول الإدارة</td>
+          </tr>
+          <tr>
+            <td><strong>Cursor-based</strong></td>
+            <td><code>?cursor=abc123&limit=20</code></td>
+            <td>أداء ثابت O(1) في DB; لا توجد مشاكل تغير الإزاحة</td>
+            <td>لا يمكن القفز لصفحة عشوائية; يتطلب فهرسًا فريدًا</td>
+            <td>التغذيات الاجتماعية (Social Feeds); قوائم الرسائل</td>
+          </tr>
+          <tr>
+            <td><strong>Keyset Pagination</strong></td>
+            <td><code>?last_id=456&last_score=99</code></td>
+            <td>أفضل أداء للجداول الكبيرة; يتعامل مع الترتيب المعقد</td>
+            <td>معقد التنفيذ; يتطلب فهارس مركبة (Composite Indexes)</td>
+            <td>قوائم المهام المرتبة; تصنيفات الأداء (Leaderboards)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout danger">
+      <div class="callout-title">🚨 مشكلة العناصر المكررة في التغذيات الحية</div>
+      <p>عند استخدام <strong>Offset-based</strong> في تغذية حية (مثل Twitter أو Instagram)، إذا تم إدراج عنصر جديد أثناء تمرير المستخدم، فإن العنصر الذي كان في الموضع <code>offset=20</code> يتحول إلى <code>offset=21</code>، مما يؤدي إلى تكرار العنصر أو فقده. الحل هو استخدام <strong>Cursor-based</strong> أو تطبيق آلية deduplication على جانب العميل باستخدام معرفات فريدة (Stable IDs).</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon crimson">📤</div>
+      <h3 class="card-title">رفع وتحميل الملفات والصور</h3>
+    </div>
+    <p>يتطلب نقل الملفات الكبيرة معالجة خاصة للحفاظ على موثوقية التطبيق:</p>
+    <ul>
+      <li><strong>Multipart Uploads:</strong> تقسيم النموذج إلى أجزاء (Parts) باستخدام <code>multipart/form-data</code>. يُستخدم في Android مع <code>MultipartBody</code> وفي iOS مع <code>MultipartFormData</code>.</li>
+      <li><strong>Resumable Uploads (TUS Protocol):</strong> بروتوكول مفتوح المصدر يسمح باستئناف الرفع من النقطة التي توقف عندها. حيوي جدًا في الشبكات غير المستقرة (3G/4G المتقطع).</li>
+      <li><strong>Chunking:</strong> تقسيم الملف إلى قطع صغيرة (Chunks) ورفعها بشكل متوازٍ (Parallel) أو تسلسلي (Sequential) مع إعادة محاولة القطعة الفاشلة فقط.</li>
+      <li><strong>Background Execution:</strong> في Android، يُستخدم <strong>WorkManager</strong> لضمان اكتمال الرفع حتى عند إغلاق التطبيق. في iOS، يُستخدم <strong>URLSessionBackgroundConfiguration</strong> مع <code>BGTaskScheduler</code>.</li>
+    </ul>
+
+    <div class="code-header">
+      <span>Background Upload WorkManager</span>
+      <span class="code-lang">Kotlin</span>
+    </div>
+    <pre dir="ltr"><code>val uploadWork = OneTimeWorkRequestBuilder&lt;UploadWorker&gt;()
+    .setInputData(workDataOf(
+        "FILE_URI" to fileUri.toString(),
+        "UPLOAD_URL" to uploadUrl
+    ))
+    .setConstraints(
+        Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresBatteryNotLow(true)
+            .build()
+    )
+    .setBackoffCriteria(
+        BackoffPolicy.EXPONENTIAL,
+        WorkRequest.MIN_BACKOFF_MILLIS,
+        TimeUnit.MILLISECONDS
+    )
+    .build()
+
+WorkManager.getInstance(context).enqueueUniqueWork(
+    "upload_${fileUri.lastPathSegment}",
+    ExistingWorkPolicy.KEEP,
+    uploadWork
+)</code></pre>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon cyan">🚀</div>
+      <h3 class="card-title">شبكات توصيل المحتوى (CDNs)</h3>
+    </div>
+    <p>تُعدّ CDNs حيوية لتقليل زمن الوصول (Latency) وتخفيف الحمل على خادم الأصل (Origin Server):</p>
+    <ul>
+      <li><strong>Edge Caching:</strong> تخزين الأصول الثابتة (Static Assets) في نقاط حافة (Edge Nodes) قريبة جغرافيًا من المستخدم.</li>
+      <li><strong>Image Resizing on the Fly:</strong> تغيير أبعاد الصور ديناميكيًا عبر معلمات URL مثل <code>?w=300&h=200&fit=crop</code>، مما يقلل من حجم البيانات المنقولة.</li>
+      <li><strong>Dynamic Routing:</strong> توجيه المستخدمين لأقرب Edge Node بناءً على GeoDNS أو Anycast IP.</li>
+      <li><strong>Origin Shield:</strong> طبقة تخزين مؤقت إضافية بين Edge Nodes والـ Origin Server لمنع الـ Cache Stampede.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="ch6">
+  <div class="section-header">
+    <div class="section-number">6</div>
+    <div class="section-title-wrapper">
+      <h2>التخزين المؤقت والدائم</h2>
+      <div class="section-subtitle">Storage and Caching — اختيار المحرك وسياسات الإخلاء والإبطال</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon cyan">💾</div>
+      <h3 class="card-title">الذاكرة المؤقتة L1 مقابل L2: المقارنة المعمارية</h3>
+    </div>
+    <p>تعتمد التطبيقات المحمولة على هرمية تخزين (Storage Hierarchy) متعددة المستويات لتحقيق التوازن بين السرعة والاستمرارية:</p>
+
+    <div class="grid-2">
+      <div class="compare-card">
+        <h4>L1: In-Memory Cache</h4>
+        <ul>
+          <li><strong>الأمثلة:</strong> <code>LruCache</code> (Android), <code>NSCache</code> (iOS), <code>HashMap</code> مع TTL</li>
+          <li><strong>السرعة:</strong> نانوثانية (Nanoseconds) — أسرع بكثير من القرص</li>
+          <li><strong>التقلب:</strong> عالي — يُفقد عند قتل العملية (Process Death)</li>
+          <li><strong>الاستخدام:</strong> بيانات الجلسة الحالية، كائنات ViewModel، نتائج حسابية مؤقتة</li>
+        </ul>
+      </div>
+      <div class="compare-card">
+        <h4>L2: Disk Cache</h4>
+        <ul>
+          <li><strong>الأمثلة:</strong> SQLite, Room, Core Data, Realm, MMKV, Filesystem</li>
+          <li><strong>السرعة:</strong> ملي ثانية (Milliseconds) — أبطأ من الذاكرة لكن دائم</li>
+          <li><strong>التقلب:</strong> منخفض — يبقى بعد إغلاق التطبيق</li>
+          <li><strong>الاستخدام:</strong> بيانات المستخدم، التخزين المؤقت للشبكة (HTTP Cache)، الإعدادات</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <div class="callout-title">💡 مبدأ الهرمية</div>
+      <p>القاعدة الذهبية: تحقق من L1 أولاً، ثم L2، ثم الشبكة. عند جلب بيانات من الشبكة، اكتبها في L2 (للاستمرارية) ثم L1 (للسرعة). هذا يُعرف بـ <strong>Cache-Aside</strong> pattern.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon emerald">🗄</div>
+      <h3 class="card-title">اختيار محرك قاعدة البيانات</h3>
+    </div>
+    <p>يؤثر اختيار محرك التخزين على أداء الاستعلام (Query Performance)، واستخدام الذاكرة (Memory Footprint)، وسهولة التزامن (Concurrency):</p>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>المحرك</th>
+            <th>النوع</th>
+            <th>المنصة</th>
+            <th>الإيجابيات</th>
+            <th>السلبيات</th>
+            <th>متى تختاره؟</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>SQLite</strong></td>
+            <td>Relational</td>
+            <td>Cross-platform</td>
+            <td>خفيف؛ SQL كامل؛ لا يتطلب خادمًا</td>
+            <td>API منخفض المستوى؛ كثير من الشفرة الوسيطة</td>
+            <td>عند الحاجة لـ SQL مباشر مع تحكم كامل</td>
+          </tr>
+          <tr>
+            <td><strong>Room</strong></td>
+            <td>ORM (SQLite)</td>
+            <td>Android</td>
+            <td>Compile-time SQL verification؛ Data Class mapping؛ Flow support</td>
+            <td>Android فقط؛ بعض القيود في الاستعلامات المعقدة</td>
+            <td>تطبيقات Android حديثة (الخيار الافتراضي)</td>
+          </tr>
+          <tr>
+            <td><strong>Core Data</strong></td>
+            <td>Object Graph / ORM</td>
+            <td>iOS/macOS</td>
+            <td>تكامل عميق مع النظام؛ Migration tools؛ NSFetchedResultsController</td>
+            <td>منحنى تعليمي حاد؛ يعمل على Thread خاص (Main Context vs Background)</td>
+            <td>تطبيقات iOS التقليدية مع بيانات معقدة</td>
+          </tr>
+          <tr>
+            <td><strong>Realm</strong></td>
+            <td>Object DB (NoSQL)</td>
+            <td>Cross-platform</td>
+            <td>سريع جدًا؛ Live Objects (Auto-Update UI)</td>
+            <td>حجم المكتبة كبير (~4MB)； قيود في الاستعلامات المتقدمة</td>
+            <td>تطبيقات تحتاج سرعة فائقة مع كائنات حية</td>
+          </tr>
+          <tr>
+            <td><strong>MMKV</strong></td>
+            <td>Key-Value Store</td>
+            <td>Android/iOS</td>
+            <td>أسرع من SharedPreferences/NSUserDefaults بـ 100x؛ يدعم Multi-Process</td>
+            <td>لا يدعم الاستعلامات المعقدة؛ Key-Value فقط</td>
+            <td>الإعدادات، التوكنات، الأعلام (Flags)، البيانات البسيطة</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout success">
+      <div class="callout-title">✅ توصية معمارية</div>
+      <p>للبيانات المنظمة المعقدة: استخدم <strong>Room</strong> (Android) أو <strong>Core Data</strong> (iOS). للإعدادات والتوكنات: استخدم <strong>MMKV</strong> أو <strong>EncryptedSharedPreferences</strong>. لتخزين الملفات الكبيرة (صور، فيديو): استخدم Filesystem مع إدارة يدوية للمساحة.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon amber">🧹</div>
+      <h3 class="card-title">سياسات إخلاء الذاكرة المؤقتة (Cache Eviction Policies)</h3>
+    </div>
+    <p>عند امتلاء الذاكرة المؤقتة، يجب اتخاذ قرار بشأن أي العناصر يجب إزالتها:</p>
+
+    <div class="grid-3">
+      <div class="compare-card">
+        <h4>LRU (Least Recently Used)</h4>
+        <p>يُزال العنصر الذي لم يُستخدم منذ أطول فترة. يُستخدم في <code>LruCache</code> (Android) و <code>NSCache</code> (iOS).</p>
+        <p><span class="badge badge-emerald">الأكثر شيوعًا</span></p>
+      </div>
+      <div class="compare-card">
+        <h4>LFU (Least Frequently Used)</h4>
+        <p>يُزال العنصر الأقل تكرارًا في الاستخدام. مفيد للبيانات التي يتم الوصول إليها بشكل دوري (Seasonal Data) لكنه يتطلب عدادات إضافية.</p>
+        <p><span class="badge badge-amber">تخصصي</span></p>
+      </div>
+      <div class="compare-card">
+        <h4>TTL (Time-To-Live)</h4>
+        <p>يُزال العنصر بعد انتهاء مدة صلاحيته الزمنية. يُستخدم غالبًا مع البيانات الحساسة للزمن (Time-Sensitive) مثل أسعار الأسهم أو أخبار السوق.</p>
+        <p><span class="badge badge-cyan">شائع في HTTP Cache</span></p>
+      </div>
+    </div>
+
+    <h4>آلية LRU في Android</h4>
+    <div class="code-header">
+      <span>LruCache Implementation</span>
+      <span class="code-lang">Kotlin</span>
+    </div>
+    <pre dir="ltr"><code>val bitmapCache = object : LruCache&lt;String, Bitmap&gt;(
+    (Runtime.getRuntime().maxMemory() / 1024 / 8).toInt()
+) {
+    override fun sizeOf(key: String, bitmap: Bitmap): Int {
+        return bitmap.byteCount / 1024  // Size in KB
+    }
+    override fun entryRemoved(
+        evicted: Boolean, key: String, oldValue: Bitmap, newValue: Bitmap?
+    ) {
+        if (evicted) oldValue.recycle()  // Free native memory
+    }
+}</code></pre>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon crimson">♻</div>
+      <h3 class="card-title">استراتيجيات إبطال الذاكرة المؤقتة (Cache Invalidation)</h3>
+    </div>
+    <p>يُعدّ إبطال الذاكرة المؤقتة من أصعب المشكلات في علوم الحاسوب. إليك الاستراتيجيات الأربع الأساسية:</p>
+
+    <div class="decision-flow">
+      <div class="decision-node">
+        <div class="node-question">Write-Through (الكتابة المباشرة)</div>
+        <div class="node-answer">تُكتب البيانات في الذاكرة المؤقتة وقاعدة البيانات في نفس الوقت. <strong>الإيجابية:</strong> اتساق تام (Strong Consistency). <strong>السلبية:</strong> زمن الكتابة أطول (Write Latency). <strong>الاستخدام:</strong> الأنظمة التي تتطلب قراءة فورية دقيقة.</div>
+      </div>
+      <div class="decision-node">
+        <div class="node-question">Write-Back / Write-Behind (الكتابة المتأخرة)</div>
+        <div class="node-answer">تُكتب البيانات في الذاكرة المؤقتة أولاً، ثم تُزامن مع قاعدة البيانات لاحقًا (بشكل غير متزامن). <strong>الإيجابية:</strong> كتابة سريعة جدًا. <strong>السلبية:</strong> خطر فقدان البيانات عند تعطل النظام. <strong>الاستخدام:</strong> التحليلات والسجلات (Analytics/Logging) حيث يُقبل فقدان جزء صغير.</div>
+      </div>
+      <div class="decision-node">
+        <div class="node-question">Cache-Aside (الذاكرة بجانب قاعدة البيانات)</div>
+        <div class="node-answer">التطبيق هو المسؤول عن إدارة الذاكرة المؤقتة. يتحقق منها أولاً، وإن لم توجد يجلب من DB ثم يخزن. <strong>الإيجابية:</strong> بسيط؛ لا يتطلب تغييرات في DB. <strong>السلبية:</strong> قد يحدث Race Condition. <strong>الاستخدام:</strong> الأنظمة القائمة (Legacy Systems)؛ التطبيقات المحمولة.</div>
+      </div>
+      <div class="decision-node">
+        <div class="node-question">Refresh-Ahead (التحديث المسبق)</div>
+        <div class="node-answer">النظام يتنبأ بالعناصر التي ستُحتاج قريبًا ويُجددها قبل انتهاء صلاحيتها. <strong>الإيجابية:</strong> لا توجد Cache Misses تقريبًا. <strong>السلبية:</strong> يتطلب نموذج تنبؤ دقيق؛ قد يُحمّل النظام بشكل زائد. <strong>الاستخدام:</strong> قوائم المنتجات الشائعة؛ الصفحات الرئيسية.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ch7">
+  <div class="section-header">
+    <div class="section-number">7</div>
+    <div class="section-title-wrapper">
+      <h2>التصميم الداعم للعمل بدون إنترنت</h2>
+      <div class="section-subtitle">Offline-First Design — مصدر الحقيقة الواحد والمزامنة والتحديثات التفاؤلية</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon emerald">📡</div>
+      <h3 class="card-title">لماذا يحتاج كل تطبيق حديث لدعم العمل بدون إنترنت؟</h3>
+    </div>
+    <p>في العالم الحقيقي، لا تكون شبكات الهاتف المحمول مثالية. يتعرض المستخدمون لأنفاق المترو، والمناطق الريفية ذات التغطية الضعيفة، ووضع الطيران (Airplane Mode). التصميم الداعم للعمل بدون إنترنت (Offline-First) ليس رفاهية، بل هو <strong>ضرورة تنافسية</strong>.</p>
+
+    <h4>نمط مصدر الحقيقة الواحد (Single Source of Truth — SSOT)</h4>
+    <p>يجب أن تكون قاعدة البيانات المحلية (Local Database) هي المصدر الوحيد للبيانات التي تعرضها واجهة المستخدم. لا تعرض البيانات القادمة من الشبكة مباشرة على الشاشة. بدلاً من ذلك:</p>
+    <ol>
+      <li>اجلب البيانات من الشبكة.</li>
+      <li>اكتبها في قاعدة البيانات المحلية (Local DB).</li>
+      <li>استخدم Reactive Streams (مثل <code>Room + Flow</code> أو <code>Core Data + NSFetchedResultsController</code>) لتحديث UI تلقائيًا.</li>
+    </ol>
+
+    <div class="diagram-box">
+<span class="comment"># SSOT Data Flow</span>
+<span class="component">Network API</span> <span class="arrow">→</span> <span class="component">Repository</span> <span class="arrow">→</span> <span class="component">Local DB</span> <span class="arrow">→</span> <span class="component">UI (Observer)</span>
+       <span class="arrow">↑</span>                                    <span class="arrow">↓</span>
+<span class="component">Sync Engine</span> <span class="arrow">←</span> <span class="component">Mutation Queue</span> <span class="arrow">←</span> <span class="component">User Action</span>
+    </div>
+
+    <div class="callout success">
+      <div class="callout-title">✅ مبدأ SSOT</div>
+      <p>عندما تكون قاعدة البيانات المحلية هي SSOT، فإن الشاشة لا تهتم بمصدر البيانات (شبكة أو ذاكرة مؤقتة). هذا يُبسّط المنطق بشكل كبير ويضمن تجربة متسقة حتى عند تقلب حالة الشبكة.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon cyan">⚡</div>
+      <h3 class="card-title">التحديثات التفاؤلية (Optimistic Updates)</h3>
+    </div>
+    <p>تُعدّ التحديثات التفاؤلية تقنية متقدمة يتم فيها تحديث واجهة المستخدم <strong>فورًا</strong> قبل تأكيد الشبكة. هذا يخلق إحساسًا فوريًا بالاستجابة (Perceived Performance).</p>
+
+    <h4>آلية العمل</h4>
+    <ol>
+      <li>يقوم المستخدم بإجراء تفاعل (مثل الإعجاب بمنشور).</li>
+      <li>يُحدّث التطبيق UI فورًا (زيادة عداد الإعجابات، تغيير لون الزر).</li>
+      <li>يُرسل الطلب للخادم في الخلفية.</li>
+      <li>إذا نجح الطلب: لا شيء يتغير (الحالة متطابقة).</li>
+      <li>إذا فشل الطلب: يجب تنفيذ <strong>Rollback</strong> — إرجاع UI للحالة السابقة وإعلام المستخدم.</li>
+    </ol>
+
+    <div class="code-header">
+      <span>Optimistic Update with Rollback</span>
+      <span class="code-lang">Kotlin + Flow</span>
+    </div>
+    <pre dir="ltr"><code>class PostRepository(private val api: PostApi, private val dao: PostDao) {
+    suspend fun likePost(postId: String) {
+        val previousState = dao.getPost(postId)
+
+        // Optimistic update
+        dao.updateLikeStatus(postId, liked = true, likeCount = previousState.likeCount + 1)
+
+        try {
+            api.likePost(postId)  // Network call
+        } catch (e: Exception) {
+            // Rollback on failure
+            dao.updateLikeStatus(
+                postId, 
+                liked = previousState.isLiked, 
+                likeCount = previousState.likeCount
+            )
+            throw OptimisticUpdateFailedException(e)
+        }
+    }
+}</code></pre>
+
+    <div class="callout warning">
+      <div class="callout-title">⚠ تحذير</div>
+      <p>لا تستخدم التحديثات التفاؤلية للعمليات الحرجة المالية (مثل الدفع الإلكتروني) أو التي يصعب التراجع عنها. استخدمها فقط للتفاعلات ذات المخاطر المنخفضة (Likes, Follows, Draft Saves).</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon amber">🔄</div>
+      <h3 class="card-title">قوائم انتظار المزامنة ومنطق إعادة التشغيل (Sync Queues)</h3>
+    </div>
+    <p>عندما يقوم المستخدم بإجراء تعديلات أثناء انقطاع الشبكة، يجب أن تُخزّن هذه التعديلات في قائمة انتظار دائمة (Persistent Queue) وتُعالج لاحقًا:</p>
+
+    <h4>المكونات الأساسية</h4>
+    <ul>
+      <li><strong>Mutation Queue:</strong> جدول في SQLite يخزن العمليات المعلقة (Pending Operations) مع بياناتها (Payload) وتسلسلها الزمني (Timestamp).</li>
+      <li><strong>Sync Engine:</strong> خدمة تعمل في الخلفية (Background Service / WorkManager) تراقب حالة الاتصال وتُعالج القائمة.</li>
+      <li><strong>Retry Loop:</strong> حلقة إعادة محاولة مع Exponential Backoff للعمليات الفاشلة.</li>
+      <li><strong>Connectivity Monitor:</strong> يراقب حالة الشبكة (Online/Offline) باستخدام <code>ConnectivityManager</code> (Android) أو <code>NWPathMonitor</code> (iOS).</li>
+    </ul>
+
+    <div class="code-header">
+      <span>Persistent Mutation Queue Schema</span>
+      <span class="code-lang">SQL</span>
+    </div>
+    <pre dir="ltr"><code>CREATE TABLE mutation_queue (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    operation_type TEXT NOT NULL,  -- 'CREATE', 'UPDATE', 'DELETE'
+    entity_type TEXT NOT NULL,     -- 'post', 'comment', 'profile'
+    entity_id TEXT NOT NULL,
+    payload TEXT NOT NULL,         -- JSON payload
+    created_at INTEGER NOT NULL,   -- Unix timestamp
+    retry_count INTEGER DEFAULT 0,
+    status TEXT DEFAULT 'pending'  -- 'pending', 'processing', 'failed', 'completed'
+);</code></pre>
+
+    <div class="callout info">
+      <div class="callout-title">💡 نصيحة معمارية</div>
+      <p>استخدم <strong>UUIDs</strong> للكيانات الجديدة التي تُنشأ أثناء العمل بدون إنترنت لتجنب تضارب المعرفات (ID Collision) عند المزامنة. لا تعتمد على IDs التسلسلية من الخادم للعمليات المحلية.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon crimson">⚔</div>
+      <h3 class="card-title">أساسيات حل النزاعات (Conflict Resolution)</h3>
+    </div>
+    <p>عندما يُعدّل المستخدم بيانات محلية بينما قام مستخدم آخر (أو نفس المستخدم على جهاز آخر) بتعديل نفس البيانات على الخادم، يحدث تضارب (Conflict). إليك الاستراتيجيات:</p>
+
+    <div class="grid-2">
+      <div class="compare-card">
+        <h4>Server-Wins</h4>
+        <p>يتم دائمًا قبول نسخة الخادم كمصدر للحقيقة. البيانات المحلية تُستبدل. <strong>الاستخدام:</strong> البيانات التي يتحكم فيها الخادم (مثل أسعار المنتجات).</p>
+      </div>
+      <div class="compare-card">
+        <h4>Client-Wins (Last-Write-Wins)</h4>
+        <p>يتم قبول آخر تعديل بناءً على الطابع الزمني (Timestamp). <strong>الاستخدام:</strong> الإعدادات الشخصية، المسودات (Drafts).</p>
+      </div>
+    </div>
+
+    <h4>CRDTs (Conflict-Free Replicated Data Types)</h4>
+    <p>هياكل بيانات رياضية تضمن التقارب (Convergence) دون الحاجة لقفل مركزي (Central Locking). أنواع CRDTs الشائعة:</p>
+    <ul>
+      <li><strong>G-Counter:</strong> عداد فقط متزايد (مثل عدد المشاهدات).</li>
+      <li><strong>PN-Counter:</strong> عداد موجب/سالب (مثل عدد الإعجابات/عدم الإعجابات).</li>
+      <li><strong>LWW-Register:</strong> تسجيل Last-Write-Wins مع Vector Clocks.</li>
+      <li><strong>OR-Set:</strong> مجموعة يمكن إضافة وإزالة عناصر منها بشكل متزامن.</li>
+    </ul>
+
+    <div class="callout info">
+      <div class="callout-title">💡 متى تستخدم CRDTs؟</div>
+      <p>استخدم CRDTs في التطبيقات التعاونية (Collaborative Apps) مثل محررات المستندات المشتركة أو قوائم المهام المتزامنة (Synced Todo Lists) حيث يُتوقع التعديل المتزامن من عدة أجهزة.</p>
+    </div>
+
+    <h4>منطق الدمج المخصص (Custom Domain Merge Logic)</h4>
+    <p>في بعض الأحيان، لا يكفي Server-Wins أو CRDTs. قد تحتاج إلى منطق أعمال مخصص (Custom Business Logic) لدمج التعديلات. على سبيل المثال، في تطبيق جدولة مواعيد، قد يكون الحل هو عرض كلا النسختين للمستخدم ليختار (Manual Merge UI).</p>
+  </div>
+</section>
+
+<section id="ch8">
+  <div class="section-header">
+    <div class="section-number">8</div>
+    <div class="section-title-wrapper">
+      <h2>التحديثات المباشرة والتزامن</h2>
+      <div class="section-subtitle">Real-Time Updates — Polling، WebSockets، SSE، والإشعارات الفورية</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon cyan">🔄</div>
+      <h3 class="card-title">استراتيجيات البيانات الفورية: تحليل معمقي</h3>
+    </div>
+    <p>يختلف اختيار بروتوكول الاتصال الفوري بناءً على متطلبات التأخير (Latency)، واستهلاك البطارية (Battery Drain)، وتوافق الجدران النارية (Firewall Compatibility). إليك المقارنة التفصيلية:</p>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>البروتوكول</th>
+            <th>الاتجاه</th>
+            <th>البروتوكول الأساسي</th>
+            <th>استهلاك البطارية</th>
+            <th>التوافق مع الجدران النارية</th>
+            <th>أفضل استخدام</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Short Polling</strong></td>
+            <td>Client → Server</td>
+            <td>HTTP/1.1</td>
+            <td>عالي (Radio wake-up متكرر)</td>
+            <td>ممتاز</td>
+            <td>بيانات نادرة التحديث؛ أنظمة Legacy</td>
+          </tr>
+          <tr>
+            <td><strong>Long Polling</strong></td>
+            <td>Client → Server</td>
+            <td>HTTP/1.1</td>
+            <td>متوسط</td>
+            <td>جيد</td>
+            <td>تحديثات متقطعة غير متوقعة</td>
+          </tr>
+          <tr>
+            <td><strong>WebSockets</strong></td>
+            <td>ثنائي الاتجاه</td>
+            <td>TCP (ws:// / wss://)</td>
+            <td>منخفض-متوسط</td>
+            <td>قد يحتاج Proxy Config</td>
+            <td>الدردشة (Chat)، الألعاب، التعاون المباشر</td>
+          </tr>
+          <tr>
+            <td><strong>SSE (Server-Sent Events)</strong></td>
+            <td>Server → Client</td>
+            <td>HTTP/1.1 (text/event-stream)</td>
+            <td>منخفض</td>
+            <td>ممتاز</td>
+            <td>البث المباشر (Live Feeds)، الأسهم، النتائج الرياضية</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Short Polling</h4>
+    <p>يقوم العميل بإرسال طلب HTTP دوريًا (مثل كل 5 ثوانٍ) للتحقق من وجود بيانات جديدة. <strong>المشكلة الجوهرية:</strong> استهلاك البطارية مرتفع بسبب إيقاظ راديو الجهاز (Radio Wake-up) بشكل متكرر، ومعظم الطلبات تُرجع "لا توجد بيانات جديدة" (Empty Responses)، مما يُهدر النطاق الترددي.</p>
+
+    <h4>Long Polling</h4>
+    <p>يفتح العميل اتصال HTTP ويُبقيه مفتوحًا حتى يتوفر رد من الخادم. بمجرد استلام الرد، يفتح العميل اتصالًا جديدًا فورًا. <strong>الإيجابية:</strong> يقلل من الطلبات الفارغة. <strong>السلبية:</strong> يتطلب إدارة اتصالات طويلة على الخادم (Long-Lived Connections) وقد يواجه مشاكل مع Load Balancers التي تُغلق الاتصالات الخاملة.</p>
+
+    <h4>WebSockets</h4>
+    <p>يتميز باتصال ثنائي الاتجاه (Full-Duplex) مستمر عبر TCP. يُستخدم بروتوكول الارتقاء (Upgrade Protocol) من HTTP. <strong>الإيجابيات:</strong> زمن استجابة منخفض جدًا؛ يدعم الرسائل الثنائية (Binary Frames). <strong>السلبيات:</strong> يتطلب إدارة حالة الاتصال (Connection State Management) على الجهاز؛ قد يُقطع الاتصال عند تغيير الشبكة (WiFi → 4G).</p>
+
+    <div class="code-header">
+      <span>WebSocket Connection Manager</span>
+      <span class="code-lang">Kotlin (OkHttp)</span>
+    </div>
+    <pre dir="ltr"><code>class WebSocketManager(private val client: OkHttpClient) {
+    private var webSocket: WebSocket? = null
+    private val listener = object : WebSocketListener() {
+        override fun onOpen(ws: WebSocket, response: Response) {
+            // Connection established, send auth token
+            ws.send("{"type":"auth","token":"$authToken"}")
+        }
+        override fun onMessage(ws: WebSocket, text: String) {
+            handleIncomingMessage(text)
+        }
+        override fun onFailure(ws: WebSocket, t: Throwable, response: Response?) {
+            scheduleReconnect()  // Exponential backoff
+        }
+        override fun onClosed(ws: WebSocket, code: Int, reason: String) {
+            if (code != NORMAL_CLOSURE) scheduleReconnect()
+        }
+    }
+
+    fun connect(url: String) {
+        val request = Request.Builder().url(url).build()
+        webSocket = client.newWebSocket(request, listener)
+    }
+
+    fun disconnect() {
+        webSocket?.close(NORMAL_CLOSURE, "App closing")
+    }
+}</code></pre>
+
+    <h4>Server-Sent Events (SSE)</h4>
+    <p>بروتوكول بسيط يعتمد على HTTP حيث يُرسل الخادم أحداثًا نصية (Text Events) عبر اتصال مفتوح. <strong>الإيجابيات:</strong> أبسط من WebSockets؛ يعمل عبر HTTP/1.1؛ يدعم إعادة الاتصال التلقائية (Auto-Reconnect) عبر <code>Last-Event-ID</code>. <strong>السلبيات:</strong> اتجاه واحد فقط (Server → Client)؛ لا يدعم البيانات الثنائية بكفاءة.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon emerald">🔔</div>
+      <h3 class="card-title">الإشعارات الفورية (Push Notifications)</h3>
+    </div>
+    <p>تُعدّ الإشعارات الفورية آلية أساسية لإعادة إشراك المستخدمين (User Re-engagement) وتوصيل الأحداث المهمة حتى عند إغلاق التطبيق:</p>
+
+    <h4>FCM (Firebase Cloud Messaging) — Android</h4>
+    <ul>
+      <li><strong>High-Priority:</strong> تُوقظ الجهاز فورًا وتُعرض الإشعار. يجب استخدامها للرسائل الفورية (Chat، تتبع الطلبات).</li>
+      <li><strong>Normal-Priority:</strong> قد تتأخر حتى يُوقظ الجهاز حدث آخر (Doze Mode). مناسبة للتحديثات غير العاجلة.</li>
+      <li><strong>Data Messages:</strong> لا تُعرض واجهة إشعار تلقائيًا. يتم تسليم البيانات الخام للتطبيق لمعالجتها (مثل المزامنة في الخلفية).</li>
+    </ul>
+
+    <h4>APNs (Apple Push Notification service) — iOS</h4>
+    <ul>
+      <li><strong>Alert:</strong> إشعار مرئي مع صوت/اهتزاز.</li>
+      <li><strong>Background:</strong> تُسلم للتطبيق في الخلفية عبر <code>application(_:didReceiveRemoteNotification:fetchCompletionHandler:)</code>.</li>
+      <li><strong>Silent Push:</strong> لا يُعرض للمستخدم. يُستخدم لـ Background Data Sync أو Content Refresh.</li>
+    </ul>
+
+    <div class="callout warning">
+      <div class="callout-title">⚠ تحذير البطارية</div>
+      <p>لا تُسيء استخدام الإشعارات عالية الأولوية (High-Priority) لتحديثات غير ضرورية. يُعاقب Google Play و App Store التطبيقات التي تُوقظ الجهاز بشكل مفرط (Wake-Lock Abuse) بتقليل أولوية إشعاراتها أو حظرها.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon amber">🎯</div>
+      <h3 class="card-title">دليل اتخاذ القرار: متى تستخدم ماذا؟</h3>
+    </div>
+    <p>فيما يلي مصفوفة قرارات تفاعلية لاختيار البروتوكول المناسب بناءً على حالة الاستخدام:</p>
+
+    <div class="grid-2">
+      <div class="compare-card">
+        <h4>💬 الدردشة الفورية (Chat)</h4>
+        <p><strong>الخيار:</strong> WebSockets</p>
+        <p><strong>السبب:</strong> يتطلب إرسال واستقبال الرسائل بزمن استجابة منخفض (< 200ms). يدعم مؤشر الكتابة (Typing Indicators) وحالة القراءة (Read Receipts).</p>
+        <p><strong>احتياطي:</strong> Push Notifications للرسائل الواردة عندما يكون التطبيق مغلقًا.</p>
+      </div>
+      <div class="compare-card">
+        <h4>⚽ النتائج الرياضية المباشرة (Live Sports)</h4>
+        <p><strong>الخيار:</strong> SSE</p>
+        <p><strong>السبب:</strong> تدفق أحادي الاتجاه من الخادم. أخف على البطارية من WebSockets. يدعم إعادة الاتصال التلقائية.</p>
+        <p><strong>احتياطي:</strong> Short Polling كـ Fallback للشبكات القديمة.</p>
+      </div>
+      <div class="compare-card">
+        <h4>📈 أسعار الأسهم (Stock Tickers)</h4>
+        <p><strong>الخيار:</strong> SSE أو WebSockets</p>
+        <p><strong>السبب:</strong> SSE ممتاز للبث المستمر (Streaming). WebSockets إذا كان المستخدم يحتاج لتنفيذ أوامر شراء/بيع من نفس الاتصال.</p>
+        <p><strong>تحسين:</strong> Throttling على الجانب الخادم (مثل بث كل 500ms بدلاً من كل تغيير).</p>
+      </div>
+      <div class="compare-card">
+        <h4>🚚 تتبع الطلبات (Order Tracking)</h4>
+        <p><strong>الخيار:</strong> Long Polling أو SSE</p>
+        <p><strong>السبب:</strong> التحديثات متقطعة (عندما يتغير حالة الطلب فقط). لا حاجة لاتصال دائم.</p>
+        <p><strong>إضافة:</strong> Push Notification عند اكتمال التسليم.</p>
+      </div>
+      <div class="compare-card">
+        <h4>📱 التغذيات الاجتماعية (Social Feeds)</h4>
+        <p><strong>الخيار:</strong> Short Polling (Pull-to-Refresh) + SSE للإشعارات</p>
+        <p><strong>السبب:</strong> المستخدمون لا يحتاجون لتحديث فوري للتغذية الرئيسية. Pull-to-Refresh كافٍ. SSE للإشعارات "هناك منشورات جديدة".</p>
+      </div>
+      <div class="compare-card">
+        <h4>🎮 الألعاب متعددة اللاعبين (Multiplayer Games)</h4>
+        <p><strong>الخيار:</strong> WebSockets أو UDP (QUIC/WebRTC)</p>
+        <p><strong>السبب:</strong> يتطلب أقل زمن استجابة ممكن (< 50ms). UDP مفضل للألعاب السريعة الإيقاع (FPS) حيث يُفضل فقدان بعض الحزم على التأخير.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ch9">
+  <div class="section-header">
+    <div class="section-number">9</div>
+    <div class="section-title-wrapper">
+      <h2>أساسيات الأداء والتحسين</h2>
+      <div class="section-subtitle">Performance Essentials — الإطلاق، التمرير، إدارة الذاكرة، وكفاءة البطارية</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon cyan">🚀</div>
+      <h3 class="card-title">تحسين إطلاق التطبيق (App Launch Optimization)</h3>
+    </div>
+    <p>يُعدّ زمن الإطلاق (Launch Time) أحد أهم مؤشرات الأداء (KPIs) التي تؤثر مباشرة على معدل الاستبقاء (Retention Rate). يُقسم الإطلاق إلى ثلاثة أنواع:</p>
+
+    <div class="grid-3">
+      <div class="compare-card">
+        <h4>Cold Start</h4>
+        <p>التطبيق لم يكن في الذاكرة. يجب إنشاء العملية، تهيئة Runtime، وتحميل كل الموارد. <strong>الهدف:</strong> < 2 ثانية.</p>
+      </div>
+      <div class="compare-card">
+        <h4>Warm Start</h4>
+        <p>العملية موجودة لكن الأنشطة (Activities) يجب إعادة إنشائها. أسرع من Cold Start لكنه يتطلب تهيئة UI.</p>
+      </div>
+      <div class="compare-card">
+        <h4>Hot Start</h4>
+        <p>التطبيق في الخلفية ويُحضر إلى المقدمة. الأسرع لأن كل شيء محمّل. <strong>الهدف:</strong> < 1.5 ثانية.</p>
+      </div>
+    </div>
+
+    <h4>استراتيجيات التحسين</h4>
+    <ul>
+      <li><strong>Baseline Profiles:</strong> في Android 13+، تُستخدم ملفات <code>baseline-prof.txt</code> لتوجيه ART (Android Runtime) لتحسين التعليمات البرمجية الحرجة (Hot Paths) قبل التشغيل الأول.</li>
+      <li><strong>Startup Tracing:</strong> استخدم <code>Macrobenchmark</code> (Android) أو <code>Instruments (Time Profiler)</code> (iOS) لتحديد الاختناقات (Bottlenecks) في سلسلة الإطلاق.</li>
+      <li><strong>Lazy Initialization:</strong> لا تُهيئ أي SDK أو مكتبة ثالثة في <code>Application.onCreate()</code> إذا لم تكن حيوية للإطلاق. استخدم <code>Lazy&lt;T&gt;</code> أو <code>dispatch_async</code> لتحميلها لاحقًا.</li>
+      <li><strong>Splash Screen API:</strong> استخدم Splash Screen الرسمي (Android 12+) لإظهار شعار أثناء التهيئة بدلاً من Activity منفصلة تُضيف زمنًا.</li>
+    </ul>
+
+    <div class="code-header">
+      <span>Lazy SDK Initialization</span>
+      <span class="code-lang">Kotlin</span>
+    </div>
+    <pre dir="ltr"><code>class MyApplication : Application() {
+    val analyticsSdk: AnalyticsSdk by lazy {
+        AnalyticsSdk.initialize(this, apiKey)
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        // Initialize ONLY critical SDKs here
+        CrashReporter.init(this)
+
+        // Defer non-critical SDKs
+        GlobalScope.launch(Dispatchers.IO) {
+            analyticsSdk  // Trigger lazy init on background thread
+        }
+    }
+}</code></pre>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon emerald">📜</div>
+      <h3 class="card-title">التمرير السلس ومعدلات الإطارات (60/120 FPS)</h3>
+    </div>
+    <p>يُتوقع من التطبيقات الحديثة تمريرًا سلسًا (Smooth Scrolling) بمعدل 60 إطارًا في الثانية (FPS) على الأقل، و 120 FPS على الأجهزة المدعومة (ProMotion Displays في iOS، 120Hz Displays في Android). أي عملية تستغرق أكثر من 16.67ms (60Hz) أو 8.33ms (120Hz) على الخيط الرئيسي (Main Thread) تُسبب تقطيعًا (Jank).</p>
+
+    <h4>أسباب Jank الشائعة</h4>
+    <ul>
+      <li><strong>Heavy Computations on Main Thread:</strong> معالجة JSON كبير، أو تصفية قوائم، أو حسابات رياضية معقدة في <code>onBindViewHolder()</code>.</li>
+      <li><strong>Layout Inflation:</strong> تخطيطات معقدة متداخلة (Deep View Hierarchy) تتطلب قياسات (Measure) ومواضع (Layout) مكلفة.</li>
+      <li><strong>Missing ViewHolder Recycling:</strong> إنشاء Views جديدة بدلاً من إعادة استخدامها في القوائم.</li>
+      <li><strong>Blocking I/O:</strong> قراءة/كتابة من القرص أو الشبكة على الخيط الرئيسي.</li>
+    </ul>
+
+    <h4>حلول معمارية</h4>
+    <ul>
+      <li><strong>RecyclerView / ListAdapter:</strong> استخدم <code>DiffUtil</code> لحساب الفروقات في الخلفية وتحديث العناصر المتغيرة فقط.</li>
+      <li><strong>Async Layout Inflation:</strong> استخدم <code>AsyncLayoutInflater</code> (Android) أو <code>Cell Pre-fetching</code> (iOS) لتهيئة الخلايا في الخلفية.</li>
+      <li><strong>ViewHolder Pattern:</strong> دائمًا في iOS مع <code>UITableView.dequeueReusableCell</code> وفي Android مع <code>RecyclerView.ViewHolder</code>.</li>
+      <li><strong>Background Threads:</strong> استخدم <code>CoroutineDispatchers.Default</code> أو <code>DispatchQueue.global()</code> لأي عملية ثقيلة، ثم <code>Dispatchers.Main</code> لتحديث UI.</li>
+    </ul>
+
+    <div class="code-header">
+      <span>DiffUtil Async Calculation</span>
+      <span class="code-lang">Kotlin</span>
+    </div>
+    <pre dir="ltr"><code>fun updateData(newList: List&lt;Item&gt;) {
+    val diffResult = DiffUtil.calculateDiff(
+        ItemDiffCallback(oldList, newList)
+    )
+    oldList = newList
+    diffResult.dispatchUpdatesTo(this)  // Apply on Main Thread
+}</code></pre>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon amber">🖼</div>
+      <h3 class="card-title">تحميل الصور وإدارة الذاكرة</h3>
+    </div>
+    <p>الصور هي أكبر مستهلك للذاكرة في التطبيقات المحمولة. صورة بدقة 4K (3840×2160) بصيغة ARGB_8888 تستهلك ~33MB من الذاكرة — أكثر من الحد المخصص للتطبيقات في الأجهزة القديمة!</p>
+
+    <h4>استراتيجيات إدارة الذاكرة للصور</h4>
+    <ul>
+      <li><strong>Bitmap Downsampling:</strong> لا تحمّل الصورة بدقةها الكاملة إذا كانت ستُعرض في مصغر (Thumbnail) صغير. استخدم <code>inSampleSize</code> (Android) أو <code>downsample</code> (iOS).</li>
+      <li><strong>In-Bitmap Reuse:</strong> في Android، استخدم <code>BitmapFactory.Options.inBitmap</code> لإعادة استخدام الذاكرة المخصصة لصور سابقة.</li>
+      <li><strong>Memory Pools:</strong> استخدم مكتبات مثل <strong>Glide</strong> (Android) أو <strong>Kingfisher</strong> (iOS) التي تدير ذاكرة LruCache و DiskCache تلقائيًا.</li>
+      <li><strong>Format Selection:</strong> استخدم WebP (Android) أو HEIC (iOS) لتقليل حجم الملف بنسبة 25-35% مقارنة بـ JPEG.</li>
+    </ul>
+
+    <div class="grid-2">
+      <div class="compare-card">
+        <h4>Glide (Android)</h4>
+        <p>يدعم GIFs، والفيديو، والصور الثابتة. يدير LruCache و DiskCache. يدعم Placeholders و Transformations (Crop, Circle, Blur).</p>
+      </div>
+      <div class="compare-card">
+        <h4>Kingfisher (iOS)</h4>
+        <p>مكتبة Swift خفيفة. تدير Downloader و Cache Manager. تدعم Placeholders، Fade Animations، و Image Processors.</p>
+      </div>
+    </div>
+
+    <div class="callout danger">
+      <div class="callout-title">🚨 خطأ شائع</div>
+      <p>لا تستخدم <code>ImageView</code> بحجم <code>wrap_content</code> مع صور كبيرة من الشبكة. سيحاول النظام تحميل الصورة بدقتها الكاملة ثم تقليصها، مما يؤدي إلى <strong>OutOfMemoryError</strong>. حدد دائمًا أبعادًا ثابتة أو نسبية.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon crimson">🔋</div>
+      <h3 class="card-title">كفاءة البطارية والشبكة</h3>
+    </div>
+    <p>تُعدّ البطارية أحد أهم الموارد المحددة في الهواتف المحمولة. يتضمن راديو الهاتف (Radio) آلة حالات (State Machine) تنتقل بين:</p>
+
+    <div class="diagram-box">
+<span class="component">Full Power</span> <span class="arrow">→</span> <span class="component">Low Power</span> <span class="arrow">→</span> <span class="component">Idle / Standby</span>
+<span class="comment"># Transitions take 1-2 seconds and consume significant energy</span>
+<span class="comment"># Goal: Batch network requests to minimize radio wake-ups</span>
+    </div>
+
+    <h4>استراتيجيات الكفاءة</h4>
+    <ul>
+      <li><strong>Batching:</strong> دمج عدة طلبات صغيرة في طلب واحد (Request Batching) أو استخدام GraphQL لجلب كل البيانات اللازمة في استجابة واحدة.</li>
+      <li><strong>Compression:</strong> استخدم <strong>Gzip</strong> (90%+ HTTP servers support it)، أو <strong>Brotli</strong> (20-26% smaller than Gzip)، أو <strong>Protobuf</strong> (Binary serialization ~50% smaller than JSON).</li>
+      <li><strong>Prefetching:</strong> جلب البيانات المُتوقع حاجتها (مثل الصور القادمة في قائمة) عندما يكون الراديو نشطًا بالفعل، لتجنب إيقاظه لاحقًا.</li>
+      <li><strong>Defer Background Work:</strong> استخدم <code>WorkManager</code> (Android) أو <code>BGTaskScheduler</code> (iOS) لتأجيل العمل غير العاجل حتى يكون الجهاز متصلاً بالشاحن وشبكة WiFi.</li>
+      <li><strong>Reduce Location Updates:</strong> استخدم <code>FusedLocationProvider</code> (Android) أو <code>significantLocationChange</code> (iOS) بدلاً من تحديثات GPS المستمرة.</li>
+    </ul>
+
+    <div class="code-header">
+      <span>Network-Aware Batching</span>
+      <span class="code-lang">Kotlin</span>
+    </div>
+    <pre dir="ltr"><code>class BatchingQueue {
+    private val queue = mutableListOf&lt;ApiRequest&gt;()
+    private val batchInterval = 500L // ms
+
+    fun enqueue(request: ApiRequest) {
+        queue.add(request)
+        // Reset timer; flush when timer expires or queue reaches 10 items
+        scheduleFlush()
+    }
+
+    private fun flush() {
+        if (queue.isEmpty()) return
+        api.executeBatch(queue.toList())
+        queue.clear()
+    }
+}</code></pre>
+  </div>
+</section>
+
+<section id="ch10">
+  <div class="section-header">
+    <div class="section-number">10</div>
+    <div class="section-title-wrapper">
+      <h2>أساسيات أمان تطبيقات الهواتف</h2>
+      <div class="section-subtitle">Security Basics — HTTPS، التثبيت، التشفير، والمصادقة الحيوية</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon crimson">🔒</div>
+      <h3 class="card-title">HTTPS وتثبيت الشهادات (Certificate Pinning)</h3>
+    </div>
+    <p>يضمن HTTPS تشفير البيانات أثناء النقل (Encryption in Transit)، لكنه لا يضمن أن الخادم الذي تتصل به هو الخادم الصحيح. يمكن لمهاجمين استخدام شهادات مزورة (Fake Certificates) عبر هجمات MITM (Man-in-the-Middle). <strong>Certificate Pinning</strong> يحل هذه المشكلة.</p>
+
+    <h4>Public Key Pinning vs Certificate Pinning</h4>
+    <div class="grid-2">
+      <div class="compare-card">
+        <h4>Certificate Pinning</h4>
+        <p>يُثبت الشهادة الكاملة (Full Certificate). <strong>السلبية:</strong> عند انتهاء صلاحية الشهادة (Expiration)، يتعطل التطبيق إذا لم يتم تحديثه. <strong>الاستخدام:</strong> بيئات عالية التحكم حيث يمكن تحديث التطبيق بسرعة.</p>
+      </div>
+      <div class="compare-card">
+        <h4>Public Key Pinning</h4>
+        <p>يُثبت المفتاح العام (Public Key) فقط. <strong>الإيجابية:</strong> الشهادة يمكن تجديدها (Renew) دون تغيير المفتاح. <strong>السلبية:</strong> إذا تغير المفتاح (مثل تغيير CA)، يتعطل التطبيق.</p>
+      </div>
+    </div>
+
+    <h4>التعامل مع انتهاء صلاحية التثبيت (Pin Expiration)</h4>
+    <ul>
+      <li>استخدم <strong>Backup Pins:</strong> ثبت أكثر من مفتاح احتياطي (Secondary Key) في التطبيق.</li>
+      <li>استخدم <strong>Dynamic Pinning:</strong> جلب المفاتيح المسموح بها من خادم trusted مع توقيع رقمي (Signature Verification).</li>
+      <li>استخدم <strong>Certificate Transparency (CT):</strong> تحقق من أن الشهادة مسجلة في سجلات CT العامة.</li>
+    </ul>
+
+    <div class="code-header">
+      <span>OkHttp Certificate Pinning</span>
+      <span class="code-lang">Kotlin</span>
+    </div>
+    <pre dir="ltr"><code>val certificatePinner = CertificatePinner.Builder()
+    .add("api.example.com", "sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=")
+    .add("api.example.com", "sha256/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=") // Backup
+    .build()
+
+val client = OkHttpClient.Builder()
+    .certificatePinner(certificatePinner)
+    .build()</code></pre>
+
+    <div class="callout warning">
+      <div class="callout-title">⚠ تحذير</div>
+      <p>لا تُثبت شهادات CA العامة (مثل Let's Encrypt) مباشرة. قد تتغير. ثبت المفاتيح العامة لخادمك فقط. اختبر دائمًا سيناريو تغيير الشهادة (Certificate Rotation) قبل الإنتاج.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon emerald">🔑</div>
+      <h3 class="card-title">تخزين الرموز بأمان (Token Storage)</h3>
+    </div>
+    <p>تُعدّ الرموز (Access Tokens / Refresh Tokens) أسرارًا حساسة (Sensitive Secrets). لا تخزّنها في SharedPreferences العادية أو NSUserDefaults.</p>
+
+    <h4>Android: Keystore + EncryptedSharedPreferences</h4>
+    <p>يُستخدم <strong>Android Keystore System</strong> لتوليد ومخزنة المفاتيح التشفيرية في Hardware-backed Security (TEE/SE). يتم تشفير الرموز بـ AES-256-GCM.</p>
+
+    <div class="code-header">
+      <span>Encrypted Token Storage</span>
+      <span class="code-lang">Kotlin</span>
+    </div>
+    <pre dir="ltr"><code>val masterKey = MasterKey.Builder(context)
+    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+    .build()
+
+val securePrefs = EncryptedSharedPreferences.create(
+    context,
+    "secure_tokens",
+    masterKey,
+    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+)
+
+securePrefs.edit().putString("refresh_token", token).apply()</code></pre>
+
+    <h4>iOS: Keychain Services</h4>
+    <p>يُستخدم <strong>Keychain</strong> لتخزين الأسرار في منطقة مشفرة من نظام التشغيل. يدعم <code>kSecAttrAccessibleWhenUnlockedThisDeviceOnly</code> لضمان عدم نسخ البيانات عبر iCloud Backup.</p>
+
+    <div class="code-header">
+      <span>Keychain Token Storage</span>
+      <span class="code-lang">Swift</span>
+    </div>
+    <pre dir="ltr"><code>let query: [String: Any] = [
+    kSecClass as String: kSecClassGenericPassword,
+    kSecAttrAccount as String: "refresh_token",
+    kSecValueData as String: token.data(using: .utf8)!,
+    kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+]
+SecItemAdd(query as CFDictionary, nil)</code></pre>
+
+    <div class="callout info">
+      <div class="callout-title">💡 فهم TEE/SE</div>
+      <p><strong>TEE (Trusted Execution Environment):</strong> منطقة معزولة في المعالج تُشغل شيفرة موثوقة. <strong>SE (Secure Element):</strong> شريحة منفصلة (مثل SIM card) مقاومة للتلاعب الفيزيائي. استخدم <code>StrongBox</code> (Android 9+) إذا كان الجهاز يدعمه.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon amber">🛡</div>
+      <h3 class="card-title">تشفير البيانات أثناء الراحة (Data Encryption at Rest)</h3>
+    </div>
+    <p>حتى إذا تمكن مهاجم من الوصول لملفات التطبيق (عبر Rooting أو Jailbreaking)، يجب أن تكون البيانات الحساسة مشفرة:</p>
+
+    <ul>
+      <li><strong>SQLCipher:</strong> امتداد لـ SQLite يشفر قاعدة البيانات بالكامل بـ AES-256. يُستخدم في Android و iOS.</li>
+      <li><strong>AES-256-GCM:</strong> خوارزمية التشفير الموصى بها للملفات المحلية. توفر Confidentiality و Integrity (Authentication).</li>
+      <li><strong>File-based Encryption:</strong> في Android 7+، استخدم <code>Context.getFilesDir()</code> الذي يخضع تلقائيًا لـ Direct Boot Encryption. في iOS، استخدم <code>FileProtection.complete</code>.</li>
+    </ul>
+
+    <div class="code-header">
+      <span>SQLCipher Configuration</span>
+      <span class="code-lang">Kotlin</span>
+    </div>
+    <pre dir="ltr"><code>val factory = SupportFactory(SQLiteDatabase.getBytes(passphrase))
+val db = Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
+    .openHelperFactory(factory)
+    .build()</code></pre>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon crimson">⚠</div>
+      <h3 class="card-title">الأخطاء الأمنية الشائعة (Common Pitfalls)</h3>
+    </div>
+    <p>فيما يلي قائمة بالأخطاء التي يقع فيها المهندسون حتى في التطبيقات الكبيرة:</p>
+
+    <div class="checklist">
+      <li><strong>Reverse Engineering:</strong> استخدم <strong>R8/ProGuard</strong> (Android) أو <strong>Swift Compiler Optimizations</strong> مع تقليل الرموز (Symbol Stripping) لجعل عكس الهندسة (Reverse Engineering) أصعب.</li>
+      <li><strong>Hardcoded Secrets:</strong> لا تضع API Keys في <code>strings.xml</code> أو <code>BuildConfig</code> مباشرة. استخدم <strong>NDK/JNI</strong> لتخزينها في مكتبة أصلية (Native Library) أو <strong>Remote Config</strong> مع تشفير.</li>
+      <li><strong>Insecure Logging:</strong> لا تُسجل الرموز (Tokens) أو كلمات المرور أو بيانات PII (Personally Identifiable Information) في Logcat أو NSLog. استخدم مكتبات تسجيل مشفرة أو قم بتعطيل التسجيل في الإنتاج.</li>
+      <li><strong>Screenshot/Recent Apps Leak:</strong> استخدم <code>FLAG_SECURE</code> (Android) أو <code>UIApplication.shared.isIdleTimerDisabled</code> مع <code>UITextField.isSecureTextEntry</code> (iOS) لمنع لقطات الشاشة في الشاشات الحساسة.</li>
+      <li><strong>Clipboard Exposure:</strong> امسح الحافظة (Clipboard) بعد لصق البيانات الحساسة.</li>
+      <li><strong>Deep Link Validation:</strong> تحقق دائمًا من مصدر Deep Links ولا تُنفذ إجراءات حساسة بناءً عليها بدون مصادقة.</li>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon cyan">🔐</div>
+      <h3 class="card-title">تدفقات المصادقة (Authentication Flows)</h3>
+    </div>
+    <p>يُعدّ تصميم تدفق المصادقة (Auth Flow) من أهم جوانب أمان التطبيق. يجب أن يكون آمنًا وسهل الاستخدام في آن واحد.</p>
+
+    <h4>OAuth 2.0 + PKCE (Proof Key for Code Exchange)</h4>
+    <p>PKCE هو امتداد إلزامي لـ OAuth 2.0 في التطبيقات المحمولة (مُحدد في RFC 7636). يمنع هجمات Interception of Authorization Code حيث يستبدل مهاجم الرمز (Code) بخاصته:</p>
+    <ol>
+      <li>التطبيق يُنشئ <code>code_verifier</code> (عشوائي 128 بايت).</li>
+      <li>يُنشئ <code>code_challenge = SHA256(code_verifier)</code>.</li>
+      <li>يُرسل <code>code_challenge</code> مع طلب التفويض (Authorization Request).</li>
+      <li>عند استلام <code>authorization_code</code>، يُرسل <code>code_verifier</code> الأصلي للتحقق.</li>
+    </ol>
+
+    <div class="code-header">
+      <span>PKCE Flow</span>
+      <span class="code-lang">Pseudocode</span>
+    </div>
+    <pre dir="ltr"><code>// Step 1: Generate verifier
+val verifier = generateRandomString(128)
+val challenge = sha256(verifier)
+
+// Step 2: Authorization request
+GET /oauth/authorize?
+    response_type=code&
+    client_id=CLIENT_ID&
+    redirect_uri=app://callback&
+    code_challenge=challenge&
+    code_challenge_method=S256
+
+// Step 3: Token exchange
+POST /oauth/token
+grant_type=authorization_code&
+code=AUTH_CODE&
+redirect_uri=app://callback&
+code_verifier=verifier  // Original verifier</code></pre>
+
+    <h4>OpenID Connect (OIDC)</h4>
+    <p>طبقة هوية (Identity Layer) فوق OAuth 2.0. توفر <code>ID Token</code> (JWT) يحتوي على معلومات المستخدم (Name, Email, Picture). يُستخدم للمصادقة (Authentication) بينما يُستخدم <code>Access Token</code> للتفويض (Authorization).</p>
+
+    <h4>Refresh Token Rotation</h4>
+    <p>بدلاً من استخدام Refresh Token واحد طويل الأمد، يُستخدم <strong>Rotation</strong>:</p>
+    <ul>
+      <li>عند استخدام Refresh Token للحصول على Access Token جديد، يتم إصدار <strong>Refresh Token جديد</strong> أيضًا.</li>
+      <li>إذا تم استخدام Refresh Token قديم مرة أخرى، يُلغى <strong>كل</strong> الرموز (Token Family Revocation) — مما يشير إلى سرقة محتملة.</li>
+    </ul>
+
+    <h4>المصادقة البيومترية (Biometric Authentication)</h4>
+    <p>تُستخدم البصمة (Fingerprint) أو التعرف على الوجه (FaceID) كعامل ملكية (Ownership Factor) في MFA (Multi-Factor Authentication):</p>
+    <ul>
+      <li><strong>Android:</strong> <code>BiometricPrompt</code> مع <code>CryptoObject</code> لفك تشفير مفتاح Keystore.</li>
+      <li><strong>iOS:</strong> <code>LAContext.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics)</code> مع <code>Secure Enclave</code>.</li>
+    </ul>
+
+    <div class="callout success">
+      <div class="callout-title">✅ أفضل ممارسة</div>
+      <p>لا تُخزّن كلمات المرور أبدًا على الجهاز. استخدم Refresh Tokens مع Rotation. اطلب Biometric Auth فقط للإجراءات الحساسة (الدفع، تغيير الإعدادات) وليس لتسجيل الدخول الأول (Initial Login).</p>
+    </div>
+  </div>
+</section>
+
+<section id="matrices">
+  <div class="section-header">
+    <div class="section-number">∞</div>
+    <div class="section-title-wrapper">
+      <h2>مصفوفات اتخاذ القرارات الشاملة</h2>
+      <div class="section-subtitle">Master Decision Matrices & System Architecture Tables — ملخصات مقارنة سريعة للمقابلات</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon cyan">📊</div>
+      <h3 class="card-title">Table 1: Mobile Architecture Patterns</h3>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>النمط</th>
+            <th>تدفق البيانات</th>
+            <th>قابلية الاختبار</th>
+            <th>الشفرة الوسيطة</th>
+            <th>قابلية الصيانة</th>
+            <th>الاستخدام الأمثل</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>MVC</strong></td>
+            <td>Bidirectional (غالبًا)</td>
+            <td>ضعيفة</td>
+            <td>منخفض</td>
+            <td>ضعيفة</td>
+            <td>تطبيقات iOS القديمة؛ MVP سريع</td>
+          </tr>
+          <tr>
+            <td><strong>MVP</strong></td>
+            <td>Bidirectional</td>
+            <td>جيدة</td>
+            <td>مرتفع</td>
+            <td>متوسطة</td>
+            <td>فرق صغيرة؛ اختبار عالي الأولوية</td>
+          </tr>
+          <tr>
+            <td><strong>MVVM</strong></td>
+            <td>Unidirectional (مُفضّل)</td>
+            <td>ممتازة</td>
+            <td>منخفض-متوسط</td>
+            <td>جيدة</td>
+            <td>تطبيقات Android/iOS الحديثة (الخيار الافتراضي)</td>
+          </tr>
+          <tr>
+            <td><strong>MVI</strong></td>
+            <td>Unidirectional Immutable</td>
+            <td>ممتازة</td>
+            <td>مرتفع</td>
+            <td>جيدة (مع تعقيد)</td>
+            <td>حالات UI معقدة؛ Chat؛ Real-time dashboards</td>
+          </tr>
+          <tr>
+            <td><strong>Clean Architecture</strong></td>
+            <td>Unidirectional (Layered)</td>
+            <td>ممتازة</td>
+            <td>مرتفع جدًا</td>
+            <td>ممتازة</td>
+            <td>تطبيقات Enterprise؛ فرق كبيرة (>10)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon emerald">📊</div>
+      <h3 class="card-title">Table 2: Mobile Storage & DB Matrix</h3>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>المحرك</th>
+            <th>النوع</th>
+            <th>السرعة</th>
+            <th>الاستمرارية</th>
+            <th>حجم المكتبة</th>
+            <th>الاستعلامات المعقدة</th>
+            <th>الاستخدام الأمثل</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>LruCache (Memory)</strong></td>
+            <td>In-Memory</td>
+            <td>نانوثانية</td>
+            <td>لا</td>
+            <td>0</td>
+            <td>لا</td>
+            <td>بيانات الجلسة؛ الصور المصغرة</td>
+          </tr>
+          <tr>
+            <td><strong>MMKV</strong></td>
+            <td>Key-Value</td>
+            <td>ممتازة</td>
+            <td>نعم</td>
+            <td>صغير</td>
+            <td>لا</td>
+            <td>الإعدادات؛ التوكنات؛ الأعلام</td>
+          </tr>
+          <tr>
+            <td><strong>SQLite/Room</strong></td>
+            <td>Relational</td>
+            <td>جيدة</td>
+            <td>نعم</td>
+            <td>صغير</td>
+            <td>ممتازة</td>
+            <td>البيانات المنظمة؛ التغذيات؛ الجداول المعقدة</td>
+          </tr>
+          <tr>
+            <td><strong>Core Data</strong></td>
+            <td>Object Graph</td>
+            <td>جيدة</td>
+            <td>نعم</td>
+            <td>متوسط</td>
+            <td>جيدة</td>
+            <td>تطبيقات iOS مع بيانات متداخلة</td>
+          </tr>
+          <tr>
+            <td><strong>Realm</strong></td>
+            <td>Object DB</td>
+            <td>ممتازة</td>
+            <td>نعم</td>
+            <td>كبير (~4MB)</td>
+            <td>متوسطة</td>
+            <td>تطبيقات تحتاج سرعة فائقة</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon amber">📊</div>
+      <h3 class="card-title">Table 3: Real-Time Protocols Matrix</h3>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>البروتوكول</th>
+            <th>الاتجاه</th>
+            <th>التأخير</th>
+            <th>استهلاك البطارية</th>
+            <th>توافق الجدار الناري</th>
+            <th>تعقيد الخادم</th>
+            <th>الاستخدام الأمثل</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Short Polling</strong></td>
+            <td>Client → Server</td>
+            <td>متوسط (Interval-based)</td>
+            <td>عالي</td>
+            <td>ممتاز</td>
+            <td>منخفض</td>
+            <td>Legacy systems؛ بيانات نادرة</td>
+          </tr>
+          <tr>
+            <td><strong>Long Polling</strong></td>
+            <td>Client → Server</td>
+            <td>منخفض</td>
+            <td>متوسط</td>
+            <td>جيد</td>
+            <td>متوسط</td>
+            <td>تحديثات متقطعة؛ Order Tracking</td>
+          </tr>
+          <tr>
+            <td><strong>WebSockets</strong></td>
+            <td>ثنائي الاتجاه</td>
+            <td>منخفض جدًا</td>
+            <td>متوسط</td>
+            <td>يتطلب Proxy</td>
+            <td>مرتفع</td>
+            <td>Chat؛ الألعاب؛ Collaboration</td>
+          </tr>
+          <tr>
+            <td><strong>SSE</strong></td>
+            <td>Server → Client</td>
+            <td>منخفض</td>
+            <td>منخفض</td>
+            <td>ممتاز</td>
+            <td>منخفض</td>
+            <td>Live feeds؛ Stocks؛ Sports scores</td>
+          </tr>
+          <tr>
+            <td><strong>Push Notifications</strong></td>
+            <td>Server → Client</td>
+            <td>متغير (seconds-minutes)</td>
+            <td>منخفض (Normal) / عالي (High)</td>
+            <td>ممتاز</td>
+            <td>منخفض</td>
+            <td>Re-engagement؛ Background sync alerts</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon crimson">📊</div>
+      <h3 class="card-title">Table 4: Mobile Security Defense Layers</h3>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>التهديد (Threat)</th>
+            <th>مستوى الخطورة</th>
+            <th>التخفيف المعماري (Mitigation)</th>
+            <th>الأدوات / التقنيات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>MITM Attack</td>
+            <td><span class="badge badge-crimson">حرج</span></td>
+            <td>Certificate Pinning + HTTPS</td>
+            <td>OkHttp CertificatePinner, TrustKit</td>
+          </tr>
+          <tr>
+            <td>Token Theft</td>
+            <td><span class="badge badge-crimson">حرج</span></td>
+            <td>Hardware-backed Storage + Encryption</td>
+            <td>Android Keystore, iOS Keychain, TEE/SE</td>
+          </tr>
+          <tr>
+            <td>Reverse Engineering</td>
+            <td><span class="badge badge-amber">عالي</span></td>
+            <td>Code Obfuscation + Native Libs</td>
+            <td>R8/ProGuard, DexGuard, NDK</td>
+          </tr>
+          <tr>
+            <td>Data Leak (Device Lost)</td>
+            <td><span class="badge badge-amber">عالي</span></td>
+            <td>Encryption at Rest</td>
+            <td>SQLCipher, AES-256-GCM, FileProtection</td>
+          </tr>
+          <tr>
+            <td>Hardcoded Secrets</td>
+            <td><span class="badge badge-amber">عالي</span></td>
+            <td>Remote Config + Native Storage</td>
+            <td>Firebase Remote Config, JNI</td>
+          </tr>
+          <tr>
+            <td>Logcat/NSLog Leaks</td>
+            <td><span class="badge badge-cyan">متوسط</span></td>
+            <td>Secure Logging + ProGuard Rules</td>
+            <td>Timber (Production disabled), Custom Loggers</td>
+          </tr>
+          <tr>
+            <td>Screenshot Leak</td>
+            <td><span class="badge badge-cyan">متوسط</span></td>
+            <td>FLAG_SECURE / Secure Text Entry</td>
+            <td>WindowManager flags, UITextField secure</td>
+          </tr>
+          <tr>
+            <td>Deep Link Hijacking</td>
+            <td><span class="badge badge-cyan">متوسط</span></td>
+            <td>Intent Validation + URL Signing</td>
+            <td>App Links (Android), Universal Links (iOS)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Final Summary Callout -->
+<section class="interview-box" style="margin-top: 4rem;">
+  <h3>🏆 نصائح كبير معماري الهواتف (Senior Mobile Architect Tips)</h3>
+  <p>في مقابلة تصميم النظام المحمول (Mobile System Design Interview)، لا يكفي معرفة كل لبنة على حدة. يجب أن تُظهر قدرتك على <strong>ربط هذه اللبنات معًا</strong> في تصميم متكامل:</p>
+  <ul>
+    <li><strong>ابدأ بالمتطلبات:</strong> لا تُجب عن السؤال مباشرة. اطرح أسئلة توضيحية (Clarifying Questions) حول Scale، وUser Count، وLatency Requirements.</li>
+    <li><strong>ارسم المعمارية:</strong> استخدم Whiteboard أو ورقة لرسم الطبقات (Presentation → Domain → Data → Network). اشرح Data Flow بشكل واضح.</li>
+    <li><strong>برّر المقايضات:</strong> عند اختيار أي تقنية، اذكر ما تضحيه (Trade-off). مثال: "اخترت Cursor-based Pagination لأنها تمنع Duplicate Items، على حساب عدم القدرة على القفز لصفحة عشوائية."</li>
+    <li><strong>فكّر Offline-First:</strong> اسأل نفسك دائمًا: "ماذا يحدث إذا انقطع الإنترنت الآن؟" اشرح SSOT و Optimistic Updates و Conflict Resolution.</li>
+    <li><strong>لا تهمل الأمان:</strong> اذكر Certificate Pinning و Token Storage و Encryption at Rest حتى لو لم يسألك المقابل عنها. هذا يُظهر نضجًا معماريًا.</li>
+    <li><strong>قياس الأداء:</strong> اذكر كيف ستُراقب App Launch Time و Memory Usage و Battery Drain. استخدم أدوات مثل <code>Macrobenchmark</code> و <code>Instruments</code>.</li>
+    <li><strong>كن واقعيًا:</strong> لا تُصمّم نظامًا لمليار مستخدم إذا كان السؤال عن تطبيق MVP. اطلب Scale ثم صمّم لذلك المقياس.</li>
+  </ul>
+  <p style="margin-top: 1.5rem; color: var(--cyan-electric); font-weight: 700; font-size: 1.1rem;">
+    "التصميم المعماري الجيد ليس عن اختيار أفضل تقنية، بل عن اختيار التقنية المناسبة للمشكلة المناسبة في الوقت المناسب."
+  </p>
+</section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <p>تم إعداد هذا الدليل كمرجع معماري شامل للجزء الثاني من تصميم أنظمة الهواتف المحمولة.</p>
+    <p style="margin-top: 0.5rem; font-size: 0.875rem; color: #64748B;">
+      Mobile System Design Building Blocks &bull; Part II &bull; Chapters 4-10
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
